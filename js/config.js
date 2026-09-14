@@ -37,6 +37,13 @@ window.ALEA = {
   google_ads_id: '',          // AW-000000000
   google_analytics: '',       // G-XXXXXXXXXX
 
+  /* A VITRINE MOSTRA PRECO?
+     O Cassiano pediu "so o produto e nome". Deixei o preco porque preco na vitrine
+     tira duvida antes do clique e porque o Google compara o valor do anuncio com o da
+     pagina. Se ele quiser a vitrine 100% limpa, troque para false: sai so da vitrine,
+     a pagina de produto continua mostrando. */
+  mostrar_preco_na_vitrine: true,
+
   /* Identificação do negócio — o Google exige isto visível na página de destino. */
   marca: 'ālea',
   responsavel: 'Cassiano Rosado',

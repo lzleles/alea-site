@@ -14,16 +14,18 @@
 </head>
 <body>
 <header class="topo">
-  <div class="embrulho">
-    <a href="index.html" aria-label="ālea — início"><img src="img/marca/alea_logo.svg" alt="ālea"></a>
-    <nav class="menu" aria-label="Principal">
-      <a href="index.html#produtos">A linha</a>
-      <a href="index.html#contato">Falar comigo</a>
-    </nav>
-  </div>
+  <a class="marca" href="index.html" aria-label="ālea - início">
+    <img class="colorida" src="img/marca/alea_logo.svg" alt="ālea">
+    <img class="clara" src="img/marca/alea_logo_claro.svg" alt="ālea">
+  </a>
+  <nav aria-label="Principal">
+    <a href="index.html" class="some-no-celular">Vitrine</a>
+    <a href="a-alea.html" class="some-no-celular">A ālea</a>
+    <a class="pedir zap" data-assunto="quero encomendar uma peça da ālea">Pedir</a>
+  </nav>
 </header>
 
-<main class="embrulho texto">
+<main class="embrulho texto pagina">
   <h1>Política de privacidade</h1>
   <p class="atualizado">Última atualização: 14/09/2026 · Lei 13.709/2018 (LGPD)</p>
 
@@ -105,9 +107,31 @@
 
 <footer class="rodape">
   <div class="embrulho">
-    <p class="lei">© 2026 ālea — Cassiano Rosado, Jataí/GO.
-      <a href="trocas-e-entrega.html">Trocas, devolução e entrega</a></p>
+    <div>
+      <img src="img/marca/alea_logo_claro.svg" alt="ālea">
+      <p>Comedouros e acessórios pet personalizados, impressos em 3D sob encomenda em Jataí-GO.</p>
+    </div>
+    <div>
+      <h4>Produtos</h4>
+      <ul>
+        <li><a href="produto-bowl-wave.html">ālea Bowl Wave</a></li>
+        <li><a href="produto-poop-bag-holder.html">ālea Poop Bag Holder</a></li>
+        <li><a href="produto-kit.html">Kit ālea</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4>Informações</h4>
+      <ul>
+        <li><a href="a-alea.html">Quem é a ālea</a></li>
+        <li><a href="trocas-e-entrega.html">Trocas, devolução e entrega</a></li>
+        <li><a href="privacidade.html">Política de privacidade</a></li>
+      </ul>
+    </div>
+    <p class="lei">© <span id="ano">2026</span> ālea — Cassiano Rosado, Jataí/GO.
+      Peças feitas sob encomenda. Identidade visual por Mirella Gaetti.</p>
   </div>
 </footer>
+<script src="js/config.js"></script>
+<script src="js/site.js"></script>
 </body>
 </html>
