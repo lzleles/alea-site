@@ -129,7 +129,12 @@ body.escuro .cena.capa { background: var(--off); }
 
 .cena .moldura {
   position: relative;
-  width: min(92vw, 74svh); aspect-ratio: 1 / 1;
+  /* ⚠️ ESTE TAMANHO FOI MEDIDO NO OLHO DELE, NÃO ESCOLHIDO NO ESCURO (14/09/2026, 14:53):
+     "ficou muito esticado na tela inteira […] a imagem vai ter que ficar um pouco menor
+     e vai ter que ter fundo, justamente pra não ficar aquele trem ampliado esquisito".
+     O `74svh` de antes fazia a foto quase encostar nas bordas; com `62svh` sobra fundo
+     em volta e a peça volta a parecer um objeto, não um zoom. */
+  width: min(86vw, 62svh); aspect-ratio: 1 / 1;
   border-radius: var(--raio); overflow: hidden;
   background: #0A0806;
   box-shadow: 0 40px 90px -50px rgba(0, 0, 0, .9);
@@ -158,6 +163,11 @@ body.escuro .cena.capa { background: var(--off); }
 .etiqueta .nome { font-family: var(--fonte-titulo); font-weight: 500; font-size: clamp(1.2rem, 2.5vw, 1.8rem); }
 .etiqueta .valor { font-family: var(--fonte-titulo); font-size: clamp(.98rem, 1.7vw, 1.2rem); opacity: .92; white-space: nowrap; }
 .etiqueta:hover .nome { text-decoration: underline; }
+/* O toque na cena avança (como stories, que ele aprovou), e a etiqueta abre a página do
+   produto. Dois gestos no mesmo lugar só funcionam se o segundo se anunciar — daí o
+   "ver produto →" visível, em vez de um link invisível que ninguém descobre. */
+.etiqueta .ver { display: block; font-size: 12px; letter-spacing: .06em; opacity: .85; margin-top: 3px; }
+.etiqueta:hover .ver { opacity: 1; }
 /* a etiqueta e' um <a>, e no modo escuro a regra geral de link pintava ela de dourado
    sobre a foto. Sobre foto, branco. */
 body.escuro a.etiqueta { color: #fff; }
@@ -166,9 +176,17 @@ body.escuro a.etiqueta { color: #fff; }
    "ele fica todo espremido, ele da destaque total so pra aquele produto" — Cassiano,
    14/09/2026. Num telefone, a moldura quadrada centralizada deixava metade da tela
    preta; em tela estreita ela vira sangria total e o produto e' tudo que existe. */
+/* NO CELULAR TAMBÉM COM RESPIRO.
+   A sangria total (foto ocupando 390x844) era o que mais "esticava": foto quadrada
+   dentro de retângulo em pé corta as laterais e amplia o miolo. Quadrada com margem,
+   a peça aparece inteira e o fundo preto faz o trabalho de destaque que ele quer. */
 @media (max-width: 700px) {
-  .cena .moldura { width: 100%; height: 100%; aspect-ratio: auto; border-radius: 0; box-shadow: none; }
-  .etiqueta { padding: 64px 20px 26px; }
+  /* Quadrado num telefone em pé desperdiça altura: a peça só podia chegar a 41% da
+     tela, e sobrava fundo demais. Em retrato 4:5 ela ocupa ~53%, continua inteira e o
+     fundo ainda faz o destaque. Corta alguns pixels de topo e base — as peças estão
+     centralizadas nas fotos, então não perde produto. */
+  .cena .moldura { width: 92vw; aspect-ratio: 4 / 5; }
+  .etiqueta { padding: 48px 16px 14px; }
 }
 
 /* ---- a capa (primeira cena) --------------------------------------------- */

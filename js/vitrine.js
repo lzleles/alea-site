@@ -58,6 +58,7 @@
             '<span>' +
               '<span class="produto-mini">' + c.produto + '</span><br>' +
               '<span class="nome">' + c.nome + '</span>' +
+              '<span class="ver">ver produto →</span>' +
             '</span>' +
             (mostrarPreco ? '<span class="valor">' + preco + '</span>' : '') +
           '</a>' +
