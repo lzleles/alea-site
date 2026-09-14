@@ -27,15 +27,16 @@
    `a` e `b` são as duas fotos da MESMA peça: é entre elas que a distorção acontece.
    --------------------------------------------------------------------------- */
 window.VITRINE = [
-  { produto: 'ālea Bowl Wave', nome: 'Luke',       preco: 179, pagina: 'bowl-wave',       a: 'luke_a',    b: 'luke_b' },
-  { produto: 'ālea Bowl Wave', nome: 'Ayla',       preco: 179, pagina: 'bowl-wave',       a: 'ayla_a',    b: 'ayla_b' },
-  { produto: 'ālea Bowl Wave', nome: 'Tina Preta', preco: 179, pagina: 'bowl-wave',       a: 'tina_a',    b: 'tina_b' },
-  { produto: 'ālea Bowl Wave', nome: 'Chica',      preco: 179, pagina: 'bowl-wave',       a: 'chica_a',   b: 'chica_b' },
-  { produto: 'ālea Bowl Wave', nome: 'Matteo',     preco: 179, pagina: 'bowl-wave',       a: 'matteo_a',  b: 'matteo_b' },
-  { produto: 'ālea Bowl Wave', nome: 'Cláudia',    preco: 179, pagina: 'bowl-wave',       a: 'claudia_a', b: 'claudia_b' },
-  { produto: 'ālea Poop Bag',  nome: 'Chica',      preco: 59,  pagina: 'poop-bag-holder', a: 'porta_saquinho', b: 'chica_b' },
-  { produto: 'Kit ālea',       nome: 'Tina Preta', preco: null, pagina: 'kit',            a: 'kit',       b: 'tina_a' }
+  { produto: 'ālea Bowl Wave', nome: 'Luke',       preco: 179, pagina: 'bowl-wave',       fotos: ['luke_1','luke_2','luke_3','luke_4'] },
+  { produto: 'ālea Bowl Wave', nome: 'Ayla',       preco: 179, pagina: 'bowl-wave',       fotos: ['ayla_1','ayla_2','ayla_3','ayla_4'] },
+  { produto: 'ālea Bowl Wave', nome: 'Tina Preta', preco: 179, pagina: 'bowl-wave',       fotos: ['tina_1','tina_2','tina_3','tina_4'] },
+  { produto: 'ālea Bowl Wave', nome: 'Chica',      preco: 179, pagina: 'bowl-wave',       fotos: ['chica_1','chica_2','chica_3'] },
+  { produto: 'ālea Bowl Wave', nome: 'Matteo',     preco: 179, pagina: 'bowl-wave',       fotos: ['matteo_1','matteo_2','matteo_3'] },
+  { produto: 'ālea Bowl Wave', nome: 'Cláudia',    preco: 179, pagina: 'bowl-wave',       fotos: ['claudia_1','claudia_2','claudia_3','claudia_4'] },
+  { produto: 'ālea Poop Bag',  nome: 'Chica',      preco: 59,  pagina: 'poop-bag-holder', fotos: ['saquinho_1','saquinho_2','saquinho_3'] },
+  { produto: 'Kit ālea',       nome: 'Tina Preta', preco: null, pagina: 'kit',            fotos: ['kit_1','kit_2','kit_3'] }
 ];
+
 
 /* ---------------------------------------------------------------------------
    2) AS PÁGINAS DE PRODUTO — aqui mora TODO o texto que saiu da vitrine.
@@ -50,7 +51,7 @@ window.PRODUTOS = [
     nome: 'ālea Bowl Wave',
     linha: 'Comedouro',
     preco: 179,
-    capa: 'luke_a',
+    capa: 'luke_1',
     resumo: 'Comedouro elevado com o nome do seu cão impresso no corpo da peça.',
     paragrafos: [
       'A onda que dá nome à peça vem do grafismo da marca — é o mesmo desenho que ' +
@@ -67,7 +68,7 @@ window.PRODUTOS = [
       ['Produção', 'Sob encomenda, 5 a 10 dias úteis após a aprovação da prévia'],
       ['Cores', 'Combinação escolhida por você; variação de tom entre lotes é normal']
     ],
-    galeria: ['ayla_a', 'tina_a', 'chica_a', 'matteo_a', 'claudia_a', 'luke_b']
+    galeria: ['ayla_1', 'tina_1', 'chica_1', 'matteo_1', 'claudia_1', 'luke_2']
   },
 
   {
@@ -75,7 +76,7 @@ window.PRODUTOS = [
     nome: 'ālea Poop Bag Holder',
     linha: 'Passeio',
     preco: 59,
-    capa: 'porta_saquinho',
+    capa: 'saquinho_1',
     resumo: 'Porta-saquinho que sai na mesma estampa do comedouro.',
     paragrafos: [
       'Prende na guia e leva o rolo de saquinhos. Sai combinando com a estampa ' +
@@ -89,7 +90,7 @@ window.PRODUTOS = [
       ['Produção', 'Sob encomenda, 5 a 10 dias úteis após a aprovação da prévia'],
       ['Combina com', 'A mesma estampa do ālea Bowl Wave']
     ],
-    galeria: ['chica_b', 'ayla_a', 'claudia_a']
+    galeria: ['saquinho_2', 'saquinho_3', 'chica_2']
   },
 
   {
@@ -100,7 +101,7 @@ window.PRODUTOS = [
        Cassiano. Enquanto for null o site diz "sob consulta", que é honesto — inventar
        valor aqui vira preço errado no anúncio, e o Google compara. */
     preco: null,
-    capa: 'kit',
+    capa: 'kit_1',
     resumo: 'Comedouro e porta-saquinho na mesma estampa, com o mesmo nome.',
     paragrafos: [
       'É como as fotos do Instagram foram feitas: as duas peças na mesma estampa, ' +
@@ -113,7 +114,7 @@ window.PRODUTOS = [
       ['Produção', 'Sob encomenda, 5 a 10 dias úteis após a aprovação da prévia'],
       ['Embalagem', 'Caixa com a tag da marca — serve de presente']
     ],
-    galeria: ['tina_a', 'luke_a', 'matteo_a']
+    galeria: ['kit_2', 'kit_3', 'tina_2']
   }
 
 ];

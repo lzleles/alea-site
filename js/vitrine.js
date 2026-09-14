@@ -42,18 +42,37 @@
     var mostrarPreco = (window.ALEA || {}).mostrar_preco_na_vitrine !== false;
 
     lista.forEach(function (c, i) {
+      var fotos = c.fotos || [];
       var sec = document.createElement('section');
       sec.className = 'cena';
       sec.setAttribute('data-cena', String(i + 1));
       var preco = c.preco === null ? 'Sob consulta' : moeda(c.preco);
+
+      /* TODAS as fotos entram no HTML, não só a primeira. Duas razões: é delas que sai
+         o `alt` que o Google lê, e é nelas que o site se apoia quando não há WebGL. */
+      var imgs = fotos.map(function (f, k) {
+        return '<img src="img/produtos/' + f + '.jpg" width="1200" height="1200" ' +
+          (i === 0 && k === 0 ? 'fetchpriority="high"' : 'loading="lazy"') +
+          ' decoding="async" class="foto' + (k === 0 ? ' ativa' : '') + '" ' +
+          'alt="' + c.produto + ' de ' + c.nome + (k ? ' — foto ' + (k + 1) : '') + '">';
+      }).join('');
+
+      /* bolinhas: o visitante precisa VER que existe mais foto, senão nunca arrasta */
+      var pontos = fotos.length > 1
+        ? '<span class="pontos" aria-hidden="true">' +
+          fotos.map(function (_, k) { return '<i' + (k === 0 ? ' class="on"' : '') + '></i>'; }).join('') +
+          '</span>'
+        : '';
+
+      var setas = fotos.length > 1
+        ? '<button class="seta esq" type="button" aria-label="Foto anterior de ' + c.nome + '">‹</button>' +
+          '<button class="seta dir" type="button" aria-label="Próxima foto de ' + c.nome + '">›</button>'
+        : '';
+
       sec.innerHTML =
-        '<div class="moldura" data-distorcao data-forca="0.30" tabindex="0" role="img" ' +
-             'aria-label="' + c.produto + ' personalizado para ' + c.nome + '">' +
-          '<img src="img/produtos/' + c.a + '.jpg" width="1200" height="1200" ' +
-               (i === 0 ? 'fetchpriority="high"' : 'loading="lazy"') + ' decoding="async" ' +
-               'alt="' + c.produto + ' com o nome ' + c.nome + '">' +
-          '<img src="img/produtos/' + c.b + '.jpg" width="1200" height="1200" loading="lazy" ' +
-               'decoding="async" alt="A mesma peça de ' + c.nome + ', em outro ângulo">' +
+        '<div class="moldura" data-distorcao data-forca="0.30" data-fotos="' + fotos.length + '" ' +
+             'tabindex="0" role="group" aria-label="' + c.produto + ' personalizado para ' + c.nome + '">' +
+          imgs + setas + pontos +
           '<a class="etiqueta" href="produto-' + c.pagina + '.html">' +
             '<span>' +
               '<span class="produto-mini">' + c.produto + '</span><br>' +
@@ -67,6 +86,78 @@
     });
     return lista.length;
   }
+
+  /* =======================================================================
+     AS FOTOS DE UM PRODUTO — o eixo horizontal
+     =======================================================================
+     "Se eu girar ou clicar para baixo e para cima, ele muda o produto. Se eu clicar
+      ou girar para a esquerda e para a direita, ele muda as fotos" — Cassiano,
+      14/09/2026, 16:22. E, no áudio seguinte: "sempre permanecer na primeira foto".
+
+     Por isso nada acontece sozinho. A foto só muda por gesto horizontal, e todo
+     produto volta à foto 1 quando entra na tela.
+     ======================================================================= */
+  function ligarFotos(cenas) {
+    cenas.forEach(function (cena) {
+      var moldura = cena.querySelector('.moldura');
+      if (!moldura) return;
+      var fotos = moldura.querySelectorAll('.foto');
+      var pontos = moldura.querySelectorAll('.pontos i');
+      if (fotos.length < 2) return;
+      var atual = 0;
+
+      function mostrar(n, dir) {
+        if (n < 0 || n >= fotos.length || n === atual) return;
+        /* com WebGL quem pinta é a lona; as <img> continuam no DOM só pro Google e
+           pra degradação. Sem WebGL, é a troca de classe que faz o trabalho. */
+        var usouWebgl = window.aleaTrocarFoto && window.aleaTrocarFoto(moldura, n, dir);
+        fotos[atual].classList.remove('ativa');
+        fotos[n].classList.add('ativa');
+        if (pontos.length) {
+          if (pontos[atual]) pontos[atual].classList.remove('on');
+          if (pontos[n]) pontos[n].classList.add('on');
+        }
+        atual = n;
+        return usouWebgl;
+      }
+      function proxima() { mostrar(atual + 1, 1); }
+      function anterior() { mostrar(atual - 1, -1); }
+
+      /* "sempre permanecer na primeira foto": ao voltar pro produto, ele reseta. */
+      moldura.__voltarPraPrimeira = function () {
+        if (atual !== 0) mostrar(0, -1);
+      };
+
+      var e = moldura.querySelector('.seta.esq');
+      var d = moldura.querySelector('.seta.dir');
+      if (e) e.addEventListener('click', function (ev) { ev.stopPropagation(); anterior(); });
+      if (d) d.addEventListener('click', function (ev) { ev.stopPropagation(); proxima(); });
+
+      moldura.addEventListener('keydown', function (ev) {
+        if (ev.key === 'ArrowRight') { ev.preventDefault(); ev.stopPropagation(); proxima(); }
+        if (ev.key === 'ArrowLeft') { ev.preventDefault(); ev.stopPropagation(); anterior(); }
+      });
+
+      /* arrasto horizontal. O vitrine decide pelo EIXO DOMINANTE: se o dedo andou mais
+         na horizontal, é foto; se andou mais na vertical, é produto. Sem essa decisão
+         um arrasto torto faria as duas coisas. */
+      var x0 = null, y0 = null, jaFoi = false;
+      moldura.addEventListener('touchstart', function (ev) {
+        x0 = ev.touches[0].clientX; y0 = ev.touches[0].clientY; jaFoi = false;
+      }, { passive: true });
+      moldura.addEventListener('touchmove', function (ev) {
+        if (x0 === null || jaFoi) return;
+        var dx = x0 - ev.touches[0].clientX;
+        var dy = y0 - ev.touches[0].clientY;
+        if (Math.abs(dx) < 34 || Math.abs(dx) < Math.abs(dy)) return;
+        jaFoi = true;
+        ev.stopPropagation();
+        if (dx > 0) proxima(); else anterior();
+      }, { passive: true });
+      moldura.addEventListener('touchend', function () { x0 = null; }, { passive: true });
+    });
+  }
+
 
   function ligarComportamento(quantasCenas) {
     var cenas = Array.prototype.slice.call(document.querySelectorAll('.cena'));
@@ -213,6 +304,14 @@
       })(t0);
     }
 
+    /* Sempre que o produto muda, ele reaparece na FOTO 1 — e a posição fica guardada
+       pra quem for ver o produto e voltar. */
+    function aoChegarNaCena(i) {
+      var m = cenas[i] && cenas[i].querySelector('.moldura');
+      if (m && m.__voltarPraPrimeira) m.__voltarPraPrimeira();
+      try { sessionStorage.setItem('alea_cena', String(i)); } catch (e) { /* aba anônima */ }
+    }
+
     function irPara(i) {
       if (i < 0) i = 0;
       if (i > cenas.length - 1) {          // passou da última: solta e entrega o rodapé
@@ -222,6 +321,7 @@
         return;
       }
       indiceAtual = i;
+      aoChegarNaCena(i);
       /* a trava segura o TEMPO DA ANIMAÇÃO. Sem ela, a inércia do dedo entrega mais
          eventos no meio do caminho e cada um vira outro passo — que é exatamente o
          "passou dois de uma vez só" que ele viu. */
@@ -280,6 +380,7 @@
        é lá que mora o link pra página do produto. */
     document.querySelectorAll('.cena').forEach(function (c) {
       c.addEventListener('click', function (e) {
+        /* a etiqueta abre o produto; as setas trocam a foto. Só o resto avança. */
         if (e.target.closest('a, button')) return;
         proxima();
       });
@@ -309,8 +410,29 @@
     conferirFundo();
   }
 
+  /* ⚠️ "ISSO ME MATA DE RAIVA EM QUALQUER SITE" (Cassiano, 14/09/2026, 16:23):
+     clicar em voltar e cair no começo depois de ter passado por 30 produtos. A posição
+     é gravada a cada troca de produto; ao voltar de uma página interna, a vitrine
+     reabre exatamente ali. Só vale quando o visitante veio DE DENTRO do site — quem
+     chega pela primeira vez merece começar pela capa. */
+  function restaurarPosicao(cenas) {
+    var veioDeDentro = document.referrer && document.referrer.indexOf(location.host) > -1;
+    if (!veioDeDentro) return;
+    var salvo;
+    try { salvo = sessionStorage.getItem('alea_cena'); } catch (e) { return; }
+    var i = parseInt(salvo, 10);
+    if (!i || i < 1 || i >= cenas.length) return;
+    var palco = document.getElementById('palco');
+    var h = cenas[0].getBoundingClientRect().height;
+    /* salto seco, sem animação: o visitante não pediu passeio, pediu o lugar dele. */
+    window.scrollTo({ top: Math.round((palco ? palco.offsetTop : 0) + i * h), behavior: 'instant' });
+  }
+
   function iniciar() {
     var quantas = desenhar();
+    var todasCenas = Array.prototype.slice.call(document.querySelectorAll('.cena'));
+    ligarFotos(todasCenas);
+    restaurarPosicao(todasCenas);
     ligarComportamento(quantas);
     if (window.aleaLigarBotoes) window.aleaLigarBotoes();
 
