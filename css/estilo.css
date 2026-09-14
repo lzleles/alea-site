@@ -78,6 +78,11 @@ body.escuro a { color: var(--dourado); }
   display: flex; align-items: center; gap: 20px;
   padding: 16px var(--gutter);
   transition: background-color .55s ease;
+  /* ⚠️ FUNDO TAMBÉM NO CLARO. Antes só o modo escuro ganhava fundo, e nas páginas de
+     produto (que são claras) o texto passava POR BAIXO do cabeçalho transparente e
+     sumia atrás do logo. Aparece no print de 14/09 16:04. */
+  background: color-mix(in srgb, var(--off) 86%, transparent);
+  backdrop-filter: saturate(140%) blur(10px);
 }
 .topo .marca img { height: 28px; width: auto; }
 /* no escuro o logo colorido dá lugar à versão clara — troca por CSS, sem JS */
@@ -271,9 +276,14 @@ body.escuro .contador { color: rgba(234, 228, 219, .55); }
 .ficha dt { font-size: 12.5px; letter-spacing: .08em; text-transform: uppercase; color: var(--dourado); font-weight: 700; }
 .ficha dd { margin: 4px 0 0; font-size: 15.5px; }
 
-.galeria { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; padding-block: clamp(20px, 4vw, 40px); }
+/* ⚠️ `align-items: start` NÃO E' ENFEITE — sem ele a galeria sai ESPREMIDA.
+   Item de grid estica no eixo vertical por padrão (`align-self: stretch`), e a
+   esticada GANHA do `aspect-ratio`: a foto quadrada virava uma tira estreita e
+   comprida. Foi o que o Cassiano viu no print de 14/09/2026 16:04 — "as imagens
+   estão muito espremidas junto". Com `start`, a altura volta a sair da proporção. */
+.galeria { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; align-items: start; padding-block: clamp(20px, 4vw, 40px); }
 @media (max-width: 700px) { .galeria { grid-template-columns: repeat(2, 1fr); } }
-.galeria img { aspect-ratio: 1/1; object-fit: cover; border-radius: var(--raio); width: 100%; }
+.galeria img { aspect-ratio: 1 / 1; height: auto; object-fit: cover; border-radius: var(--raio); width: 100%; }
 
 .botao {
   display: inline-flex; align-items: center; gap: 10px;

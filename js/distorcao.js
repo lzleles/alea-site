@@ -210,10 +210,16 @@
        em emulador e em híbrido com tela sensível ao toque), quem manda é quem age. */
     var dica = this.caixa.querySelector('.dica-hover');
     if (dica) dica.remove();
+    var espera = null;
     var obs = new IntersectionObserver(function (es) {
       es.forEach(function (e) {
-        self.alvo = e.isIntersecting ? 1 : 0;
-        self.animar();
+        clearTimeout(espera);
+        if (!e.isIntersecting) { self.alvo = 0; self.animar(); return; }
+        /* ⚠️ ESPERA A CENA ASSENTAR ANTES DE TROCAR A FOTO.
+           Sem este atraso, a troca de personalização começa NO MEIO da rolagem: duas
+           animações ao mesmo tempo, e o resultado é o "negócio desfigurado" que ele
+           viu no vídeo de 14/09 16:02. A rolagem leva 820ms; a foto só começa depois. */
+        espera = setTimeout(function () { self.alvo = 1; self.animar(); }, 900);
       });
     }, { threshold: 0.6 });
     obs.observe(this.caixa);
@@ -235,7 +241,9 @@
        eterno e o notebook do visitante fica com a ventoinha ligada a toa */
     (function passo() {
       var falta = self.alvo - self.progresso;
-      self.progresso += falta * 0.09;
+      /* 0.09 por quadro dava ~0,7s e no telefone parecia um piscar defeituoso.
+         0.045 estica pra ~1,4s: a foto ESCORRE em vez de trocar. */
+      self.progresso += falta * 0.045;
       if (Math.abs(falta) < 0.002) {
         self.progresso = self.alvo;
         self.desenhar();

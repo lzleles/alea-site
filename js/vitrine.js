@@ -176,7 +176,12 @@
        a entrada de rolagem do usuário como cancelamento de rolagem suave em curso, e
        o pedido morre calado. Nenhum erro, nenhum aviso; só a tela parada.
        Animando quadro a quadro com `scrollTo` instantâneo, nada há o que cancelar. */
-    var DURACAO = 520;
+    /* 520ms parecia bom no desktop e ficou "esquisito" no telefone dele (14/09, 16:03:
+       "eu queria ele mais devagar [...] a gente tá clicando e já aparece de uma vez, aí
+       dá aquele negócio desfigurado"). O problema não era só a velocidade: a peça
+       trocava de personalização NO MEIO da rolagem, duas animações ao mesmo tempo.
+       Aqui a rolagem desacelera; o `atraso` da troca de foto está no distorcao.js. */
+    var DURACAO = 820;
 
     /* ⚠️ `behavior: 'instant'` NÃO É ENFEITE — foi a causa do defeito de 15/09h.
        O CSS desta casa tem `html { scroll-behavior: smooth }`, e isso muda o PADRÃO de
