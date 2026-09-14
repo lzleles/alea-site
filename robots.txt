@@ -1,0 +1,19 @@
+# alea - Cassiano Rosado, Jatai-GO
+# Tudo liberado de proposito: site de vitrine vive de ser encontrado, e o AdsBot do
+# Google precisa conseguir rastrear a pagina de destino. robots.txt bloqueando = a
+# politica "Destino nao rastreavel" reprova o anuncio.
+#
+# ATENCAO (14/09/2026): o endereco abaixo e' o provisorio do GitHub Pages, porque a
+# alea ainda nao tem dominio proprio. Quando tiver, trocar a linha do Sitemap aqui,
+# as <loc> do sitemap.xml e os 4 enderecos do <head> de cada pagina.
+
+User-agent: *
+Allow: /
+
+User-agent: AdsBot-Google
+Allow: /
+
+User-agent: AdsBot-Google-Mobile
+Allow: /
+
+Sitemap: https://lzleles.github.io/alea-site/sitemap.xml

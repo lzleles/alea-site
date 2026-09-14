@@ -1,0 +1,252 @@
+/* =============================================================================
+   estilo.css — ālea
+   =============================================================================
+   Paleta e tipografia saem do "Manual de Diretrizes | Alea" (Mirella Gaetti, 2026),
+   páginas 4, 8 e 14. Nada aqui é cor escolhida por gosto: é a paleta da marca.
+
+   ⚠️ TIPOGRAFIA — UMA SUBSTITUIÇÃO DECLARADA (14/09/2026)
+   O manual manda "Defante" nos títulos e "Hanken Grotesk" no corpo. A Hanken Grotesk
+   é aberta e está aqui, servida pelo Google Fonts. A Defante é comercial e o arquivo
+   NÃO veio no kit — usar sem licença é risco jurídico do cliente, não economia.
+   Enquanto ela não for licenciada, os títulos usam "Outfit", geométrica de esqueleto
+   parecido. Quando o Cassiano comprar a Defante, troque a variável --fonte-titulo
+   e adicione o @font-face: NADA MAIS no site precisa mudar.
+   ========================================================================== */
+
+:root {
+  /* paleta — manual, pág. 4 */
+  --off:        #EAE4DB;   /* fundo                       */
+  --terracota:  #924429;   /* texto forte e ações         */
+  --laranja:    #B26E3A;   /* destaque quente             */
+  --dourado:    #AA9661;   /* detalhe, linhas, selos      */
+  --azul:       #7695A5;   /* contraponto frio            */
+  --tinta:      #2B2118;   /* corpo de texto              */
+  --tinta-fraca:#6B5D50;
+  --papel:      #F6F3EE;   /* cartões sobre o fundo       */
+  --borda:      rgba(146, 68, 41, .16);
+
+  --fonte-titulo: 'Outfit', 'Hanken Grotesk', system-ui, sans-serif;
+  --fonte-corpo:  'Hanken Grotesk', system-ui, -apple-system, 'Segoe UI', sans-serif;
+
+  --raio: 14px;
+  --gutter: clamp(20px, 5vw, 72px);
+  --maxima: 1240px;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+
+body {
+  margin: 0;
+  background: var(--off);
+  color: var(--tinta);
+  font-family: var(--fonte-corpo);
+  font-size: 17px;
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+}
+
+img { max-width: 100%; display: block; }
+a { color: var(--terracota); }
+
+.embrulho { width: 100%; max-width: var(--maxima); margin-inline: auto; padding-inline: var(--gutter); }
+
+/* pular pro conteúdo — quem usa leitor de tela não deve reouvir o menu em toda página */
+.pular {
+  position: absolute; left: -9999px; top: 0; z-index: 99;
+  background: var(--terracota); color: var(--off); padding: 12px 18px; border-radius: 0 0 var(--raio) 0;
+}
+.pular:focus { left: 0; }
+
+/* ------------------------------------------------------------------ cabeçalho */
+.topo {
+  position: sticky; top: 0; z-index: 20;
+  background: color-mix(in srgb, var(--off) 88%, transparent);
+  backdrop-filter: saturate(140%) blur(10px);
+  border-bottom: 1px solid var(--borda);
+}
+.topo .embrulho { display: flex; align-items: center; gap: 24px; padding-block: 14px; }
+.topo img { height: 30px; width: auto; }
+.menu { margin-left: auto; display: flex; gap: clamp(14px, 2.4vw, 32px); align-items: center; }
+.menu a {
+  text-decoration: none; color: var(--tinta); font-size: 15px; letter-spacing: .01em;
+  padding-block: 6px; border-bottom: 1.5px solid transparent;
+}
+.menu a:hover, .menu a:focus-visible { border-bottom-color: var(--laranja); }
+/* No celular o menu inteiro nao cabe ao lado da marca: ele quebrava em duas linhas
+   e empurrava o cabecalho. Abaixo de 760px sobra so o atalho que importa — falar. */
+@media (max-width: 760px) {
+  .menu a.some-no-celular, .menu a[href='#personalizacoes'], .menu a[href='#produtos'] { display: none; }
+  .menu a[href='#contato'] {
+    background: var(--terracota); color: var(--off); border-radius: 999px;
+    padding: 8px 16px; font-weight: 600; border-bottom: 0;
+  }
+  .topo img { height: 26px; }
+}
+
+/* ------------------------------------------------------------------ botões */
+.botao {
+  display: inline-flex; align-items: center; gap: 10px;
+  background: var(--terracota); color: var(--off);
+  text-decoration: none; font-weight: 600; font-size: 16px;
+  padding: 13px 24px; border-radius: 999px; border: 0; cursor: pointer;
+  transition: transform .18s ease, background .18s ease;
+}
+.botao:hover { background: var(--laranja); transform: translateY(-1px); }
+.botao.contorno { background: transparent; color: var(--terracota); box-shadow: inset 0 0 0 1.5px var(--terracota); }
+.botao.contorno:hover { background: var(--terracota); color: var(--off); }
+.botao[disabled], .botao[aria-disabled='true'] {
+  background: var(--dourado); cursor: not-allowed; transform: none; opacity: .75;
+}
+
+/* Tarja de configuração pendente. Uma só, no topo, acima de tudo.
+   Some sozinha no dia em que o WhatsApp entrar no config.js — não é decoração
+   permanente, é sinalização de obra. */
+.tarja-config {
+  background: var(--dourado); color: #1F1710;
+  font-size: 14.5px; line-height: 1.5;
+  padding: 11px var(--gutter);
+  text-align: center;
+}
+.tarja-config code {
+  background: rgba(255, 255, 255, .45); padding: 1px 6px; border-radius: 5px; font-size: 13px;
+}
+/* o cabeçalho é sticky: com a tarja em cima, ele gruda ABAIXO dela e não por cima */
+.com-tarja .topo { top: 0; }
+
+/* ------------------------------------------------------------------ herói */
+.heroi { padding-block: clamp(48px, 9vw, 110px) clamp(40px, 7vw, 88px); }
+.heroi .embrulho { display: grid; grid-template-columns: 1.05fr .95fr; gap: clamp(32px, 5vw, 72px); align-items: center; }
+@media (max-width: 900px) { .heroi .embrulho { grid-template-columns: 1fr; } }
+
+.heroi h1 {
+  font-family: var(--fonte-titulo);
+  font-size: clamp(2.6rem, 6.4vw, 4.6rem);
+  line-height: 1.02; letter-spacing: -.02em; font-weight: 500;
+  margin: 0 0 22px; color: var(--terracota);
+}
+.heroi h1 em { font-style: normal; color: var(--azul); }
+.heroi .chamada { font-size: clamp(1.05rem, 1.7vw, 1.28rem); color: var(--tinta-fraca); max-width: 46ch; margin: 0 0 30px; }
+.heroi .acoes { display: flex; flex-wrap: wrap; gap: 14px; }
+
+.selo-linha { display: flex; flex-wrap: wrap; gap: 10px 22px; margin-top: 34px; font-size: 14px; color: var(--tinta-fraca); }
+/* `> span` e nao `span`: o terceiro selo tem um <span data-campo> DENTRO dele, e o
+   seletor solto punha um pingo dourado no meio da frase ("Pronto em * 5 a 10 dias"). */
+.selo-linha > span { display: inline-flex; align-items: center; gap: 8px; }
+.selo-linha > span::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: var(--dourado); flex: none; }
+
+/* ------------------------------------------------------------------ a peça que se transforma */
+.quadro {
+  position: relative; aspect-ratio: 1 / 1; border-radius: var(--raio);
+  overflow: hidden; background: var(--papel); box-shadow: 0 18px 50px -28px rgba(43, 33, 24, .55);
+}
+.quadro img { width: 100%; height: 100%; object-fit: cover; }
+/* a segunda foto fica por baixo e só aparece quando NÃO há WebGL (degradação) */
+.quadro img + img { position: absolute; inset: 0; opacity: 0; transition: opacity .45s ease; }
+.quadro:hover img + img, .quadro:focus-within img + img { opacity: 1; }
+/* com WebGL o canvas cobre tudo e as imgs viram só a fonte da textura + o que o
+   Google lê. Não removemos as imgs do DOM: é delas que vem o alt e a indexação. */
+.quadro .lona { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.quadro.com-webgl img { visibility: hidden; }
+.sem-distorcao .quadro .lona { display: none; }
+.sem-distorcao .quadro img { visibility: visible !important; }
+
+.dica-hover {
+  position: absolute; left: 14px; bottom: 14px; z-index: 3;
+  background: color-mix(in srgb, var(--off) 92%, transparent);
+  color: var(--terracota); font-size: 13px; font-weight: 600;
+  padding: 7px 13px; border-radius: 999px; pointer-events: none;
+  transition: opacity .3s ease;
+}
+.quadro:hover .dica-hover { opacity: 0; }
+/* no celular nao existe 'passar o mouse' — a troca acontece ao rolar, e o
+   cartao se explica sozinho. Manter o texto la seria mentir pro visitante. */
+@media (hover: none) { .dica-hover { display: none; } }
+
+/* ------------------------------------------------------------------ seções */
+section { padding-block: clamp(48px, 8vw, 96px); }
+section > .embrulho > h2 {
+  font-family: var(--fonte-titulo); font-weight: 500;
+  font-size: clamp(1.9rem, 3.8vw, 2.9rem); line-height: 1.1; letter-spacing: -.015em;
+  color: var(--terracota); margin: 0 0 14px;
+}
+section > .embrulho > .subtitulo { color: var(--tinta-fraca); max-width: 62ch; margin: 0 0 40px; }
+
+.faixa-clara { background: var(--papel); }
+
+/* ------------------------------------------------------------------ grade de personalizações */
+.grade-personas { display: grid; grid-template-columns: repeat(3, 1fr); gap: clamp(14px, 2vw, 26px); }
+@media (max-width: 900px) { .grade-personas { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 540px) { .grade-personas { grid-template-columns: 1fr; } }
+
+.persona { display: block; text-decoration: none; color: inherit; }
+.persona .quadro { box-shadow: 0 12px 34px -24px rgba(43, 33, 24, .5); }
+.persona figcaption { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; padding: 14px 4px 0; }
+.persona .nome { font-family: var(--fonte-titulo); font-size: 1.22rem; color: var(--terracota); font-weight: 500; }
+.persona .estampa { font-size: 13.5px; color: var(--tinta-fraca); text-align: right; }
+
+/* ------------------------------------------------------------------ produtos */
+.grade-produtos { display: grid; grid-template-columns: repeat(3, 1fr); gap: clamp(18px, 2.4vw, 30px); }
+@media (max-width: 900px) { .grade-produtos { grid-template-columns: 1fr; } }
+
+.produto {
+  background: var(--papel); border: 1px solid var(--borda); border-radius: var(--raio);
+  overflow: hidden; display: flex; flex-direction: column;
+}
+.produto > img { aspect-ratio: 4 / 3; object-fit: cover; width: 100%; }
+.produto .corpo { padding: 22px; display: flex; flex-direction: column; gap: 10px; flex: 1; }
+.produto .linha { font-size: 12.5px; letter-spacing: .09em; text-transform: uppercase; color: var(--dourado); font-weight: 700; }
+.produto h3 { font-family: var(--fonte-titulo); font-weight: 500; font-size: 1.4rem; margin: 0; color: var(--terracota); }
+.produto p { margin: 0; color: var(--tinta-fraca); font-size: 15.5px; }
+.produto .preco { font-family: var(--fonte-titulo); font-size: 1.6rem; color: var(--tinta); margin-top: auto; padding-top: 10px; }
+.produto .preco small { font-size: .95rem; color: var(--tinta-fraca); font-family: var(--fonte-corpo); }
+.produto .botao { align-self: flex-start; }
+
+/* ------------------------------------------------------------------ como funciona */
+.passos { display: grid; grid-template-columns: repeat(4, 1fr); gap: clamp(18px, 2.4vw, 32px); counter-reset: passo; }
+@media (max-width: 860px) { .passos { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 480px) { .passos { grid-template-columns: 1fr; } }
+.passo { counter-increment: passo; }
+.passo::before {
+  content: counter(passo, decimal-leading-zero);
+  font-family: var(--fonte-titulo); font-size: 2.1rem; color: var(--dourado); display: block; margin-bottom: 8px;
+}
+.passo h3 { font-family: var(--fonte-titulo); font-weight: 500; font-size: 1.16rem; margin: 0 0 6px; color: var(--terracota); }
+.passo p { margin: 0; font-size: 15.5px; color: var(--tinta-fraca); }
+
+/* ------------------------------------------------------------------ sobre */
+.sobre .embrulho { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(30px, 5vw, 70px); align-items: center; }
+@media (max-width: 860px) { .sobre .embrulho { grid-template-columns: 1fr; } }
+.sobre .quadro { aspect-ratio: 4 / 3; }
+
+/* ------------------------------------------------------------------ contato */
+.cartao-contato {
+  background: var(--terracota); color: var(--off); border-radius: var(--raio);
+  padding: clamp(30px, 5vw, 56px); display: grid; grid-template-columns: 1.2fr .8fr; gap: 34px; align-items: center;
+}
+@media (max-width: 800px) { .cartao-contato { grid-template-columns: 1fr; } }
+.cartao-contato h2 { font-family: var(--fonte-titulo); font-weight: 500; font-size: clamp(1.7rem, 3.4vw, 2.5rem); margin: 0 0 12px; color: var(--off); }
+.cartao-contato p { margin: 0 0 8px; color: color-mix(in srgb, var(--off) 82%, var(--terracota)); }
+.cartao-contato .botao { background: var(--off); color: var(--terracota); }
+.cartao-contato .botao:hover { background: var(--dourado); color: var(--tinta); }
+
+/* ------------------------------------------------------------------ rodapé */
+.rodape { border-top: 1px solid var(--borda); padding-block: 44px 34px; font-size: 14.5px; color: var(--tinta-fraca); }
+.rodape .embrulho { display: grid; grid-template-columns: 1.4fr 1fr 1fr; gap: 30px; }
+@media (max-width: 760px) { .rodape .embrulho { grid-template-columns: 1fr; } }
+.rodape img { height: 26px; width: auto; margin-bottom: 12px; }
+.rodape h4 { font-size: 13px; letter-spacing: .08em; text-transform: uppercase; color: var(--dourado); margin: 0 0 10px; }
+.rodape ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 7px; }
+.rodape a { color: var(--tinta-fraca); text-decoration: none; }
+.rodape a:hover { color: var(--terracota); text-decoration: underline; }
+.rodape .lei { grid-column: 1 / -1; border-top: 1px solid var(--borda); padding-top: 18px; margin-top: 8px; font-size: 13px; }
+
+/* ------------------------------------------------------------------ páginas de texto */
+.texto { max-width: 76ch; padding-block: clamp(40px, 7vw, 80px); }
+.texto h1 { font-family: var(--fonte-titulo); font-weight: 500; font-size: clamp(2rem, 4.4vw, 3rem); color: var(--terracota); margin: 0 0 8px; }
+.texto h2 { font-family: var(--fonte-titulo); font-weight: 500; font-size: 1.45rem; color: var(--terracota); margin: 36px 0 10px; }
+.texto .atualizado { color: var(--tinta-fraca); font-size: 14.5px; margin: 0 0 30px; }
+.texto ul { padding-left: 1.2em; }
+.texto li { margin-bottom: 8px; }

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Enderecos provisorios do GitHub Pages ate a alea ter dominio proprio (14/09/2026). -->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://lzleles.github.io/alea-site/</loc>
+    <lastmod>2026-09-14</lastmod>
+    <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>https://lzleles.github.io/alea-site/trocas-e-entrega.html</loc>
+    <lastmod>2026-09-14</lastmod>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://lzleles.github.io/alea-site/privacidade.html</loc>
+    <lastmod>2026-09-14</lastmod>
+    <priority>0.3</priority>
+  </url>
+</urlset>
