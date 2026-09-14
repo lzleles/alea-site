@@ -105,39 +105,196 @@
       cenas.forEach(function (c) { if (c.hasAttribute('data-cena')) obs.observe(c); });
     }
 
-    /* 3) AVANÇAR. O índice vem da POSIÇÃO REAL da rolagem, não de um contador que a
-          gente incrementa: se o visitante rolar com o dedo e depois tocar, um contador
-          próprio estaria dessincronizado e o toque pularia pra cena errada. */
-    function proxima() {
-      var y = window.scrollY;
-      var alvo = cenas.find(function (c) { return c.offsetTop > y + 8; });
-      if (alvo) {
-        window.scrollTo({ top: alvo.offsetTop, behavior: 'smooth' });
-      } else {
-        var rodape = document.querySelector('.rodape');
-        if (rodape) window.scrollTo({ top: rodape.offsetTop, behavior: 'smooth' });
-      }
+    /* =====================================================================
+       3) UM GESTO = UM PRODUTO. E NADA MAIS.
+       =====================================================================
+       Pedido do Cassiano em 14/09/2026, 15:17, olhando a v2 no celular:
+
+         "se eu rolo o dedo um pouco rápido, ele passa dois de uma vez só […]
+          se eu rolo a tela uma vez só, ele só mostra a primeira imagem e JÁ
+          TRAVA ELA. A segunda não aparece enquanto eu não arrastar o dedo de
+          novo ou clicar de novo."
+
+       O `scroll-snap` sozinho não faz isso: ele escolhe onde PARAR, mas deixa a
+       inércia do dedo correr — e um peteleco rápido atravessa três painéis antes
+       de encaixar. Para um gesto valer exatamente um passo, a navegação precisa
+       ser nossa: aqui a rolagem dentro da vitrine é interceptada e traduzida em
+       um único passo, com uma trava enquanto a animação acontece.
+
+       POR QUE AGORA SIM, SE ANTES EU TINHA DESCARTADO
+       -----------------------------------------------
+       Na v2 eu evitei interceptar a rolagem porque navegação frustrante piora a
+       Experiência na Página de Destino do Google Ads. Isso mudou de peso quando
+       a arquitetura mudou: a página de destino do anúncio passou a ser a de
+       PRODUTO, que tem rolagem nativa e intacta. A vitrine é a porta da marca,
+       não o destino do clique pago.
+
+       AS TRÊS SAÍDAS DE EMERGÊNCIA (pra não virar armadilha)
+       ------------------------------------------------------
+       1. A trava só vale DENTRO da vitrine. No rodapé e nas outras páginas a
+          rolagem é a do navegador, sem interferência nenhuma.
+       2. Passar da última cena solta a trava e entrega o rodapé.
+       3. Teclado continua funcionando (setas, PageUp/Down, Home/End), e quem
+          pediu "menos movimento" no sistema recebe salto seco em vez de animação.
+       ===================================================================== */
+    var travado = false;
+    var indiceAtual = 0;
+    var rodape = document.querySelector('.rodape');
+    var querMenosMovimento = window.matchMedia
+      && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    /* ⚠️ NUNCA PERGUNTE `offsetTop` A UM ELEMENTO `sticky` — ELE MENTE.
+       Custou a tarde de 14/09/2026. Em Blink, `offsetTop` de um elemento grudado
+       devolve a posição ONDE ELE ESTÁ AGORA, não a de origem no fluxo. Com as cenas
+       empilhadas, TODAS as que já grudaram passam a responder o mesmo número: a sonda
+       mostrou `2891,2891,2891,2891,3841,4791,...`. Consequência: descer funcionava (as
+       cenas de baixo ainda não grudaram e respondem a verdade) e SUBIR era um pedido
+       pra ir exatamente onde já se está — ou seja, nada acontecia, sem erro nenhum.
+
+       A posição verdadeira se calcula: o palco não é sticky, então o `offsetTop` DELE é
+       confiável, e toda cena tem a mesma altura. */
+    var palcoEl = document.getElementById('palco');
+    function alturaDaCena() {
+      return cenas.length ? cenas[0].getBoundingClientRect().height : window.innerHeight;
+    }
+    function topoDe(i) {
+      return Math.round((palcoEl ? palcoEl.offsetTop : 0) + i * alturaDaCena());
+    }
+    function ondeEstou() {
+      var h = alturaDaCena();
+      if (!h) return 0;
+      var i = Math.round((window.scrollY - (palcoEl ? palcoEl.offsetTop : 0)) / h);
+      if (i < 0) i = 0;
+      if (i > cenas.length - 1) i = cenas.length - 1;
+      return i;
     }
 
-    if (botao) botao.addEventListener('click', proxima);
+    /* A ANIMAÇÃO É NOSSA, E NÃO O `behavior: smooth` DO NAVEGADOR.
+       Medido em 14/09/2026: descer funcionava, SUBIR não saía do lugar. O `scrollTo`
+       nu funciona perfeitamente (testado de fora, em todas as posições) — o que não
+       funciona é pedir rolagem suave DE DENTRO do tratador de `wheel`: o Chrome trata
+       a entrada de rolagem do usuário como cancelamento de rolagem suave em curso, e
+       o pedido morre calado. Nenhum erro, nenhum aviso; só a tela parada.
+       Animando quadro a quadro com `scrollTo` instantâneo, nada há o que cancelar. */
+    var DURACAO = 520;
 
-    /* "um toque, próximo produto" — só onde não existe mouse. No desktop, clique em
-       foto que avança a página é comportamento surpreendente, e surpresa aqui é atrito. */
-    var temMouse = window.matchMedia && window.matchMedia('(hover: hover)').matches;
-    if (!temMouse) {
-      document.querySelectorAll('.cena').forEach(function (c) {
-        c.addEventListener('click', function (e) {
-          if (e.target.closest('a, button')) return;   // etiqueta e botões seguem o seu caminho
-          proxima();
-        });
+    /* ⚠️ `behavior: 'instant'` NÃO É ENFEITE — foi a causa do defeito de 15/09h.
+       O CSS desta casa tem `html { scroll-behavior: smooth }`, e isso muda o PADRÃO de
+       todo `scrollTo`: cada quadro da animação abaixo virava, ele mesmo, uma rolagem
+       suave do navegador. Sessenta animações por segundo brigando entre si — descer
+       chegava perto por sorte (parava a 6px do alvo), e SUBIR simplesmente empacava.
+       Nenhum erro no console; a tela só não obedecia.
+       `instant` diz explicitamente "salte", e aí a animação volta a ser só nossa. */
+    function pular(y) {
+      window.scrollTo({ top: y, behavior: 'instant' });
+    }
+    function animarAte(destino, aoTerminar) {
+      var inicio = window.scrollY;
+      var distancia = destino - inicio;
+      if (querMenosMovimento || Math.abs(distancia) < 2) {
+        pular(destino);
+        if (aoTerminar) aoTerminar();
+        return;
+      }
+      var t0 = performance.now();
+      (function quadro(agora) {
+        var t = Math.min(1, (agora - t0) / DURACAO);
+        /* easeInOutCubic: sai devagar, corre no meio, encosta devagar. É o que faz a
+           peça parecer que "cai" em vez de pular. */
+        var e = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+        pular(Math.round(inicio + distancia * e));
+        if (t < 1) { requestAnimationFrame(quadro); }
+        else if (aoTerminar) { aoTerminar(); }
+      })(t0);
+    }
+
+    function irPara(i) {
+      if (i < 0) i = 0;
+      if (i > cenas.length - 1) {          // passou da última: solta e entrega o rodapé
+        if (!rodape) return;
+        travado = true;
+        animarAte(rodape.offsetTop, function () { travado = false; });
+        return;
+      }
+      indiceAtual = i;
+      /* a trava segura o TEMPO DA ANIMAÇÃO. Sem ela, a inércia do dedo entrega mais
+         eventos no meio do caminho e cada um vira outro passo — que é exatamente o
+         "passou dois de uma vez só" que ele viu. */
+      travado = true;
+      animarAte(topoDe(i), function () {
+        /* respiro curto DEPOIS da animação: o trackpad continua mandando eventos por
+           uns milissegundos depois que o dedo sai, e sem esta folga o último resquício
+           do mesmo gesto viraria um segundo passo. */
+        setTimeout(function () { travado = false; }, 90);
       });
     }
 
-    /* teclado: seta pra baixo / espaço já rolam sozinhos (é rolagem nativa); aqui só
-       o atalho de pular cena inteira, que a rolagem nativa não dá. */
-    document.addEventListener('keydown', function (e) {
-      if (e.key === 'PageDown') { e.preventDefault(); proxima(); }
+    function passo(direcao) {
+      if (travado) return;
+      irPara(ondeEstou() + direcao);
+    }
+    function proxima() { passo(1); }
+
+    /* A vitrine termina onde o rodapé começa. Fora dessa faixa não mexemos em nada. */
+    function dentroDaVitrine() {
+      return !rodape || window.scrollY < rodape.offsetTop - 40;
+    }
+
+    /* --- roda do mouse e trackpad ------------------------------------- */
+    window.addEventListener('wheel', function (e) {
+      if (!dentroDaVitrine()) return;
+      if (Math.abs(e.deltaY) < 4) return;          // tremida de trackpad não conta
+      e.preventDefault();
+      passo(e.deltaY > 0 ? 1 : -1);
+    }, { passive: false });
+
+    /* --- dedo ---------------------------------------------------------- */
+    var toqueY = null, arrastou = false;
+    window.addEventListener('touchstart', function (e) {
+      toqueY = e.touches[0].clientY;
+      arrastou = false;
+    }, { passive: true });
+
+    window.addEventListener('touchmove', function (e) {
+      if (!dentroDaVitrine() || toqueY === null) return;
+      /* segurar o touchmove é o que mata a INÉRCIA. Sem isto o dedo solta e o
+         navegador continua rolando sozinho por três painéis. */
+      e.preventDefault();
+      var dy = toqueY - e.touches[0].clientY;
+      if (!arrastou && Math.abs(dy) > 28) {
+        arrastou = true;                            // um arrasto = um passo, e só
+        passo(dy > 0 ? 1 : -1);
+      }
+    }, { passive: false });
+
+    window.addEventListener('touchend', function () { toqueY = null; }, { passive: true });
+
+    if (botao) botao.addEventListener('click', proxima);
+
+    /* "um toque, próximo produto". A etiqueta e os botões seguem o seu caminho —
+       é lá que mora o link pra página do produto. */
+    document.querySelectorAll('.cena').forEach(function (c) {
+      c.addEventListener('click', function (e) {
+        if (e.target.closest('a, button')) return;
+        proxima();
+      });
     });
+
+    document.addEventListener('keydown', function (e) {
+      if (!dentroDaVitrine()) return;
+      if (e.key === 'ArrowDown' || e.key === 'PageDown' || e.key === ' ') {
+        e.preventDefault(); passo(1);
+      } else if (e.key === 'ArrowUp' || e.key === 'PageUp') {
+        e.preventDefault(); passo(-1);
+      } else if (e.key === 'Home') {
+        e.preventDefault(); irPara(0);
+      }
+    });
+
+    /* O snap nativo sai de cena: com a navegação por passo, os dois brigariam pelo
+       mesmo pixel e o resultado é tremor no fim de cada transição. */
+    var palco = document.getElementById('palco');
+    if (palco) palco.style.scrollSnapType = 'none';
 
     window.addEventListener('scroll', conferirFundo, { passive: true });
     window.addEventListener('resize', function () {
