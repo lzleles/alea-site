@@ -78,7 +78,7 @@ window.VITRINE = [
   { produto: 'ālea Bowl Wave', nome: 'Matteo',     categoria: 'pet', preco: 179,  pagina: 'bowl-wave',       recorte: true,  fotos: ['matteo_1','matteo_2','matteo_3'] },
   { produto: 'ālea Bowl Wave', nome: 'Cláudia',    categoria: 'pet', preco: 179,  pagina: 'bowl-wave',       recorte: true,  fotos: ['claudia_1','claudia_2','claudia_3','claudia_4'] },
   { produto: 'ālea Poop Bag',  nome: 'Chica',      categoria: 'pet', preco: 59,   pagina: 'poop-bag-holder', recorte: true,  fotos: ['saquinho_1','saquinho_2','saquinho_3'] },
-  { produto: 'Kit ālea',       nome: 'Tina Preta', categoria: 'pet', preco: null, pagina: 'kit',             recorte: true,  fotos: ['kit_1','kit_2','kit_3'] }
+  { produto: 'Kit ālea',       nome: 'Tina Preta', categoria: 'pet', preco: null, pagina: 'kit',             recorte: false,  fotos: ['kit_1','kit_2','kit_3'] }
 ];
 
 
