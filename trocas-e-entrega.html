@@ -13,17 +13,27 @@
 <link rel="stylesheet" href="css/estilo.css">
 </head>
 <body>
+<!-- ALEA:TOPO -->
 <header class="topo">
-  <a class="marca" href="index.html" aria-label="ālea - início">
-    <img class="colorida" src="img/marca/alea_logo.svg" alt="ālea">
-    <img class="clara" src="img/marca/alea_logo_claro.svg" alt="ālea">
+  <a class="marca" href="index.html" aria-label="ālea — início">
+    <img class="colorida" src="img/marca/alea_logo.svg" alt="ālea" width="129" height="28">
+    <img class="clara" src="img/marca/alea_logo_claro.svg" alt="ālea" width="129" height="28">
   </a>
   <nav aria-label="Principal">
-    <a href="index.html" class="some-no-celular">Vitrine</a>
+    <a href="index.html" class="some-no-celular">Feed</a>
     <a href="a-alea.html" class="some-no-celular">A ālea</a>
-    <a class="pedir zap" data-assunto="quero encomendar uma peça da ālea">Pedir</a>
+    <button class="botao-icone" type="button" data-abrir="conta" aria-haspopup="dialog">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+      <span class="rotulo">Conta</span>
+    </button>
+    <button class="botao-icone" type="button" data-abrir="carrinho" aria-haspopup="dialog">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><path d="M3 6h18"></path><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
+      <span class="rotulo">Carrinho</span>
+      <span class="quantos" data-quantos>0</span>
+    </button>
   </nav>
 </header>
+<!-- /ALEA:TOPO -->
 
 <main class="embrulho texto pagina">
   <h1>Trocas, devolução e entrega</h1>
@@ -38,10 +48,15 @@
 
   <h2>Prazo de produção</h2>
   <p>
-    A peça só entra na fila de impressão <strong>depois que você aprova a prévia</strong>
-    (nome, cor e estampa). A partir da aprovação, o prazo é de
-    <strong>5 a 10 dias úteis</strong> para a peça ficar pronta. O prazo de entrega é
-    contado além disso e depende da forma de envio.
+    A peça é feita <strong>sob encomenda</strong>: ela entra na fila de impressão depois
+    da <strong>confirmação do pagamento</strong>, e fica pronta em
+    <strong>3 dias úteis</strong> a partir daí. O prazo de entrega é contado além desse
+    e depende da forma de envio.
+  </p>
+  <p>
+    Antes de imprimir, você recebe uma prévia com o nome e as cores para conferir. A
+    prévia é uma conferência, não um novo pedido: o prazo continua correndo da
+    confirmação do pagamento.
   </p>
 
   <h2>Entrega</h2>
@@ -59,9 +74,23 @@
     devolvendo-o e recebendo de volta tudo que pagou, frete incluído.
   </p>
   <p>
-    <strong>Isso vale aqui também.</strong> Peça personalizada é uma exceção discutida no
-    direito do consumidor, mas a nossa regra é simples: se você se arrependeu dentro dos
-    7 dias, me chame no WhatsApp e devolvemos. Não vale a pena brigar por uma peça.
+    <strong>Isso vale aqui, com uma ressalva que você declara na hora da compra.</strong>
+    Antes de pôr a peça no carrinho, você marca uma declaração dizendo que revisou o
+    nome, a grafia e as cores, e que está ciente das condições abaixo. É o mesmo texto
+    que aparece na página de cada produto:
+  </p>
+  <blockquote style="border-left:3px solid var(--borda);margin:0 0 18px;padding:2px 0 2px 16px;color:var(--tinta-fraca)">
+    Por se tratar de um produto produzido sob encomenda e personalizado especialmente de
+    acordo com as suas escolhas, pedidos personalizados não poderão ser cancelados ou
+    devolvidos após a confirmação de pagamento se o produto já estiver sendo fabricado,
+    ressalvados casos de defeito, vício ou erro de fabricação.
+  </blockquote>
+  <p>
+    Na prática: pediu e mudou de ideia <strong>antes</strong> de a impressão começar, é
+    só chamar no WhatsApp — cancelamos e devolvemos. Depois que a peça com o nome do seu
+    pet já está sendo impressa, ela não serve para mais ninguém, e é aí que a ressalva
+    vale. <strong>Defeito, vício ou erro de fabricação continuam cobertos sempre</strong>,
+    sem prazo de 7 dias nenhum: é a seção abaixo.
   </p>
 
   <h2>Peça com defeito</h2>
@@ -103,33 +132,32 @@
   <p style="margin-top:34px"><a class="botao contorno" href="index.html">Voltar ao site</a></p>
 </main>
 
+<!-- ALEA:RODAPE -->
 <footer class="rodape">
-  <div class="embrulho">
-    <div>
-      <img src="img/marca/alea_logo_claro.svg" alt="ālea">
-      <p>Comedouros e acessórios pet personalizados, impressos em 3D sob encomenda em Jataí-GO.</p>
-    </div>
-    <div>
-      <h4>Produtos</h4>
-      <ul>
-        <li><a href="produto-bowl-wave.html">ālea Bowl Wave</a></li>
-        <li><a href="produto-poop-bag-holder.html">ālea Poop Bag Holder</a></li>
-        <li><a href="produto-kit.html">Kit ālea</a></li>
-      </ul>
-    </div>
-    <div>
-      <h4>Informações</h4>
-      <ul>
-        <li><a href="a-alea.html">Quem é a ālea</a></li>
-        <li><a href="trocas-e-entrega.html">Trocas, devolução e entrega</a></li>
-        <li><a href="privacidade.html">Política de privacidade</a></li>
-      </ul>
-    </div>
-    <p class="lei">© <span id="ano">2026</span> ālea — Cassiano Rosado, Jataí/GO.
-      Peças feitas sob encomenda. Identidade visual por Mirella Gaetti.</p>
-  </div>
+  <img class="marca-rodape" src="img/marca/alea_logo_claro.svg" alt="ālea">
+  <p class="frase" data-assinatura>Onde cada impressão começa com um sonho!</p>
+  <a class="orcamento zap" data-assunto="orçamento de uma peça personalizada">Orçamentos e personalizados, clique aqui!</a>
+  <nav class="menu-categorias" data-menu-categorias aria-label="Categorias"></nav>
+  <div class="redes" data-redes></div>
+  <p class="lei">
+    © <img src="img/marca/alea_logo_claro.svg" alt="ālea"> <span id="ano">2026</span> — Todos os direitos reservados.
+    <span class="creditos">
+      <span data-campo="responsavel">Cassiano Rosado</span>, <span data-campo="cidade">Jataí</span>/<span data-campo="uf">GO</span> ·
+      peças feitas sob encomenda · identidade visual por Mirella Gaetti ·
+      <a href="produto-bowl-wave.html">ālea Bowl Wave</a> ·
+      <a href="produto-poop-bag-holder.html">ālea Poop Bag Holder</a> ·
+      <a href="produto-kit.html">Kit ālea</a> ·
+      
+      <a href="a-alea.html">Quem é a ālea</a> ·
+      <a href="trocas-e-entrega.html">Trocas, devolução e entrega</a> ·
+      <a href="privacidade.html">Política de privacidade</a>
+    </span>
+  </p>
 </footer>
+<!-- /ALEA:RODAPE -->
 <script src="js/config.js"></script>
+<script src="js/produtos.js"></script>
 <script src="js/site.js"></script>
+<script src="js/carrinho.js"></script>
 </body>
 </html>

@@ -1,19 +1,25 @@
 /* =============================================================================
-   estilo.css — ālea  ·  v2 (14/09/2026), reescrito pelo retorno do Cassiano
+   estilo.css — ālea  ·  v3 (15/09/2026), reescrito pelo retorno do Cassiano
    =============================================================================
-   O QUE MUDOU E POR QUÊ (áudios de 14/09/2026, 14:14–14:15)
+   O QUE MUDOU DA v2 PRA CÁ, E POR QUÊ (pedidos dele, 15/09/2026)
 
-   Ele pediu, com estas palavras:
-     · "a tela tem que ser branca mesmo para combinar com a paleta […] mas a partir
-        da hora que o cara rola a tela aí ela fica preta […] mais destaque para as fotos"
-     · "você nunca consegue ver duas imagens ao mesmo tempo"
-     · "um toque, próximo produto"
-     · "não quero nada escrito lá no site […] só o produto e nome"
+     · "quando abrir, fazer uma animação da capivara gigante, depois ela diminuindo
+        indo pro lado esquerdo e aparecendo o nome ALEA pro lado direito"
+     · a frase da capa é escrita LETRA POR LETRA: "Onde cada impressão começa com um sonho!"
+     · "mudar o fundo da tela inicial pra ficar igual o Linktree"
+     · "deixar esse MENU, onde somente depois que clicar na categoria a tela ficará
+        preta e apresentará o feed com os produtos"
+     · "tirar as fotos sempre sem fundo, somente o objeto […] deixando as fotos
+        completas somente se arrastar pro lado"
+     · "queria que deslizasse o objeto pra cima até sumir enquanto o outro estivesse
+        roubando o lugar central"
+     · "diminuir o quadrado da foto"; tirar as setas e "colocar as bolinhas
+        centralizadas, logo acima do título do objeto"; tirar a seta do canto inferior
+     · no topo, sai o "Pedir" e entram CONTA e CARRINHO
 
-   Então a home virou um EMPILHAMENTO de cenas grudadas no topo: cada cena cobre a
-   anterior por inteiro, e o fundo sai do off-white da marca para o preto quente na
-   primeira rolagem. Todo o texto que existia na home foi para as páginas de produto
-   e para a página da marca — que passam a ser as páginas de destino do Google Ads.
+   Então a home tem agora DUAS TELAS: a ABERTURA (clara, gradiente, marca, frase e
+   menu de categorias) e o FEED (preto, um objeto recortado por vez). O feed só nasce
+   depois do clique numa categoria — antes disso ele nem existe na tela.
 
    Paleta e tipografia continuam saindo do "Manual de Diretrizes | Alea"
    (Mirella Gaetti, 2026), páginas 4, 8 e 14.
@@ -41,11 +47,22 @@
   --raio: 14px;
   --gutter: clamp(20px, 5vw, 72px);
   --maxima: 1180px;
+
+  /* ⚠️ O TAMANHO DO OBJETO NO FEED — mexer AQUI, não espalhado.
+     Ele pediu menor em 15/09 ("diminuir o quadrado da foto pra ficar esteticamente
+     mais apresentável"). Era 62svh na v2; agora 50svh, e a legenda ganhou o espaço
+     que sobrou — que é o que faz a tela parecer arrumada em vez de lotada. */
+  --objeto: min(78vw, 50svh);
 }
 
 *, *::before, *::after { box-sizing: border-box; }
-html { scroll-behavior: smooth; }
-@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+
+/* ⚠️ NADA DE `scroll-behavior: smooth` AQUI.
+   Custou a tarde de 14/09/2026: ele muda o PADRÃO de todo `scrollTo` do site, e cada
+   quadro de uma animação nossa virava, sozinho, outra rolagem suave do navegador.
+   Sessenta animações por segundo brigando entre si, sem erro nenhum no console.
+   Quando uma rolagem tiver que ser suave, ela pede suavidade na chamada. */
+html { scroll-behavior: auto; }
 
 body {
   margin: 0;
@@ -55,14 +72,10 @@ body {
   font-size: 17px;
   line-height: 1.65;
   -webkit-font-smoothing: antialiased;
-  /* a virada branco -> preto acontece aqui, e é a única animação de cor da página */
-  transition: background-color .55s ease, color .55s ease;
 }
-body.escuro { background: var(--preto); color: var(--off); }
 
 img { max-width: 100%; display: block; }
 a { color: var(--terracota); }
-body.escuro a { color: var(--dourado); }
 
 .embrulho { width: 100%; max-width: var(--maxima); margin-inline: auto; padding-inline: var(--gutter); }
 
@@ -72,15 +85,25 @@ body.escuro a { color: var(--dourado); }
 }
 .pular:focus { left: 0; }
 
-/* ------------------------------------------------------------------ cabeçalho */
+/* o título que o Google e o leitor de tela leem, e o visitante não vê: a abertura é
+   a marca e o menu, e h1 escrito na tela brigaria com o desenho dela */
+.so-leitor {
+  position: absolute; width: 1px; height: 1px; overflow: hidden;
+  clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap;
+}
+
+/* trava a rolagem do fundo enquanto o feed ou uma gaveta está aberta */
+body.travado { overflow: hidden; }
+
+/* ============================================================== CABEÇALHO
+   Saiu o botão "Pedir" (15/09/2026). Entraram CONTA e CARRINHO — os dois ícones que
+   ele pediu no canto superior direito. */
 .topo {
-  position: fixed; inset: 0 0 auto 0; z-index: 30;
+  position: fixed; left: 0; right: 0; top: var(--tarja, 0px); z-index: 60;
+  transition: top .2s ease;
   display: flex; align-items: center; gap: 20px;
-  padding: 16px var(--gutter);
-  transition: background-color .55s ease;
-  /* ⚠️ FUNDO TAMBÉM NO CLARO. Antes só o modo escuro ganhava fundo, e nas páginas de
-     produto (que são claras) o texto passava POR BAIXO do cabeçalho transparente e
-     sumia atrás do logo. Aparece no print de 14/09 16:04. */
+  padding: 14px var(--gutter);
+  transition: background-color .45s ease, color .45s ease;
   background: color-mix(in srgb, var(--off) 86%, transparent);
   backdrop-filter: saturate(140%) blur(10px);
 }
@@ -89,234 +112,428 @@ body.escuro a { color: var(--dourado); }
 .topo .marca .clara { display: none; }
 body.escuro .topo .marca .colorida { display: none; }
 body.escuro .topo .marca .clara { display: block; }
-body.escuro .topo { background: color-mix(in srgb, var(--preto) 78%, transparent); backdrop-filter: blur(8px); }
+body.escuro .topo { background: color-mix(in srgb, var(--preto) 72%, transparent); color: var(--off); }
+/* na abertura o cabeçalho flutua sem fundo: o gradiente é o assunto da tela */
+body.na-abertura .topo { background: transparent; backdrop-filter: none; }
 
-.topo nav { margin-left: auto; display: flex; gap: clamp(12px, 2vw, 26px); align-items: center; }
-.topo nav a {
+.topo nav { margin-left: auto; display: flex; gap: clamp(8px, 1.6vw, 18px); align-items: center; }
+.topo nav > a {
   text-decoration: none; color: inherit; font-size: 14.5px;
   padding: 7px 0; border-bottom: 1.5px solid transparent;
 }
-.topo nav a:hover, .topo nav a:focus-visible { border-bottom-color: var(--dourado); }
-.topo nav a.pedir {
-  background: var(--terracota); color: var(--off); border-radius: 999px;
-  padding: 8px 18px; font-weight: 600; border-bottom: 0;
-}
-body.escuro .topo nav a.pedir { background: var(--dourado); color: var(--preto); }
+.topo nav > a:hover, .topo nav > a:focus-visible { border-bottom-color: var(--dourado); }
 @media (max-width: 700px) { .topo nav a.some-no-celular { display: none; } }
 
-/* ================================================================== A VITRINE
-   O EMPILHAMENTO. Cada cena gruda no topo da janela; a seguinte sobe por cima e
-   cobre a anterior inteira. É o que garante a regra do Cassiano — "você nunca
-   consegue ver duas imagens ao mesmo tempo" — sem sequestrar a rolagem do
-   visitante, que é prática que o próprio Google trata como experiência ruim. */
-/* `mandatory`: a rolagem SEMPRE para numa cena inteira. Com `proximity` ela podia
-   descansar no meio do caminho, e no meio do caminho aparecem duas peças ao mesmo
-   tempo — exatamente o que ele não quer. */
-.palco { scroll-snap-type: y mandatory; }
+/* --- os dois botões do canto: conta e carrinho --------------------------- */
+.botao-icone {
+  position: relative;
+  display: inline-flex; align-items: center; gap: 8px;
+  background: transparent; color: inherit; border: 1.5px solid currentColor;
+  border-radius: 999px; padding: 7px 14px 7px 12px; cursor: pointer;
+  font: inherit; font-size: 14px; line-height: 1;
+  opacity: .85; transition: opacity .2s ease, background .2s ease, color .2s ease;
+}
+.botao-icone:hover, .botao-icone:focus-visible { opacity: 1; background: var(--terracota); color: var(--off); border-color: var(--terracota); }
+body.escuro .botao-icone:hover, body.escuro .botao-icone:focus-visible { background: var(--dourado); color: var(--preto); border-color: var(--dourado); }
+.botao-icone svg { width: 18px; height: 18px; flex: none; }
+/* no celular fica só o ícone: o texto ao lado comeria a largura do cabeçalho */
+@media (max-width: 560px) { .botao-icone .rotulo { display: none; } .botao-icone { padding: 8px 10px; } }
+/* a bolinha com a quantidade — nasce escondida e só aparece com item no carrinho */
+.botao-icone .quantos {
+  position: absolute; top: -6px; right: -6px; min-width: 19px; height: 19px;
+  border-radius: 999px; background: var(--terracota); color: #fff;
+  font-size: 11px; font-weight: 700; display: none; place-items: center; padding: 0 5px;
+}
+.botao-icone.tem-item .quantos { display: grid; }
 
-.cena {
-  position: sticky; top: 0;
-  height: 100svh; min-height: 480px;
-  scroll-snap-align: start;
+/* ================================================================ ABERTURA
+   "Mudar o fundo da tela inicial pra ficar igual o Linktree" — gradiente de parede a
+   parede, com duas manchas macias que respiram. As cores são as da marca, não as do
+   Linktree: o efeito é o mesmo, a paleta continua sendo dele. */
+.abertura {
+  position: relative; z-index: 1;
+  min-height: 100svh;
+  margin-top: var(--tarja, 0px);
+  display: grid; grid-template-rows: 1fr auto; align-content: center; justify-items: center;
+  gap: clamp(22px, 5vh, 48px);
+  padding: clamp(96px, 14vh, 150px) var(--gutter) clamp(40px, 8vh, 70px);
+  text-align: center;
+  overflow: hidden;
+  background:
+    radial-gradient(1100px 720px at 16% 14%, rgba(118, 149, 165, .60), transparent 62%),
+    radial-gradient(940px 660px at 86% 24%, rgba(170, 150, 97, .58), transparent 60%),
+    radial-gradient(1080px 780px at 52% 98%, rgba(146, 68, 41, .46), transparent 64%),
+    linear-gradient(162deg, #F8F5F0 0%, #EAE4DB 54%, #E2D6C6 100%);
+}
+/* a mancha que se mexe devagar: dá vida sem pedir atenção */
+.abertura::after {
+  content: ''; position: absolute; inset: -20%;
+  background: radial-gradient(520px 520px at 30% 40%, rgba(178, 110, 58, .22), transparent 60%);
+  animation: respirar 22s ease-in-out infinite alternate;
+  pointer-events: none;
+}
+@keyframes respirar {
+  from { transform: translate3d(-4%, -3%, 0) scale(1); }
+  to   { transform: translate3d(6%, 5%, 0) scale(1.12); }
+}
+.abertura > * { position: relative; z-index: 1; }
+.abertura .miolo { display: grid; justify-items: center; gap: clamp(18px, 4vh, 36px); align-content: center; }
+
+/* ---- a animação da marca ------------------------------------------------
+   AS DUAS PEÇAS TÊM O MESMO viewBox DO LOGO INTEIRO (ver _partir_logo_v1.py), então
+   sobrepostas e sem transformação nenhuma elas REMONTAM o logotipo exato. É por isso
+   que o fim da animação é `transform: none`: não tem margem pra eu errar.
+
+   `--cap-x: 19%` e `--cap-y: 53%` são o centro da capivara dentro dessa caixa larga —
+   medidos no SVG, não chutados. É o ponto em torno do qual ela cresce, e é de lá que
+   ela viaja até o lugar dela. */
+.marca-anim {
+  position: relative;
+  width: min(86vw, 860px); aspect-ratio: 3448.89 / 748.01;
+  --cap-x: 19%; --cap-y: 53%;
+}
+.marca-anim img { position: absolute; inset: 0; width: 100%; height: 100%; }
+.marca-anim .capivara {
+  transform-origin: var(--cap-x) var(--cap-y);
+  animation: capivara-chega 2.15s cubic-bezier(.22, .92, .24, 1) both;
+}
+.marca-anim .nome {
+  animation: nome-chega 1.15s cubic-bezier(.22, .92, .24, 1) 1.35s both;
+}
+/* gigante e no meio da tela -> pequena e no lugar dela, à esquerda */
+@keyframes capivara-chega {
+  0%   { transform: translateX(31%) scale(2.6); opacity: 0; }
+  14%  { transform: translateX(31%) scale(2.6); opacity: 1; }
+  100% { transform: none; opacity: 1; }
+}
+/* o nome entra pela direita e assenta */
+@keyframes nome-chega {
+  from { transform: translateX(9%); opacity: 0; }
+  to   { transform: none; opacity: 1; }
+}
+/* quem já viu a abertura nesta sessão recebe o logo pronto, sem esperar de novo */
+body.sem-abertura .marca-anim .capivara,
+body.sem-abertura .marca-anim .nome { animation: none; }
+@media (prefers-reduced-motion: reduce) {
+  .marca-anim .capivara, .marca-anim .nome { animation: none; }
+  .abertura::after { animation: none; }
+}
+
+/* ---- a frase escrita letra por letra -------------------------------------
+   O texto real vai INTEIRO no HTML e é o `.digitado` que cresce por cima dele: assim o
+   Google e o leitor de tela recebem a frase completa, mesmo que o JS não rode. */
+.assinatura {
+  font-family: var(--fonte-titulo); font-weight: 300;
+  font-size: clamp(1.1rem, 2.7vw, 1.85rem); line-height: 1.3;
+  color: var(--terracota); margin: 0; max-width: 24ch; min-height: 2.6em;
+}
+.assinatura .cursor {
+  display: inline-block; width: .06em; height: 1em; margin-left: .06em;
+  background: currentColor; vertical-align: -.12em;
+  animation: piscar 1s steps(1) infinite;
+}
+.assinatura.pronta .cursor { animation: none; opacity: 0; }
+@keyframes piscar { 0%, 49% { opacity: 1; } 50%, 100% { opacity: 0; } }
+
+/* ---- o menu de categorias ------------------------------------------------
+   Do jeito que ele escreveu: nomes separados por ponto médio. O ponto é desenhado pelo
+   CSS (`::before`), não digitado — assim ninguém precisa lembrar de pôr o "·" na mão
+   quando criar uma categoria nova no produtos.js. */
+.menu-categorias {
+  display: flex; flex-wrap: wrap; justify-content: center; align-items: center;
+  gap: 2px clamp(2px, 1vw, 10px);
+  font-family: var(--fonte-titulo); font-weight: 500;
+  font-size: clamp(.92rem, 1.9vw, 1.12rem); letter-spacing: .14em;
+  max-width: 34ch;
+}
+.menu-categorias a, .menu-categorias span {
+  position: relative; text-decoration: none; color: var(--tinta);
+  padding: 9px 12px; border-radius: 999px; line-height: 1;
+  transition: background .2s ease, color .2s ease, opacity .2s ease;
+}
+.menu-categorias a::before, .menu-categorias span::before {
+  content: '·'; position: absolute; left: -2px; opacity: .45; letter-spacing: 0;
+}
+.menu-categorias a:hover, .menu-categorias a:focus-visible { background: var(--terracota); color: var(--off); }
+.menu-categorias a:hover::before, .menu-categorias a:focus-visible::before { opacity: 0; }
+/* categoria ainda sem peça: aparece, mas não promete clique que não leva a nada */
+.menu-categorias .vazia { opacity: .38; cursor: default; }
+.menu-categorias .vazia small { display: block; font-size: 9.5px; letter-spacing: .1em; opacity: .9; margin-top: 2px; }
+
+/* ==================================================================== FEED
+   Tela cheia, preta, um objeto por vez. É uma CAMADA FIXA por cima da abertura, e não
+   uma parte da página: foi o que permitiu a transição que ele pediu — o objeto sobe e
+   some enquanto o próximo toma o lugar central — sem depender de rolagem nenhuma. */
+.feed {
+  position: fixed; inset: 0; z-index: 50;
+  background: var(--preto); color: var(--off);
   display: grid; place-items: center;
   overflow: hidden;
-  /* ⚠️ FUNDO OPACO, E ISTO NÃO É DETALHE.
-     As cenas ficam empilhadas e grudadas no mesmo topo. Sem fundo próprio, a cena de
-     cima é TRANSPARENTE e deixa ver a de baixo — foi o que a primeira medição pegou:
-     duas peças na tela ao mesmo tempo, que é justamente a regra do Cassiano sendo
-     quebrada. Com fundo opaco, a cena que sobe COBRE a anterior enquanto ela "cai". */
-  background: var(--off);
-  transition: background-color .55s ease;
+  opacity: 0; visibility: hidden;
+  transition: opacity .5s ease, visibility .5s;
 }
-body.escuro .cena { background: var(--preto); }
-.cena.capa { background: var(--off); }
-body.escuro .cena.capa { background: var(--off); }
+.feed.aberto { opacity: 1; visibility: visible; }
 
-.cena .moldura {
+.feed .palco { position: absolute; inset: 0; }
+
+.feed .item {
+  position: absolute; inset: 0;
+  display: grid; grid-template-rows: 1fr auto; align-items: center; justify-items: center;
+  gap: clamp(14px, 2.6vh, 26px);
+  padding: clamp(84px, 12vh, 120px) var(--gutter) clamp(54px, 9vh, 90px);
+  /* ⚠️ `visibility` E NÃO `display`: o item precisa continuar MEDÍVEL enquanto está
+     fora da tela, senão o canvas do efeito nasce com 0x0 e a peça aparece preta na
+     primeira troca. Com visibility ele some da tela e continua tendo tamanho. */
+  visibility: hidden; opacity: 0;
+  transform: translateY(0) scale(1);
+  will-change: transform, opacity;
+}
+.feed .item.visivel { visibility: visible; }
+.feed .item.ativo { opacity: 1; transform: none; z-index: 2; }
+/* o que sai vai pra CIMA e some; o que entra chega DE BAIXO e assenta no centro —
+   "deslizasse o objeto pra cima até sumir enquanto o outro estivesse roubando o lugar
+   central" (Cassiano, 15/09/2026). Descendo, os papéis se invertem. */
+.feed .item.acima  { opacity: 0; transform: translateY(-48%) scale(.88); z-index: 1; }
+.feed .item.abaixo { opacity: 0; transform: translateY(48%) scale(.88); z-index: 1; }
+.feed.anima .item { transition: transform .82s cubic-bezier(.3, .86, .28, 1), opacity .58s ease; }
+@media (prefers-reduced-motion: reduce) { .feed.anima .item { transition: opacity .2s linear; } }
+
+/* ---- o objeto -----------------------------------------------------------
+   No estado padrão NÃO existe moldura nenhuma: é o objeto recortado sobre o preto,
+   que é o "aspecto minimalista" que ele pediu. A moldura (fundo + cantos arredondados)
+   só aparece quando o visitante arrasta pro lado e entra uma FOTO INTEIRA. */
+.feed .objeto {
   position: relative;
-  /* ⚠️ ESTE TAMANHO FOI MEDIDO NO OLHO DELE, NÃO ESCOLHIDO NO ESCURO (14/09/2026, 14:53):
-     "ficou muito esticado na tela inteira […] a imagem vai ter que ficar um pouco menor
-     e vai ter que ter fundo, justamente pra não ficar aquele trem ampliado esquisito".
-     O `74svh` de antes fazia a foto quase encostar nas bordas; com `62svh` sobra fundo
-     em volta e a peça volta a parecer um objeto, não um zoom. */
-  width: min(86vw, 62svh); aspect-ratio: 1 / 1;
-  border-radius: var(--raio); overflow: hidden;
+  width: var(--objeto); aspect-ratio: 1 / 1;
+  display: grid; place-items: center;
+  border-radius: var(--raio);
+  background: transparent;
+  transition: background .45s ease, box-shadow .45s ease;
+}
+.feed .objeto.com-cenario {
   background: #0A0806;
   box-shadow: 0 40px 90px -50px rgba(0, 0, 0, .9);
+  overflow: hidden;
 }
-/* As fotos ficam empilhadas; só a `.ativa` aparece. Com WebGL quem pinta é a lona e
-   elas viram fonte de textura — mas continuam no DOM, porque é delas que sai o alt
-   que o Google lê. */
-.cena .moldura img.foto { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity .45s ease; }
-.cena .moldura img.foto.ativa { opacity: 1; }
-.cena .moldura .lona { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
-.cena .moldura.com-webgl img.foto { visibility: hidden; }
-.sem-distorcao .moldura .lona { display: none; }
-.sem-distorcao .moldura img.foto { visibility: visible !important; }
-
-/* setas de foto — o eixo horizontal. Discretas, mas visíveis: sem elas ninguém
-   descobre que existe uma segunda foto, e aí o recurso não existe. */
-.seta {
-  position: absolute; top: 50%; transform: translateY(-50%); z-index: 5;
-  width: 40px; height: 56px; border: 0; cursor: pointer;
-  background: rgba(0, 0, 0, .34); color: #fff; font-size: 26px; line-height: 1;
-  display: grid; place-items: center; padding: 0;
-  border-radius: 8px; transition: background .2s ease;
+.feed .objeto img {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  opacity: 0; transition: opacity .45s ease;
 }
-.seta:hover, .seta:focus-visible { background: rgba(0, 0, 0, .62); }
-.seta.esq { left: 8px; }
-.seta.dir { right: 8px; }
-@media (hover: none) { .seta { width: 34px; height: 48px; font-size: 22px; background: rgba(0,0,0,.28); } }
+/* recorte: aparece inteiro, sem cortar nada. foto de cenário: preenche o quadrado. */
+.feed .objeto img.recorte { object-fit: contain; }
+.feed .objeto img.cenario { object-fit: cover; border-radius: var(--raio); }
+.feed .objeto img.ativa { opacity: 1; }
+.feed .objeto .lona { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.feed .objeto.com-webgl img { visibility: hidden; }
+.sem-distorcao .objeto .lona { display: none; }
+.sem-distorcao .objeto img { visibility: visible !important; }
 
-/* bolinhas: quantas fotos existem e em qual estamos */
-.pontos { position: absolute; left: 0; right: 0; top: 14px; z-index: 5; display: flex; gap: 6px; justify-content: center; }
-.pontos i { width: 6px; height: 6px; border-radius: 50%; background: rgba(255,255,255,.45); transition: background .25s ease, transform .25s ease; }
-.pontos i.on { background: #fff; transform: scale(1.35); }
-
-/* o ÚNICO texto da vitrine: nome e preço. Nada mais, por pedido dele. */
-.etiqueta {
-  position: absolute; left: 0; right: 0; bottom: 0; z-index: 4;
-  display: flex; align-items: baseline; justify-content: space-between; gap: 14px;
-  padding: 52px 20px 16px;
-  /* o degradê sobe mais alto e mais forte do que parece necessário porque a foto
-     embaixo MUDA: numa peça clara (a da Cláudia é branca) o preço sumia. Texto
-     sobre foto tem que aguentar a foto mais clara do catálogo, não a média. */
-  background: linear-gradient(to top, rgba(0,0,0,.82) 0%, rgba(0,0,0,.55) 42%, rgba(0,0,0,0) 100%);
-  color: #fff; text-decoration: none;
-  text-shadow: 0 1px 3px rgba(0,0,0,.55);
+/* ---- a legenda: bolinhas ACIMA do título (pedido de 15/09) --------------- */
+.feed .legenda { display: grid; justify-items: center; gap: 6px; max-width: 30ch; }
+.feed .pontos { display: flex; gap: 7px; justify-content: center; margin-bottom: 4px; min-height: 8px; }
+/* as bolinhas são o ÚNICO controle de foto que sobrou (as setas saíram por pedido
+   dele). No computador não existe arrastar, então elas precisam ser clicáveis — sem
+   isso, quem usa mouse nunca veria a segunda foto. */
+.feed .pontos button {
+  width: 8px; height: 8px; padding: 0; border: 0; border-radius: 50%; cursor: pointer;
+  background: rgba(234, 228, 219, .38);
+  transition: background .25s ease, transform .25s ease;
 }
-.etiqueta .produto-mini { font-size: 12px; letter-spacing: .1em; text-transform: uppercase; opacity: .82; }
-.etiqueta .nome { font-family: var(--fonte-titulo); font-weight: 500; font-size: clamp(1.2rem, 2.5vw, 1.8rem); }
-.etiqueta .valor { font-family: var(--fonte-titulo); font-size: clamp(.98rem, 1.7vw, 1.2rem); opacity: .92; white-space: nowrap; }
-.etiqueta:hover .nome { text-decoration: underline; }
-/* O toque na cena avança (como stories, que ele aprovou), e a etiqueta abre a página do
-   produto. Dois gestos no mesmo lugar só funcionam se o segundo se anunciar — daí o
-   "ver produto →" visível, em vez de um link invisível que ninguém descobre. */
-.etiqueta .ver { display: block; font-size: 12px; letter-spacing: .06em; opacity: .85; margin-top: 3px; }
-.etiqueta:hover .ver { opacity: 1; }
-/* a etiqueta e' um <a>, e no modo escuro a regra geral de link pintava ela de dourado
-   sobre a foto. Sobre foto, branco. */
-body.escuro a.etiqueta { color: #fff; }
+.feed .pontos button.on { background: var(--off); transform: scale(1.35); }
+.feed .pontos button:focus-visible { outline: 2px solid var(--dourado); outline-offset: 3px; }
 
-/* NO CELULAR A PECA OCUPA A TELA INTEIRA.
-   "ele fica todo espremido, ele da destaque total so pra aquele produto" — Cassiano,
-   14/09/2026. Num telefone, a moldura quadrada centralizada deixava metade da tela
-   preta; em tela estreita ela vira sangria total e o produto e' tudo que existe. */
-/* NO CELULAR TAMBÉM COM RESPIRO.
-   A sangria total (foto ocupando 390x844) era o que mais "esticava": foto quadrada
-   dentro de retângulo em pé corta as laterais e amplia o miolo. Quadrada com margem,
-   a peça aparece inteira e o fundo preto faz o trabalho de destaque que ele quer. */
-@media (max-width: 700px) {
-  /* Quadrado num telefone em pé desperdiça altura: a peça só podia chegar a 41% da
-     tela, e sobrava fundo demais. Em retrato 4:5 ela ocupa ~53%, continua inteira e o
-     fundo ainda faz o destaque. Corta alguns pixels de topo e base — as peças estão
-     centralizadas nas fotos, então não perde produto. */
-  .cena .moldura { width: 92vw; aspect-ratio: 4 / 5; }
-  .etiqueta { padding: 48px 16px 14px; }
+.feed .produto-mini { font-size: 11.5px; letter-spacing: .16em; text-transform: uppercase; opacity: .62; }
+.feed .nome-peca {
+  font-family: var(--fonte-titulo); font-weight: 500;
+  font-size: clamp(1.35rem, 3.4vw, 2.1rem); line-height: 1.1;
+  color: var(--off); text-decoration: none;
 }
+.feed .nome-peca:hover { text-decoration: underline; }
+.feed .valor { font-family: var(--fonte-titulo); font-size: clamp(.98rem, 1.8vw, 1.18rem); opacity: .82; }
+.feed .ver { font-size: 12px; letter-spacing: .08em; opacity: .7; color: var(--dourado); text-decoration: none; margin-top: 2px; }
+.feed .ver:hover { opacity: 1; text-decoration: underline; }
 
-/* ---- a capa (primeira cena) --------------------------------------------- */
-.capa .marca-grande { text-align: center; padding-inline: var(--gutter); }
-.capa .marca-grande img { width: min(70vw, 400px); margin: 0 auto 26px; }
-.capa .marca-grande p {
-  font-family: var(--fonte-titulo); font-weight: 300;
-  font-size: clamp(1.15rem, 2.8vw, 1.9rem); line-height: 1.25; color: var(--terracota);
-  margin: 0 auto; max-width: 18ch;
+/* ---- a dica de arrastar, SÓ no primeiro produto -------------------------
+   "Somente no primeiro produto, mostrar alguma animação com setas ou algo do tipo,
+   que é só rolar pra direita" (15/09/2026). Ela some no primeiro arrasto e não volta. */
+.dica-arrasto {
+  /* ⚠️ z-index acima da lona: o canvas do efeito é acrescentado DEPOIS dela no DOM, e
+     sem isto a dica nasce atrás dele — some da tela sem erro nenhum. Foi o que o
+     primeiro teste de 15/09/2026 mostrou.
+     E ela mora no PÉ do objeto, não no meio: no celular, no meio, ela tapava
+     justamente a peça que está convidando a olhar. */
+  position: absolute; left: 50%; bottom: 6px; transform: translateX(-50%); z-index: 6;
+  display: flex; align-items: center; gap: 9px; pointer-events: none;
+  white-space: nowrap;                     /* sem isto a seta cai numa linha e o texto noutra */
+  font-size: 11.5px; letter-spacing: .12em; text-transform: uppercase;
+  color: rgba(234, 228, 219, .92); text-shadow: 0 2px 10px rgba(0, 0, 0, .8);
+  background: rgba(20, 16, 13, .55); padding: 8px 15px; border-radius: 999px;
+  backdrop-filter: blur(3px);
+  transition: opacity .45s ease;
 }
-
-/* ---- o convite pra rolar ------------------------------------------------- */
-.role {
-  position: fixed; left: 50%; bottom: 20px; transform: translateX(-50%); z-index: 25;
-  display: flex; flex-direction: column; align-items: center; gap: 6px;
-  font-size: 12px; letter-spacing: .12em; text-transform: uppercase;
-  color: var(--tinta-fraca); pointer-events: none; transition: opacity .4s ease;
+.dica-arrasto .mao { font-size: 15px; line-height: 1; animation: deslizar 1.9s ease-in-out infinite; }
+@keyframes deslizar {
+  0%, 100% { transform: translateX(-7px); opacity: .45; }
+  50%      { transform: translateX(7px);  opacity: 1; }
 }
-body.escuro .role { color: rgba(234, 228, 219, .6); }
-.role::after { content: ''; width: 1px; height: 24px; background: currentColor; animation: descer 1.9s ease-in-out infinite; }
-@keyframes descer { 0%, 100% { opacity: .25; transform: translateY(-5px); } 50% { opacity: 1; transform: translateY(5px); } }
-@media (prefers-reduced-motion: reduce) { .role::after { animation: none; } }
-.role.some { opacity: 0; }
+@media (prefers-reduced-motion: reduce) { .dica-arrasto .mao { animation: none; } }
+.dica-arrasto.some { opacity: 0; }
+@media (prefers-reduced-motion: reduce) { .dica-arrasto .mao { animation: none; } }
 
-/* ---- o toque que avança (celular) ---------------------------------------- */
-.avancar {
-  position: fixed; right: 16px; bottom: 16px; z-index: 26;
-  width: 52px; height: 52px; border-radius: 50%; border: 0; cursor: pointer;
-  background: var(--terracota); color: var(--off); font-size: 21px; line-height: 1;
-  display: grid; place-items: center;
-  box-shadow: 0 10px 26px -10px rgba(0,0,0,.6);
-  transition: background .2s ease, transform .2s ease;
-}
-.avancar:hover { transform: translateY(-2px); }
-body.escuro .avancar { background: var(--dourado); color: var(--preto); }
-
-/* ---- contador de cenas --------------------------------------------------- */
-.contador {
-  position: fixed; left: var(--gutter); bottom: 22px; z-index: 25;
+/* ---- contador e o botão de voltar pro menu ------------------------------ */
+.feed .contador {
+  position: absolute; left: var(--gutter); bottom: 22px; z-index: 6;
   font-family: var(--fonte-titulo); font-size: 13px; letter-spacing: .1em;
-  color: var(--tinta-fraca); pointer-events: none;
+  color: rgba(234, 228, 219, .55); pointer-events: none;
 }
-body.escuro .contador { color: rgba(234, 228, 219, .55); }
-@media (max-width: 560px) { .contador { display: none; } }
+@media (max-width: 560px) { .feed .contador { display: none; } }
+.feed .fechar-feed {
+  /* desce a tarja de obra + a altura do cabeçalho: sem a parcela da tarja ele fica
+     escondido atrás do cabeçalho, que é onde ele estava no teste de 15/09 */
+  position: absolute; left: var(--gutter); top: calc(var(--tarja, 0px) + 72px); z-index: 6;
+  background: transparent; border: 0; color: rgba(234, 228, 219, .72);
+  font: inherit; font-size: 13.5px; letter-spacing: .06em; cursor: pointer; padding: 6px 0;
+}
+.feed .fechar-feed:hover { color: var(--off); text-decoration: underline; }
 
-/* ================================================================ RODAPÉ
-   A vitrine não tem texto, mas a página precisa levar a algum lugar: é aqui que
-   moram os links que o Google Ads exige encontrar (quem é, trocas, privacidade). */
+/* ---- o cartão de fim do feed ------------------------------------------- */
+.feed .fim { display: grid; justify-items: center; gap: 18px; text-align: center; max-width: 34ch; }
+.feed .fim img { width: min(64vw, 300px); }
+.feed .fim p { margin: 0; color: rgba(234, 228, 219, .8); }
+
+/* ================================================================== RODAPÉ
+   Repete a marca com a frase embaixo, o mesmo menu de categorias e as redes —
+   exatamente a lista que ele mandou em 15/09/2026. */
 .rodape {
   position: relative; z-index: 2;
-  background: var(--preto); color: rgba(234, 228, 219, .72);
-  padding-block: 54px 34px; font-size: 14.5px;
+  background: var(--preto); color: rgba(234, 228, 219, .74);
+  padding-block: clamp(46px, 8vw, 72px) 30px; font-size: 14.5px;
+  text-align: center;
 }
-.rodape .embrulho { display: grid; grid-template-columns: 1.4fr 1fr 1fr; gap: 30px; }
-@media (max-width: 760px) { .rodape .embrulho { grid-template-columns: 1fr; } }
-.rodape img { height: 26px; width: auto; margin-bottom: 12px; }
-.rodape h4 { font-size: 12.5px; letter-spacing: .09em; text-transform: uppercase; color: var(--dourado); margin: 0 0 10px; }
-.rodape ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 7px; }
-.rodape a { color: inherit; text-decoration: none; }
-.rodape a:hover { color: var(--off); text-decoration: underline; }
-.rodape .lei { grid-column: 1 / -1; border-top: 1px solid rgba(234,228,219,.14); padding-top: 18px; margin-top: 8px; font-size: 13px; }
+.rodape .marca-rodape { width: min(72vw, 300px); margin: 0 auto 14px; }
+.rodape .frase { font-family: var(--fonte-titulo); font-weight: 300; font-size: clamp(1rem, 2.2vw, 1.3rem); color: var(--dourado); margin: 0 0 26px; }
+.rodape .orcamento {
+  display: inline-block; margin-bottom: 30px; color: var(--off);
+  font-size: 15.5px; text-decoration: none; border-bottom: 1.5px solid var(--dourado); padding-bottom: 3px;
+}
+.rodape .orcamento:hover { color: var(--dourado); }
+.rodape .orcamento[aria-disabled='true'] { opacity: .55; cursor: not-allowed; border-bottom-style: dashed; }
+.rodape .menu-categorias { margin: 0 auto 26px; color: rgba(234, 228, 219, .8); }
+.rodape .menu-categorias a, .rodape .menu-categorias span { color: inherit; }
+.rodape .menu-categorias a:hover, .rodape .menu-categorias a:focus-visible { background: var(--dourado); color: var(--preto); }
 
-/* ============================================================ PÁGINA DE PRODUTO
-   Aqui mora TODO o texto que saiu da vitrine — "quando ela clicar lá, que apareça
-   as instruções, beleza" (áudio 3, 00:14). É esta página, e não a home, que vira a
-   página de destino do anúncio: é ela que tem conteúdo original suficiente. */
-.pagina { padding-top: 88px; }
+.rodape .redes { display: flex; justify-content: center; gap: 18px; margin-bottom: 26px; }
+.rodape .redes a { color: rgba(234, 228, 219, .72); transition: color .2s ease, transform .2s ease; }
+.rodape .redes a:hover { color: var(--off); transform: translateY(-2px); }
+.rodape .redes svg { width: 22px; height: 22px; display: block; }
 
-.produto-topo { display: grid; grid-template-columns: 1.05fr .95fr; gap: clamp(28px, 5vw, 60px); align-items: center; padding-block: clamp(20px, 4vw, 48px); }
+.rodape .lei {
+  border-top: 1px solid rgba(234, 228, 219, .14); padding-top: 20px; margin: 0 auto;
+  max-width: var(--maxima); font-size: 13px; line-height: 2;
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 4px 8px;
+}
+/* "© ALEA 2026" com o LOGO no lugar do nome escrito — ele registrou a marca e pediu
+   que o registro apareça, não a palavra solta. */
+.rodape .lei img { height: 17px; width: auto; display: inline-block; vertical-align: -3px; }
+.rodape .lei .creditos { flex-basis: 100%; opacity: .6; font-size: 12px; }
+.rodape a { color: inherit; }
+
+/* ================================================== PÁGINAS INTERNAS (produto/texto) */
+.pagina { padding-top: calc(var(--tarja, 0px) + 92px); }
+
+.produto-topo { display: grid; grid-template-columns: 1.05fr .95fr; gap: clamp(28px, 5vw, 60px); align-items: start; padding-block: clamp(20px, 4vw, 48px); }
 @media (max-width: 900px) { .produto-topo { grid-template-columns: 1fr; } }
-.produto-topo .moldura { position: relative; aspect-ratio: 1/1; border-radius: var(--raio); overflow: hidden; background: var(--papel); }
-.produto-topo .moldura img { width: 100%; height: 100%; object-fit: cover; }
 .produto-topo .linha { font-size: 12.5px; letter-spacing: .1em; text-transform: uppercase; color: var(--dourado); font-weight: 700; }
 .produto-topo h1 { font-family: var(--fonte-titulo); font-weight: 500; font-size: clamp(2rem, 4.6vw, 3.1rem); line-height: 1.06; color: var(--terracota); margin: 8px 0 14px; }
 .produto-topo .valor-grande { font-family: var(--fonte-titulo); font-size: clamp(1.7rem, 3vw, 2.2rem); margin: 0 0 6px; }
-.produto-topo .valor-grande small { font-family: var(--fonte-corpo); font-size: .92rem; color: var(--tinta-fraca); }
 .produto-topo p { color: var(--tinta-fraca); }
 
+/* ---- a capa da peça na página de produto --------------------------------
+   Mesmo padrão do feed: objeto recortado, sem moldura. Quando a peça ainda não tem
+   foto boa pro recorte, a foto normal entra na moldura de sempre. */
+.capa-produto {
+  position: relative; aspect-ratio: 1/1; border-radius: var(--raio); overflow: hidden;
+  background: var(--papel);
+}
+.capa-produto img { width: 100%; height: 100%; object-fit: cover; }
+.capa-produto.sem-fundo { background: transparent; overflow: visible; }
+.capa-produto.sem-fundo img { object-fit: contain; }
+
+.recado-aceite { color: var(--terracota); font-size: 13.5px; margin: 10px 0 0; }
+
+/* ---- A COLMEIA ----------------------------------------------------------
+   "Fazer algo diferente como se fosse uma colmeia, todas as fotos em miniatura,
+   espalhadas, onde você clica na miniatura e ela expande no lugar que ela está,
+   fazendo com que as outras diminuam ao mesmo tempo" (Cassiano, 15/09/2026).
+
+   Como funciona: favos hexagonais em linhas encaixadas (a linha de baixo entra no vão
+   da de cima). Clicar num favo cresce ELE e encolhe os outros — a colmeia inteira
+   respira em volta de quem está aberto. Nada troca de lugar: a foto expande ONDE ELA
+   ESTÁ, que foi o pedido literal. */
+.colmeia {
+  --favo: clamp(96px, 15vw, 150px);
+  display: flex; flex-wrap: wrap; justify-content: center;
+  gap: calc(var(--favo) * .06);
+  padding-block: clamp(16px, 3vw, 28px);
+  margin-bottom: 8px;
+}
+.colmeia .favo {
+  width: var(--favo); height: calc(var(--favo) * 1.1547);   /* proporção do hexágono */
+  margin: calc(var(--favo) * -.14) 0;                        /* encaixa as linhas */
+  padding: 0; border: 0; background: var(--papel); cursor: pointer;
+  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+  transition: transform .45s cubic-bezier(.3, .86, .28, 1), filter .45s ease, opacity .45s ease;
+  transform-origin: center;
+}
+.colmeia .favo img { width: 100%; height: 100%; object-fit: cover; }
+.colmeia .favo:hover { filter: brightness(1.06); }
+.colmeia .favo:focus-visible { outline: 2px solid var(--terracota); outline-offset: 2px; }
+/* a linha ímpar entra no vão da par — é o que faz virar colmeia e não grade */
+.colmeia .favo:nth-child(even) { transform: translateY(calc(var(--favo) * .29)); }
+.colmeia.tem-aberto .favo { opacity: .55; transform: scale(.78); }
+.colmeia.tem-aberto .favo:nth-child(even) { transform: translateY(calc(var(--favo) * .29)) scale(.78); }
+.colmeia.tem-aberto .favo.aberto { opacity: 1; transform: scale(2.05); z-index: 5; position: relative; }
+.colmeia.tem-aberto .favo:nth-child(even).aberto { transform: translateY(calc(var(--favo) * .29)) scale(2.05); }
+/* espaço em volta pra foto aberta não sair da página */
+.colmeia-caixa { padding: calc(var(--favo, 120px) * .55) 0; overflow: hidden; }
+.colmeia-dica { text-align: center; font-size: 13px; color: var(--tinta-fraca); margin: 0 0 4px; }
+@media (prefers-reduced-motion: reduce) { .colmeia .favo { transition: none; } }
+
+/* ---- ficha, abas e o aceite --------------------------------------------- */
 .ficha { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px 30px; margin: 24px 0 26px; padding: 0; }
 @media (max-width: 560px) { .ficha { grid-template-columns: 1fr; } }
 .ficha div { border-top: 1px solid var(--borda); padding-top: 10px; }
 .ficha dt { font-size: 12.5px; letter-spacing: .08em; text-transform: uppercase; color: var(--dourado); font-weight: 700; }
 .ficha dd { margin: 4px 0 0; font-size: 15.5px; }
 
-/* ⚠️ `align-items: start` NÃO E' ENFEITE — sem ele a galeria sai ESPREMIDA.
-   Item de grid estica no eixo vertical por padrão (`align-self: stretch`), e a
-   esticada GANHA do `aspect-ratio`: a foto quadrada virava uma tira estreita e
-   comprida. Foi o que o Cassiano viu no print de 14/09/2026 16:04 — "as imagens
-   estão muito espremidas junto". Com `start`, a altura volta a sair da proporção. */
-.galeria { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; align-items: start; padding-block: clamp(20px, 4vw, 40px); }
-@media (max-width: 700px) { .galeria { grid-template-columns: repeat(2, 1fr); } }
-.galeria img { aspect-ratio: 1 / 1; height: auto; object-fit: cover; border-radius: var(--raio); width: 100%; }
+.aviso-personalizado { border: 1px solid var(--borda); border-radius: var(--raio); padding: 18px 20px; margin: 4px 0 22px; background: var(--papel); }
+.aviso-personalizado h2 { font-family: var(--fonte-titulo); font-size: 13px; letter-spacing: .12em; text-transform: uppercase; color: var(--terracota); margin: 0 0 8px; }
+.aviso-personalizado p { margin: 0; font-size: 14.5px; color: var(--tinta-fraca); }
+
+.aceite { display: flex; gap: 11px; align-items: flex-start; margin: 0 0 18px; font-size: 14px; color: var(--tinta-fraca); cursor: pointer; }
+.aceite input { margin: 3px 0 0; width: 19px; height: 19px; flex: none; accent-color: var(--terracota); cursor: pointer; }
+.aceite.faltou { color: var(--terracota); font-weight: 600; }
+
+.personalizar { display: grid; gap: 12px; margin: 0 0 20px; }
+.personalizar label { display: grid; gap: 5px; font-size: 13px; letter-spacing: .06em; text-transform: uppercase; color: var(--dourado); font-weight: 700; }
+.personalizar input, .personalizar select {
+  font: inherit; font-size: 15.5px; text-transform: none; letter-spacing: 0; color: var(--tinta);
+  padding: 11px 13px; border: 1px solid var(--borda); border-radius: 10px; background: #fff;
+}
+.personalizar input:focus, .personalizar select:focus { outline: 2px solid var(--terracota); outline-offset: 1px; }
 
 .botao {
-  display: inline-flex; align-items: center; gap: 10px;
+  display: inline-flex; align-items: center; justify-content: center; gap: 10px;
   background: var(--terracota); color: var(--off);
-  text-decoration: none; font-weight: 600; font-size: 16px;
+  text-decoration: none; font-weight: 600; font-size: 16px; font-family: inherit;
   padding: 14px 26px; border-radius: 999px; border: 0; cursor: pointer;
-  transition: transform .18s ease, background .18s ease;
+  transition: transform .18s ease, background .18s ease, opacity .18s ease;
 }
 .botao:hover { background: var(--laranja); transform: translateY(-1px); }
 .botao.contorno { background: transparent; color: var(--terracota); box-shadow: inset 0 0 0 1.5px var(--terracota); }
 .botao.contorno:hover { background: var(--terracota); color: var(--off); }
-.botao[aria-disabled='true'] { background: var(--dourado); cursor: not-allowed; transform: none; opacity: .8; }
+.botao[aria-disabled='true'], .botao:disabled { background: var(--dourado); cursor: not-allowed; transform: none; opacity: .7; }
+.botoes-produto { display: flex; flex-wrap: wrap; gap: 12px; }
 
 .voltar { display: inline-block; margin-block: 8px 26px; font-size: 14.5px; }
 
@@ -328,10 +545,42 @@ body.escuro .contador { color: rgba(234, 228, 219, .55); }
 .texto ul { padding-left: 1.2em; }
 .texto li { margin-bottom: 8px; }
 
-/* ------------------------------------------------------------ tarja de obra */
+/* ================================================================= GAVETAS
+   Conta e carrinho abrem pela direita, por cima de tudo — inclusive do feed. */
+.gaveta {
+  /* desce a tarja de obra: ela é fixa no topo com z-index maior, e sem isto o título
+     da gaveta nasce escondido atrás dela */
+  position: fixed; top: var(--tarja, 0px); right: 0; bottom: 0; left: auto; z-index: 80;
+  width: min(420px, 100vw); background: var(--papel); color: var(--tinta);
+  box-shadow: -30px 0 70px -40px rgba(0, 0, 0, .8);
+  transform: translateX(100%); transition: transform .38s cubic-bezier(.3, .86, .28, 1);
+  display: flex; flex-direction: column;
+}
+.gaveta.aberta { transform: none; }
+.gaveta header { display: flex; align-items: center; gap: 12px; padding: 18px 20px; border-bottom: 1px solid var(--borda); }
+.gaveta header h2 { font-family: var(--fonte-titulo); font-weight: 500; font-size: 1.25rem; margin: 0; color: var(--terracota); }
+.gaveta header button { margin-left: auto; background: transparent; border: 0; font-size: 22px; line-height: 1; cursor: pointer; color: var(--tinta-fraca); padding: 4px 8px; }
+.gaveta .corpo { padding: 18px 20px; overflow: auto; flex: 1; }
+.gaveta .rodape-gaveta { padding: 16px 20px; border-top: 1px solid var(--borda); display: grid; gap: 10px; }
+.gaveta .vazio { color: var(--tinta-fraca); font-size: 15px; }
+.cortina { position: fixed; inset: 0; z-index: 79; background: rgba(20, 16, 13, .5); opacity: 0; visibility: hidden; transition: opacity .3s ease, visibility .3s; }
+.cortina.aberta { opacity: 1; visibility: visible; }
+
+.linha-carrinho { display: grid; grid-template-columns: 62px 1fr auto; gap: 12px; align-items: start; padding: 12px 0; border-bottom: 1px solid var(--borda); }
+.linha-carrinho img { width: 62px; height: 62px; object-fit: contain; background: #fff; border-radius: 10px; }
+.linha-carrinho .titulo { font-weight: 600; font-size: 15px; }
+.linha-carrinho .detalhe { font-size: 13px; color: var(--tinta-fraca); }
+.linha-carrinho .tirar { background: transparent; border: 0; color: var(--tinta-fraca); cursor: pointer; font-size: 13px; text-decoration: underline; padding: 0; }
+.total-carrinho { display: flex; justify-content: space-between; font-family: var(--fonte-titulo); font-size: 1.15rem; }
+
+/* ------------------------------------------------------------ tarja de obra
+   ⚠️ ELA E' FIXA, E O CABECALHO DESCE A ALTURA DELA.
+   Antes a tarja era `relative` e o cabecalho `fixed; top: 0` — os dois no mesmo lugar,
+   e o logo da ālea ficava escondido atras do aviso. Quem mede a altura e' o site.js
+   (ela quebra em duas linhas no celular), e o valor chega aqui como `--tarja`. */
 .tarja-config {
-  position: relative; z-index: 40;
+  position: fixed; inset: 0 0 auto 0; z-index: 90;
   background: var(--dourado); color: #1F1710;
   font-size: 14px; line-height: 1.5; padding: 10px var(--gutter); text-align: center;
 }
-.tarja-config code { background: rgba(255,255,255,.45); padding: 1px 6px; border-radius: 5px; font-size: 13px; }
+.tarja-config code { background: rgba(255, 255, 255, .45); padding: 1px 6px; border-radius: 5px; font-size: 13px; }

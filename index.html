@@ -37,76 +37,105 @@
 }
 </script>
 </head>
-<body>
-<a class="pular" href="#palco">Pular para os produtos</a>
+<body class="home na-abertura">
+<a class="pular" href="#abertura">Pular para o menu de categorias</a>
 
+<!-- ⚠️ O BLOCO ENTRE OS MARCADORES ALEA:TOPO É GERADO.
+     Quem manda nele é o 01_gerar_paginas_v2.py: ele reescreve o cabeçalho de TODAS as
+     páginas de uma vez. Editar aqui à mão funciona até a próxima geração, e aí some.
+     Isso existe porque cabeçalho e rodapé repetidos em seis arquivos divergem — foi
+     assim que o site da Negocie ficou com dois menus diferentes. -->
+<!-- ALEA:TOPO -->
 <header class="topo">
   <a class="marca" href="index.html" aria-label="ālea — início">
-    <img class="colorida" src="img/marca/alea_logo.svg" alt="ālea">
-    <img class="clara" src="img/marca/alea_logo_claro.svg" alt="ālea">
+    <img class="colorida" src="img/marca/alea_logo.svg" alt="ālea" width="129" height="28">
+    <img class="clara" src="img/marca/alea_logo_claro.svg" alt="ālea" width="129" height="28">
   </a>
   <nav aria-label="Principal">
+    <a href="index.html" class="some-no-celular">Feed</a>
     <a href="a-alea.html" class="some-no-celular">A ālea</a>
-    <a href="produto-bowl-wave.html" class="some-no-celular">Comedouro</a>
-    <a class="pedir zap" data-assunto="quero encomendar uma peça da ālea">Pedir</a>
+    <button class="botao-icone" type="button" data-abrir="conta" aria-haspopup="dialog">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+      <span class="rotulo">Conta</span>
+    </button>
+    <button class="botao-icone" type="button" data-abrir="carrinho" aria-haspopup="dialog">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><path d="M3 6h18"></path><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
+      <span class="rotulo">Carrinho</span>
+      <span class="quantos" data-quantos>0</span>
+    </button>
   </nav>
 </header>
+<!-- /ALEA:TOPO -->
 
-<!-- ======================================================================= VITRINE
-     Sem texto, por pedido do Cassiano. Uma peça por tela, a seguinte cobrindo a
-     anterior. As cenas nascem do js/produtos.js — não se escreve produto aqui. -->
-<main id="palco" class="palco">
+<!-- ======================================================================= ABERTURA
+     A primeira tela: gradiente da marca (o "igual o Linktree" que ele pediu), a
+     capivara que cresce e vira o logotipo, a frase escrita letra por letra e o menu.
+     O FEED só aparece depois que uma categoria for clicada. -->
+<main id="abertura" class="abertura">
+  <h1 class="so-leitor">ālea — comedouros e acessórios pet personalizados, impressos em 3D em Jataí-GO</h1>
 
-  <section class="cena capa">
-    <div class="marca-grande">
-      <img src="img/marca/alea_logo.svg" alt="ālea" width="400" height="87">
-      <p>O comedouro tem o nome dele.</p>
+  <div class="miolo">
+    <!-- as duas peças têm o viewBox do logo inteiro: sobrepostas, remontam o logotipo
+         exato. Ver _partir_logo_v1.py. -->
+    <div class="marca-anim" aria-hidden="true">
+      <img class="capivara" src="img/marca/alea_capivara.svg" alt="">
+      <img class="nome" src="img/marca/alea_nome.svg" alt="">
     </div>
-  </section>
 
-  <!-- as demais cenas entram aqui, desenhadas pelo js/vitrine.js -->
+    <!-- a frase vai INTEIRA no HTML (Google e leitor de tela leem mesmo sem JS); o JS
+         só revela letra a letra o que já está escrito aqui. -->
+    <p class="assinatura" data-datilografar>Onde cada impressão começa com um sonho!</p>
+  </div>
+
+  <nav class="menu-categorias" data-menu-categorias aria-label="Categorias"></nav>
 </main>
 
-<div class="role" aria-hidden="true">role</div>
-<div class="contador" id="contador" aria-hidden="true">01 / 09</div>
-<button class="avancar" id="avancar" type="button" aria-label="Próximo produto">↓</button>
+<!-- ========================================================================== FEED
+     Camada preta por cima de tudo. Nasce vazia; o js/feed.js desenha os itens da
+     categoria escolhida. -->
+<section class="feed" id="feed" aria-label="Produtos" aria-hidden="true">
+  <button class="fechar-feed" type="button" data-fechar-feed>← categorias</button>
+  <div class="palco" id="palco"></div>
+  <div class="contador" id="contador" aria-hidden="true"></div>
+</section>
 
+<!-- ALEA:RODAPE -->
 <footer class="rodape">
-  <div class="embrulho">
-    <div>
-      <img src="img/marca/alea_logo_claro.svg" alt="ālea">
-      <p>Comedouros e acessórios pet personalizados, impressos em 3D sob encomenda em
-         <span data-campo="cidade">Jataí</span>-<span data-campo="uf">GO</span>.</p>
-    </div>
-    <div>
-      <h4>Produtos</h4>
-      <ul>
-        <li><a href="produto-bowl-wave.html">ālea Bowl Wave</a></li>
-        <li><a href="produto-poop-bag-holder.html">ālea Poop Bag Holder</a></li>
-        <li><a href="produto-kit.html">Kit ālea</a></li>
-      </ul>
-    </div>
-    <div>
-      <h4>Informações</h4>
-      <ul>
-        <li><a href="a-alea.html">Quem é a ālea</a></li>
-        <li><a href="trocas-e-entrega.html">Trocas, devolução e entrega</a></li>
-        <li><a href="privacidade.html">Política de privacidade</a></li>
-        <li><a href="https://www.instagram.com/alea.decor3d/" target="_blank" rel="noopener">Instagram @alea.decor3d</a></li>
-      </ul>
-    </div>
-    <p class="lei">
-      © <span id="ano">2026</span> ālea — <span data-campo="responsavel">Cassiano Rosado</span>,
-      <span data-campo="cidade">Jataí</span>/<span data-campo="uf">GO</span>.
-      Peças feitas sob encomenda. Identidade visual por Mirella Gaetti.
-    </p>
-  </div>
+  <img class="marca-rodape" src="img/marca/alea_logo_claro.svg" alt="ālea">
+  <p class="frase" data-assinatura>Onde cada impressão começa com um sonho!</p>
+  <a class="orcamento zap" data-assunto="orçamento de uma peça personalizada">Orçamentos e personalizados, clique aqui!</a>
+  <nav class="menu-categorias" data-menu-categorias aria-label="Categorias"></nav>
+  <div class="redes" data-redes></div>
+  <p class="lei">
+    © <img src="img/marca/alea_logo_claro.svg" alt="ālea"> <span id="ano">2026</span> — Todos os direitos reservados.
+    <span class="creditos">
+      <span data-campo="responsavel">Cassiano Rosado</span>, <span data-campo="cidade">Jataí</span>/<span data-campo="uf">GO</span> ·
+      peças feitas sob encomenda · identidade visual por Mirella Gaetti ·
+      <a href="produto-bowl-wave.html">ālea Bowl Wave</a> ·
+      <a href="produto-poop-bag-holder.html">ālea Poop Bag Holder</a> ·
+      <a href="produto-kit.html">Kit ālea</a> ·
+      
+      <a href="a-alea.html">Quem é a ālea</a> ·
+      <a href="trocas-e-entrega.html">Trocas, devolução e entrega</a> ·
+      <a href="privacidade.html">Política de privacidade</a>
+    </span>
+  </p>
 </footer>
+<!-- /ALEA:RODAPE -->
 
 <script src="js/config.js"></script>
 <script src="js/produtos.js"></script>
 <script src="js/site.js"></script>
-<script src="js/vitrine.js"></script>
+<script src="js/carrinho.js"></script>
+<!-- ⚠️ A ORDEM IMPORTA, e já custou caro duas vezes (Negocie 10/09, ālea 14/09).
+     O distorcao.js tem que estar CARREGADO antes do feed.js: o feed manda montar o
+     efeito no item que entra na tela, e manda isso já na primeira abertura. Se ele
+     carregar depois, `window.aleaDistorcao` ainda não existe nesse instante e o
+     primeiro produto fica sem efeito — sem erro nenhum no console.
+     O abertura.js vem antes do feed.js porque ele ESPERA o aviso `alea:feed-pronto`;
+     carregado depois, perderia o aviso e a categoria do endereço não abriria. -->
 <script src="js/distorcao.js"></script>
+<script src="js/abertura.js"></script>
+<script src="js/feed.js"></script>
 </body>
 </html>

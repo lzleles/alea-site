@@ -24,6 +24,7 @@
   "name": "ālea Poop Bag Holder",
   "description": "Porta-saquinho que sai na mesma estampa do comedouro.",
   "image": "https://lzleles.github.io/alea-site/img/produtos/saquinho_1.jpg",
+  "material": "PLA",
   "brand": { "@type": "Brand", "name": "ālea" },
   "offers": {
     "@type": "Offer",
@@ -37,73 +38,105 @@
 </head>
 <body>
 <a class="pular" href="#conteudo">Pular para o conteúdo</a>
+<!-- ALEA:TOPO -->
 <header class="topo">
   <a class="marca" href="index.html" aria-label="ālea — início">
-    <img class="colorida" src="img/marca/alea_logo.svg" alt="ālea">
-    <img class="clara" src="img/marca/alea_logo_claro.svg" alt="ālea">
+    <img class="colorida" src="img/marca/alea_logo.svg" alt="ālea" width="129" height="28">
+    <img class="clara" src="img/marca/alea_logo_claro.svg" alt="ālea" width="129" height="28">
   </a>
   <nav aria-label="Principal">
-    <a href="index.html" class="some-no-celular">Vitrine</a>
+    <a href="index.html" class="some-no-celular">Feed</a>
     <a href="a-alea.html" class="some-no-celular">A ālea</a>
-    <a class="pedir zap" data-assunto="ālea Poop Bag Holder (R$ 59,00)">Pedir</a>
+    <button class="botao-icone" type="button" data-abrir="conta" aria-haspopup="dialog">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+      <span class="rotulo">Conta</span>
+    </button>
+    <button class="botao-icone" type="button" data-abrir="carrinho" aria-haspopup="dialog">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><path d="M3 6h18"></path><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
+      <span class="rotulo">Carrinho</span>
+      <span class="quantos" data-quantos>0</span>
+    </button>
   </nav>
 </header>
+<!-- /ALEA:TOPO -->
 <main id="conteudo" class="pagina">
 <div class="embrulho">
-  <a class="voltar" href="index.html">← Voltar para a vitrine</a>
+  <a class="voltar" href="index.html">← Voltar para o feed</a>
 
   <div class="produto-topo">
-    <div class="moldura">
-      <img src="img/produtos/saquinho_1.jpg" width="1200" height="1200" fetchpriority="high"
-           decoding="async" alt="ālea Poop Bag Holder — Porta-saquinho que sai na mesma estampa do comedouro.">
+    <div>
+      <div class="capa-produto sem-fundo"><img src="img/produtos/saquinho_1_obj.webp" class="recorte" fetchpriority="high" decoding="async" alt="ālea Poop Bag Holder — Porta-saquinho que sai na mesma estampa do comedouro."></div>
+      <p class="colmeia-dica">Clique numa foto pra ampliar.</p><div class="colmeia-caixa"><div class="colmeia" data-colmeia><button class="favo" type="button" data-favo="0" aria-label="Ampliar foto 1 de ālea Poop Bag Holder"><img src="img/produtos/saquinho_1_m.jpg" width="700" height="700" loading="lazy" decoding="async" alt="ālea Poop Bag Holder — foto 1"></button><button class="favo" type="button" data-favo="1" aria-label="Ampliar foto 2 de ālea Poop Bag Holder"><img src="img/produtos/saquinho_2_m.jpg" width="700" height="700" loading="lazy" decoding="async" alt="ālea Poop Bag Holder — foto 2"></button><button class="favo" type="button" data-favo="2" aria-label="Ampliar foto 3 de ālea Poop Bag Holder"><img src="img/produtos/saquinho_3_m.jpg" width="700" height="700" loading="lazy" decoding="async" alt="ālea Poop Bag Holder — foto 3"></button><button class="favo" type="button" data-favo="3" aria-label="Ampliar foto 4 de ālea Poop Bag Holder"><img src="img/produtos/chica_2_m.jpg" width="700" height="700" loading="lazy" decoding="async" alt="ālea Poop Bag Holder — foto 4"></button></div></div>
     </div>
     <div>
       <span class="linha">Passeio</span>
       <h1>ālea Poop Bag Holder</h1>
-      <p class="valor-grande">R$ 59,00 <small>+ frete</small></p>
+      <p class="valor-grande">R$ 59,00</p>
       <p>Porta-saquinho que sai na mesma estampa do comedouro.</p>
-      <p>Prende na guia e leva o rolo de saquinhos. Sai combinando com a estampa escolhida no comedouro — é o mesmo desenho aplicado numa peça menor.</p><p>Também aceita o nome do cão, pelo mesmo processo: impresso junto com a peça, em outra cor, sem adesivo.</p>
-      <dl class="ficha"><div><dt>Material</dt><dd>PLA de impressão 3D</dd></div><div><dt>Personalização</dt><dd>Nome e estampa, inclusos no preço</dd></div><div><dt>Produção</dt><dd>Sob encomenda, 5 a 10 dias úteis após a aprovação da prévia</dd></div><div><dt>Combina com</dt><dd>A mesma estampa do ālea Bowl Wave</dd></div></dl>
-      <a class="botao zap" data-assunto="ālea Poop Bag Holder (R$ 59,00)">Pedir pelo WhatsApp</a>
+      <p>Prende na guia e leva o rolo de saquinhos. Sai combinando com a estampa escolhida no comedouro — é o mesmo desenho aplicado numa peça menor.</p><p>Também aceita o nome do cão, pelo mesmo processo: em baixo relevo, na cor do objeto, impresso junto com a peça.</p>
+      <dl class="ficha"><div><dt>Material</dt><dd>PLA</dd></div><div><dt>Personalização</dt><dd>Nome do pet em baixo relevo na cor do objeto.</dd></div><div><dt>Produção</dt><dd>Sob encomenda, 3 dias úteis após a confirmação de pagamento!</dd></div><div><dt>Cores</dt><dd>Totalmente personalizável, podendo escolher entre filamentos básicos, foscos ou brilhosos.</dd></div><div><dt>Combina com</dt><dd>A mesma estampa do ālea Bowl Wave</dd></div></dl>
+
+      <section class="aviso-personalizado">
+        <h2>PRODUTOS PERSONALIZADOS</h2>
+        <p>Por se tratar de um produto produzido sob encomenda e personalizado especialmente de acordo com as suas escolhas, pedidos personalizados não poderão ser cancelados ou devolvidos após a confirmação de pagamento se o produto já estiver sendo fabricado, ressalvados casos de defeito, vício ou erro de fabricação.</p>
+      </section>
+
+      <form class="personalizar" data-personalizar autocomplete="off">
+        <label>Nome do pet
+          <input type="text" name="nome_pet" maxlength="18" placeholder="como vai sair impresso na peça">
+        </label>
+        <label>Cores
+          <input type="text" name="cor" maxlength="60" placeholder="ex.: azul fosco com letra dourada">
+        </label>
+      </form>
+
+      <label class="aceite" data-aceite>
+        <input type="checkbox" data-aceite-caixa>
+        <span>Declaro que revisei cuidadosamente todas as informações da personalização, incluindo nome, grafia e cores. Declaro, ainda, estar ciente e de acordo com as condições acima aplicáveis a produtos personalizados, inclusive quanto a cancelamentos e devoluções.</span>
+      </label>
+
+      <div class="botoes-produto">
+        <button class="botao" type="button" data-add-carrinho
+                data-slug="poop-bag-holder" data-nome="ālea Poop Bag Holder" data-preco="59"
+                data-capa="saquinho_1" data-material="PLA" disabled>
+          Adicionar ao carrinho
+        </button>
+        <a class="botao contorno zap" data-assunto="ālea Poop Bag Holder (R$ 59,00)">Pedir pelo WhatsApp</a>
+      </div>
+      <p class="recado-aceite" data-recado-aceite hidden>
+        Marque a declaração acima para adicionar ao carrinho.
+      </p>
     </div>
   </div>
-
-  <div class="galeria"><img src="img/produtos/saquinho_2_m.jpg" width="700" height="700" loading="lazy" decoding="async" alt="ālea Poop Bag Holder — outra personalização"><img src="img/produtos/saquinho_3_m.jpg" width="700" height="700" loading="lazy" decoding="async" alt="ālea Poop Bag Holder — outra personalização"><img src="img/produtos/chica_2_m.jpg" width="700" height="700" loading="lazy" decoding="async" alt="ālea Poop Bag Holder — outra personalização"></div>
-
-  <p style="color:var(--tinta-fraca);font-size:15px;max-width:70ch">
-    Peça feita sob encomenda e personalizada. Antes de imprimir, você recebe uma prévia
-    para aprovar o nome e a estampa. Prazos, entrega, troca e devolução estão em
-    <a href="trocas-e-entrega.html">trocas, devolução e entrega</a>.
-  </p>
 </div>
 </main>
+<!-- ALEA:RODAPE -->
 <footer class="rodape">
-  <div class="embrulho">
-    <div>
-      <img src="img/marca/alea_logo_claro.svg" alt="ālea">
-      <p>Comedouros e acessórios pet personalizados, impressos em 3D sob encomenda em
-         Jataí-GO.</p>
-    </div>
-    <div>
-      <h4>Produtos</h4>
-      <ul><li><a href="produto-bowl-wave.html">ālea Bowl Wave</a></li><li><a href="produto-poop-bag-holder.html">ālea Poop Bag Holder</a></li><li><a href="produto-kit.html">Kit ālea</a></li></ul>
-    </div>
-    <div>
-      <h4>Informações</h4>
-      <ul>
-        <li><a href="a-alea.html">Quem é a ālea</a></li>
-        <li><a href="trocas-e-entrega.html">Trocas, devolução e entrega</a></li>
-        <li><a href="privacidade.html">Política de privacidade</a></li>
-        <li><a href="https://www.instagram.com/alea.decor3d/" target="_blank" rel="noopener">Instagram @alea.decor3d</a></li>
-      </ul>
-    </div>
-    <p class="lei">
-      © <span id="ano">2026</span> ālea — Cassiano Rosado, Jataí/GO.
-      Peças feitas sob encomenda. Identidade visual por Mirella Gaetti.
-    </p>
-  </div>
+  <img class="marca-rodape" src="img/marca/alea_logo_claro.svg" alt="ālea">
+  <p class="frase" data-assinatura>Onde cada impressão começa com um sonho!</p>
+  <a class="orcamento zap" data-assunto="orçamento de uma peça personalizada">Orçamentos e personalizados, clique aqui!</a>
+  <nav class="menu-categorias" data-menu-categorias aria-label="Categorias"></nav>
+  <div class="redes" data-redes></div>
+  <p class="lei">
+    © <img src="img/marca/alea_logo_claro.svg" alt="ālea"> <span id="ano">2026</span> — Todos os direitos reservados.
+    <span class="creditos">
+      <span data-campo="responsavel">Cassiano Rosado</span>, <span data-campo="cidade">Jataí</span>/<span data-campo="uf">GO</span> ·
+      peças feitas sob encomenda · identidade visual por Mirella Gaetti ·
+      <a href="produto-bowl-wave.html">ālea Bowl Wave</a> ·
+      <a href="produto-poop-bag-holder.html">ālea Poop Bag Holder</a> ·
+      <a href="produto-kit.html">Kit ālea</a> ·
+      
+      <a href="a-alea.html">Quem é a ālea</a> ·
+      <a href="trocas-e-entrega.html">Trocas, devolução e entrega</a> ·
+      <a href="privacidade.html">Política de privacidade</a>
+    </span>
+  </p>
 </footer>
+<!-- /ALEA:RODAPE -->
 <script src="js/config.js"></script>
+<script src="js/produtos.js"></script>
 <script src="js/site.js"></script>
+<script src="js/carrinho.js"></script>
+<script src="js/produto.js"></script>
 </body>
 </html>

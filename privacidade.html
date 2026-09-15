@@ -13,17 +13,27 @@
 <link rel="stylesheet" href="css/estilo.css">
 </head>
 <body>
+<!-- ALEA:TOPO -->
 <header class="topo">
-  <a class="marca" href="index.html" aria-label="ālea - início">
-    <img class="colorida" src="img/marca/alea_logo.svg" alt="ālea">
-    <img class="clara" src="img/marca/alea_logo_claro.svg" alt="ālea">
+  <a class="marca" href="index.html" aria-label="ālea — início">
+    <img class="colorida" src="img/marca/alea_logo.svg" alt="ālea" width="129" height="28">
+    <img class="clara" src="img/marca/alea_logo_claro.svg" alt="ālea" width="129" height="28">
   </a>
   <nav aria-label="Principal">
-    <a href="index.html" class="some-no-celular">Vitrine</a>
+    <a href="index.html" class="some-no-celular">Feed</a>
     <a href="a-alea.html" class="some-no-celular">A ālea</a>
-    <a class="pedir zap" data-assunto="quero encomendar uma peça da ālea">Pedir</a>
+    <button class="botao-icone" type="button" data-abrir="conta" aria-haspopup="dialog">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+      <span class="rotulo">Conta</span>
+    </button>
+    <button class="botao-icone" type="button" data-abrir="carrinho" aria-haspopup="dialog">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><path d="M3 6h18"></path><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
+      <span class="rotulo">Carrinho</span>
+      <span class="quantos" data-quantos>0</span>
+    </button>
   </nav>
 </header>
+<!-- /ALEA:TOPO -->
 
 <main class="embrulho texto pagina">
   <h1>Política de privacidade</h1>
@@ -86,6 +96,21 @@
     nas configurações do seu navegador sem perder nada do conteúdo desta página.
   </p>
 
+  <h2>O carrinho e a sua conta neste site</h2>
+  <p>
+    O carrinho e a área "Conta" guardam as informações <strong>dentro do seu próprio
+    navegador</strong>, neste aparelho: o que você pôs no carrinho, a personalização que
+    escreveu, os pedidos que já montou aqui e, se você preencher, o seu nome e a sua
+    cidade. Isso serve para você não ter que digitar tudo de novo.
+  </p>
+  <p>
+    <strong>Nada disso é enviado para a ālea, nem para ninguém, enquanto você não clicar
+    para fechar o pedido.</strong> Quando você clica, o resumo do pedido vai para o
+    WhatsApp — por você, na sua conversa. Não existe banco de dados nosso guardando
+    carrinho de visitante, e não existe login: apagar os dados de navegação do seu
+    navegador apaga tudo isso, sem pedir nada a nós.
+  </p>
+
   <h2>Fotos de clientes</h2>
   <p>
     As fotos de cães que aparecem no site são de peças reais já entregues, publicadas com
@@ -105,33 +130,32 @@
   <p style="margin-top:34px"><a class="botao contorno" href="index.html">Voltar ao site</a></p>
 </main>
 
+<!-- ALEA:RODAPE -->
 <footer class="rodape">
-  <div class="embrulho">
-    <div>
-      <img src="img/marca/alea_logo_claro.svg" alt="ālea">
-      <p>Comedouros e acessórios pet personalizados, impressos em 3D sob encomenda em Jataí-GO.</p>
-    </div>
-    <div>
-      <h4>Produtos</h4>
-      <ul>
-        <li><a href="produto-bowl-wave.html">ālea Bowl Wave</a></li>
-        <li><a href="produto-poop-bag-holder.html">ālea Poop Bag Holder</a></li>
-        <li><a href="produto-kit.html">Kit ālea</a></li>
-      </ul>
-    </div>
-    <div>
-      <h4>Informações</h4>
-      <ul>
-        <li><a href="a-alea.html">Quem é a ālea</a></li>
-        <li><a href="trocas-e-entrega.html">Trocas, devolução e entrega</a></li>
-        <li><a href="privacidade.html">Política de privacidade</a></li>
-      </ul>
-    </div>
-    <p class="lei">© <span id="ano">2026</span> ālea — Cassiano Rosado, Jataí/GO.
-      Peças feitas sob encomenda. Identidade visual por Mirella Gaetti.</p>
-  </div>
+  <img class="marca-rodape" src="img/marca/alea_logo_claro.svg" alt="ālea">
+  <p class="frase" data-assinatura>Onde cada impressão começa com um sonho!</p>
+  <a class="orcamento zap" data-assunto="orçamento de uma peça personalizada">Orçamentos e personalizados, clique aqui!</a>
+  <nav class="menu-categorias" data-menu-categorias aria-label="Categorias"></nav>
+  <div class="redes" data-redes></div>
+  <p class="lei">
+    © <img src="img/marca/alea_logo_claro.svg" alt="ālea"> <span id="ano">2026</span> — Todos os direitos reservados.
+    <span class="creditos">
+      <span data-campo="responsavel">Cassiano Rosado</span>, <span data-campo="cidade">Jataí</span>/<span data-campo="uf">GO</span> ·
+      peças feitas sob encomenda · identidade visual por Mirella Gaetti ·
+      <a href="produto-bowl-wave.html">ālea Bowl Wave</a> ·
+      <a href="produto-poop-bag-holder.html">ālea Poop Bag Holder</a> ·
+      <a href="produto-kit.html">Kit ālea</a> ·
+      
+      <a href="a-alea.html">Quem é a ālea</a> ·
+      <a href="trocas-e-entrega.html">Trocas, devolução e entrega</a> ·
+      <a href="privacidade.html">Política de privacidade</a>
+    </span>
+  </p>
 </footer>
+<!-- /ALEA:RODAPE -->
 <script src="js/config.js"></script>
+<script src="js/produtos.js"></script>
 <script src="js/site.js"></script>
+<script src="js/carrinho.js"></script>
 </body>
 </html>

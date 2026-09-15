@@ -1,18 +1,19 @@
 /* =============================================================================
-   site.js — o que vale em TODA página (vitrine, produto, textos)
+   site.js — o que vale em TODA página (abertura, feed, produto, textos)
    =============================================================================
-   Liga os botões de WhatsApp, preenche os campos vindos do config.js e, se o número
-   não existir, desliga tudo e avisa uma vez só.
+   Liga os botões de WhatsApp, preenche os campos vindos do config.js, monta o menu de
+   categorias e as redes do rodapé, e abre/fecha as gavetas de CONTA e CARRINHO.
 
    A TRAVA QUE NÃO SE MEXE
    -----------------------
    Sem número no `config.js`, NADA vira link. Os botões saem desabilitados, com uma
    tarja no topo explicando. Melhor um botão apagado e honesto do que um `wa.me` sem
    número, que abre o WhatsApp em branco e faz o visitante achar que o site quebrou.
+   A mesma régua vale pras redes: endereço vazio, ícone não aparece.
 
    E A ORDEM
    ---------
-   Quem desenha conteúdo (a vitrine, as páginas geradas) avisa quando terminou, e só
+   Quem desenha conteúdo (o feed, as páginas geradas) avisa quando terminou, e só
    então os botões são ligados. Ligar antes deixa botão sem href — foi o defeito pego
    no site da Negocie em 10/09/2026, e ele só aparece conferindo o href NO AR.
    ========================================================================== */
@@ -23,15 +24,19 @@
   var C = window.ALEA || {};
   var temZap = /^\d{12,13}$/.test(String(C.whatsapp || ''));
 
+  /* ------------------------------------------------------------------ dinheiro */
   window.aleaDinheiro = function (v) {
     if (v === null || v === undefined) return null;
     return 'R$ ' + v.toFixed(2).replace('.', ',');
   };
 
+  /* ------------------------------------------------------------------ WhatsApp */
   function linkZap(assunto) {
     var texto = (C.mensagem || 'Oi! Vim pelo site.').replace('{produto}', assunto);
     return 'https://wa.me/' + C.whatsapp + '?text=' + encodeURIComponent(texto);
   }
+  window.aleaLinkZap = function (assunto) { return temZap ? linkZap(assunto) : ''; };
+  window.aleaTemZap = temZap;
 
   function marcarConversao() {
     if (!C.conversao_whatsapp || typeof window.gtag !== 'function') return;
@@ -49,6 +54,16 @@
       ' de propósito, em vez de virarem link morto.';
     document.body.insertBefore(t, document.body.firstChild);
     document.documentElement.classList.add('com-tarja');
+
+    /* A ALTURA DELA VIRA UMA VARIAVEL DE CSS. A tarja é fixa no topo; sem isto o
+       cabeçalho fica POR BAIXO dela e o logo da ālea some atrás do aviso — foi o que
+       apareceu no primeiro teste de 15/09/2026. Medir em vez de chutar um número
+       porque no celular o texto quebra em duas ou três linhas. */
+    var medir = function () {
+      document.documentElement.style.setProperty('--tarja', t.offsetHeight + 'px');
+    };
+    medir();
+    window.addEventListener('resize', medir);
   }
 
   window.aleaLigarBotoes = function (raiz) {
@@ -71,18 +86,179 @@
     if (!temZap && total) avisarUmaVez(total);
   };
 
+  /* ------------------------------------------------- campos vindos do config.js */
   function preencherContato() {
     Array.prototype.forEach.call(document.querySelectorAll('[data-campo]'), function (el) {
       var v = C[el.getAttribute('data-campo')];
       if (v) el.textContent = v;
     });
+    Array.prototype.forEach.call(document.querySelectorAll('[data-assinatura], [data-datilografar]'), function (el) {
+      if (C.assinatura) el.textContent = C.assinatura;
+    });
     var ano = document.getElementById('ano');
     if (ano) ano.textContent = new Date().getFullYear();
   }
 
+  /* ------------------------------------------------------ menu de categorias
+     O mesmo menu aparece na abertura e no rodapé, e em toda página interna. Ele é
+     montado a partir do produtos.js: categoria nova no catálogo entra no menu sozinha.
+
+     Categoria SEM PEÇA não vira link. Ela aparece apagada, com "em breve" — porque
+     link que abre uma tela vazia é pior do que não ter link, e o Google trata isso
+     como experiência ruim na página de destino. */
+  function montarMenuCategorias() {
+    var caixas = document.querySelectorAll('[data-menu-categorias]');
+    if (!caixas.length) return;
+    var cats = window.CATEGORIAS || [];
+    var feed = window.VITRINE || [];
+    var naHome = !!document.getElementById('feed');
+
+    Array.prototype.forEach.call(caixas, function (caixa) {
+      caixa.innerHTML = '';
+      cats.forEach(function (cat) {
+        var quantos = feed.filter(function (i) { return i.categoria === cat.id; }).length;
+        if (!quantos && C.esconder_categorias_vazias) return;
+        var el;
+        if (quantos) {
+          el = document.createElement('a');
+          el.href = (naHome ? '' : 'index.html') + '#' + cat.id;
+          el.setAttribute('data-categoria', cat.id);
+          el.textContent = cat.nome;
+          if (cat.descricao) el.title = cat.descricao;
+        } else {
+          el = document.createElement('span');
+          el.className = 'vazia';
+          el.innerHTML = cat.nome + '<small>em breve</small>';
+        }
+        caixa.appendChild(el);
+      });
+    });
+  }
+
+  /* ------------------------------------------------------------------- redes
+     Ícone só existe se o endereço existir. Ver `redes` no config.js. */
+  var ICONES = {
+    linktree: '<path d="M7.2 2h9.6v4.6l3.3-3.3 2.4 2.4-3.6 3.5H24v3.4h-5.1l3.6 3.5-2.4 2.4-5.9-5.9H13v6.1h-2v-6.1H9.4l-5.9 5.9-2.4-2.4L4.7 12.6H0V9.2h5.1L1.5 5.7l2.4-2.4 3.3 3.3z" transform="scale(.85) translate(2 2)"/>',
+    instagram: '<rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.4" cy="6.6" r="1.2" fill="currentColor" stroke="none"/>',
+    youtube: '<rect x="2" y="5" width="20" height="14" rx="4"/><path d="M10.5 9.2l5 2.8-5 2.8z" fill="currentColor" stroke="none"/>',
+    twitch: '<path d="M4 3h16v11l-4 4h-3l-3 3H8v-3H4z"/><path d="M11 8v4M15 8v4"/>'
+  };
+  var NOMES = { linktree: 'Linktree', instagram: 'Instagram', youtube: 'YouTube', twitch: 'Twitch' };
+
+  function montarRedes() {
+    var caixas = document.querySelectorAll('[data-redes]');
+    if (!caixas.length) return;
+    var redes = C.redes || {};
+    Array.prototype.forEach.call(caixas, function (caixa) {
+      caixa.innerHTML = '';
+      ['linktree', 'instagram', 'youtube', 'twitch'].forEach(function (id) {
+        var url = redes[id];
+        if (!url) return;                     // vazio = não aparece, nunca link morto
+        var a = document.createElement('a');
+        a.href = url;
+        a.target = '_blank';
+        a.rel = 'noopener';
+        a.setAttribute('aria-label', NOMES[id]);
+        a.title = NOMES[id];
+        a.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" ' +
+          'stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" ' +
+          'aria-hidden="true">' + ICONES[id] + '</svg>';
+        caixa.appendChild(a);
+      });
+    });
+  }
+
+  /* =======================================================================
+     AS GAVETAS — conta e carrinho
+     =======================================================================
+     Construídas aqui, uma vez, e não copiadas na mão em cada página: gaveta repetida
+     em seis arquivos é gaveta que diverge.
+
+     ⚠️ SOBRE A "CONTA" (parecer de 15/09/2026, registrado no código porque é onde ele
+     não some): conta de verdade — com login, senha e histórico de pedidos — exige
+     SERVIDOR, e este site é estático no GitHub Pages. Página estática não guarda
+     segredo nem sessão. Então a gaveta da Conta entrega o que dá pra entregar com
+     honestidade: os pedidos feitos NESTE APARELHO e os dados de contato salvos aqui,
+     que voltam preenchidos no próximo pedido. Nada de tela de login que não loga em
+     lugar nenhum. Quando o checkout da Rota A subir (ver PARECER_PAGAMENTO_E_FRETE),
+     é esta mesma gaveta que ganha o login — o botão e o lugar já existem. */
+  function montarGavetas() {
+    if (document.getElementById('cortina-alea')) return;
+
+    var cortina = document.createElement('div');
+    cortina.className = 'cortina';
+    cortina.id = 'cortina-alea';
+    document.body.appendChild(cortina);
+
+    var molde = function (id, titulo, corpo, rodape) {
+      var g = document.createElement('aside');
+      g.className = 'gaveta';
+      g.id = 'gaveta-' + id;
+      g.setAttribute('role', 'dialog');
+      g.setAttribute('aria-modal', 'true');
+      g.setAttribute('aria-label', titulo);
+      g.setAttribute('aria-hidden', 'true');
+      g.innerHTML =
+        '<header><h2>' + titulo + '</h2>' +
+        '<button type="button" aria-label="Fechar" data-fechar-gaveta>&times;</button></header>' +
+        '<div class="corpo" data-corpo>' + corpo + '</div>' +
+        (rodape ? '<div class="rodape-gaveta" data-rodape-gaveta>' + rodape + '</div>' : '');
+      document.body.appendChild(g);
+      return g;
+    };
+
+    molde('carrinho', 'Seu carrinho',
+      '<p class="vazio">Seu carrinho está vazio.</p>',
+      '<div class="total-carrinho"><span>Total</span><span data-total>—</span></div>' +
+      '<button class="botao" type="button" data-fechar-pedido disabled>Fechar pedido</button>' +
+      '<p style="font-size:12.5px;color:var(--tinta-fraca);margin:0">' +
+      'O frete é calculado no fechamento, pelo CEP. Peça personalizada só entra em ' +
+      'produção depois da confirmação do pagamento.</p>');
+
+    molde('conta', 'Sua conta ālea',
+      '<p class="vazio">Carregando…</p>', '');
+
+    function fechar() {
+      Array.prototype.forEach.call(document.querySelectorAll('.gaveta'), function (g) {
+        g.classList.remove('aberta');
+        g.setAttribute('aria-hidden', 'true');
+      });
+      cortina.classList.remove('aberta');
+      document.body.classList.remove('travado');
+    }
+    function abrir(id) {
+      var g = document.getElementById('gaveta-' + id);
+      if (!g) return;
+      fechar();
+      g.classList.add('aberta');
+      g.setAttribute('aria-hidden', 'false');
+      cortina.classList.add('aberta');
+      document.body.classList.add('travado');
+      document.dispatchEvent(new CustomEvent('alea:gaveta', { detail: { id: id } }));
+      var alvo = g.querySelector('button, a, input');
+      if (alvo) alvo.focus();
+    }
+    window.aleaGaveta = { abrir: abrir, fechar: fechar };
+
+    cortina.addEventListener('click', fechar);
+    document.addEventListener('click', function (e) {
+      var b = e.target.closest('[data-abrir]');
+      if (b) { e.preventDefault(); abrir(b.getAttribute('data-abrir')); return; }
+      if (e.target.closest('[data-fechar-gaveta]')) fechar();
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') fechar();
+    });
+  }
+
+  /* -------------------------------------------------------------------- início */
   function iniciar() {
     preencherContato();
+    montarMenuCategorias();
+    montarRedes();
+    montarGavetas();
     window.aleaLigarBotoes();     // as páginas de produto já nascem prontas no HTML
+    document.dispatchEvent(new CustomEvent('alea:site-pronto'));
   }
 
   if (document.readyState === 'loading') {

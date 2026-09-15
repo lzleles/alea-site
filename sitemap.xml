@@ -1,39 +1,39 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- GERADO por 01_gerar_paginas_v1.py em 14/09/2026. Nao editar a mao. -->
+<!-- GERADO por 01_gerar_paginas_v2.py em 15/09/2026. Nao editar a mao. -->
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://lzleles.github.io/alea-site/</loc>
-    <lastmod>2026-09-14</lastmod>
+    <lastmod>2026-09-15</lastmod>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://lzleles.github.io/alea-site/produto-bowl-wave.html</loc>
-    <lastmod>2026-09-14</lastmod>
+    <lastmod>2026-09-15</lastmod>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://lzleles.github.io/alea-site/produto-poop-bag-holder.html</loc>
-    <lastmod>2026-09-14</lastmod>
+    <lastmod>2026-09-15</lastmod>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://lzleles.github.io/alea-site/produto-kit.html</loc>
-    <lastmod>2026-09-14</lastmod>
+    <lastmod>2026-09-15</lastmod>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://lzleles.github.io/alea-site/a-alea.html</loc>
-    <lastmod>2026-09-14</lastmod>
+    <lastmod>2026-09-15</lastmod>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://lzleles.github.io/alea-site/trocas-e-entrega.html</loc>
-    <lastmod>2026-09-14</lastmod>
+    <lastmod>2026-09-15</lastmod>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://lzleles.github.io/alea-site/privacidade.html</loc>
-    <lastmod>2026-09-14</lastmod>
+    <lastmod>2026-09-15</lastmod>
     <priority>0.4</priority>
   </url>
 </urlset>

@@ -2,32 +2,34 @@
    distorcao.js — a troca de foto com distorção, dentro de um produto
    =============================================================================
 
-   O QUE MUDOU EM 14/09/2026, 16:22 (e por quê)
-   --------------------------------------------
-   Até agora a peça trocava de foto SOZINHA quando entrava na tela. O Cassiano viu e
-   cortou:
-
-     "toda vez que eu rolo, ele está na imagem principal e ele troca para a segunda
-      foto automático. Então deixar para ele trocar a foto só se eu clicar para a
-      direita ou para a esquerda […] sempre permanecer na primeira foto."
-
-   Então a distorção deixou de ser enfeite automático e virou NAVEGAÇÃO:
-
-     · rolar pra cima/baixo  → troca de PRODUTO   (vitrine.js)
-     · arrastar pros lados   → troca de FOTO do mesmo produto  (aqui)
-
-   Cada produto pode ter 3, 4 fotos. A primeira é a principal, e o cartão sempre
-   volta pra ela quando o produto entra na tela.
-
-   POR QUE A DISTORÇÃO TEM ESSA FORMA
-   ----------------------------------
+   O QUE ESTE EFEITO É (e por que ele não é enfeite)
+   -------------------------------------------------
    O mapa de deslocamento é o GRAFISMO FACETADO da própria ālea, em cinza e desfocado
    (gerado por `_preparar_imagens_v1.py`). Cada tom empurra o pixel numa direção — a
-   foto se dissolve seguindo a geometria da marca, não um ruído de tutorial.
+   imagem se dissolve seguindo a geometria da marca, não um ruído de tutorial. Quem
+   olha vê a peça virar outra peça pela forma da marca.
+
+   O EIXO QUE ELE DEFINIU (14/09/2026, 16:22)
+   ------------------------------------------
+     · rolar pra cima/baixo  → troca de PRODUTO   (feed.js)
+     · arrastar pros lados   → troca de FOTO      (aqui)
+   Nada acontece sozinho: "sempre permanecer na primeira foto".
+
+   ⚠️ O QUE MUDOU EM 15/09/2026: ALFA
+   ----------------------------------
+   A primeira imagem de cada peça agora é um OBJETO RECORTADO, com fundo transparente.
+   WebGL não adivinha isso: o contexto nasce opaco e o upload de textura era `gl.RGB` —
+   com isso o recorte apareceria com fundo PRETO CHAPADO numa moldura invisível, que é
+   exatamente o oposto do pedido. Três coisas mudaram juntas, e nenhuma delas funciona
+   sozinha:
+     1. o contexto é criado com `alpha: true` e `premultipliedAlpha: true`;
+     2. a textura sobe como `gl.RGBA` e com `UNPACK_PREMULTIPLY_ALPHA_WEBGL`;
+     3. a mistura é `ONE, ONE_MINUS_SRC_ALPHA`, que é a conta certa pra cor já
+        pré-multiplicada — com a conta errada a borda do recorte ganha um halo escuro.
 
    POR QUE WEBGL NA MÃO, SEM BIBLIOTECA
    ------------------------------------
-   three.js pesa 600 KB, curtains.js 120 KB. Isto tem ~9 KB. Em página que vai receber
+   three.js pesa 600 KB, curtains.js 120 KB. Isto tem ~10 KB. Em página que vai receber
    clique pago, peso é dinheiro: página lenta piora a Experiência na Página de Destino
    e encarece o clique.
 
@@ -50,7 +52,10 @@
   /* Desloca as UVs das duas texturas em sentidos OPOSTOS, proporcional ao cinza do
      mapa, e mistura pelo progresso. Sentidos opostos é o que faz parecer que a matéria
      escorreu, e não que uma foto apagou em cima da outra. O `sentido` inverte o empurrão
-     conforme o visitante vai pra direita ou pra esquerda. */
+     conforme o visitante vai pra direita ou pra esquerda.
+     A conta vale pra RGB E pra alfa: com cor pré-multiplicada, misturar os quatro
+     canais junto é a conta correta — é isso que mantém o recorte recortado no meio
+     da transição, em vez de virar um borrão retangular. */
   var FRAG = [
     'precision mediump float;',
     'varying vec2 uv;',
@@ -98,7 +103,8 @@
     gl.activeTexture(gl.TEXTURE0 + unidade);
     gl.bindTexture(gl.TEXTURE_2D, textura);
     gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, img);
+    gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, true);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img);
   }
 
   function carregar(src) {
@@ -125,13 +131,15 @@
 
   Peca.prototype.montar = function () {
     var self = this;
-    if (this.imgs.length < 1) return Promise.resolve(false);
+    if (this.imgs.length < 2) return Promise.resolve(false);   // sem 2 fotos, sem troca
 
     var cv = document.createElement('canvas');
     cv.className = 'lona';
     cv.setAttribute('aria-hidden', 'true');
-    var gl = cv.getContext('webgl', { alpha: false, antialias: false, depth: false })
-          || cv.getContext('experimental-webgl', { alpha: false });
+    /* alpha: true é o que deixa o recorte flutuar sobre o preto do feed em vez de
+       ganhar um fundo preto chapado dentro de uma moldura invisível. */
+    var gl = cv.getContext('webgl', { alpha: true, premultipliedAlpha: true, antialias: false, depth: false })
+          || cv.getContext('experimental-webgl', { alpha: true, premultipliedAlpha: true });
     if (!gl) return Promise.resolve(false);
 
     return carregar(this.imgs[0].src).then(function (primeira) {
@@ -144,6 +152,10 @@
       gl.linkProgram(prog);
       if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) return false;
       gl.useProgram(prog);
+
+      gl.enable(gl.BLEND);
+      gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);   // a conta certa pra pré-multiplicado
+      gl.clearColor(0, 0, 0, 0);
 
       var buf = gl.createBuffer();
       gl.bindBuffer(gl.ARRAY_BUFFER, buf);
@@ -177,7 +189,7 @@
       self.desenhar();
       return true;
     }).catch(function (e) {
-      console.warn('[alea] efeito desligado neste cartao:', e.message);
+      console.warn('[alea] efeito desligado neste objeto:', e.message);
       return false;
     });
   };
@@ -199,6 +211,9 @@
   Peca.prototype.desenhar = function () {
     var gl = this.gl;
     if (!gl) return;
+    /* limpar antes de desenhar NÃO é ritual: sem isto, o que sobrou do quadro anterior
+       aparece por baixo das partes transparentes do recorte. */
+    gl.clear(gl.COLOR_BUFFER_BIT);
     gl.uniform1f(this.uProgresso, this.progresso);
     gl.uniform1f(this.uForca, this.forca);
     gl.uniform1f(this.uSentido, this.sentido);
@@ -230,7 +245,7 @@
     if (this.rodando) return;
     this.rodando = true;
     var self = this;
-    /* laco que PARA sozinho: sem isto cada cartao segura um requestAnimationFrame
+    /* laco que PARA sozinho: sem isto cada objeto segura um requestAnimationFrame
        eterno e a ventoinha do visitante fica ligada a toa */
     (function passo() {
       /* 0.045 por quadro ~ 1,4s. O Cassiano pediu mais devagar em 14/09 16:03:
@@ -254,58 +269,45 @@
     })();
   };
 
-  /* ------------------------------------------------------------------ montagem */
+  /* ------------------------------------------------------------------ montagem
+     O feed manda montar o objeto que ENTROU na tela, e só ele. Antes isso era decidido
+     por IntersectionObserver; não serve mais, porque no feed os itens fora da vez ficam
+     com `visibility: hidden` — e elemento invisível nunca "intersecciona", então o
+     efeito nunca acenderia. Quem sabe qual peça está na vez é o feed. */
   var promessaDoMapa = null;
-  var pecas = [];
+  var desligado = false;
 
-  function iniciar() {
-    var caixas = document.querySelectorAll('[data-distorcao]:not([data-montado])');
-    if (!caixas.length) return;
-
-    var querMenosMovimento = window.matchMedia
-      && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (querMenosMovimento) {
-      document.documentElement.classList.add('sem-distorcao');
-      return;                       // as imgs + CSS resolvem, sem canvas nenhum
-    }
-
+  function mapa() {
     if (!promessaDoMapa) {
-      var mapa = document.documentElement.getAttribute('data-mapa') || 'img/mapa_deslocamento.jpg';
-      promessaDoMapa = carregar(mapa);
+      var src = document.documentElement.getAttribute('data-mapa') || 'img/mapa_deslocamento.jpg';
+      promessaDoMapa = carregar(src);
     }
+    return promessaDoMapa;
+  }
 
-    promessaDoMapa.then(function (mapaImg) {
-      /* so monta quando o cartao chega perto da tela: nao faz sentido acender oito
-         contextos WebGL antes de o visitante rolar a pagina */
-      var obs = new IntersectionObserver(function (entradas) {
-        entradas.forEach(function (e) {
-          if (!e.isIntersecting) return;
-          obs.unobserve(e.target);
-          var pc = new Peca(e.target, mapaImg);
-          pc.montar().then(function (ok) { if (ok) { pecas.push(pc); e.target.__peca = pc; } });
-        });
-      }, { rootMargin: '250px' });
-      Array.prototype.forEach.call(caixas, function (c) {
-        c.setAttribute('data-montado', '1');
-        obs.observe(c);
-      });
+  function montar(caixa) {
+    if (desligado || !caixa || caixa.hasAttribute('data-montado')) return;
+    caixa.setAttribute('data-montado', '1');
+    mapa().then(function (mapaImg) {
+      var pc = new Peca(caixa, mapaImg);
+      return pc.montar().then(function (ok) { if (ok) caixa.__peca = pc; });
     }).catch(function () {
+      desligado = true;
       document.documentElement.classList.add('sem-distorcao');
     });
   }
 
-  /* O vitrine.js é quem manda trocar de foto — ele conhece os gestos. */
-  window.aleaTrocarFoto = function (caixa, n, dir) {
+  function trocar(caixa, n, dir) {
     if (caixa && caixa.__peca) return caixa.__peca.irParaFoto(n, dir);
     return false;
-  };
-
-  /* QUANDO COMEÇAR: os cartões nascem em JavaScript, no vitrine.js. Procurar cedo
-     demais acha só o que está escrito no HTML — foi o defeito medido em 14/09/2026. */
-  if (window.__aleaVitrinePronta) {
-    iniciar();
-  } else {
-    document.addEventListener('alea:vitrine-pronta', iniciar);
   }
-  window.addEventListener('load', iniciar);
+
+  var querMenosMovimento = window.matchMedia &&
+    window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (querMenosMovimento) {
+    desligado = true;
+    document.documentElement.classList.add('sem-distorcao');   // as imgs + CSS resolvem
+  }
+
+  window.aleaDistorcao = { montar: montar, trocar: trocar };
 })();
