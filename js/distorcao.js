@@ -142,7 +142,15 @@
           || cv.getContext('experimental-webgl', { alpha: true, premultipliedAlpha: true });
     if (!gl) return Promise.resolve(false);
 
-    return carregar(this.imgs[0].src).then(function (primeira) {
+    /* ⚠️ A BASE É A FOTO QUE ESTÁ NA TELA, não a primeira da lista.
+       O objeto é montado quando a peça entra em cena, e nesse instante o visitante pode
+       já ter arrastado pro lado (o efeito monta em alguns décimos de segundo; o dedo é
+       mais rápido). Montando sempre na foto 1, a lona acendia mostrando a foto errada e
+       o site passava a contar a partir de um número que a tela não confirmava — metade
+       do "está colocando aleatório" que ele viu em 15/09/2026. */
+    var base = this.imgs.filter(function (i) { return i.classList.contains('ativa'); })[0] || this.imgs[0];
+    this.indice = this.destino = this.imgs.indexOf(base);
+    return carregar(base.src).then(function (primeira) {
       var vs = compilar(gl, gl.VERTEX_SHADER, VERT);
       var fs = compilar(gl, gl.FRAGMENT_SHADER, FRAG);
       if (!vs || !fs) return false;
@@ -178,7 +186,7 @@
       self.uForca = gl.getUniformLocation(prog, 'forca');
       self.uSentido = gl.getUniformLocation(prog, 'sentido');
 
-      self.cache[self.imgs[0].src] = primeira;
+      self.cache[base.src] = primeira;
       self.caixa.appendChild(cv);
       self.cv = cv;
       self.caixa.classList.add('com-webgl');
@@ -221,43 +229,80 @@
   };
 
   /* Troca pra foto `n`. `dir` só decide de que lado a matéria escorre. */
+  /* Troca pra foto `n`. `dir` só decide de que lado a matéria escorre.
+     Devolve `true` só quando ACEITOU o pedido — e quem chama respeita a resposta.
+
+     ⚠️ `ocupado` cobre também o tempo de BAIXAR a foto, e não só o de animar.
+     `rodando` só liga depois que a imagem chega; se o visitante arrastasse duas vezes
+     enquanto a segunda foto ainda estava vindo pela rede, os dois pedidos entravam e o
+     último a chegar ganhava — que é a outra metade do "passo pra direita e a foto se
+     repete" de 15/09/2026. */
   Peca.prototype.irParaFoto = function (n, dir) {
     var self = this;
-    if (!this.gl || this.rodando) return false;
+    if (!this.gl || this.rodando || this.ocupado) return false;
     if (n < 0 || n >= this.imgs.length || n === this.indice) return false;
 
     var src = this.imgs[n].src;
     this.sentido = dir < 0 ? -1 : 1;
+    this.ocupado = true;
 
     var seguir = function (img) {
       self.cache[src] = img;
       subir(self.gl, 1, self.texB, img);
       self.destino = n;
       self.progresso = 0;
+      self.ocupado = false;
       self.animar();
     };
     if (this.cache[src]) { seguir(this.cache[src]); }
-    else { carregar(src).then(seguir).catch(function () {}); }
+    else {
+      carregar(src).then(seguir).catch(function () {
+        /* a foto não veio: solta a trava e deixa o estado como estava. Nunca fingir que
+           trocou — o site perderia a conta de onde está. */
+        self.ocupado = false;
+      });
+    }
     return true;
   };
+
+  /* ⚠️ A ANIMAÇÃO ANDA PELO RELÓGIO, E NÃO POR QUADRO — e isso conserta dois defeitos
+     de uma vez (medidos em 15/09/2026):
+
+     1. TRAVA DE VEZ SE A ABA SAI DE VISTA. O `requestAnimationFrame` é suspenso quando
+        a aba fica em segundo plano. Com o progresso somando "um tantinho por quadro", a
+        troca ficava eternamente pela metade: `rodando` nunca voltava a `false` e, como a
+        lona é a dona da ordem das fotos, o arrasto lateral morria calado. Foi assim que
+        a sonda pegou: `rodando: true` parado, e nenhuma troca aceita depois da primeira.
+     2. VELOCIDADE DEPENDIA DO MONITOR. `progresso += (1-progresso)*0.045` num monitor de
+        120 Hz corre o DOBRO da velocidade de um de 60 Hz. O Cassiano pediu essa transição
+        mais devagar em 14/09 — e "mais devagar" não pode significar coisas diferentes em
+        cada aparelho.
+
+     Com tempo de verdade, uma pausa da aba vira um SALTO (o próximo quadro já chega com
+     o tempo passado), e a duração é a mesma em qualquer tela. */
+  var DURACAO_TROCA = 1400;      // ms — o "mais devagar" que ele pediu em 14/09 16:03
 
   Peca.prototype.animar = function () {
     if (this.rodando) return;
     this.rodando = true;
     var self = this;
+    var t0 = (window.performance || Date).now();
+
     /* laco que PARA sozinho: sem isto cada objeto segura um requestAnimationFrame
        eterno e a ventoinha do visitante fica ligada a toa */
     (function passo() {
-      /* 0.045 por quadro ~ 1,4s. O Cassiano pediu mais devagar em 14/09 16:03:
-         "a gente ta clicando e ja aparece de uma vez, ai da aquele negocio desfigurado". */
-      self.progresso += (1 - self.progresso) * 0.045;
-      if (self.progresso > 0.995) {
+      var t = Math.min(1, ((window.performance || Date).now() - t0) / DURACAO_TROCA);
+      /* easeOutCubic: começa rápido e encosta devagar, que é o que faz a matéria
+         parecer que assentou em vez de parar de repente */
+      self.progresso = 1 - Math.pow(1 - t, 3);
+      if (t >= 1) {
         self.progresso = 1;
         self.desenhar();
         /* a foto que chegou vira a foto de base, e o progresso volta a zero. Sem isto a
            proxima troca partiria do meio da anterior e a imagem "piscaria". */
         self.indice = self.destino;
-        subir(self.gl, 0, self.texA, self.cache[self.imgs[self.indice].src]);
+        var base = self.cache[self.imgs[self.indice].src];
+        if (base) subir(self.gl, 0, self.texA, base);
         self.progresso = 0;
         self.desenhar();
         self.rodando = false;

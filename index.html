@@ -51,6 +51,11 @@
     <img class="colorida" src="img/marca/alea_logo.svg" alt="ālea" width="129" height="28">
     <img class="clara" src="img/marca/alea_logo_claro.svg" alt="ālea" width="129" height="28">
   </a>
+  <!-- ⚠️ O BOTÃO DE VOLTAR PRAS CATEGORIAS MORA AQUI, e não dentro do feed.
+       Dentro do feed ele caía POR CIMA da foto no celular (visto pelo Cassiano em
+       15/09/2026). No cabeçalho ele tem lugar próprio, não disputa pixel com a peça,
+       e some sozinho quando o feed está fechado. Quem liga e desliga é o feed.js. -->
+  <button class="voltar-categorias" type="button" data-fechar-feed hidden>&larr; categorias</button>
   <nav aria-label="Principal">
     <a href="index.html" class="some-no-celular">Feed</a>
     <a href="a-alea.html" class="some-no-celular">A ālea</a>
@@ -75,26 +80,30 @@
   <h1 class="so-leitor">ālea — comedouros e acessórios pet personalizados, impressos em 3D em Jataí-GO</h1>
 
   <div class="miolo">
-    <!-- as duas peças têm o viewBox do logo inteiro: sobrepostas, remontam o logotipo
-         exato. Ver _partir_logo_v1.py. -->
+    <!-- AS CINCO PEÇAS TÊM O viewBox DO LOGO INTEIRO (ver _partir_logo_v2.py):
+         sobrepostas e sem transformação nenhuma, elas remontam o logotipo exato. É isso
+         que deixa cada letra "sair de dentro da capivara" com uma linha de CSS — basta
+         escalá-la em torno do centro da capivara. Nenhuma medida de letra no meio. -->
     <div class="marca-anim" aria-hidden="true">
       <img class="capivara" src="img/marca/alea_capivara.svg" alt="">
-      <img class="nome" src="img/marca/alea_nome.svg" alt="">
+      <img class="letra l1" src="img/marca/alea_letra1.svg" alt="">
+      <img class="letra l2" src="img/marca/alea_letra2.svg" alt="">
+      <img class="letra l3" src="img/marca/alea_letra3.svg" alt="">
+      <img class="letra l4" src="img/marca/alea_letra4.svg" alt="">
     </div>
 
     <!-- a frase vai INTEIRA no HTML (Google e leitor de tela leem mesmo sem JS); o JS
          só revela letra a letra o que já está escrito aqui. -->
     <p class="assinatura" data-datilografar>Onde cada impressão começa com um sonho!</p>
-  </div>
 
-  <nav class="menu-categorias" data-menu-categorias aria-label="Categorias"></nav>
+    <nav class="menu-categorias" data-menu-categorias aria-label="Categorias"></nav>
+  </div>
 </main>
 
 <!-- ========================================================================== FEED
      Camada preta por cima de tudo. Nasce vazia; o js/feed.js desenha os itens da
      categoria escolhida. -->
 <section class="feed" id="feed" aria-label="Produtos" aria-hidden="true">
-  <button class="fechar-feed" type="button" data-fechar-feed>← categorias</button>
   <div class="palco" id="palco"></div>
   <div class="contador" id="contador" aria-hidden="true"></div>
 </section>

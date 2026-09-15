@@ -37,7 +37,11 @@
   'use strict';
 
   var POS = 'alea_feed_pos';
-  var DURACAO = 820;        // tem que bater com a transição do .feed.anima no CSS
+  /* ⚠️ 1250ms — ele pediu mais devagar na 2ª rodada de 15/09/2026 ("a transição dos
+     produtos, quando pra cima e pra baixo, está rápida"). Tem que bater com a
+     `transition` do `.feed.anima .item` no CSS: é este número que solta a trava do
+     gesto, e se ele for menor que a transição a trava abre no meio da animação. */
+  var DURACAO = 1250;
 
   var feed = document.getElementById('feed');
   var palco = document.getElementById('palco');
@@ -55,6 +59,11 @@
 
   function moeda(v) {
     return (window.aleaDinheiro && window.aleaDinheiro(v)) || 'Sob consulta';
+  }
+
+  function nomeDaCategoria(id) {
+    var c = (window.CATEGORIAS || []).filter(function (x) { return x.id === id; })[0];
+    return c ? c.nome : String(id || '').toUpperCase();
   }
 
   /* ======================================================================= desenho */
@@ -90,6 +99,9 @@
 
       var quantas = fotos.length + (c.recorte ? 1 : 0);
 
+      /* as bolinhas ficam DENTRO do quadrado da foto, no pé dele (2ª rodada de
+         15/09/2026). Elas são botões de verdade: no computador não existe arrastar, e
+         sem as setas — que ele mandou tirar — elas são o único caminho pra segunda foto. */
       var pontos = quantas > 1
         ? '<span class="pontos">' +
           Array.apply(null, Array(quantas)).map(function (_, k) {
@@ -102,17 +114,25 @@
         ? '<span class="dica-arrasto" data-dica><span class="mao">›››</span>arraste pro lado</span>'
         : '';
 
+      /* A LEGENDA, no formato que ele ditou na 2ª rodada:
+             PET               (maior, caixa alta, negrito)      <- a categoria
+             ĀLEA BOWL WAVE    (menor, caixa alta, sem negrito)  <- o produto
+             ver produto →
+         e o valor em destaque do outro lado. O nome do pet saiu daqui: ele é a
+         personalização daquela foto, não o nome do produto, e continua no `alt` das
+         imagens — que é o que o Google lê. */
       art.innerHTML =
         '<div class="objeto' + (c.recorte ? '' : ' com-cenario') + '" data-distorcao data-forca="0.30" ' +
              'role="group" aria-label="' + c.produto + ' personalizado para ' + c.nome + '">' +
-          imgs + dica +
+          imgs + dica + pontos +
         '</div>' +
         '<div class="legenda">' +
-          pontos +
-          '<span class="produto-mini">' + c.produto + '</span>' +
-          '<a class="nome-peca" href="produto-' + c.pagina + '.html">' + c.nome + '</a>' +
+          '<span class="lado-esquerdo">' +
+            '<span class="categoria">' + nomeDaCategoria(c.categoria) + '</span>' +
+            '<span class="produto-mini">' + c.produto + '</span>' +
+            '<a class="ver" href="produto-' + c.pagina + '.html">ver produto →</a>' +
+          '</span>' +
           (mostrarPreco ? '<span class="valor">' + (c.preco === null ? 'Sob consulta' : moeda(c.preco)) + '</span>' : '') +
-          '<a class="ver" href="produto-' + c.pagina + '.html">ver produto →</a>' +
         '</div>';
       palco.appendChild(art);
     });
@@ -156,17 +176,34 @@
     return Array.prototype.slice.call(item.querySelectorAll('.objeto img'));
   }
 
+  /* ⚠️ O DEFEITO QUE ELE VIU NA 2ª RODADA, E A CAUSA
+     -----------------------------------------------
+     "A transição pras laterais está confusa, não está colocando na ordem. Às vezes
+      passo pra direita e a foto se repete, às vezes volto pra esquerda e não volta
+      pra imagem anterior."
+
+     Era dessincronia entre o DOM e a lona do WebGL. Quando a distorção estava no meio
+     de uma troca, ela RECUSAVA o pedido e devolvia `false` — mas o código aqui ignorava
+     a resposta e trocava as classes assim mesmo. Resultado: o site passava a achar que
+     estava na foto 3 enquanto a tela ainda mostrava a 2. O próximo gesto partia do
+     número errado, e daí vinha tanto a foto repetida quanto o "voltar que não volta".
+
+     A cura é tratar a lona como dona da verdade: **se ela recusa, nada muda** — o gesto
+     simplesmente não conta. E ela só recusa por alguns décimos de segundo, o tempo da
+     própria animação. */
   function mostrarFoto(item, n, dir) {
     var fotos = fotosDo(item);
     var pontos = item.querySelectorAll('.pontos button');
     var atual = fotos.findIndex(function (f) { return f.classList.contains('ativa'); });
     if (atual < 0) atual = 0;
-    if (n < 0 || n >= fotos.length || n === atual) return;
+    if (n < 0 || n >= fotos.length || n === atual) return false;
 
     var objeto = item.querySelector('.objeto');
     /* com WebGL quem pinta é a lona; as <img> continuam no DOM só pro Google e pra
        degradação. Sem WebGL, é a troca de classe que faz o trabalho. */
-    if (window.aleaDistorcao) window.aleaDistorcao.trocar(objeto, n, dir);
+    if (objeto && objeto.classList.contains('com-webgl') && window.aleaDistorcao) {
+      if (!window.aleaDistorcao.trocar(objeto, n, dir)) return false;
+    }
     fotos[atual].classList.remove('ativa');
     fotos[n].classList.add('ativa');
     if (pontos[atual]) pontos[atual].classList.remove('on');
@@ -178,6 +215,33 @@
 
     var dica = item.querySelector('[data-dica]');
     if (dica) dica.classList.add('some');
+    return true;
+  }
+
+  /* ⚠️ GESTO RECUSADO NÃO SE PERDE — ELE INSISTE.
+     A lona é a dona da ordem das fotos e recusa enquanto está animando ou ainda
+     montando o efeito. Descartar o gesto nessa hora dava um defeito pequeno e chato:
+     o PRIMEIRO toque lateral de cada peça não fazia nada (o efeito ainda estava
+     acendendo), e a pessoa tocava de novo achando que o site travou. Medido em
+     15/09/2026, 2ª rodada.
+
+     Aqui o pedido fica guardado e é retentado por até ~2s. Tocar em outra bolinha no
+     meio disso simplesmente troca o alvo — quem manda é o último toque, que é o que a
+     pessoa quer. */
+  var alvoFoto = null, insistindo = false;
+
+  function pedirFoto(item, n, dir) {
+    alvoFoto = { item: item, n: n, dir: dir };
+    if (insistindo) return;
+    insistindo = true;
+    (function tentar(resta) {
+      if (!alvoFoto) { insistindo = false; return; }
+      var p = alvoFoto;
+      if (mostrarFoto(p.item, p.n, p.dir) || resta <= 0) {
+        alvoFoto = null; insistindo = false; return;
+      }
+      setTimeout(function () { tentar(resta - 1); }, 160);
+    })(12);
   }
 
   function voltarPraPrimeira(item) {
@@ -254,6 +318,14 @@
     return null;
   }
 
+  /* O botão "← categorias" mora no CABEÇALHO desde 15/09/2026 (2ª rodada): dentro do
+     feed ele caía por cima da foto no celular. Aqui só se decide quando ele aparece. */
+  function mostrarVoltar(ligado) {
+    Array.prototype.forEach.call(document.querySelectorAll('.voltar-categorias'), function (b) {
+      b.hidden = !ligado;
+    });
+  }
+
   /* ================================================================ abrir e fechar */
   function abrir(catId, forcarIndice) {
     if (!catId) return;
@@ -278,6 +350,7 @@
 
     feed.classList.add('aberto');
     feed.setAttribute('aria-hidden', 'false');
+    mostrarVoltar(true);
     document.body.classList.add('escuro', 'travado');
     document.body.classList.remove('na-abertura');
     aberto = true;
@@ -291,6 +364,7 @@
     if (!aberto) return;
     feed.classList.remove('aberto');
     feed.setAttribute('aria-hidden', 'true');
+    mostrarVoltar(false);
     document.body.classList.remove('escuro', 'travado');
     document.body.classList.add('na-abertura');
     aberto = false;
@@ -333,7 +407,7 @@
       var item = itens[indice];
       var fotos = fotosDo(item);
       var atual = fotos.findIndex(function (f) { return f.classList.contains('ativa'); });
-      mostrarFoto(item, (dx > 0 ? atual + 1 : atual - 1), dx > 0 ? 1 : -1);
+      pedirFoto(item, (dx > 0 ? atual + 1 : atual - 1), dx > 0 ? 1 : -1);
     } else {
       if (Math.abs(dy) < 28) return;
       jaFoi = true;                              // um arrasto = um passo, e só
@@ -357,7 +431,7 @@
       e.preventDefault();
       var atual = fotos.findIndex(function (f) { return f.classList.contains('ativa'); });
       var dir = e.key === 'ArrowRight' ? 1 : -1;
-      mostrarFoto(item, atual + dir, dir);
+      pedirFoto(item, atual + dir, dir);
     }
   });
 
@@ -369,7 +443,7 @@
       var item = itens[indice];
       var fotos = fotosDo(item);
       var atual = fotos.findIndex(function (f) { return f.classList.contains('ativa'); });
-      mostrarFoto(item, n, n > atual ? 1 : -1);
+      pedirFoto(item, n, n > atual ? 1 : -1);
       return;
     }
     /* "um toque, próximo produto" (14/09). Link e botão seguem o seu caminho. */

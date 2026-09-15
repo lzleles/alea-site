@@ -147,16 +147,20 @@ body.escuro .botao-icone:hover, body.escuro .botao-icone:focus-visible { backgro
 .botao-icone.tem-item .quantos { display: grid; }
 
 /* ================================================================ ABERTURA
-   "Mudar o fundo da tela inicial pra ficar igual o Linktree" — gradiente de parede a
-   parede, com duas manchas macias que respiram. As cores são as da marca, não as do
-   Linktree: o efeito é o mesmo, a paleta continua sendo dele. */
+   "Mudar o fundo da tela inicial pra ficar igual o Linktree" - gradiente de parede a
+   parede, com duas manchas macias que respiram. As cores sao as da marca.
+
+   ⚠️ O CONTEÚDO SOBE (15/09/2026, 2ª rodada): "subir toda a logo e menu, pois ficou um
+   espaço bem grande vazio". Antes a marca ficava no centro vertical e o menu colado no
+   pé da tela, com um buraco no meio. Agora os três — marca, frase e menu — são um bloco
+   só, com respiro curto entre eles, ancorado um pouco acima do centro. O rodapé preto
+   continua existindo embaixo, fora da primeira tela, que é o que ele autorizou. */
 .abertura {
   position: relative; z-index: 1;
   min-height: 100svh;
   margin-top: var(--tarja, 0px);
-  display: grid; grid-template-rows: 1fr auto; align-content: center; justify-items: center;
-  gap: clamp(22px, 5vh, 48px);
-  padding: clamp(96px, 14vh, 150px) var(--gutter) clamp(40px, 8vh, 70px);
+  display: grid; align-content: center; justify-items: center;
+  padding: clamp(84px, 12vh, 130px) var(--gutter) clamp(28px, 6vh, 54px);
   text-align: center;
   overflow: hidden;
   background:
@@ -177,45 +181,88 @@ body.escuro .botao-icone:hover, body.escuro .botao-icone:focus-visible { backgro
   to   { transform: translate3d(6%, 5%, 0) scale(1.12); }
 }
 .abertura > * { position: relative; z-index: 1; }
-.abertura .miolo { display: grid; justify-items: center; gap: clamp(18px, 4vh, 36px); align-content: center; }
+/* o bloco único: marca, frase e menu juntos, sem buraco no meio */
+.abertura .miolo {
+  display: grid; justify-items: center; align-content: start;
+  gap: clamp(10px, 2.2vh, 22px);
+  transform: translateY(-4vh);          /* um pouco acima do centro óptico */
+}
 
 /* ---- a animação da marca ------------------------------------------------
-   AS DUAS PEÇAS TÊM O MESMO viewBox DO LOGO INTEIRO (ver _partir_logo_v1.py), então
+   AS CINCO PEÇAS TÊM O MESMO viewBox DO LOGO INTEIRO (ver _partir_logo_v2.py), então
    sobrepostas e sem transformação nenhuma elas REMONTAM o logotipo exato. É por isso
-   que o fim da animação é `transform: none`: não tem margem pra eu errar.
+   que o fim de toda animação aqui é `transform: none`: não tem margem pra eu errar.
 
    `--cap-x: 19%` e `--cap-y: 53%` são o centro da capivara dentro dessa caixa larga —
-   medidos no SVG, não chutados. É o ponto em torno do qual ela cresce, e é de lá que
-   ela viaja até o lugar dela. */
+   medidos no SVG, não chutados (x de 79 a 1234 num viewBox de 3448,89; y de 62 a 736
+   num de 748,01). É o ponto em torno do qual tudo cresce e encolhe.
+
+   ⚠️ `--cap-k`, `--cap-dx` e `--cap-dy` são calculados pelo abertura.js: é ele que sabe
+   o tamanho da janela, e "o maior tamanho possível" muda com ela. Enquanto ele não
+   mediu, a marca fica invisível — melhor esperar um quadro do que piscar a capivara no
+   tamanho errado. */
 .marca-anim {
   position: relative;
-  width: min(86vw, 860px); aspect-ratio: 3448.89 / 748.01;
+  width: min(92vw, 900px); aspect-ratio: 3448.89 / 748.01;
   --cap-x: 19%; --cap-y: 53%;
+  visibility: hidden;                    /* liberada pelo JS, ver acima */
 }
 .marca-anim img { position: absolute; inset: 0; width: 100%; height: 100%; }
-.marca-anim .capivara {
+body.marca-medida .marca-anim { visibility: visible; }
+
+/* estado de partida, ANTES de a animação rodar: capivara gigante no meio da tela,
+   letras recolhidas dentro dela. Sem isto, o primeiro quadro mostra o logo pronto. */
+body.marca-medida:not(.marca-anima) .marca-anim .capivara {
+  transform: translate(var(--cap-dx, 0px), var(--cap-dy, 0px)) scale(var(--cap-k, 3));
   transform-origin: var(--cap-x) var(--cap-y);
-  animation: capivara-chega 2.15s cubic-bezier(.22, .92, .24, 1) both;
 }
-.marca-anim .nome {
-  animation: nome-chega 1.15s cubic-bezier(.22, .92, .24, 1) 1.35s both;
+body.marca-medida:not(.marca-anima) .marca-anim .letra { opacity: 0; }
+
+/* 1) A CAPIVARA: 3 segundos, devagar, do tamanho máximo até o lugar dela.
+      A curva sai bem devagar e só ganha corpo no meio — é o "vai devagar" dele. */
+body.marca-anima .marca-anim .capivara {
+  transform-origin: var(--cap-x) var(--cap-y);
+  animation: capivara-chega 3s cubic-bezier(.34, .01, .2, 1) both;
 }
-/* gigante e no meio da tela -> pequena e no lugar dela, à esquerda */
 @keyframes capivara-chega {
-  0%   { transform: translateX(31%) scale(2.6); opacity: 0; }
-  14%  { transform: translateX(31%) scale(2.6); opacity: 1; }
-  100% { transform: none; opacity: 1; }
+  from { transform: translate(var(--cap-dx, 0px), var(--cap-dy, 0px)) scale(var(--cap-k, 3)); }
+  to   { transform: none; }
 }
-/* o nome entra pela direita e assenta */
-@keyframes nome-chega {
-  from { transform: translateX(9%); opacity: 0; }
+
+/* 2) AS LETRAS: cada uma sai DE DENTRO da capivara e leva 1s até o seu lugar.
+      Elas escalam em torno do centro da capivara — por isso o trajeto é uma reta que
+      começa lá dentro e termina na posição exata da letra no logotipo. Nenhuma medida
+      de letra precisou ser tirada: o viewBox comum faz a conta.
+      Começam depois dos 3s da capivara, uma a cada 0,7s, da esquerda pra direita. */
+body.marca-anima .marca-anim .letra {
+  transform-origin: var(--cap-x) var(--cap-y);
+  animation: letra-sai-da-capivara 1s cubic-bezier(.22, .78, .3, 1) both;
+}
+body.marca-anima .marca-anim .l1 { animation-delay: 3.0s; }
+body.marca-anima .marca-anim .l2 { animation-delay: 3.7s; }
+body.marca-anima .marca-anim .l3 { animation-delay: 4.4s; }
+body.marca-anima .marca-anim .l4 { animation-delay: 5.1s; }
+@keyframes letra-sai-da-capivara {
+  from { transform: scale(.04); opacity: 0; }
+  30%  { opacity: 1; }
   to   { transform: none; opacity: 1; }
 }
+
+/* o resto da tela só aparece quando a capivara já chegou — é o "revelando o site".
+   ⚠️ A FRASE TEM A VEZ DELA, SEPARADA DO MENU: ela só acende quando o datilógrafo
+   começa, depois da última letra do logo. Reveladas juntas, a frase aparecia inteira
+   aos 2,7s e a máquina de escrever ficava sem serviço — foi o que o primeiro teste
+   desta rodada mostrou. */
+.abertura .assinatura, .abertura .menu-categorias {
+  opacity: 0; transition: opacity .8s ease;
+}
+body.site-revelado .abertura .menu-categorias { opacity: 1; }
+body.frase-revelada .abertura .assinatura { opacity: 1; }
+
 /* quem já viu a abertura nesta sessão recebe o logo pronto, sem esperar de novo */
-body.sem-abertura .marca-anim .capivara,
-body.sem-abertura .marca-anim .nome { animation: none; }
+body.sem-abertura .marca-anim img { animation: none !important; transform: none !important; opacity: 1 !important; }
 @media (prefers-reduced-motion: reduce) {
-  .marca-anim .capivara, .marca-anim .nome { animation: none; }
+  .marca-anim img { animation: none !important; transform: none !important; opacity: 1 !important; }
   .abertura::after { animation: none; }
 }
 
@@ -237,7 +284,7 @@ body.sem-abertura .marca-anim .nome { animation: none; }
 
 /* ---- o menu de categorias ------------------------------------------------
    Do jeito que ele escreveu: nomes separados por ponto médio. O ponto é desenhado pelo
-   CSS (`::before`), não digitado — assim ninguém precisa lembrar de pôr o "·" na mão
+   CSS (`::before`), não digitado — assim ninguém precisa lembrar de pôr o ponto na mão
    quando criar uma categoria nova no produtos.js. */
 .menu-categorias {
   display: flex; flex-wrap: wrap; justify-content: center; align-items: center;
@@ -252,7 +299,7 @@ body.sem-abertura .marca-anim .nome { animation: none; }
   transition: background .2s ease, color .2s ease, opacity .2s ease;
 }
 .menu-categorias a::before, .menu-categorias span::before {
-  content: '·'; position: absolute; left: -2px; opacity: .45; letter-spacing: 0;
+  content: '\00b7'; position: absolute; left: -2px; opacity: .45; letter-spacing: 0;
 }
 .menu-categorias a:hover, .menu-categorias a:focus-visible { background: var(--terracota); color: var(--off); }
 .menu-categorias a:hover::before, .menu-categorias a:focus-visible::before { opacity: 0; }
@@ -295,7 +342,10 @@ body.sem-abertura .marca-anim .nome { animation: none; }
    central" (Cassiano, 15/09/2026). Descendo, os papéis se invertem. */
 .feed .item.acima  { opacity: 0; transform: translateY(-48%) scale(.88); z-index: 1; }
 .feed .item.abaixo { opacity: 0; transform: translateY(48%) scale(.88); z-index: 1; }
-.feed.anima .item { transition: transform .82s cubic-bezier(.3, .86, .28, 1), opacity .58s ease; }
+/* ⚠️ 1,25s, e não 0,82s: "a transição dos produtos, quando pra cima e pra baixo, está
+   rápida, colocar mais devagar" (Cassiano, 15/09/2026, 2ª rodada). Este número tem que
+   bater com o `DURACAO` do feed.js — é ele que solta a trava do gesto. */
+.feed.anima .item { transition: transform 1.25s cubic-bezier(.3, .86, .28, 1), opacity .8s ease; }
 @media (prefers-reduced-motion: reduce) { .feed.anima .item { transition: opacity .2s linear; } }
 
 /* ---- o objeto -----------------------------------------------------------
@@ -328,9 +378,31 @@ body.sem-abertura .marca-anim .nome { animation: none; }
 .sem-distorcao .objeto .lona { display: none; }
 .sem-distorcao .objeto img { visibility: visible !important; }
 
-/* ---- a legenda: bolinhas ACIMA do título (pedido de 15/09) --------------- */
-.feed .legenda { display: grid; justify-items: center; gap: 6px; max-width: 30ch; }
-.feed .pontos { display: flex; gap: 7px; justify-content: center; margin-bottom: 4px; min-height: 8px; }
+/* ---- as bolinhas: DENTRO do quadrado da foto, no pé dele ------------------
+   "Pode colocar as bolinhas das fotos no próprio quadrado da imagem, centralizado, na
+   parte inferior, no limite final do quadrado, pra ficar visualmente mais limpo"
+   (Cassiano, 15/09/2026, 2ª rodada). Antes elas ficavam soltas acima do título.
+   `pointer-events` volta a existir só nelas: o resto da faixa deixa o toque passar
+   pro objeto, senão a faixa inteira viraria uma parede sobre a peça. */
+.feed .pontos {
+  position: absolute; left: 0; right: 0; bottom: 10px; z-index: 6;
+  display: flex; gap: 7px; justify-content: center; min-height: 8px;
+  pointer-events: none;
+}
+.feed .pontos button { pointer-events: auto; }
+
+/* ---- a legenda: categoria e produto à esquerda, valor à direita ----------
+   Formato ditado por ele na 2ª rodada:
+       PET               (maior, caixa alta, negrito)
+       ĀLEA BOWL WAVE    (menor, caixa alta, sem negrito)
+       ver produto →
+   e o valor, em destaque, do outro lado. */
+.feed .legenda {
+  width: min(100%, var(--objeto));
+  display: flex; align-items: flex-end; justify-content: space-between; gap: 18px;
+  text-align: left;
+}
+.feed .legenda .lado-esquerdo { display: grid; gap: 2px; }
 /* as bolinhas são o ÚNICO controle de foto que sobrou (as setas saíram por pedido
    dele). No computador não existe arrastar, então elas precisam ser clicáveis — sem
    isso, quem usa mouse nunca veria a segunda foto. */
@@ -342,15 +414,21 @@ body.sem-abertura .marca-anim .nome { animation: none; }
 .feed .pontos button.on { background: var(--off); transform: scale(1.35); }
 .feed .pontos button:focus-visible { outline: 2px solid var(--dourado); outline-offset: 3px; }
 
-.feed .produto-mini { font-size: 11.5px; letter-spacing: .16em; text-transform: uppercase; opacity: .62; }
-.feed .nome-peca {
-  font-family: var(--fonte-titulo); font-weight: 500;
-  font-size: clamp(1.35rem, 3.4vw, 2.1rem); line-height: 1.1;
-  color: var(--off); text-decoration: none;
+.feed .categoria {
+  font-family: var(--fonte-titulo); font-weight: 700;
+  font-size: clamp(1.15rem, 2.6vw, 1.6rem); line-height: 1.05;
+  letter-spacing: .12em; text-transform: uppercase; color: var(--off);
 }
-.feed .nome-peca:hover { text-decoration: underline; }
-.feed .valor { font-family: var(--fonte-titulo); font-size: clamp(.98rem, 1.8vw, 1.18rem); opacity: .82; }
-.feed .ver { font-size: 12px; letter-spacing: .08em; opacity: .7; color: var(--dourado); text-decoration: none; margin-top: 2px; }
+.feed .produto-mini {
+  font-family: var(--fonte-titulo); font-weight: 400;
+  font-size: clamp(.82rem, 1.7vw, 1rem); line-height: 1.2;
+  letter-spacing: .14em; text-transform: uppercase; color: rgba(234, 228, 219, .78);
+}
+.feed .valor {
+  font-family: var(--fonte-titulo); font-weight: 500;
+  font-size: clamp(1.2rem, 2.8vw, 1.7rem); color: var(--off); white-space: nowrap;
+}
+.feed .ver { display: inline-block; font-size: 12px; letter-spacing: .08em; opacity: .7; color: var(--dourado); text-decoration: none; margin-top: 6px; }
 .feed .ver:hover { opacity: 1; text-decoration: underline; }
 
 /* ---- a dica de arrastar, SÓ no primeiro produto -------------------------
@@ -387,10 +465,17 @@ body.sem-abertura .marca-anim .nome { animation: none; }
   color: rgba(234, 228, 219, .55); pointer-events: none;
 }
 @media (max-width: 560px) { .feed .contador { display: none; } }
+/* ⚠️ O BOTÃO DE VOLTAR MUDOU DE LUGAR (15/09/2026, 2ª rodada): "após o clique no menu,
+   o menu pra voltar pra categorias ficou em cima da foto". Ele agora mora no CABEÇALHO
+   (ver o TOPO no 01_gerar_paginas_v2.py), onde tem espaço próprio e não disputa pixel
+   com a peça. Aqui fica só a versão solta do cartão de fim do feed. */
+.voltar-categorias {
+  background: transparent; border: 0; color: inherit; cursor: pointer;
+  font: inherit; font-size: 13.5px; letter-spacing: .06em; padding: 8px 10px;
+  border-radius: 999px; opacity: .8; transition: opacity .2s ease, background .2s ease;
+}
+.voltar-categorias:hover, .voltar-categorias:focus-visible { opacity: 1; background: rgba(234, 228, 219, .14); }
 .feed .fechar-feed {
-  /* desce a tarja de obra + a altura do cabeçalho: sem a parcela da tarja ele fica
-     escondido atrás do cabeçalho, que é onde ele estava no teste de 15/09 */
-  position: absolute; left: var(--gutter); top: calc(var(--tarja, 0px) + 72px); z-index: 6;
   background: transparent; border: 0; color: rgba(234, 228, 219, .72);
   font: inherit; font-size: 13.5px; letter-spacing: .06em; cursor: pointer; padding: 6px 0;
 }
@@ -448,18 +533,28 @@ body.sem-abertura .marca-anim .nome { animation: none; }
 .produto-topo .valor-grande { font-family: var(--fonte-titulo); font-size: clamp(1.7rem, 3vw, 2.2rem); margin: 0 0 6px; }
 .produto-topo p { color: var(--tinta-fraca); }
 
-/* ---- a capa da peça na página de produto --------------------------------
-   Mesmo padrão do feed: objeto recortado, sem moldura. Quando a peça ainda não tem
-   foto boa pro recorte, a foto normal entra na moldura de sempre. */
-.capa-produto {
-  position: relative; aspect-ratio: 1/1; border-radius: var(--raio); overflow: hidden;
-  background: var(--papel);
-}
-.capa-produto img { width: 100%; height: 100%; object-fit: cover; }
-.capa-produto.sem-fundo { background: transparent; overflow: visible; }
-.capa-produto.sem-fundo img { object-fit: contain; }
+/* ⚠️ A FOTO DE DESTAQUE SAIU DA PÁGINA DE PRODUTO (15/09/2026, 2ª rodada).
+   "Quando clico no produto não aparece ele, está aparecendo foto de outro produto."
+   E era verdade — e não era defeito de código: a página é do PRODUTO (ālea Bowl Wave),
+   e a capa dela é uma personalização só (a do Luke). Quem clicava no comedouro da
+   Cláudia batia numa foto do Luke em tamanho grande. A colmeia mostra TODAS as
+   personalizações no mesmo peso, que é o que a página de produto tem a dizer. */
 
-.recado-aceite { color: var(--terracota); font-size: 13.5px; margin: 10px 0 0; }
+/* o recado do aceite: nasce escondido e só aparece quando o botão é tentado */
+.recado-aceite {
+  color: #C0392B; font-weight: 600; font-size: 13.5px; margin: 0 0 10px;
+}
+
+/* ---- tremida do botão travado -------------------------------------------
+   "Somente quando clicar em comprar agora ou adicionar ao carrinho, tremer os botões e
+   aparecer essa mensagem" (Cassiano, 15/09/2026, 2ª rodada). */
+@keyframes tremer {
+  0%, 100% { transform: translateX(0); }
+  15%, 45%, 75% { transform: translateX(-6px); }
+  30%, 60%, 90% { transform: translateX(6px); }
+}
+.botoes-produto.tremendo { animation: tremer .45s ease-in-out 1; }
+@media (prefers-reduced-motion: reduce) { .botoes-produto.tremendo { animation: none; } }
 
 /* ---- A COLMEIA ----------------------------------------------------------
    "Fazer algo diferente como se fosse uma colmeia, todas as fotos em miniatura,
@@ -496,7 +591,43 @@ body.sem-abertura .marca-anim .nome { animation: none; }
 .colmeia.tem-aberto .favo:nth-child(even).aberto { transform: translateY(calc(var(--favo) * .29)) scale(2.05); }
 /* espaço em volta pra foto aberta não sair da página */
 .colmeia-caixa { padding: calc(var(--favo, 120px) * .55) 0; overflow: hidden; }
-.colmeia-dica { text-align: center; font-size: 13px; color: var(--tinta-fraca); margin: 0 0 4px; }
+.colmeia-dica { text-align: center; font-size: 13px; color: var(--tinta-fraca); margin: 0 0 2px; }
+.colmeia-dica2 { text-align: center; font-size: 11.5px; color: var(--tinta-fraca); opacity: .75; margin: 0 0 4px; }
+
+/* ---- a foto em TELA CHEIA -----------------------------------------------
+   Segundo toque no favo já aberto. O fundo é o mesmo da página, embaçado — "com o fundo
+   exatamente como está, porém embaçado". Rola pros lados pra ver todas; passar do fim
+   FECHA em vez de dar a volta, pro cliente sentir que aquela era a última. */
+.telacheia {
+  position: fixed; inset: 0; z-index: 85;
+  display: grid; grid-template-rows: auto 1fr auto; align-items: center;
+  background: rgba(246, 243, 238, .82);
+  backdrop-filter: blur(22px) saturate(120%);
+  opacity: 0; visibility: hidden; transition: opacity .28s ease, visibility .28s;
+}
+.telacheia.aberta { opacity: 1; visibility: visible; }
+.telacheia .fechar-x {
+  justify-self: end; align-self: start;
+  margin: calc(var(--tarja, 0px) + 14px) 18px 0 0;
+  width: 40px; height: 40px; border-radius: 50%; border: 0; cursor: pointer;
+  background: rgba(20, 16, 13, .1); color: var(--tinta); font-size: 21px; line-height: 1;
+  display: grid; place-items: center;
+}
+.telacheia .fechar-x:hover { background: rgba(20, 16, 13, .2); }
+.telacheia .palco-foto { display: grid; place-items: center; padding: 0 var(--gutter); }
+.telacheia img {
+  max-width: min(92vw, 900px); max-height: 74svh; width: auto; height: auto;
+  border-radius: var(--raio); box-shadow: 0 40px 90px -50px rgba(0, 0, 0, .8);
+  background: #fff;
+}
+.telacheia .legenda-tc {
+  display: flex; align-items: center; justify-content: center; gap: 14px;
+  padding: 14px 0 calc(18px + env(safe-area-inset-bottom, 0px));
+  font-size: 13px; color: var(--tinta-fraca);
+}
+.telacheia .pontos-tc { display: flex; gap: 7px; }
+.telacheia .pontos-tc i { width: 7px; height: 7px; border-radius: 50%; background: rgba(43, 33, 24, .28); }
+.telacheia .pontos-tc i.on { background: var(--terracota); transform: scale(1.3); }
 @media (prefers-reduced-motion: reduce) { .colmeia .favo { transition: none; } }
 
 /* ---- ficha, abas e o aceite --------------------------------------------- */
@@ -521,6 +652,24 @@ body.sem-abertura .marca-anim .nome { animation: none; }
   padding: 11px 13px; border: 1px solid var(--borda); border-radius: 10px; background: #fff;
 }
 .personalizar input:focus, .personalizar select:focus { outline: 2px solid var(--terracota); outline-offset: 1px; }
+.personalizar input:disabled { background: #EFEAE2; color: var(--tinta-fraca); cursor: not-allowed; }
+
+/* ---- o adicional "Nome Colorido" ----------------------------------------
+   "Um quadrado pra clicar com o título Nome Colorido + R$ 30,00, onde a pessoa precisa
+   clicar pra poder responder a cor do nome" (Cassiano, 15/09/2026). O campo da cor do
+   nome nasce desligado e só abre com este quadrado marcado — e o valor entra no preço
+   na hora, no botão e no carrinho. */
+.extra {
+  display: flex; align-items: center; gap: 12px; cursor: pointer;
+  border: 1.5px solid var(--borda); border-radius: var(--raio);
+  padding: 13px 15px; background: #fff;
+  transition: border-color .2s ease, background .2s ease;
+}
+.extra:hover { border-color: var(--dourado); }
+.extra input { width: 20px; height: 20px; flex: none; accent-color: var(--terracota); cursor: pointer; }
+.extra .titulo-extra { font-family: var(--fonte-titulo); font-weight: 500; font-size: 16px; }
+.extra .detalhe-extra { display: block; font-size: 12.5px; color: var(--tinta-fraca); font-family: var(--fonte-corpo); }
+.extra.marcado { border-color: var(--terracota); background: #FFFDFA; }
 
 .botao {
   display: inline-flex; align-items: center; justify-content: center; gap: 10px;
@@ -533,7 +682,20 @@ body.sem-abertura .marca-anim .nome { animation: none; }
 .botao.contorno { background: transparent; color: var(--terracota); box-shadow: inset 0 0 0 1.5px var(--terracota); }
 .botao.contorno:hover { background: var(--terracota); color: var(--off); }
 .botao[aria-disabled='true'], .botao:disabled { background: var(--dourado); cursor: not-allowed; transform: none; opacity: .7; }
-.botoes-produto { display: flex; flex-wrap: wrap; gap: 12px; }
+.botoes-produto { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+
+/* o botão da sacola com o "+": é o ADICIONAR AO CARRINHO. O texto grande ao lado virou
+   "Comprar agora", por pedido dele. */
+.botao-sacola {
+  position: relative; flex: none;
+  width: 52px; height: 52px; border-radius: 999px; cursor: pointer;
+  background: transparent; color: var(--terracota);
+  border: 1.5px solid var(--terracota);
+  display: grid; place-items: center;
+  transition: background .18s ease, color .18s ease, transform .18s ease;
+}
+.botao-sacola:hover { background: var(--terracota); color: var(--off); transform: translateY(-1px); }
+.botao-sacola svg { width: 22px; height: 22px; }
 
 .voltar { display: inline-block; margin-block: 8px 26px; font-size: 14.5px; }
 

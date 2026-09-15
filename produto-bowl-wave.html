@@ -44,6 +44,11 @@
     <img class="colorida" src="img/marca/alea_logo.svg" alt="ālea" width="129" height="28">
     <img class="clara" src="img/marca/alea_logo_claro.svg" alt="ālea" width="129" height="28">
   </a>
+  <!-- ⚠️ O BOTÃO DE VOLTAR PRAS CATEGORIAS MORA AQUI, e não dentro do feed.
+       Dentro do feed ele caía POR CIMA da foto no celular (visto pelo Cassiano em
+       15/09/2026). No cabeçalho ele tem lugar próprio, não disputa pixel com a peça,
+       e some sozinho quando o feed está fechado. Quem liga e desliga é o feed.js. -->
+  <button class="voltar-categorias" type="button" data-fechar-feed hidden>&larr; categorias</button>
   <nav aria-label="Principal">
     <a href="index.html" class="some-no-celular">Feed</a>
     <a href="a-alea.html" class="some-no-celular">A ālea</a>
@@ -65,13 +70,12 @@
 
   <div class="produto-topo">
     <div>
-      <div class="capa-produto sem-fundo"><img src="img/produtos/luke_1_obj.webp" class="recorte" fetchpriority="high" decoding="async" alt="ālea Bowl Wave — Comedouro elevado com o nome do seu cão impresso no corpo da peça."></div>
-      <p class="colmeia-dica">Clique numa foto pra ampliar.</p><div class="colmeia-caixa"><div class="colmeia" data-colmeia><button class="favo" type="button" data-favo="0" aria-label="Ampliar foto 1 de ālea Bowl Wave"><img src="img/produtos/luke_1_m.jpg" width="700" height="700" loading="lazy" decoding="async" alt="ālea Bowl Wave — foto 1"></button><button class="favo" type="button" data-favo="1" aria-label="Ampliar foto 2 de ālea Bowl Wave"><img src="img/produtos/ayla_1_m.jpg" width="700" height="700" loading="lazy" decoding="async" alt="ālea Bowl Wave — foto 2"></button><button class="favo" type="button" data-favo="2" aria-label="Ampliar foto 3 de ālea Bowl Wave"><img src="img/produtos/tina_1_m.jpg" width="700" height="700" loading="lazy" decoding="async" alt="ālea Bowl Wave — foto 3"></button><button class="favo" type="button" data-favo="3" aria-label="Ampliar foto 4 de ālea Bowl Wave"><img src="img/produtos/chica_1_m.jpg" width="700" height="700" loading="lazy" decoding="async" alt="ālea Bowl Wave — foto 4"></button><button class="favo" type="button" data-favo="4" aria-label="Ampliar foto 5 de ālea Bowl Wave"><img src="img/produtos/matteo_1_m.jpg" width="700" height="700" loading="lazy" decoding="async" alt="ālea Bowl Wave — foto 5"></button><button class="favo" type="button" data-favo="5" aria-label="Ampliar foto 6 de ālea Bowl Wave"><img src="img/produtos/claudia_1_m.jpg" width="700" height="700" loading="lazy" decoding="async" alt="ālea Bowl Wave — foto 6"></button><button class="favo" type="button" data-favo="6" aria-label="Ampliar foto 7 de ālea Bowl Wave"><img src="img/produtos/luke_2_m.jpg" width="700" height="700" loading="lazy" decoding="async" alt="ālea Bowl Wave — foto 7"></button></div></div>
+      <p class="colmeia-dica">Clique numa foto pra ampliar.</p><p class="colmeia-dica2">Toque novamente para tela cheia!</p><div class="colmeia-caixa"><div class="colmeia" data-colmeia data-grandes='["img/produtos/luke_1.jpg","img/produtos/ayla_1.jpg","img/produtos/tina_1.jpg","img/produtos/chica_1.jpg","img/produtos/matteo_1.jpg","img/produtos/claudia_1.jpg","img/produtos/luke_2.jpg"]'><button class="favo" type="button" data-favo="0" aria-label="Ampliar foto 1 de ālea Bowl Wave"><img src="img/produtos/luke_1_m.jpg" width="700" height="700" loading="lazy" decoding="async" alt="ālea Bowl Wave — foto 1"></button><button class="favo" type="button" data-favo="1" aria-label="Ampliar foto 2 de ālea Bowl Wave"><img src="img/produtos/ayla_1_m.jpg" width="700" height="700" loading="lazy" decoding="async" alt="ālea Bowl Wave — foto 2"></button><button class="favo" type="button" data-favo="2" aria-label="Ampliar foto 3 de ālea Bowl Wave"><img src="img/produtos/tina_1_m.jpg" width="700" height="700" loading="lazy" decoding="async" alt="ālea Bowl Wave — foto 3"></button><button class="favo" type="button" data-favo="3" aria-label="Ampliar foto 4 de ālea Bowl Wave"><img src="img/produtos/chica_1_m.jpg" width="700" height="700" loading="lazy" decoding="async" alt="ālea Bowl Wave — foto 4"></button><button class="favo" type="button" data-favo="4" aria-label="Ampliar foto 5 de ālea Bowl Wave"><img src="img/produtos/matteo_1_m.jpg" width="700" height="700" loading="lazy" decoding="async" alt="ālea Bowl Wave — foto 5"></button><button class="favo" type="button" data-favo="5" aria-label="Ampliar foto 6 de ālea Bowl Wave"><img src="img/produtos/claudia_1_m.jpg" width="700" height="700" loading="lazy" decoding="async" alt="ālea Bowl Wave — foto 6"></button><button class="favo" type="button" data-favo="6" aria-label="Ampliar foto 7 de ālea Bowl Wave"><img src="img/produtos/luke_2_m.jpg" width="700" height="700" loading="lazy" decoding="async" alt="ālea Bowl Wave — foto 7"></button></div></div>
     </div>
     <div>
       <span class="linha">Comedouro</span>
       <h1>ālea Bowl Wave</h1>
-      <p class="valor-grande">R$ 179,00</p>
+      <p class="valor-grande" data-valor data-preco-base="179">R$ 179,00</p>
       <p>Comedouro elevado com o nome do seu cão impresso no corpo da peça.</p>
       <p>A onda que dá nome à peça vem do grafismo da marca — é o mesmo desenho que aparece na embalagem e na tag, aplicado na curva do comedouro.</p><p>O nome não é adesivo colado. Ele é impresso junto com a peça, em baixo relevo na cor do objeto, então não descasca, não desbota e não sai na lavagem. A tigela interna é de inox e sai pra lavar.</p><p>A base elevada deixa o cão comer com o pescoço em posição mais natural, sem ter que abaixar a cabeça até o chão.</p>
       <dl class="ficha"><div><dt>Material</dt><dd>PLA</dd></div><div><dt>Personalização</dt><dd>Nome do pet em baixo relevo na cor do objeto.</dd></div><div><dt>Produção</dt><dd>Sob encomenda, 3 dias úteis após a confirmação de pagamento!</dd></div><div><dt>Cores</dt><dd>Totalmente personalizável, podendo escolher entre filamentos básicos, foscos ou brilhosos.</dd></div><div><dt>Acompanha</dt><dd>Tigela interna em inox, removível pra lavar</dd></div></dl>
@@ -85,8 +89,13 @@
         <label>Nome do pet
           <input type="text" name="nome_pet" maxlength="18" placeholder="como vai sair impresso na peça">
         </label>
-        <label>Cores
-          <input type="text" name="cor" maxlength="60" placeholder="ex.: azul fosco com letra dourada">
+        <label class="extra" data-extra data-extra-id="nome_colorido" data-extra-preco="30"><input type="checkbox" data-extra-caixa><span class="titulo-extra">Nome Colorido + R$ 30,00<small class="detalhe-extra">O nome sai em outra cor, em vez de em baixo relevo na cor da peca.</small></span></label>
+        <label>Cor do nome
+          <input type="text" name="cor_nome" maxlength="40" disabled
+                 placeholder="marque o Nome Colorido acima para escolher">
+        </label>
+        <label>Cores da peça
+          <input type="text" name="cor" maxlength="60" placeholder="ex.: azul fosco com base cinza">
         </label>
       </form>
 
@@ -95,18 +104,32 @@
         <span>Declaro que revisei cuidadosamente todas as informações da personalização, incluindo nome, grafia e cores. Declaro, ainda, estar ciente e de acordo com as condições acima aplicáveis a produtos personalizados, inclusive quanto a cancelamentos e devoluções.</span>
       </label>
 
-      <div class="botoes-produto">
-        <button class="botao" type="button" data-add-carrinho
-                data-slug="bowl-wave" data-nome="ālea Bowl Wave" data-preco="179"
-                data-capa="luke_1" data-material="PLA" disabled>
-          Adicionar ao carrinho
-        </button>
-        <a class="botao contorno zap" data-assunto="ālea Bowl Wave (R$ 179,00)">Pedir pelo WhatsApp</a>
-      </div>
       <p class="recado-aceite" data-recado-aceite hidden>
         Marque a declaração acima para adicionar ao carrinho.
       </p>
+      <div class="botoes-produto" data-botoes>
+        <button class="botao" type="button" data-comprar-agora
+                data-slug="bowl-wave" data-nome="ālea Bowl Wave" data-preco="179"
+                data-capa="luke_1" data-material="PLA">
+          Comprar agora
+        </button>
+        <button class="botao-sacola" type="button" data-add-carrinho
+                aria-label="Adicionar ao carrinho" title="Adicionar ao carrinho">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 4 3.5 7.5V20a2 2 0 0 0 2 2h13a2 2 0 0 0 2-2V7.5L18 4z"></path><path d="M3.5 7.5h17"></path><path d="M9 11.5a3 3 0 0 0 6 0"></path><path d="M12 13.5v5M9.5 16h5"></path></svg>
+        </button>
+      </div>
     </div>
+  </div>
+</div>
+
+<!-- A TELA CHEIA da colmeia. Nasce vazia; o produto.js enche com a foto clicada.
+     "Com o fundo exatamente como está, porém embaçado" (Cassiano, 15/09/2026). -->
+<div class="telacheia" data-telacheia aria-hidden="true" role="dialog" aria-label="Foto ampliada">
+  <button class="fechar-x" type="button" data-fechar-tc aria-label="Fechar">&times;</button>
+  <div class="palco-foto" data-palco-tc></div>
+  <div class="legenda-tc">
+    <span class="pontos-tc" data-pontos-tc></span>
+    <span data-conta-tc></span>
   </div>
 </div>
 </main>

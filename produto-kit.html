@@ -37,6 +37,11 @@
     <img class="colorida" src="img/marca/alea_logo.svg" alt="ālea" width="129" height="28">
     <img class="clara" src="img/marca/alea_logo_claro.svg" alt="ālea" width="129" height="28">
   </a>
+  <!-- ⚠️ O BOTÃO DE VOLTAR PRAS CATEGORIAS MORA AQUI, e não dentro do feed.
+       Dentro do feed ele caía POR CIMA da foto no celular (visto pelo Cassiano em
+       15/09/2026). No cabeçalho ele tem lugar próprio, não disputa pixel com a peça,
+       e some sozinho quando o feed está fechado. Quem liga e desliga é o feed.js. -->
+  <button class="voltar-categorias" type="button" data-fechar-feed hidden>&larr; categorias</button>
   <nav aria-label="Principal">
     <a href="index.html" class="some-no-celular">Feed</a>
     <a href="a-alea.html" class="some-no-celular">A ālea</a>
@@ -58,13 +63,12 @@
 
   <div class="produto-topo">
     <div>
-      <div class="capa-produto"><img src="img/produtos/kit_1.jpg" width="1200" height="1200" fetchpriority="high" decoding="async" alt="Kit ālea — Comedouro e porta-saquinho na mesma estampa, com o mesmo nome."></div>
-      <p class="colmeia-dica">Clique numa foto pra ampliar.</p><div class="colmeia-caixa"><div class="colmeia" data-colmeia><button class="favo" type="button" data-favo="0" aria-label="Ampliar foto 1 de Kit ālea"><img src="img/produtos/kit_1_m.jpg" width="700" height="700" loading="lazy" decoding="async" alt="Kit ālea — foto 1"></button><button class="favo" type="button" data-favo="1" aria-label="Ampliar foto 2 de Kit ālea"><img src="img/produtos/kit_2_m.jpg" width="700" height="700" loading="lazy" decoding="async" alt="Kit ālea — foto 2"></button><button class="favo" type="button" data-favo="2" aria-label="Ampliar foto 3 de Kit ālea"><img src="img/produtos/kit_3_m.jpg" width="700" height="700" loading="lazy" decoding="async" alt="Kit ālea — foto 3"></button><button class="favo" type="button" data-favo="3" aria-label="Ampliar foto 4 de Kit ālea"><img src="img/produtos/tina_2_m.jpg" width="700" height="700" loading="lazy" decoding="async" alt="Kit ālea — foto 4"></button></div></div>
+      <p class="colmeia-dica">Clique numa foto pra ampliar.</p><p class="colmeia-dica2">Toque novamente para tela cheia!</p><div class="colmeia-caixa"><div class="colmeia" data-colmeia data-grandes='["img/produtos/kit_1.jpg","img/produtos/kit_2.jpg","img/produtos/kit_3.jpg","img/produtos/tina_2.jpg"]'><button class="favo" type="button" data-favo="0" aria-label="Ampliar foto 1 de Kit ālea"><img src="img/produtos/kit_1_m.jpg" width="700" height="700" loading="lazy" decoding="async" alt="Kit ālea — foto 1"></button><button class="favo" type="button" data-favo="1" aria-label="Ampliar foto 2 de Kit ālea"><img src="img/produtos/kit_2_m.jpg" width="700" height="700" loading="lazy" decoding="async" alt="Kit ālea — foto 2"></button><button class="favo" type="button" data-favo="2" aria-label="Ampliar foto 3 de Kit ālea"><img src="img/produtos/kit_3_m.jpg" width="700" height="700" loading="lazy" decoding="async" alt="Kit ālea — foto 3"></button><button class="favo" type="button" data-favo="3" aria-label="Ampliar foto 4 de Kit ālea"><img src="img/produtos/tina_2_m.jpg" width="700" height="700" loading="lazy" decoding="async" alt="Kit ālea — foto 4"></button></div></div>
     </div>
     <div>
       <span class="linha">Kit</span>
       <h1>Kit ālea</h1>
-      <p class="valor-grande"><small>Sob consulta</small></p>
+      <p class="valor-grande" data-valor data-preco-base=""><small>Sob consulta</small></p>
       <p>Comedouro e porta-saquinho na mesma estampa, com o mesmo nome.</p>
       <p>É como as fotos do Instagram foram feitas: as duas peças na mesma estampa, personalizadas com o mesmo nome, embaladas juntas com a tag da marca.</p><p>O valor do kit sai por WhatsApp, junto com as opções de estampa.</p>
       <dl class="ficha"><div><dt>Material</dt><dd>PLA</dd></div><div><dt>Personalização</dt><dd>Nome do pet em baixo relevo na cor do objeto.</dd></div><div><dt>Produção</dt><dd>Sob encomenda, 3 dias úteis após a confirmação de pagamento!</dd></div><div><dt>Cores</dt><dd>Totalmente personalizável, podendo escolher entre filamentos básicos, foscos ou brilhosos.</dd></div><div><dt>Contém</dt><dd>ālea Bowl Wave + ālea Poop Bag Holder</dd></div><div><dt>Embalagem</dt><dd>Caixa com a tag da marca — serve de presente</dd></div></dl>
@@ -78,8 +82,13 @@
         <label>Nome do pet
           <input type="text" name="nome_pet" maxlength="18" placeholder="como vai sair impresso na peça">
         </label>
-        <label>Cores
-          <input type="text" name="cor" maxlength="60" placeholder="ex.: azul fosco com letra dourada">
+        <label class="extra" data-extra data-extra-id="nome_colorido" data-extra-preco="30"><input type="checkbox" data-extra-caixa><span class="titulo-extra">Nome Colorido + R$ 30,00<small class="detalhe-extra">O nome sai em outra cor, em vez de em baixo relevo na cor da peca.</small></span></label>
+        <label>Cor do nome
+          <input type="text" name="cor_nome" maxlength="40" disabled
+                 placeholder="marque o Nome Colorido acima para escolher">
+        </label>
+        <label>Cores da peça
+          <input type="text" name="cor" maxlength="60" placeholder="ex.: azul fosco com base cinza">
         </label>
       </form>
 
@@ -88,18 +97,32 @@
         <span>Declaro que revisei cuidadosamente todas as informações da personalização, incluindo nome, grafia e cores. Declaro, ainda, estar ciente e de acordo com as condições acima aplicáveis a produtos personalizados, inclusive quanto a cancelamentos e devoluções.</span>
       </label>
 
-      <div class="botoes-produto">
-        <button class="botao" type="button" data-add-carrinho
-                data-slug="kit" data-nome="Kit ālea" data-preco=""
-                data-capa="kit_1" data-material="PLA" disabled>
-          Adicionar ao carrinho
-        </button>
-        <a class="botao contorno zap" data-assunto="Kit ālea">Pedir pelo WhatsApp</a>
-      </div>
       <p class="recado-aceite" data-recado-aceite hidden>
         Marque a declaração acima para adicionar ao carrinho.
       </p>
+      <div class="botoes-produto" data-botoes>
+        <button class="botao" type="button" data-comprar-agora
+                data-slug="kit" data-nome="Kit ālea" data-preco=""
+                data-capa="kit_1" data-material="PLA">
+          Comprar agora
+        </button>
+        <button class="botao-sacola" type="button" data-add-carrinho
+                aria-label="Adicionar ao carrinho" title="Adicionar ao carrinho">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 4 3.5 7.5V20a2 2 0 0 0 2 2h13a2 2 0 0 0 2-2V7.5L18 4z"></path><path d="M3.5 7.5h17"></path><path d="M9 11.5a3 3 0 0 0 6 0"></path><path d="M12 13.5v5M9.5 16h5"></path></svg>
+        </button>
+      </div>
     </div>
+  </div>
+</div>
+
+<!-- A TELA CHEIA da colmeia. Nasce vazia; o produto.js enche com a foto clicada.
+     "Com o fundo exatamente como está, porém embaçado" (Cassiano, 15/09/2026). -->
+<div class="telacheia" data-telacheia aria-hidden="true" role="dialog" aria-label="Foto ampliada">
+  <button class="fechar-x" type="button" data-fechar-tc aria-label="Fechar">&times;</button>
+  <div class="palco-foto" data-palco-tc></div>
+  <div class="legenda-tc">
+    <span class="pontos-tc" data-pontos-tc></span>
+    <span data-conta-tc></span>
   </div>
 </div>
 </main>

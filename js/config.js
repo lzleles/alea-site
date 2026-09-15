@@ -82,6 +82,22 @@ window.ALEA = {
            'foscos ou brilhosos.'
   },
 
+  /* ADICIONAIS DE PERSONALIZACAO — o que soma no preco da peca.
+     -------------------------------------------------------------------------------
+     id ....... nao muda depois que um pedido ja foi feito com ele (o carrinho guarda)
+     rotulo ... o que aparece no quadrado pra clicar
+     preco .... soma ao valor da peca, na hora, no botao e no carrinho
+     libera ... o campo que so pode ser respondido depois de marcar este adicional
+
+     ⚠️ ORIGEM DO VALOR: R$ 30,00, decidido pelo Cassiano em 15/09/2026, 2a rodada de
+     retorno do site ("colocar um quadrado pra clicar com o titulo Nome Colorido +
+     R$ 30,00, onde a pessoa precisa clicar pra poder responder a cor do nome").
+     Nao e' estimativa nossa. Mudou o preco aqui, muda no anuncio e no que o cliente ve. */
+  adicionais: [
+    { id: 'nome_colorido', rotulo: 'Nome Colorido', preco: 30, libera: 'cor_nome',
+      detalhe: 'O nome sai em outra cor, em vez de em baixo relevo na cor da peca.' }
+  ],
+
   /* O TEXTO JURÍDICO DA PEÇA PERSONALIZADA, palavra por palavra como ele mandou.
      Fica aqui, e não espalhado nas páginas, porque ele aparece em DOIS lugares que
      não podem divergir: a aba do produto e a trava do carrinho. Texto de consumo que

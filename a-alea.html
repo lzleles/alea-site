@@ -26,6 +26,11 @@
     <img class="colorida" src="img/marca/alea_logo.svg" alt="ālea" width="129" height="28">
     <img class="clara" src="img/marca/alea_logo_claro.svg" alt="ālea" width="129" height="28">
   </a>
+  <!-- ⚠️ O BOTÃO DE VOLTAR PRAS CATEGORIAS MORA AQUI, e não dentro do feed.
+       Dentro do feed ele caía POR CIMA da foto no celular (visto pelo Cassiano em
+       15/09/2026). No cabeçalho ele tem lugar próprio, não disputa pixel com a peça,
+       e some sozinho quando o feed está fechado. Quem liga e desliga é o feed.js. -->
+  <button class="voltar-categorias" type="button" data-fechar-feed hidden>&larr; categorias</button>
   <nav aria-label="Principal">
     <a href="index.html" class="some-no-celular">Feed</a>
     <a href="a-alea.html" class="some-no-celular">A ālea</a>

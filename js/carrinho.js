@@ -64,6 +64,10 @@
   }
 
   window.aleaCarrinho = {
+    /* o "Comprar agora" da página de produto chama isto de fora: ele põe no carrinho e
+       já quer fechar. Devolve `false` quando não deu (sem WhatsApp, carrinho vazio) —
+       e aí quem chamou abre a gaveta, que explica o que falta. */
+    fecharPedido: function () { return fecharPedido(); },
     itens: function () { return itens.slice(); },
     quantos: function () { return itens.length; },
     total: total,
@@ -92,7 +96,11 @@
     var p = i.personalizacao || {};
     var partes = [];
     if (p.nome_pet) partes.push('nome: ' + p.nome_pet);
-    if (p.cor) partes.push('cor: ' + p.cor);
+    if (p.cor) partes.push('cores da peça: ' + p.cor);
+    if (p.cor_nome) partes.push('cor do nome: ' + p.cor_nome);
+    (i.extras || []).forEach(function (x) {
+      partes.push(x.rotulo + ' (+' + window.aleaDinheiro(x.preco) + ')');
+    });
     if (i.material) partes.push(i.material);
     return partes.join(' · ');
   }
@@ -114,7 +122,11 @@
     corpo.innerHTML = itens.map(function (i, n) {
       var valor = i.preco ? window.aleaDinheiro(i.preco) : 'Sob consulta';
       return '<div class="linha-carrinho">' +
-        '<img src="img/produtos/' + i.capa + '_obj_m.webp" alt="" loading="lazy">' +
+        /* miniatura: o recorte quando existe, a foto normal quando nao. Nem toda peca
+           tem recorte (ver `recorte` no produtos.js), e imagem quebrada no carrinho e'
+           a ultima coisa que alguem quer ver antes de fechar um pedido. */
+        '<img src="img/produtos/' + i.capa + '_obj_m.webp" alt="" loading="lazy" ' +
+        'onerror="this.onerror=null;this.src=&quot;img/produtos/' + i.capa + '_m.jpg&quot;">' +
         '<div><div class="titulo">' + i.nome + '</div>' +
         '<div class="detalhe">' + (descreverItem(i) || 'sem personalização') + '</div>' +
         '<button class="tirar" type="button" data-tirar="' + n + '">tirar</button></div>' +
@@ -152,7 +164,7 @@
   }
 
   function fecharPedido() {
-    if (!itens.length || !window.aleaTemZap) return;
+    if (!itens.length || !window.aleaTemZap) return false;
     /* O pedido vira histórico ANTES de abrir o WhatsApp: se a conversa não abrir (app
        fora do ar, janela bloqueada), o visitante não perde o que montou. */
     var pedidos = ler(CHAVE_PEDIDOS, []) || [];
@@ -165,6 +177,7 @@
 
     window.aleaCarrinho.limpar();
     if (window.aleaGaveta) window.aleaGaveta.fechar();
+    return true;
   }
 
   /* ------------------------------------------------------------ a gaveta da conta */
