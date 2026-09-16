@@ -15,14 +15,12 @@
 
 window.ALEA = {
 
-  /* ⚠️ VAZIO DE PROPÓSITO (14/09/2026) — NÃO INVENTE UM NÚMERO AQUI.
-     O WhatsApp comercial da ālea ainda não foi informado pelo Cassiano. A bio do
-     Instagram pessoal dele traz um fragmento ("+55 064 1991") que NÃO é um telefone
-     válido, e chutar o número da casa é mandar cliente pago pra conversa errada.
-     Enquanto isto estiver vazio, todo botão de compra do site aparece DESLIGADO,
-     com o aviso na tela — em vez de virar link morto, que é o defeito que mais
-     custou caro na rede (wa.me sem número abre o WhatsApp em branco). */
-  whatsapp: '',
+  /* O WhatsApp comercial da ālea. Informado pelo Cassiano em 15/09/2026.
+     Formato: 55 (Brasil) + 64 (DDD de Jataí) + o número que ele mandou (999569994).
+     Ele mandou assim:  64999569994
+     Conferir sempre que mexer: tem que ter 12 ou 13 dígitos, só número, sem espaço e
+     sem traço — é essa a régua que o site.js usa pra decidir se liga os botões. */
+  whatsapp: '5564999569994',
 
   /* Texto que já vai escrito na conversa. O {produto} é trocado pelo item clicado. */
   mensagem: 'Oi! Vim pelo site da ālea. Queria saber sobre: {produto}',
