@@ -65,6 +65,18 @@
     });
   }
 
+  /* ⚠️ CLICAR EM QUALQUER LUGAR FECHA A MINIATURA AMPLIADA (3ª rodada de 15/09/2026).
+     Ele notou a assimetria: na tela cheia, clicar fora fechava; na colmeia, a foto
+     ampliada só voltava ao tamanho se clicasse nela de novo — e ninguém adivinha isso.
+     O ouvinte é no documento, e sai de cena quando o clique foi DENTRO da colmeia (lá
+     o primeiro clique expande e o segundo abre a tela cheia) ou na tela cheia. */
+  document.addEventListener('click', function (ev) {
+    if (!colmeia || !colmeia.classList.contains('tem-aberto')) return;
+    if (ev.target.closest('[data-colmeia]')) return;
+    if (ev.target.closest('[data-telacheia]')) return;
+    fecharFavos();
+  });
+
   /* =================================================================== tela cheia */
   var fotosGrandes = [];
   try { fotosGrandes = JSON.parse(colmeia && colmeia.getAttribute('data-grandes') || '[]'); }
@@ -190,6 +202,61 @@
     });
   });
 
+  /* ==================================================== as cores da peça
+     "Apagar o quadrado de escrita e colocar as bolinhas igual do Declaro; quando o
+     cliente clicar na bolinha, aparece a quantidade de quadrado correspondente à cor
+     que ele escolheu" (Cassiano, 15/09/2026, 3ª rodada).
+
+     O Degradê é o caso especial: não abre campo nenhum e mostra o aviso que ele ditou —
+     filamento sazonal não se promete antes de existir. */
+  var caixaCores = document.querySelector('[data-cores-peca]');
+  var camposCores = document.querySelector('[data-cores-campos]');
+
+  function desenharCamposDeCor(radio) {
+    if (!camposCores) return;
+    camposCores.innerHTML = '';
+    var aviso = radio.getAttribute('data-aviso');
+    if (aviso) {
+      var p = document.createElement('p');
+      p.className = 'aviso-degrade';
+      p.textContent = aviso;
+      camposCores.appendChild(p);
+      return;
+    }
+    var quantos = parseInt(radio.getAttribute('data-campos'), 10) || 0;
+    for (var k = 1; k <= quantos; k++) {
+      var linha = document.createElement('div');
+      linha.className = 'campo-cor';
+      linha.innerHTML = '<span class="numero">' + k + '</span>' +
+        '<input type="text" name="cor_' + k + '" maxlength="40" ' +
+        'placeholder="Cor ' + k + '" aria-label="Cor ' + k + ' da peça">';
+      camposCores.appendChild(linha);
+    }
+    var primeiro = camposCores.querySelector('input');
+    if (primeiro) primeiro.focus();
+  }
+
+  if (caixaCores) {
+    caixaCores.addEventListener('change', function (ev) {
+      var r = ev.target.closest('input[name="cores_peca"]');
+      if (r) desenharCamposDeCor(r);
+    });
+  }
+
+  function coresEscolhidas() {
+    if (!caixaCores) return null;
+    var r = caixaCores.querySelector('input[name="cores_peca"]:checked');
+    if (!r) return null;
+    var lista = Array.prototype.map.call(
+      camposCores.querySelectorAll('input'), function (i) { return i.value.trim(); }
+    ).filter(function (v) { return v; });
+    return {
+      modo: r.parentNode.textContent.trim(),
+      cores: lista,
+      a_combinar: !!r.getAttribute('data-aviso')
+    };
+  }
+
   /* ==================================================== o aceite, os dois botões */
   function campo(nome) {
     var el = document.querySelector('[data-personalizar] [name="' + nome + '"]');
@@ -217,7 +284,11 @@
       preco: precoTotal(),
       capa: botaoComprar.getAttribute('data-capa'),
       material: botaoComprar.getAttribute('data-material'),
-      personalizacao: { nome_pet: campo('nome_pet'), cor: campo('cor'), cor_nome: campo('cor_nome') },
+      personalizacao: {
+        nome_pet: campo('nome_pet'),
+        cor_nome: campo('cor_nome'),
+        cores: coresEscolhidas()
+      },
       extras: extras,
       /* o ACEITE vai junto do item, com data e hora. É a prova de que a declaração foi
          marcada ANTES da compra — e é ela que sustenta a regra de não cancelamento que

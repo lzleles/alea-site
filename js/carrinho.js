@@ -96,7 +96,15 @@
     var p = i.personalizacao || {};
     var partes = [];
     if (p.nome_pet) partes.push('nome: ' + p.nome_pet);
-    if (p.cor) partes.push('cores da peça: ' + p.cor);
+    if (p.cor) partes.push('cores da peça: ' + p.cor);      // formato antigo, ainda no aparelho de quem já comprou
+    /* as cores viraram escolha (Tricolor, Bicolor, Monocromático, Degradê) em
+       15/09/2026. O Degradê não traz cor nenhuma: traz a combinação a fazer depois. */
+    if (p.cores && p.cores.modo) {
+      partes.push(p.cores.a_combinar
+        ? (p.cores.modo + ' (cores a combinar depois do pagamento)')
+        : (p.cores.modo + (p.cores.cores && p.cores.cores.length
+            ? ': ' + p.cores.cores.join(', ') : '')));
+    }
     if (p.cor_nome) partes.push('cor do nome: ' + p.cor_nome);
     (i.extras || []).forEach(function (x) {
       partes.push(x.rotulo + ' (+' + window.aleaDinheiro(x.preco) + ')');

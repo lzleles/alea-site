@@ -53,7 +53,12 @@ window.ALEA = {
      de linhas que ele já registrou, sem prometer clique que não leva a nada. */
   esconder_categorias_vazias: false,
 
-  /* Identificação do negócio — o Google exige isto visível na página de destino. */
+  /* Identificação do negócio — o Google exige isto visível na página de destino.
+     ⚠️ CNPJ informado pelo Cassiano em 15/09/2026. Ele fecha metade da exigência de
+     "vendedor identificável" da política de destino do Google Ads; ainda faltam
+     ENDEREÇO COMERCIAL e E-MAIL. Sem conferir: é o número que ele mandou, escrito
+     como ele mandou. */
+  cnpj: '61.338.171/0001-10',
   marca: 'ālea',
   responsavel: 'Cassiano Rosado',
   cidade: 'Jataí',
@@ -94,8 +99,8 @@ window.ALEA = {
      R$ 30,00, onde a pessoa precisa clicar pra poder responder a cor do nome").
      Nao e' estimativa nossa. Mudou o preco aqui, muda no anuncio e no que o cliente ve. */
   adicionais: [
-    { id: 'nome_colorido', rotulo: 'Nome Colorido', preco: 30, libera: 'cor_nome',
-      detalhe: 'O nome sai em outra cor, em vez de em baixo relevo na cor da peca.' }
+    { id: 'nome_colorido', rotulo: 'Um detalhe que transforma!', preco: 30, libera: 'cor_nome',
+      detalhe: 'Deixe o nome do seu pet ainda mais especial adicionando cores!' }
   ],
 
   /* O TEXTO JURÍDICO DA PEÇA PERSONALIZADA, palavra por palavra como ele mandou.
@@ -114,6 +119,29 @@ window.ALEA = {
             'personalização, incluindo nome, grafia e cores. Declaro, ainda, estar ' +
             'ciente e de acordo com as condições acima aplicáveis a produtos ' +
             'personalizados, inclusive quanto a cancelamentos e devoluções.'
+  },
+
+  /* AS CORES DA PEÇA — deixou de ser um campo de escrita livre (Cassiano, 15/09/2026,
+     3ª rodada). Agora o cliente ESCOLHE quantas cores a peça leva, e o site abre um
+     retângulo numerado para cada uma.
+
+     `campos` é quantas cores aquela escolha pede. O Degradê pede ZERO e mostra um aviso:
+     o filamento é sazonal, e prometer uma cor que pode não existir no dia da impressão é
+     promessa que o CDC cobra depois.
+
+     ⚠️ Ele escreveu "serão 3 opções" e listou QUATRO nomes. Deixei as quatro, porque as
+     quatro estão escritas com todas as letras na mensagem dele e porque três delas é que
+     pedem cor (o Degradê não pede). Se a intenção era outra, é uma linha aqui. */
+  cores_da_peca: {
+    titulo: 'Cores da peça',
+    opcoes: [
+      { id: 'tricolor',      rotulo: 'Tricolor',      campos: 3 },
+      { id: 'bicolor',       rotulo: 'Bicolor',       campos: 2 },
+      { id: 'monocromatico', rotulo: 'Monocromático', campos: 1 },
+      { id: 'degrade',       rotulo: 'Degradê',       campos: 0,
+        aviso: 'Por se tratar de filamentos específicos e sazonais, após a confirmação ' +
+               'de pagamento entraremos em contato pra informar as cores disponíveis!' }
+    ]
   },
 
   /* Onde entrega. "a combinar" faz o site dizer "consulte o frete" em vez de prometer

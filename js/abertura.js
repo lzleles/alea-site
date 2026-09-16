@@ -36,11 +36,13 @@
   if (!corpo.classList.contains('home')) return;
 
   /* Os tempos, num lugar só. Têm que bater com os `animation-delay` do CSS. */
-  var CAPIVARA_MS = 3000;          // ela leva 3s pra chegar no lugar
+  var PAUSA_CAPIVARA_MS = 1400;    // ela fica PARADA, gigante, antes de andar (3ª rodada)
+  var CAPIVARA_MS = 3600;          // e leva 3,6s indo devagar pro lugar dela
   var LETRA_MS = 1000;             // cada letra leva 1s pra sair da capivara
   var ENTRE_LETRAS_MS = 700;       // e a seguinte parte 0,7s depois da anterior
   var LETRAS = 4;
-  var FIM_DAS_LETRAS = CAPIVARA_MS + ENTRE_LETRAS_MS * (LETRAS - 1) + LETRA_MS;   // 6,1s
+  var FIM_DAS_LETRAS = PAUSA_CAPIVARA_MS + CAPIVARA_MS +
+                       ENTRE_LETRAS_MS * (LETRAS - 1) + LETRA_MS;                 // 8,1s
 
   /* =======================================================================
      1) F5 VOLTA PRO COMEÇO — e por que isso não é automático
@@ -71,8 +73,14 @@
     window.scrollTo(0, 0);
   }
 
+  /* ⚠️ F5 REPRODUZ A ABERTURA INTEIRA (Cassiano, 15/09/2026, 3ª rodada).
+     A marca de "já viu" continua existindo — é ela que poupa a animação de quem volta
+     da página de produto, que foi o pedido dele em 14/09. Mas RECARREGAR é um gesto
+     deliberado de quem quer ver de novo: nessa navegação a marca é ignorada. Os dois
+     pedidos convivem porque quem decide é o TIPO da navegação, não o relógio. */
   var jaViu = false;
   try { jaViu = sessionStorage.getItem(VIU) === '1'; } catch (e) { /* aba anônima */ }
+  if (recarregou) jaViu = false;
   if (jaViu) corpo.classList.add('sem-abertura');
   try { sessionStorage.setItem(VIU, '1'); } catch (e) { /* aba anônima */ }
 
@@ -171,6 +179,10 @@
         setTimeout(escrever, pausa);
       } else {
         alvo.classList.add('pronta');
+        /* ⚠️ O MENU SÓ APARECE AQUI, depois da última letra da frase — pedido literal da
+           3ª rodada. Antes ele acendia junto com a capivara, e a tela ficava pronta
+           enquanto a frase ainda estava sendo escrita. */
+        corpo.classList.add('site-revelado');
       }
     })();
   }
@@ -193,9 +205,8 @@
         corpo.classList.add('marca-anima');
       });
     });
-    /* o site "se revela" quando a capivara chega no lugar dela */
-    setTimeout(function () { corpo.classList.add('site-revelado'); }, CAPIVARA_MS - 250);
-    /* e a frase só começa DEPOIS da última letra — pedido literal dele */
+    /* a frase só começa DEPOIS da última letra do logo, e o menu só depois da frase
+       (quem acende o menu é o fim do datilógrafo, lá em cima). */
     setTimeout(datilografar, FIM_DAS_LETRAS + 200);
   }
 

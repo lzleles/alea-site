@@ -110,6 +110,8 @@
           }).join('') + '</span>'
         : '';
 
+      /* a dica fica FORA do quadrado, logo abaixo dele: dentro, ela cobria as bolinhas
+         (visto por ele na 3ª rodada de 15/09/2026). */
       var dica = (i === 0 && quantas > 1)
         ? '<span class="dica-arrasto" data-dica><span class="mao">›››</span>arraste pro lado</span>'
         : '';
@@ -122,9 +124,11 @@
          personalização daquela foto, não o nome do produto, e continua no `alt` das
          imagens — que é o que o Google lê. */
       art.innerHTML =
-        '<div class="objeto' + (c.recorte ? '' : ' com-cenario') + '" data-distorcao data-forca="0.30" ' +
-             'role="group" aria-label="' + c.produto + ' personalizado para ' + c.nome + '">' +
-          imgs + dica + pontos +
+        '<div class="area-objeto">' +
+          '<div class="objeto' + (c.recorte ? '' : ' com-cenario') + '" data-distorcao data-forca="0.30" ' +
+               'role="group" aria-label="' + c.produto + ' personalizado para ' + c.nome + '">' +
+            imgs + pontos +
+          '</div>' + dica +
         '</div>' +
         '<div class="legenda">' +
           '<span class="lado-esquerdo">' +

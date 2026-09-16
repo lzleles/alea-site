@@ -15,15 +15,18 @@
 <body>
 <!-- ALEA:TOPO -->
 <header class="topo">
-  <a class="marca" href="index.html" aria-label="ālea — início">
-    <img class="colorida" src="img/marca/alea_logo.svg" alt="ālea" width="129" height="28">
-    <img class="clara" src="img/marca/alea_logo_claro.svg" alt="ālea" width="129" height="28">
-  </a>
-  <!-- ⚠️ O BOTÃO DE VOLTAR PRAS CATEGORIAS MORA AQUI, e não dentro do feed.
-       Dentro do feed ele caía POR CIMA da foto no celular (visto pelo Cassiano em
-       15/09/2026). No cabeçalho ele tem lugar próprio, não disputa pixel com a peça,
-       e some sozinho quando o feed está fechado. Quem liga e desliga é o feed.js. -->
-  <button class="voltar-categorias" type="button" data-fechar-feed hidden>&larr; categorias</button>
+  <!-- ⚠️ O BOTÃO DE VOLTAR PRAS CATEGORIAS MORA AQUI, EMBAIXO DO LOGO.
+       Dentro do feed ele caía POR CIMA da foto no celular; ao LADO do logo ele ficou
+       apertado (as duas coisas vistas pelo Cassiano em 15/09/2026). Empilhado abaixo da
+       marca ele tem lugar próprio e não disputa pixel com nada.
+       Quem liga e desliga é o feed.js. -->
+  <span class="canto-marca">
+    <a class="marca" href="index.html" aria-label="ālea — início">
+      <img class="colorida" src="img/marca/alea_logo.svg" alt="ālea" width="129" height="28">
+      <img class="clara" src="img/marca/alea_logo_claro.svg" alt="ālea" width="129" height="28">
+    </a>
+    <button class="voltar-categorias" type="button" data-fechar-feed hidden>&larr; categorias</button>
+  </span>
   <nav aria-label="Principal">
     <a href="index.html" class="some-no-celular">Feed</a>
     <a href="a-alea.html" class="some-no-celular">A ālea</a>
@@ -124,13 +127,14 @@
   </p>
 
   <h2>Quem responde por isto</h2>
-  <!-- ⚠️ PENDENTE (14/09/2026): falta a identificação fiscal completa do vendedor.
-       CNPJ (ou CPF, se a venda for como pessoa física), endereço comercial e e-mail.
-       NÃO INVENTAR. O Google Ads e o CDC pedem vendedor identificável na página de
-       destino; sem isso a campanha pode ser reprovada em "práticas comerciais".
-       Trocar o parágrafo abaixo assim que o Cassiano informar. -->
+  <!-- ⚠️ AINDA PENDENTE (15/09/2026): o CNPJ chegou; faltam ENDEREÇO COMERCIAL e
+       E-MAIL. NÃO INVENTAR nenhum dos dois. O Google Ads e o CDC pedem vendedor
+       identificável na página de destino, e identificável é nome + inscrição + onde
+       encontrar. Completar assim que o Cassiano informar. -->
   <p>
-    <strong>ālea</strong> — <span>Cassiano Rosado</span>, Jataí/GO.
+    <strong>ālea</strong> — <span data-campo="responsavel">Cassiano Rosado</span>,
+    <span data-campo="cidade">Jataí</span>/<span data-campo="uf">GO</span>.
+    CNPJ <span data-campo="cnpj">61.338.171/0001-10</span>.
     Contato pelo WhatsApp informado na página inicial e pelo Instagram @alea.decor3d.
   </p>
 
@@ -148,6 +152,7 @@
     © <img src="img/marca/alea_logo_claro.svg" alt="ālea"> <span id="ano">2026</span> — Todos os direitos reservados.
     <span class="creditos">
       <span data-campo="responsavel">Cassiano Rosado</span>, <span data-campo="cidade">Jataí</span>/<span data-campo="uf">GO</span> ·
+      CNPJ <span data-campo="cnpj">61.338.171/0001-10</span> ·
       peças feitas sob encomenda · identidade visual por Mirella Gaetti ·
       <a href="produto-bowl-wave.html">ālea Bowl Wave</a> ·
       <a href="produto-poop-bag-holder.html">ālea Poop Bag Holder</a> ·

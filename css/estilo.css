@@ -107,6 +107,9 @@ body.travado { overflow: hidden; }
   background: color-mix(in srgb, var(--off) 86%, transparent);
   backdrop-filter: saturate(140%) blur(10px);
 }
+/* a marca e o "← categorias" empilhados: ele pediu o botão EMBAIXO do logo, não ao
+   lado (3ª rodada). O canto esquerdo vira uma coluna; o resto do cabeçalho não muda. */
+.topo .canto-marca { display: grid; justify-items: start; gap: 2px; }
 .topo .marca img { height: 28px; width: auto; }
 /* no escuro o logo colorido dá lugar à versão clara — troca por CSS, sem JS */
 .topo .marca .clara { display: none; }
@@ -220,9 +223,14 @@ body.marca-medida:not(.marca-anima) .marca-anim .letra { opacity: 0; }
 
 /* 1) A CAPIVARA: 3 segundos, devagar, do tamanho máximo até o lugar dela.
       A curva sai bem devagar e só ganha corpo no meio — é o "vai devagar" dele. */
+/* ⚠️ ELA FICA PARADA, GIGANTE, ANTES DE ANDAR — 1,4s de pausa e 3,6s de trajeto.
+   "Pode aumentar o tempo da capivara em destaque quando entra no site" (Cassiano,
+   15/09/2026, 3ª rodada). A pausa é o `animation-delay`; o estado de partida já está
+   pintado pela regra `body.marca-medida:not(.marca-anima)` acima, então durante o
+   atraso a tela mostra exatamente o primeiro quadro: a capivara sozinha, grande. */
 body.marca-anima .marca-anim .capivara {
   transform-origin: var(--cap-x) var(--cap-y);
-  animation: capivara-chega 3s cubic-bezier(.34, .01, .2, 1) both;
+  animation: capivara-chega 3.6s cubic-bezier(.34, .01, .2, 1) 1.4s both;
 }
 @keyframes capivara-chega {
   from { transform: translate(var(--cap-dx, 0px), var(--cap-dy, 0px)) scale(var(--cap-k, 3)); }
@@ -238,10 +246,11 @@ body.marca-anima .marca-anim .letra {
   transform-origin: var(--cap-x) var(--cap-y);
   animation: letra-sai-da-capivara 1s cubic-bezier(.22, .78, .3, 1) both;
 }
-body.marca-anima .marca-anim .l1 { animation-delay: 3.0s; }
-body.marca-anima .marca-anim .l2 { animation-delay: 3.7s; }
-body.marca-anima .marca-anim .l3 { animation-delay: 4.4s; }
-body.marca-anima .marca-anim .l4 { animation-delay: 5.1s; }
+/* as letras entram depois que a capivara assentou: 1,4s de pausa + 3,6s de trajeto */
+body.marca-anima .marca-anim .l1 { animation-delay: 5.0s; }
+body.marca-anima .marca-anim .l2 { animation-delay: 5.7s; }
+body.marca-anima .marca-anim .l3 { animation-delay: 6.4s; }
+body.marca-anima .marca-anim .l4 { animation-delay: 7.1s; }
 @keyframes letra-sai-da-capivara {
   from { transform: scale(.04); opacity: 0; }
   30%  { opacity: 1; }
@@ -269,10 +278,17 @@ body.sem-abertura .marca-anim img { animation: none !important; transform: none 
 /* ---- a frase escrita letra por letra -------------------------------------
    O texto real vai INTEIRO no HTML e é o `.digitado` que cresce por cima dele: assim o
    Google e o leitor de tela recebem a frase completa, mesmo que o JS não rode. */
+/* ⚠️ UMA LINHA SÓ, EM QUALQUER TELA (pedido de 15/09/2026, 3ª rodada).
+   `white-space: nowrap` proíbe a quebra; o tamanho da fonte é que cede. O `min()` com
+   `vw` faz a frase encolher junto com a tela em vez de furar a lateral — num telefone
+   de 390px ela fica pequena, mas inteira, que é o que ele pediu. O `min-height` fixo
+   em `em` guarda o lugar dela enquanto a máquina de escrever não chegou, pra o menu
+   não dar um pulo quando o texto aparece. */
 .assinatura {
   font-family: var(--fonte-titulo); font-weight: 300;
-  font-size: clamp(1.1rem, 2.7vw, 1.85rem); line-height: 1.3;
-  color: var(--terracota); margin: 0; max-width: 24ch; min-height: 2.6em;
+  font-size: min(3.5vw, 1.7rem); line-height: 1.3;
+  white-space: nowrap;
+  color: var(--terracota); margin: 0; max-width: none; min-height: 1.4em;
 }
 .assinatura .cursor {
   display: inline-block; width: .06em; height: 1em; margin-left: .06em;
@@ -311,15 +327,22 @@ body.sem-abertura .marca-anim img { animation: none !important; transform: none 
    Tela cheia, preta, um objeto por vez. É uma CAMADA FIXA por cima da abertura, e não
    uma parte da página: foi o que permitiu a transição que ele pediu — o objeto sobe e
    some enquanto o próximo toma o lugar central — sem depender de rolagem nenhuma. */
+/* ⚠️ `pointer-events: none` ENQUANTO FECHADO — E ISSO NÃO É DETALHE.
+   Foi o defeito que travou o site do Cassiano em 15/09/2026: depois de fechar o feed,
+   clicar em PET não fazia nada, e só F5 resolvia. A causa: o item do produto declara
+   `visibility: visible`, e isso VENCE o `visibility: hidden` do pai — então o
+   `<article>` continuava por cima da abertura, invisível (opacity 0) e clicável.
+   Cada toque no menu morria no fantasma. `opacity: 0` esconde; não desarma o clique. */
 .feed {
   position: fixed; inset: 0; z-index: 50;
+  pointer-events: none;
   background: var(--preto); color: var(--off);
   display: grid; place-items: center;
   overflow: hidden;
   opacity: 0; visibility: hidden;
   transition: opacity .5s ease, visibility .5s;
 }
-.feed.aberto { opacity: 1; visibility: visible; }
+.feed.aberto { opacity: 1; visibility: visible; pointer-events: auto; }
 
 .feed .palco { position: absolute; inset: 0; }
 
@@ -434,13 +457,13 @@ body.sem-abertura .marca-anim img { animation: none !important; transform: none 
 /* ---- a dica de arrastar, SÓ no primeiro produto -------------------------
    "Somente no primeiro produto, mostrar alguma animação com setas ou algo do tipo,
    que é só rolar pra direita" (15/09/2026). Ela some no primeiro arrasto e não volta. */
+/* ⚠️ A DICA SAIU DE DENTRO DO QUADRADO (3ª rodada): "ficou em cima da bolinha, colocar
+   ele abaixo dela pra não ficar parecendo que está sobrepondo". Agora ela é irmã do
+   objeto, logo abaixo dele — as bolinhas ficam no pé da foto e a dica vem depois, sem
+   ninguém pisando em ninguém. */
+.area-objeto { display: grid; justify-items: center; gap: 10px; }
 .dica-arrasto {
-  /* ⚠️ z-index acima da lona: o canvas do efeito é acrescentado DEPOIS dela no DOM, e
-     sem isto a dica nasce atrás dele — some da tela sem erro nenhum. Foi o que o
-     primeiro teste de 15/09/2026 mostrou.
-     E ela mora no PÉ do objeto, não no meio: no celular, no meio, ela tapava
-     justamente a peça que está convidando a olhar. */
-  position: absolute; left: 50%; bottom: 6px; transform: translateX(-50%); z-index: 6;
+  position: relative; z-index: 6;
   display: flex; align-items: center; gap: 9px; pointer-events: none;
   white-space: nowrap;                     /* sem isto a seta cai numa linha e o texto noutra */
   font-size: 11.5px; letter-spacing: .12em; text-transform: uppercase;
@@ -471,8 +494,9 @@ body.sem-abertura .marca-anim img { animation: none !important; transform: none 
    com a peça. Aqui fica só a versão solta do cartão de fim do feed. */
 .voltar-categorias {
   background: transparent; border: 0; color: inherit; cursor: pointer;
-  font: inherit; font-size: 13.5px; letter-spacing: .06em; padding: 8px 10px;
-  border-radius: 999px; opacity: .8; transition: opacity .2s ease, background .2s ease;
+  font: inherit; font-size: 12.5px; letter-spacing: .06em; padding: 2px 8px 2px 0;
+  border-radius: 999px; opacity: .75; transition: opacity .2s ease;
+  text-align: left;
 }
 .voltar-categorias:hover, .voltar-categorias:focus-visible { opacity: 1; background: rgba(234, 228, 219, .14); }
 .feed .fechar-feed {
@@ -660,6 +684,11 @@ body.sem-abertura .marca-anim img { animation: none !important; transform: none 
    nome nasce desligado e só abre com este quadrado marcado — e o valor entra no preço
    na hora, no botão e no carrinho. */
 .extra {
+  /* ⚠️ caixa NORMAL, e não alta: o `.personalizar label` deixa os rótulos em maiúscula,
+     e isto aqui não é rótulo — é uma frase que o Cassiano escreveu ("Um detalhe que
+     transforma!" / "Deixe o nome do seu pet ainda mais especial adicionando cores!").
+     Em maiúscula ela parecia um aviso de sistema em vez de um convite. */
+  text-transform: none; letter-spacing: 0; color: var(--tinta); font-weight: 400;
   display: flex; align-items: center; gap: 12px; cursor: pointer;
   border: 1.5px solid var(--borda); border-radius: var(--raio);
   padding: 13px 15px; background: #fff;
@@ -667,9 +696,36 @@ body.sem-abertura .marca-anim img { animation: none !important; transform: none 
 }
 .extra:hover { border-color: var(--dourado); }
 .extra input { width: 20px; height: 20px; flex: none; accent-color: var(--terracota); cursor: pointer; }
-.extra .titulo-extra { font-family: var(--fonte-titulo); font-weight: 500; font-size: 16px; }
+.extra .titulo-extra { font-family: var(--fonte-titulo); font-weight: 600; font-size: 16px; color: var(--terracota); }
 .extra .detalhe-extra { display: block; font-size: 12.5px; color: var(--tinta-fraca); font-family: var(--fonte-corpo); }
 .extra.marcado { border-color: var(--terracota); background: #FFFDFA; }
+
+/* ---- as CORES DA PEÇA, em opções --------------------------------------
+   "Apagar o quadrado de escrita e colocar as bolinhas igual do Declaro; quando o
+   cliente clicar na bolinha, aparece a quantidade de quadrado correspondente à cor que
+   ele escolheu" (Cassiano, 15/09/2026, 3ª rodada). */
+.cores-peca > .rotulo-grupo {
+  font-size: 13px; letter-spacing: .06em; text-transform: uppercase;
+  color: var(--dourado); font-weight: 700; margin-bottom: 8px; display: block;
+}
+.cores-opcoes { display: flex; flex-wrap: wrap; gap: 8px 20px; margin-bottom: 12px; }
+.cores-opcoes label {
+  display: flex; align-items: center; gap: 8px; cursor: pointer;
+  font: inherit; font-size: 15.5px; text-transform: none; letter-spacing: 0; color: var(--tinta);
+}
+.cores-opcoes input { width: 19px; height: 19px; accent-color: var(--terracota); cursor: pointer; }
+/* os retângulos numerados, um por cor da escolha */
+.cores-campos { display: grid; gap: 10px; }
+.cores-campos .campo-cor { display: grid; grid-template-columns: 28px 1fr; gap: 10px; align-items: center; }
+.cores-campos .numero {
+  width: 28px; height: 28px; border-radius: 8px; display: grid; place-items: center;
+  background: var(--off); color: var(--terracota); font-weight: 700; font-size: 13px;
+}
+.aviso-degrade {
+  border-left: 3px solid var(--dourado); background: var(--papel);
+  padding: 12px 14px; border-radius: 0 var(--raio) var(--raio) 0;
+  font-size: 14px; color: var(--tinta-fraca); margin: 0;
+}
 
 .botao {
   display: inline-flex; align-items: center; justify-content: center; gap: 10px;
