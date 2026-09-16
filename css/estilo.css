@@ -158,12 +158,22 @@ body.escuro .botao-icone:hover, body.escuro .botao-icone:focus-visible { backgro
    pé da tela, com um buraco no meio. Agora os três — marca, frase e menu — são um bloco
    só, com respiro curto entre eles, ancorado um pouco acima do centro. O rodapé preto
    continua existindo embaixo, fora da primeira tela, que é o que ele autorizou. */
+/* ⚠️ A FAIXA PRETA NO PÉ DO IPHONE (16/09/2026, áudio das 13:15 + print): "antes eu abria a
+   página e não aparecia a parte preta, ficava inteirinha de uma cor só". A abertura media
+   exatamente 100svh, a altura da tela COM a barra do Safari. A barra do iOS novo flutua e é
+   transparente, então o que mora logo abaixo dos 100svh aparece através dela, e ali mora o
+   rodapé PRETO. Antes não se via porque a tarja de obra empurrava tudo pra baixo; ela saiu
+   em 15/09, 23:31, e o rodapé subiu pra baixo da barra.
+   Cura: a abertura ganha uma faixa extra de gradiente (`--sob-a-barra`) e o mesmo tanto a
+   mais no padding de baixo. A área onde a marca se centraliza continua a mesma de antes,
+   então nada sobe nem desce na primeira tela. O rodapé só começa depois da barra. */
 .abertura {
+  --sob-a-barra: 110px;
   position: relative; z-index: 1;
-  min-height: 100svh;
+  min-height: calc(100svh + var(--sob-a-barra));
   margin-top: var(--tarja, 0px);
   display: grid; align-content: center; justify-items: center;
-  padding: clamp(84px, 12vh, 130px) var(--gutter) clamp(28px, 6vh, 54px);
+  padding: clamp(84px, 12vh, 130px) var(--gutter) calc(clamp(28px, 6vh, 54px) + var(--sob-a-barra));
   text-align: center;
   overflow: hidden;
   background:
@@ -171,6 +181,11 @@ body.escuro .botao-icone:hover, body.escuro .botao-icone:focus-visible { backgro
     radial-gradient(940px 660px at 86% 24%, rgba(170, 150, 97, .58), transparent 60%),
     radial-gradient(1080px 780px at 52% 98%, rgba(146, 68, 41, .46), transparent 64%),
     linear-gradient(162deg, #F8F5F0 0%, #EAE4DB 54%, #E2D6C6 100%);
+}
+/* onde o navegador mede as duas alturas, a faixa acompanha a barra de verdade (o mínimo de
+   110 px fica como piso, pro caso de o Safari relatar as duas iguais) */
+@supports (height: 100lvh) {
+  .abertura { --sob-a-barra: max(110px, 100lvh - 100svh); }
 }
 /* a mancha que se mexe devagar: dá vida sem pedir atenção */
 .abertura::after {
@@ -488,6 +503,17 @@ body.sem-abertura .marca-anim img { animation: none !important; transform: none 
   color: rgba(234, 228, 219, .55); pointer-events: none;
 }
 @media (max-width: 560px) { .feed .contador { display: none; } }
+/* a linha que diz o que a categoria é (16/09/2026). Fica logo abaixo do cabeçalho, que
+   termina em 83 px, e acima da peça, que começa em 130 px no celular pequeno (medido):
+   uma linha só cabe, duas não. */
+.feed .descricao-categoria {
+  position: absolute; z-index: 6;
+  top: calc(var(--tarja, 0px) + 90px); left: var(--gutter); right: var(--gutter);
+  margin: 0; text-align: center;
+  font-size: 13px; line-height: 1.35; letter-spacing: .04em;
+  color: rgba(234, 228, 219, .72); pointer-events: none;
+}
+.feed .descricao-categoria[hidden] { display: none; }
 /* ⚠️ O BOTÃO DE VOLTAR MUDOU DE LUGAR (15/09/2026, 2ª rodada): "após o clique no menu,
    o menu pra voltar pra categorias ficou em cima da foto". Ele agora mora no CABEÇALHO
    (ver o TOPO no 01_gerar_paginas_v2.py), onde tem espaço próprio e não disputa pixel
@@ -770,11 +796,24 @@ body.sem-abertura .marca-anim img { animation: none !important; transform: none 
      da gaveta nasce escondido atrás dela */
   position: fixed; top: var(--tarja, 0px); right: 0; bottom: 0; left: auto; z-index: 80;
   width: min(420px, 100vw); background: var(--papel); color: var(--tinta);
-  box-shadow: -30px 0 70px -40px rgba(0, 0, 0, .8);
-  transform: translateX(100%); transition: transform .38s cubic-bezier(.3, .86, .28, 1);
+  /* ⚠️ A FAIXA ESCURA NA BORDA DIREITA (16/09/2026, print do Cassiano). Fechada, a gaveta
+     só era empurrada pra fora da tela (`translateX(100%)`), mas a SOMBRA dela escorria
+     70 px pra dentro. Com Conta e Carrinho, eram duas sombras somadas na borda direita da
+     abertura: luminância 104,6 contra 180,9 no miolo, medido no celular emulado.
+     Fechada, agora ela não tem sombra e fica `hidden`. A `visibility` só troca DEPOIS
+     que a animação de fechar termina (atraso de .38s), senão ela sumiria no meio do
+     movimento. Ao abrir, a troca é imediata, e o foco no primeiro botão continua
+     funcionando. */
+  box-shadow: none; visibility: hidden;
+  transform: translateX(100%);
+  transition: transform .38s cubic-bezier(.3, .86, .28, 1), box-shadow .38s ease, visibility 0s linear .38s;
   display: flex; flex-direction: column;
 }
-.gaveta.aberta { transform: none; }
+.gaveta.aberta {
+  transform: none; visibility: visible;
+  box-shadow: -30px 0 70px -40px rgba(0, 0, 0, .8);
+  transition: transform .38s cubic-bezier(.3, .86, .28, 1), box-shadow .38s ease, visibility 0s;
+}
 .gaveta header { display: flex; align-items: center; gap: 12px; padding: 18px 20px; border-bottom: 1px solid var(--borda); }
 .gaveta header h2 { font-family: var(--fonte-titulo); font-weight: 500; font-size: 1.25rem; margin: 0; color: var(--terracota); }
 .gaveta header button { margin-left: auto; background: transparent; border: 0; font-size: 22px; line-height: 1; cursor: pointer; color: var(--tinta-fraca); padding: 4px 8px; }

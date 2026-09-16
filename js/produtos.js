@@ -38,13 +38,20 @@
 
    ⚠️ A DESCRIÇÃO ESTÁ VAZIA DE PROPÓSITO. Ele mandou os NOMES, não o que cada um
    quer dizer, e o palpite de quem não vende a peça vira texto errado no ar. O que eu
-   imaginaria está no comentário de cada linha — ele confirma ou corrige, aí entra. */
+   imaginaria está no comentário de cada linha — ele confirma ou corrige, aí entra.
+
+   ⚠️ A DESCRIÇÃO APARECE NO TOPO DO FEED (16/09/2026, áudio das 13:11): "a partir da hora
+   que ele clica em PET, aí ele já no topo já coloca ali (…) a nossa linha PET é voltada
+   pra cachorro (…) um textinho pequeno explicativo, só pra ele ver: ah, não é isso que
+   eu quero não, aí ele volta na página e clica no outro". A PET é a primeira com o
+   significado dito por ele. UMA LINHA SÓ: no celular pequeno (360×640) o espaço entre o
+   cabeçalho e a peça é de 47 px, medido. Frase maior que isso cai em cima da foto. */
 window.CATEGORIAS = [
   { id: 'custom', nome: 'CUSTOM', descricao: '' },   // sugestão minha: peça sob projeto, do zero
   { id: 'fan',    nome: 'FAN',    descricao: '' },   // sugestão minha: cultura pop, coleção
   { id: 'glow',   nome: 'GLOW',   descricao: '' },   // sugestão minha: filamento que brilha no escuro
   { id: 'home',   nome: 'HOME',   descricao: '' },   // sugestão minha: casa e decoração
-  { id: 'pet',    nome: 'PET',    descricao: '' },   // a única com peça hoje
+  { id: 'pet',    nome: 'PET',    descricao: 'Nossa linha PET é voltada para cachorros.' },   // dita por ele, 16/09/2026
   { id: 'play',   nome: 'PLAY',   descricao: '' },   // sugestão minha: brinquedo e jogo
   { id: 'sense',  nome: 'SENSE',  descricao: '' }    // sugestão minha: sensorial, fidget
 ];

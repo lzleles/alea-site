@@ -66,6 +66,23 @@
     return c ? c.nome : String(id || '').toUpperCase();
   }
 
+  /* A linha que explica a categoria, no topo do feed (pedido de 16/09/2026). Nasce aqui e
+     não no index.html porque o feed inteiro é desenhado por este arquivo. Categoria sem
+     descrição não ganha linha vazia: o elemento some. */
+  function pintarDescricao(id) {
+    var c = (window.CATEGORIAS || []).filter(function (x) { return x.id === id; })[0];
+    var texto = c && c.descricao ? c.descricao : '';
+    var el = document.getElementById('descricao-categoria');
+    if (!el) {
+      el = document.createElement('p');
+      el.id = 'descricao-categoria';
+      el.className = 'descricao-categoria';
+      feed.appendChild(el);
+    }
+    el.textContent = texto;
+    el.hidden = !texto;
+  }
+
   /* ======================================================================= desenho */
   function desenhar(catId) {
     var lista = (window.VITRINE || []).filter(function (c) { return c.categoria === catId; });
@@ -355,6 +372,7 @@
     feed.classList.add('aberto');
     feed.setAttribute('aria-hidden', 'false');
     mostrarVoltar(true);
+    pintarDescricao(catId);
     document.body.classList.add('escuro', 'travado');
     document.body.classList.remove('na-abertura');
     aberto = true;
