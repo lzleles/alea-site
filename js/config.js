@@ -62,14 +62,14 @@ window.ALEA = {
   cidade: 'Jataí',
   uf: 'GO',
   email: '',                  // ⚠️ e-mail comercial da ālea — ainda não informado
-  instagram: 'alea.decor3d',
+  instagram: 'alea.co_',        // trocado em 16/09/2026: o @alea.decor3d deixou de existir; @alea.co_ conferido na API da Meta ("ālea & Co")
   instagram_canal: 'eaibora.3d',
 
   /* AS REDES DO RODAPÉ. Endereço vazio = o ícone não aparece — nunca vira link morto.
      ⚠️ Faltam do Cassiano: Linktree, YouTube e Twitch. Assim que ele mandar, é colar. */
   redes: {
     linktree:  '',            // https://linktr.ee/...
-    instagram: 'https://www.instagram.com/alea.decor3d/',
+    instagram: 'https://www.instagram.com/alea.co_/',
     youtube:   '',            // https://www.youtube.com/@...
     twitch:    ''             // https://www.twitch.tv/...
   },
