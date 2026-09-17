@@ -71,7 +71,13 @@ window.ALEA = {
      […] o link do Linktree". Os dois entraram: o Linktree é o dele (o mesmo da bio do
      @eaibora.3d, lido no retrato de 14/09) e o segundo Instagram ganha ícone próprio. */
   redes: {
-    linktree:  'https://linktr.ee/eaibora.3d',
+    /* ⚠️ O ENDEREÇO DO LINKTREE É O QUE ELE MANDOU, COM TODAS AS LETRAS (4ª rodada, 17/09/2026,
+       item 5: "colocar a logo também do linktr, onde quando eu clicar, vai cair nesse domínio").
+       O rabicho depois do `?` é rastreamento de quem clicou no link da BIO do Instagram dele
+       (utm_* e fbclid). `https://linktr.ee/eaibora.3d` sozinho abre a mesma página; mantive o dele
+       porque quem escolhe o link é o dono da conta, e porque o Linktree conta essa visita como
+       vinda do Instagram — se um dia ele quiser separar "veio do site", é aqui que se troca. */
+    linktree:  'https://linktr.ee/eaibora.3d?utm_source=ig&utm_medium=social&utm_content=link_in_bio&fbclid=PAdGRleAUYWSxwZG9mAmZkaWQWUOkM91TjGzxZsGlPaArH1voSo4_jjGV4dG4DYWVtAjExAHNydGMGYXBwX2lkDzEyNDAyNDU3NDI4NzQxNAABpzXaxi12EnfVzwcyuaOEvwRaWDu6O0_U-Sq64AjEdd39UlRlaIC5LxabGdrK_aem_oa-Nn97SXEFFzUbBcxxXdA',
     instagram: 'https://www.instagram.com/alea.co_/',
     instagram_canal: 'https://www.instagram.com/eaibora.3d/',
     youtube:   '',            // https://www.youtube.com/@...

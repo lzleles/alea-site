@@ -149,13 +149,20 @@
   var NOMES = { linktree: 'Linktree', instagram: 'Instagram @alea.co_',
                 instagram_canal: 'Instagram @eaibora.3d', youtube: 'YouTube', twitch: 'Twitch' };
 
+  /* ⚠️ O LINKTREE É UM SÍMBOLO CHEIO, não um contorno (4ª rodada, item 5).
+     Todos os outros ícones daqui são desenhos de linha (`fill:none` + `stroke`), e a marca do
+     Linktree desenhada assim vira um risco fino em volta da estrela — some num ícone de 20 px.
+     Ele é o único que vai pintado por dentro. */
+  var CHEIOS = { linktree: true };
+
   function montarRedes() {
     var caixas = document.querySelectorAll('[data-redes]');
     if (!caixas.length) return;
     var redes = C.redes || {};
     Array.prototype.forEach.call(caixas, function (caixa) {
       caixa.innerHTML = '';
-      ['linktree', 'instagram', 'instagram_canal', 'youtube', 'twitch'].forEach(function (id) {
+      /* a ordem é a que ele pediu na 4ª rodada: o Linktree "do lado do logo do Instagram" */
+      ['instagram', 'instagram_canal', 'linktree', 'youtube', 'twitch'].forEach(function (id) {
         var url = redes[id];
         if (!url) return;                     // vazio = não aparece, nunca link morto
         var a = document.createElement('a');
@@ -164,7 +171,8 @@
         a.rel = 'noopener';
         a.setAttribute('aria-label', NOMES[id]);
         a.title = NOMES[id];
-        a.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" ' +
+        a.innerHTML = '<svg viewBox="0 0 24 24" ' +
+          (CHEIOS[id] ? 'fill="currentColor" stroke="none" ' : 'fill="none" stroke="currentColor" ') +
           'stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" ' +
           'aria-hidden="true">' + ICONES[id] + '</svg>';
         caixa.appendChild(a);

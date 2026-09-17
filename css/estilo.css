@@ -127,6 +127,41 @@ body.escuro .topo { background: color-mix(in srgb, var(--preto) 72%, transparent
 /* na abertura o cabeçalho flutua sem fundo: o gradiente é o assunto da tela */
 body.na-abertura .topo { background: transparent; backdrop-filter: none; }
 
+/* --- A LOGO DO CANAL @eaibora.3d ---------------------------------------------
+   Cassiano, 4ª rodada (17/09/2026), item 3: "coloque a logo do @eaibora.3d […] pra fazer
+   a animação igual da capivara! A diferença vai ser: ela vai ser 3x menor do que da
+   capivara e ela vai ficar posicionada a direita do logo do Alea no canto superior
+   esquerdo! Ela não sair do lugar dela hora nenhuma, vai só expandir quando entrar na
+   página igual a capivara e vai diminuindo conforme a capivara vai diminuindo!"
+
+   ⚠️ "NÃO SAIR DO LUGAR" É O `transform-origin: top left`. A capivara faz duas coisas ao
+   mesmo tempo — cresce E se desloca pro meio da tela (o `translate` do `--cap-dx/dy`).
+   Esta aqui só cresce, e cresce a partir do canto superior esquerdo DELA: o ponto onde
+   ela está fica parado no pixel, e o resto se abre pra direita e pra baixo, dentro da
+   tela. Com origem no centro, metade dela subiria pra fora do topo da janela.
+
+   ⚠️ QUEM MEDE O "3x MENOR" É O abertura.js (`--logo3d-k`): o tamanho da capivara gigante
+   depende da janela, então um número fixo aqui ficaria certo num aparelho e errado nos
+   outros — o mesmo motivo do `--cap-k`. Enquanto ele não mediu, na home ela fica
+   invisível, pra não piscar no tamanho errado (mesma régua da `.marca-anim`). */
+.topo .marca-3d { display: block; line-height: 0; transform-origin: top left; }
+.topo .marca-3d img { display: block; height: 28px; width: auto; }
+body.home:not(.marca-medida) .topo .marca-3d { visibility: hidden; }
+/* o primeiro quadro: já grande, parada, esperando a vez junto com a capivara */
+body.home.marca-medida:not(.marca-anima) .topo .marca-3d { transform: scale(var(--logo3d-k, 1)); }
+/* e a volta: mesmo atraso (1,4s), mesma duração (3,6s) e mesma curva da capivara */
+body.home.marca-anima .topo .marca-3d {
+  animation: logo3d-chega 3.6s cubic-bezier(.34, .01, .2, 1) 1.4s both;
+}
+@keyframes logo3d-chega {
+  from { transform: scale(var(--logo3d-k, 1)); }
+  to   { transform: none; }
+}
+body.sem-abertura .topo .marca-3d { animation: none !important; transform: none !important; }
+@media (prefers-reduced-motion: reduce) {
+  .topo .marca-3d { animation: none !important; transform: none !important; }
+}
+
 .topo nav { margin-left: auto; display: flex; gap: clamp(8px, 1.6vw, 18px); align-items: center; }
 .topo nav > a {
   text-decoration: none; color: inherit; font-size: 14.5px;
@@ -202,11 +237,34 @@ body.escuro .botao-icone:hover, body.escuro .botao-icone:focus-visible { backgro
    3D do Linktree e a estampa terracota ficou guardada na branch `previa/3d-e-estampa-2026-09-17`.)
    O arquivo é a Estampa_Off da Mirella em ladrilho 2×2 espelhado sem a moldura
    (`_preparar_estampa_ladrilho_v2_off.py`): assim o tamanho em pixel sai daqui e o traço tem a mesma
-   grossura no celular e no monitor. `inset: 0` cobre também a faixa de baixo da barra do Safari. */
+   grossura no celular e no monitor. `inset: 0` cobre também a faixa de baixo da barra do Safari.
+
+   ⚠️ 4ª RODADA (17/09/2026, item 8): "deixar a estampa mais suave ainda, ela ficou muito em
+   destaque, e ela não aparecer aonde estiver a logo, tanto do nome, quanto da capivara, quanto
+   do menu". São duas coisas, e cada uma tem o seu jeito:
+     · MAIS SUAVE = `opacity` no desenho inteiro. Mexer na cor do SVG resolveria também, mas aí o
+       número mora no arquivo gerado e some na próxima geração; aqui ele fica à vista e num lugar só.
+     · NÃO APARECER ATRÁS DA MARCA = uma CLAREIRA recortada na própria estampa (`mask`), não uma
+       mancha clara por cima: mancha por cima teria que acertar a cor do degradê embaixo, que muda
+       do topo pro pé da tela. O buraco deixa passar o degradê exatamente como ele é.
+   ⚠️ A CLAREIRA É MEDIDA, NÃO ESCRITA: o miolo (marca + frase + menu) muda de tamanho com a janela
+   e com a fonte, então quem dá as coordenadas é o abertura.js (`--clareira-*`), e a máscara só
+   entra depois de medida (`body.tem-clareira`) — sem isso, um buraco no lugar errado. */
 .abertura::before {
   content: ''; position: absolute; inset: 0; z-index: 0;
   background: url(../img/marca/estampa_off_ladrilho.svg) left top / 900px auto repeat;
+  opacity: .5;                         /* "mais suave ainda" (item 8) */
   pointer-events: none;
+}
+/* o buraco: transparente (= estampa apagada) no miolo, cheio (= estampa inteira) longe dele.
+   A parada em 50% é o raio onde ela começa a voltar; em 100% já voltou por completo. */
+body.tem-clareira .abertura::before {
+  -webkit-mask-image: radial-gradient(ellipse var(--clareira-rx, 0px) var(--clareira-ry, 0px)
+                      at var(--clareira-x, 50%) var(--clareira-y, 40%),
+                      transparent 0%, transparent 50%, #000 100%);
+  mask-image: radial-gradient(ellipse var(--clareira-rx, 0px) var(--clareira-ry, 0px)
+              at var(--clareira-x, 50%) var(--clareira-y, 40%),
+              transparent 0%, transparent 50%, #000 100%);
 }
 @media (min-aspect-ratio: 3/5) {
   .abertura::before { background-size: clamp(1000px, 90vw, 1400px) auto; background-position: center top; }
