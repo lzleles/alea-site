@@ -66,10 +66,14 @@ window.ALEA = {
   instagram_canal: 'eaibora.3d',
 
   /* AS REDES DO RODAPÉ. Endereço vazio = o ícone não aparece — nunca vira link morto.
-     ⚠️ Faltam do Cassiano: Linktree, YouTube e Twitch. Assim que ele mandar, é colar. */
+     ⚠️ Faltam do Cassiano: YouTube e Twitch. Assim que ele mandar, é colar.
+     17/09/2026 (áudio de 16/09, 23:51): "eu tenho o segundo Instagram, que é do eaibora3d
+     […] o link do Linktree". Os dois entraram: o Linktree é o dele (o mesmo da bio do
+     @eaibora.3d, lido no retrato de 14/09) e o segundo Instagram ganha ícone próprio. */
   redes: {
-    linktree:  '',            // https://linktr.ee/...
+    linktree:  'https://linktr.ee/eaibora.3d',
     instagram: 'https://www.instagram.com/alea.co_/',
+    instagram_canal: 'https://www.instagram.com/eaibora.3d/',
     youtube:   '',            // https://www.youtube.com/@...
     twitch:    ''             // https://www.twitch.tv/...
   },

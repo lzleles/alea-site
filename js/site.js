@@ -143,7 +143,11 @@
     youtube: '<rect x="2" y="5" width="20" height="14" rx="4"/><path d="M10.5 9.2l5 2.8-5 2.8z" fill="currentColor" stroke="none"/>',
     twitch: '<path d="M4 3h16v11l-4 4h-3l-3 3H8v-3H4z"/><path d="M11 8v4M15 8v4"/>'
   };
-  var NOMES = { linktree: 'Linktree', instagram: 'Instagram', youtube: 'YouTube', twitch: 'Twitch' };
+  /* o segundo Instagram (o do canal "eaí, bora?") usa o mesmo desenho; quem diferencia os
+     dois é o nome, que aparece no toque longo e é o que o leitor de tela fala */
+  ICONES.instagram_canal = ICONES.instagram;
+  var NOMES = { linktree: 'Linktree', instagram: 'Instagram @alea.co_',
+                instagram_canal: 'Instagram @eaibora.3d', youtube: 'YouTube', twitch: 'Twitch' };
 
   function montarRedes() {
     var caixas = document.querySelectorAll('[data-redes]');
@@ -151,7 +155,7 @@
     var redes = C.redes || {};
     Array.prototype.forEach.call(caixas, function (caixa) {
       caixa.innerHTML = '';
-      ['linktree', 'instagram', 'youtube', 'twitch'].forEach(function (id) {
+      ['linktree', 'instagram', 'instagram_canal', 'youtube', 'twitch'].forEach(function (id) {
         var url = redes[id];
         if (!url) return;                     // vazio = não aparece, nunca link morto
         var a = document.createElement('a');

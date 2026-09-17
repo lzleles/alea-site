@@ -78,9 +78,26 @@
 <!-- ======================================================================= ABERTURA
      A primeira tela: gradiente da marca (o "igual o Linktree" que ele pediu), a
      capivara que cresce e vira o logotipo, a frase escrita letra por letra e o menu.
-     O FEED só aparece depois que uma categoria for clicada. -->
+     O FEED só aparece depois que uma categoria for clicada.
+
+     17/09/2026 (áudios de 16/09, 23:51 e 23:54, + print do Linktree dele): "a parte de
+     cima fazer essa animação inteira do Linktree, juntando essa logo do 3D com a ālea,
+     tudo em degradê, e tudo com esse fundo terracota". O 3D do "eaí, bora?" mora no
+     alto e se desmancha no degradê; a estampa terracota da Mirella fica por baixo de
+     tudo; a marca, a frase e o menu descem pro meio. A animação da capivara NÃO mudou
+     ("a parte inicial, não quero que muda nada"). -->
 <main id="abertura" class="abertura">
   <h1 class="so-leitor">ālea — comedouros e acessórios pet personalizados, impressos em 3D em Jataí-GO</h1>
+
+  <!-- decorativo: o nome ālea é o que se lê; o 3D é a imagem do canal dele, a mesma do
+       Linktree (linktr.ee/eaibora.3d). Em <img> e não em background de CSS porque a
+       animação só começa no `load`, e é o <img> que o `load` garante que já chegou. -->
+  <div class="heroi-3d" aria-hidden="true">
+    <img src="img/marca/eaibora_3d_760.jpg"
+         srcset="img/marca/eaibora_3d_760.jpg 760w, img/marca/eaibora_3d_1200.jpg 1200w"
+         sizes="(max-aspect-ratio: 16/25) 100vw, 60vh"
+         width="1200" height="1200" alt="" fetchpriority="high">
+  </div>
 
   <div class="miolo">
     <!-- AS CINCO PEÇAS TÊM O viewBox DO LOGO INTEIRO (ver _partir_logo_v2.py):

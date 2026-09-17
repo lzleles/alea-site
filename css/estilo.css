@@ -24,6 +24,18 @@
    Paleta e tipografia continuam saindo do "Manual de Diretrizes | Alea"
    (Mirella Gaetti, 2026), páginas 4, 8 e 14.
 
+   v3.1 (17/09/2026) — A ABERTURA GANHA O 3D E A ESTAMPA (áudios de 16/09, 23:51 e 23:54)
+     · "a parte inicial, não quero que muda nada, o degradê ficou animal"  → o degradê e a
+        animação da capivara ficaram como estavam;
+     · "a página inicial ficou muito espaço pra cima e pra baixo […] esse meio aí um pouco
+        pra baixo"  → marca, frase e menu descem ~100 px no celular;
+     · "a parte de cima fazer essa animação inteira do Linktree, juntando essa logo do 3D
+        com a ālea, tudo em degradê, e tudo com esse fundo terracota"  → o 3D do canal
+        "eaí, bora?" (a imagem do Linktree dele) no alto, esfumando no degradê, acendendo
+        enquanto a capivara anda; a Estampa_Terracota da Mirella por baixo de tudo.
+     Blocos: ABERTURA (`.heroi-3d`, `.abertura::before`, `.miolo::before`).
+     Testado por gesto em 6 aparelhos: `_testar_abertura_gesto_v1.py` (fora do repo).
+
    ⚠️ TIPOGRAFIA — SUBSTITUIÇÃO DECLARADA: o manual manda "Defante" nos títulos; ela é
    comercial e não veio no kit. Até ser licenciada, títulos usam "Outfit". Trocar a
    variável --fonte-titulo e somar um @font-face resolve; nada mais no site muda.
@@ -167,13 +179,29 @@ body.escuro .botao-icone:hover, body.escuro .botao-icone:focus-visible { backgro
    Cura: a abertura ganha uma faixa extra de gradiente (`--sob-a-barra`) e o mesmo tanto a
    mais no padding de baixo. A área onde a marca se centraliza continua a mesma de antes,
    então nada sobe nem desce na primeira tela. O rodapé só começa depois da barra. */
+/* ⚠️ O 3D EM CIMA E A MARCA NO MEIO (17/09/2026, áudios de 16/09 23:51 e 23:54 + print):
+   "a página inicial ficou muito espaço pra cima e pra baixo […] esse meio aí todo
+   preenchido um pouco pra baixo e a parte de cima fazer essa animação inteira do
+   Linktree, juntando essa logo do 3D com a ālea, tudo em degradê, e tudo com esse fundo
+   terracota". A tela vira quatro faixas de grade:
+     1. o lugar do 3D (`--heroi` é o lado do quadrado dele; a marca entra a 80% dessa
+        altura, dentro do degradê onde o 3D se desmancha — como no Linktree dele);
+     2. um respiro que estica;
+     3. a marca, a frase e o menu (o `.miolo`, que não mudou por dentro);
+     4. o dobro do respiro de cima, pra o bloco não ficar no pé da tela.
+   ⚠️ `--heroi` usa `vh`, e não `svh`, DE PROPÓSITO: é a mesma unidade da `@media
+   (min-aspect-ratio: 3/5)` que decide se as laterais do 3D se desmancham. Com unidades
+   diferentes, num iPhone SE o 3D ficava 20 px mais estreito que a tela e sem esfumar a
+   borda: duas faixas duras dos lados. */
 .abertura {
   --sob-a-barra: 110px;
+  --heroi: min(100vw, 60vh);
   position: relative; z-index: 1;
   min-height: calc(100svh + var(--sob-a-barra));
   margin-top: var(--tarja, 0px);
-  display: grid; align-content: center; justify-items: center;
-  padding: clamp(84px, 12vh, 130px) var(--gutter) calc(clamp(28px, 6vh, 54px) + var(--sob-a-barra));
+  display: grid; justify-items: center;
+  grid-template-rows: calc(var(--heroi) * .80) minmax(0, 1fr) auto minmax(0, 2fr);
+  padding: 0 var(--gutter) calc(clamp(28px, 6vh, 54px) + var(--sob-a-barra));
   text-align: center;
   overflow: hidden;
   background:
@@ -187,9 +215,25 @@ body.escuro .botao-icone:hover, body.escuro .botao-icone:focus-visible { backgro
 @supports (height: 100lvh) {
   .abertura { --sob-a-barra: max(110px, 100lvh - 100svh); }
 }
+/* a ESTAMPA TERRACOTA da Mirella, por baixo de tudo e por cima do degradê.
+   O arquivo é um ladrilho 2×2 espelhado, sem a moldura do original
+   (`_preparar_abertura_3d_v1.py`): assim o tamanho em pixel sai daqui e o traço tem a
+   mesma grossura no celular e no monitor. Esticar o desenho inteiro pra cobrir a tela
+   deixaria a linha com 1,5 px num telefone e 5 px num monitor.
+   No celular o canto de cima à esquerda é o desenho como ela fez; em tela larga o eixo
+   do espelho cai no meio, atrás do 3D e da marca, e a simetria fica a favor. */
+.abertura::before {
+  content: ''; position: absolute; inset: 0; z-index: 0;
+  background: url(../img/marca/estampa_terracota_ladrilho.svg) left top / 900px auto repeat;
+  opacity: .30;
+  pointer-events: none;
+}
+@media (min-aspect-ratio: 3/5) {
+  .abertura::before { background-size: clamp(1000px, 90vw, 1400px) auto; background-position: center top; }
+}
 /* a mancha que se mexe devagar: dá vida sem pedir atenção */
 .abertura::after {
-  content: ''; position: absolute; inset: -20%;
+  content: ''; position: absolute; inset: -20%; z-index: 0;
   background: radial-gradient(520px 520px at 30% 40%, rgba(178, 110, 58, .22), transparent 60%);
   animation: respirar 22s ease-in-out infinite alternate;
   pointer-events: none;
@@ -198,13 +242,85 @@ body.escuro .botao-icone:hover, body.escuro .botao-icone:focus-visible { backgro
   from { transform: translate3d(-4%, -3%, 0) scale(1); }
   to   { transform: translate3d(6%, 5%, 0) scale(1.12); }
 }
-.abertura > * { position: relative; z-index: 1; }
-/* o bloco único: marca, frase e menu juntos, sem buraco no meio */
+.abertura > * { position: relative; z-index: 2; }
+
+/* ---- o 3D do "eaí, bora?" no alto ----------------------------------------
+   Quadrado de lado `--heroi`, colado no topo, atrás do cabeçalho. A parte de baixo se
+   desmancha no degradê (e em tela larga as laterais também), que é o "tudo em degradê"
+   dele. Fica ATRÁS da marca (z-index 1 × 2): a ālea entra por cima do esfumado. */
+.abertura > .heroi-3d {
+  position: absolute; z-index: 1;
+  top: 0; left: 50%;
+  width: var(--heroi); height: var(--heroi);
+  transform: translateX(-50%);
+  pointer-events: none;
+  -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 58%, transparent 96%);
+          mask-image: linear-gradient(to bottom, #000 0%, #000 58%, transparent 96%);
+}
+.heroi-3d img { width: 100%; height: 100%; object-fit: cover; }
+@media (min-aspect-ratio: 3/5) {
+  /* o 3D ficou mais estreito que a tela: sem isto, as bordas dele seriam duas linhas duras */
+  .abertura > .heroi-3d {
+    -webkit-mask-image:
+      linear-gradient(to bottom, #000 0%, #000 58%, transparent 96%),
+      linear-gradient(to right, transparent 0%, #000 22%, #000 78%, transparent 100%);
+    -webkit-mask-composite: source-in;
+            mask-image:
+      linear-gradient(to bottom, #000 0%, #000 58%, transparent 96%),
+      linear-gradient(to right, transparent 0%, #000 22%, #000 78%, transparent 100%);
+            mask-composite: intersect;
+  }
+}
+
+/* A "ANIMAÇÃO INTEIRA DO LINKTREE, JUNTANDO A LOGO DO 3D COM A ĀLEA".
+   A abertura da capivara continua igual. O 3D entra no MESMO instante em que ela começa a
+   andar (1,4 s) e termina de aparecer antes da primeira letra (5,0 s): primeiro a capivara
+   sozinha, gigante, como já era; depois ela encolhe pro lugar enquanto o 3D acende em cima;
+   aí as letras saem dela, a frase é escrita e o menu aparece.
+   Sem JS (ou antes de ele medir), o 3D fica simplesmente visível — nunca some por falha. */
+body.marca-medida:not(.marca-anima) .heroi-3d img { opacity: 0; }
+body.marca-anima .heroi-3d img { animation: heroi-chega 2.8s cubic-bezier(.25, .1, .25, 1) 1.4s both; }
+@keyframes heroi-chega {
+  from { opacity: 0; transform: scale(1.06); }
+  to   { opacity: 1; transform: none; }
+}
+body.sem-abertura .heroi-3d img { animation: none !important; opacity: 1 !important; transform: none !important; }
+
+/* o bloco único: marca, frase e menu juntos, sem buraco no meio. Mora na 3ª faixa da grade
+   (a `translateY(-4vh)` que o subia saiu: quem posiciona agora é a grade). */
 .abertura .miolo {
+  grid-row: 3;
   display: grid; justify-items: center; align-content: start;
   gap: clamp(10px, 2.2vh, 22px);
-  transform: translateY(-4vh);          /* um pouco acima do centro óptico */
 }
+/* ⚠️ A CLAREIRA ATRÁS DA FRASE E DO MENU. No primeiro print desta rodada as linhas da
+   estampa cruzavam as letras, e o "em breve" (que já é claro de propósito) sumia. Uma
+   névoa da cor de fundo, macia e sem borda, só atrás da metade de baixo do bloco: o
+   desenho continua inteiro na tela e a leitura volta. Não sobe até o 3D (o centro fica
+   a 62% da altura da caixa), pra não desbotar a ponta do triângulo.
+   ⚠️ centro + raio vertical (62% + 36% = 98%) têm que caber DENTRO da caixa: no 1º teste
+   eram 70% + 46%, a névoa passava do fundo da caixa e virava uma borda reta na tela. */
+.abertura .miolo::before {
+  content: ''; position: absolute; z-index: -1;
+  inset: 0 -18vw -110px;
+  background: radial-gradient(ellipse 50% 36% at 50% 62%,
+    rgba(240, 233, 223, .82) 0%, rgba(240, 233, 223, .62) 50%, rgba(240, 233, 223, 0) 100%);
+  pointer-events: none;
+}
+
+/* o cabeçalho flutua sobre o azul do 3D: logo e botões ganham um vidro claro, igual aos
+   botões do Linktree dele. Sem isso o "ā" azul e o "a" dourado somem no azul. A margem
+   negativa devolve o espaço do vidro, então nada muda de lugar. */
+body.na-abertura .topo .marca {
+  display: block; margin: -6px -12px; padding: 6px 12px; border-radius: 999px;
+  background: rgba(252, 245, 235, .62);
+  -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+}
+body.na-abertura .topo .botao-icone {
+  background: rgba(252, 245, 235, .62);
+  -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+}
+body.na-abertura .topo .botao-icone:hover, body.na-abertura .topo .botao-icone:focus-visible { background: var(--terracota); }
 
 /* ---- a animação da marca ------------------------------------------------
    AS CINCO PEÇAS TÊM O MESMO viewBox DO LOGO INTEIRO (ver _partir_logo_v2.py), então
@@ -219,9 +335,13 @@ body.escuro .botao-icone:hover, body.escuro .botao-icone:focus-visible { backgro
    o tamanho da janela, e "o maior tamanho possível" muda com ela. Enquanto ele não
    mediu, a marca fica invisível — melhor esperar um quadro do que piscar a capivara no
    tamanho errado. */
+/* ⚠️ a largura agora também respeita o 3D (17/09/2026): em tela larga a marca de 900 px
+   ficava maior que o quadrado do 3D logo acima e o conjunto perdia o eixo. 1,25× o lado
+   do 3D é a proporção do Linktree dele (a ālea um pouco mais larga que o triângulo). No
+   celular quem manda continua sendo os 92vw — nada muda lá. */
 .marca-anim {
   position: relative;
-  width: min(92vw, 900px); aspect-ratio: 3448.89 / 748.01;
+  width: min(92vw, 900px, calc(var(--heroi, 100vw) * 1.25)); aspect-ratio: 3448.89 / 748.01;
   --cap-x: 19%; --cap-y: 53%;
   visibility: hidden;                    /* liberada pelo JS, ver acima */
 }
@@ -287,6 +407,8 @@ body.frase-revelada .abertura .assinatura { opacity: 1; }
 body.sem-abertura .marca-anim img { animation: none !important; transform: none !important; opacity: 1 !important; }
 @media (prefers-reduced-motion: reduce) {
   .marca-anim img { animation: none !important; transform: none !important; opacity: 1 !important; }
+  /* o 3D também: sem isto ele ficaria preso no estado de partida (invisível) */
+  .heroi-3d img { animation: none !important; transform: none !important; opacity: 1 !important; }
   .abertura::after { animation: none; }
 }
 
