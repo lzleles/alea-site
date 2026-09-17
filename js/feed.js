@@ -345,6 +345,7 @@
   function ligarSumicoDaDescricao() {
     feed.addEventListener('scroll', function () {
       feed.classList.toggle('rolou', feed.scrollTop > 40);
+      reverQuemEstaNaVez();
     }, { passive: true });
   }
 
@@ -371,22 +372,49 @@
     itens.forEach(function (it) { olhoRevela.observe(it); });
   }
 
+  /* ⚠️ QUEM ESTÁ "NA VEZ" MUDOU DE RÉGUA NA 7ª RODADA.
+     Enquanto cada item ocupava uma tela inteira, dava pra dizer "está na vez quem preenche 60%
+     da tela". Com o espaçamento do laulau cabem QUASE DOIS produtos na tela ao mesmo tempo — e
+     aí os dois preenchem 100% de si mesmos, os dois se dizem vencedores, e o contador fica
+     piscando entre eles conforme a ordem em que o navegador avisa.
+
+     A régua que não depende do tamanho do item: **está na vez quem tem o centro mais perto do
+     centro da tela**. Uma conta só, no evento de rolagem, sem observador nenhum. */
+  function quemEstaNaVez() {
+    if (!itens.length) return 0;
+    var meio = feed.scrollTop + feed.clientHeight / 2;
+    var melhor = 0, menor = Infinity;
+    for (var i = 0; i < itens.length; i++) {
+      var it = itens[i];
+      var d = Math.abs((it.offsetTop + it.offsetHeight / 2) - meio);
+      if (d < menor) { menor = d; melhor = i; }
+    }
+    return melhor;
+  }
+
+  function reverQuemEstaNaVez() {
+    var n = quemEstaNaVez();
+    if (n === indice) return;
+    indice = n;
+    pintarContador();
+    guardarPosicao();
+  }
+
   function ligarObservador() {
     if (olho) olho.disconnect();
+    /* o observador agora cuida só do que é por-item e não depende de "estar na vez":
+       acender o efeito de quem apareceu, e devolver à foto 1 quem saiu de cena. */
     olho = new IntersectionObserver(function (entradas) {
       entradas.forEach(function (e) {
-        var it = e.target;
-        if (e.isIntersecting && e.intersectionRatio >= 0.6) {
-          var n = parseInt(it.getAttribute('data-i'), 10);
-          if (n !== indice) { indice = n; pintarContador(); guardarPosicao(); }
-          if (window.aleaDistorcao) window.aleaDistorcao.montar(it.querySelector('.objeto'));
-        } else if (!e.isIntersecting) {
+        if (e.isIntersecting) {
+          if (window.aleaDistorcao) window.aleaDistorcao.montar(e.target.querySelector('.objeto'));
+        } else {
           /* "sempre permanecer na primeira foto" (14/09/2026, 16:23): quem sai de cena
              volta pro começo, pra não reaparecer na foto 3. */
-          voltarPraPrimeira(it);
+          voltarPraPrimeira(e.target);
         }
       });
-    }, { root: feed, threshold: [0, 0.6] });
+    }, { root: feed, threshold: 0 });
     itens.forEach(function (it) { olho.observe(it); });
   }
 
@@ -452,6 +480,7 @@
     ligarRevelacao();
     if (!feed.dataset.sumicoLigado) { ligarSumicoDaDescricao(); feed.dataset.sumicoLigado = '1'; }
     feed.classList.toggle('rolou', feed.scrollTop > 40);
+    reverQuemEstaNaVez();
 
     mostrarVoltar(true);
     pintarDescricao(catId);
