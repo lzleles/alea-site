@@ -472,6 +472,43 @@ body.sem-abertura .marca-anim img { animation: none !important; transform: none 
 }
 @supports not (height: 100svh) { .feed .item { min-height: 100vh; } }
 
+/* ⚠️ A REVELAÇÃO POR ROLAGEM — 6ª rodada, 17/09/2026, e os números são MEDIDOS, não copiados
+   de descrição. Ele: "no laulau é como se ela aparecesse na tela, como se não existisse ela, aí
+   de repente ela sobe e aparece na tela […] no que você criou pra mim as imagens estão todas
+   estáticas". Ele mandou junto o nome que o ChatGPT deu ao efeito: Scroll-Triggered Reveal.
+
+   O nome estava certo — mas nome não dá número. Abri o laulau.xyz num navegador de verdade e
+   medi o que cada cartão de produto faz ANTES de ser revelado (`medir_laulau.py`, 17/09/2026):
+       opacity: 0  ·  transform: translateY(102.966px)  ·  transition: 0.8s ease
+       + um atraso em escada de ~0,0105 s por elemento (Squarespace "global animations",
+         estilo fade, tipo slide, curva ease, complexidade detailed — 89 elementos marcados)
+   Daí os 103 px, os 0,8 s e o `ease` aqui embaixo: são o do laulau, não um chute.
+
+   O `scale(.96)` é o único acréscimo, e é a fala dele: "como se ela tivesse um efeito 3D saindo
+   da tela e pegando o lugar dela". Sutil de propósito — o laulau não escala.
+
+   ⚠️ REVELA UMA VEZ, como no laulau: subir de volta não re-anima. Quem manda revelar é o
+   `IntersectionObserver` do feed.js, com folga de 25% (o item se revela quando entra de baixo,
+   não quando encosta na borda). */
+.feed .item .area-objeto,
+.feed .item .legenda,
+.feed .item .fim {
+  opacity: 0;
+  transform: translateY(103px) scale(.96);
+  transition: opacity .8s ease, transform .8s ease;
+}
+.feed .item.revelado .area-objeto,
+.feed .item.revelado .legenda,
+.feed .item.revelado .fim { opacity: 1; transform: none; }
+/* a escada: a peça chega e a legenda vem logo atrás — é o "detailed" do laulau */
+.feed .item.revelado .area-objeto { transition-delay: .05s; }
+.feed .item.revelado .legenda { transition-delay: .16s; }
+@media (prefers-reduced-motion: reduce) {
+  .feed .item .area-objeto, .feed .item .legenda, .feed .item .fim {
+    opacity: 1; transform: none; transition: none;
+  }
+}
+
 /* ---- o objeto -----------------------------------------------------------
    No estado padrão NÃO existe moldura nenhuma: é o objeto recortado sobre o preto,
    que é o "aspecto minimalista" que ele pediu. A moldura (fundo + cantos arredondados)

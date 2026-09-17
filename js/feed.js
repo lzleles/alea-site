@@ -70,6 +70,7 @@
   var indice = 0;
   var aberto = false;
   var olho = null;                 // o IntersectionObserver que diz quem está na tela
+  var olhoRevela = null;           // o outro: revela o item quando ele entra de baixo
 
   var querMenosMovimento = window.matchMedia &&
     window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -347,6 +348,29 @@
     }, { passive: true });
   }
 
+  /* ⚠️ A REVELAÇÃO (6ª rodada) — medida no laulau.xyz, não copiada de descrição: cada cartão
+     de lá nasce com `opacity: 0` e `translateY(102.966px)` e volta ao lugar em 0,8 s com curva
+     `ease`. Os números estão no CSS; aqui fica só o GATILHO.
+
+     `rootMargin: '0px 0px -25% 0px'` encolhe o fundo da área de observação em um quarto: o item
+     só conta como "entrou" depois de subir um pedaço da tela. Sem essa folga ele se revelaria
+     encostando na borda de baixo, fora do campo de visão, e a pessoa nunca veria a entrada —
+     que é exatamente a queixa dele ("as imagens estão todas estáticas").
+
+     `unobserve` depois de revelar: revela UMA VEZ, como no laulau. Subir de volta não re-anima
+     (e não deve: a animação vem de baixo, e vista de cima ficaria ao contrário). */
+  function ligarRevelacao() {
+    if (olhoRevela) olhoRevela.disconnect();
+    olhoRevela = new IntersectionObserver(function (entradas) {
+      entradas.forEach(function (e) {
+        if (!e.isIntersecting) return;
+        e.target.classList.add('revelado');
+        olhoRevela.unobserve(e.target);
+      });
+    }, { root: feed, rootMargin: '0px 0px -25% 0px', threshold: 0.01 });
+    itens.forEach(function (it) { olhoRevela.observe(it); });
+  }
+
   function ligarObservador() {
     if (olho) olho.disconnect();
     olho = new IntersectionObserver(function (entradas) {
@@ -423,7 +447,9 @@
     aberto = true;
 
     irParaItem(indice, false);                   // a entrada não anima: já chega no lugar
+    itens.forEach(function (it) { it.classList.remove('revelado'); });   // categoria nova, entrada nova
     ligarObservador();
+    ligarRevelacao();
     if (!feed.dataset.sumicoLigado) { ligarSumicoDaDescricao(); feed.dataset.sumicoLigado = '1'; }
     feed.classList.toggle('rolou', feed.scrollTop > 40);
 
@@ -437,6 +463,7 @@
   function fechar() {
     if (!aberto) return;
     if (olho) { olho.disconnect(); olho = null; }   // fechado, ninguém precisa ser observado
+    if (olhoRevela) { olhoRevela.disconnect(); olhoRevela = null; }
     feed.classList.remove('aberto');
     feed.setAttribute('aria-hidden', 'true');
     mostrarVoltar(false);
