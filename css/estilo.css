@@ -622,6 +622,26 @@ body.sem-abertura .marca-anim img { animation: none !important; transform: none 
 .feed .ver { display: inline-block; font-size: 12px; line-height: 1.3; letter-spacing: .08em; opacity: .7; color: var(--dourado); text-decoration: none; margin-top: 2px; }
 .feed .ver:hover { opacity: 1; text-decoration: underline; }
 
+/* ⚠️ TELA ESTREITA: A LEGENDA PESA MAIS, e isso aparece como vão maior entre os produtos.
+   Medido em 17/09/2026 no endereço publicado, comparando com o laulau (passo 1,28 × o objeto,
+   vão 0,277 × o objeto):
+
+       1920 .... 1,28 / 0,27     iPad ..... 1,26 / 0,26
+       1440 .... 1,31 / 0,30     iPhone 14  1,35 / 0,34
+       iPhone SE (320 px) ...... 1,41 / 0,40   ← fora da régua
+
+   A causa não é o espaçamento: é que o OBJETO encolhe com a largura da tela e o TEXTO não, porque
+   as fontes têm piso no `clamp`. Num aparelho de 320 px a legenda vira um bloco proporcionalmente
+   enorme. A cura é abaixar o piso das fontes só onde o problema existe — mexer nelas em todas as
+   telas mudaria o que ele já viu e aprovou no aparelho dele. */
+@media (max-width: 360px) {
+  .feed .item { padding: 8px var(--gutter); gap: 7px; }
+  .feed .categoria { font-size: 1.02rem; }
+  .feed .produto-mini { font-size: .76rem; }
+  .feed .valor { font-size: 1.05rem; }
+  .feed .ver { font-size: 11px; }
+}
+
 /* ---- a dica de arrastar, SÓ no primeiro produto -------------------------
    "Somente no primeiro produto, mostrar alguma animação com setas ou algo do tipo,
    que é só rolar pra direita" (15/09/2026). Ela some no primeiro arrasto e não volta. */
