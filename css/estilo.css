@@ -422,8 +422,17 @@ body.sem-abertura .marca-anim img { animation: none !important; transform: none 
 
 /* ==================================================================== FEED
    Tela cheia, preta, um objeto por vez. É uma CAMADA FIXA por cima da abertura, e não
-   uma parte da página: foi o que permitiu a transição que ele pediu — o objeto sobe e
-   some enquanto o próximo toma o lugar central — sem depender de rolagem nenhuma. */
+   uma parte da página.
+
+   ⚠️ 5ª RODADA (17/09/2026): A CAMADA VIROU UM CONTÊINER QUE ROLA.
+   "Eu queria que a tela fosse mais fluida, como se fosse o site do Laulau […] ela não vai
+   passando meio que página por página, produto por produto […] se eu quiser rolar tudo de
+   uma vez só também eu consigo" — áudio dele das 17:27, com vídeo da tela do laulau.xyz.
+   Antes os itens eram `position: absolute` empilhados, e o JS trocava classe pra animar.
+   Agora eles são blocos normais, um embaixo do outro, e quem move é o navegador.
+   **Sem `scroll-snap`:** snap é justamente o "página por página" que ele acabou de recusar.
+   E **sem `scroll-behavior: smooth` aqui** — no CSS ele contamina toda rolagem programática
+   da página; a suavidade vai na chamada do JS, quando for pedida. */
 /* ⚠️ `pointer-events: none` ENQUANTO FECHADO — E ISSO NÃO É DETALHE.
    Foi o defeito que travou o site do Cassiano em 15/09/2026: depois de fechar o feed,
    clicar em PET não fazia nada, e só F5 resolvia. A causa: o item do produto declara
@@ -434,45 +443,44 @@ body.sem-abertura .marca-anim img { animation: none !important; transform: none 
   position: fixed; inset: 0; z-index: 50;
   pointer-events: none;
   background: var(--preto); color: var(--off);
-  display: grid; place-items: center;
-  overflow: hidden;
+  overflow: hidden;                      /* fechado, não rola nem aparece */
   opacity: 0; visibility: hidden;
   transition: opacity .5s ease, visibility .5s;
 }
-.feed.aberto { opacity: 1; visibility: visible; pointer-events: auto; }
+/* aberto ele é o que rola. `overscroll-behavior: contain` impede que o fim da lista
+   empurre a página de trás (o "elástico" do iPhone puxando o site inteiro). */
+.feed.aberto {
+  opacity: 1; visibility: visible; pointer-events: auto;
+  overflow-y: auto; overflow-x: hidden;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+.feed .palco { position: relative; }
 
-.feed .palco { position: absolute; inset: 0; }
-
+/* ⚠️ UMA TELA POR PRODUTO — e é isto que faz o efeito que ele descreveu:
+   "se você ver um produto só, você vai pensar que já acabou os produtos; só quando você
+   rola a tela […] ele vai entrando imagem por imagem, bem suave". Não existe espiada no
+   próximo: ele ocupa a tela inteira e o de baixo entra pela emenda.
+   `svh` e não `vh`: no iPhone a barra do Safari entra e sai, e com `vh` o item fica maior
+   que a tela e sobra uma faixa preta no pé. */
 .feed .item {
-  position: absolute; inset: 0;
+  position: relative;
+  min-height: 100svh;
   display: grid; grid-template-rows: 1fr auto; align-items: center; justify-items: center;
   gap: clamp(14px, 2.6vh, 26px);
   padding: clamp(84px, 12vh, 120px) var(--gutter) clamp(54px, 9vh, 90px);
-  /* ⚠️ `visibility` E NÃO `display`: o item precisa continuar MEDÍVEL enquanto está
-     fora da tela, senão o canvas do efeito nasce com 0x0 e a peça aparece preta na
-     primeira troca. Com visibility ele some da tela e continua tendo tamanho. */
-  visibility: hidden; opacity: 0;
-  transform: translateY(0) scale(1);
-  will-change: transform, opacity;
 }
-.feed .item.visivel { visibility: visible; }
-.feed .item.ativo { opacity: 1; transform: none; z-index: 2; }
-/* o que sai vai pra CIMA e some; o que entra chega DE BAIXO e assenta no centro —
-   "deslizasse o objeto pra cima até sumir enquanto o outro estivesse roubando o lugar
-   central" (Cassiano, 15/09/2026). Descendo, os papéis se invertem. */
-.feed .item.acima  { opacity: 0; transform: translateY(-48%) scale(.88); z-index: 1; }
-.feed .item.abaixo { opacity: 0; transform: translateY(48%) scale(.88); z-index: 1; }
-/* ⚠️ 1,25s, e não 0,82s: "a transição dos produtos, quando pra cima e pra baixo, está
-   rápida, colocar mais devagar" (Cassiano, 15/09/2026, 2ª rodada). Este número tem que
-   bater com o `DURACAO` do feed.js — é ele que solta a trava do gesto. */
-.feed.anima .item { transition: transform 1.25s cubic-bezier(.3, .86, .28, 1), opacity .8s ease; }
-@media (prefers-reduced-motion: reduce) { .feed.anima .item { transition: opacity .2s linear; } }
+@supports not (height: 100svh) { .feed .item { min-height: 100vh; } }
 
 /* ---- o objeto -----------------------------------------------------------
    No estado padrão NÃO existe moldura nenhuma: é o objeto recortado sobre o preto,
    que é o "aspecto minimalista" que ele pediu. A moldura (fundo + cantos arredondados)
    só aparece quando o visitante arrasta pro lado e entra uma FOTO INTEIRA. */
+/* ⚠️ `touch-action: pan-y` (5ª rodada): diz ao navegador que dentro da peça SÓ existe
+   rolagem vertical. Com isso o arrasto lateral sobra pro JS trocar a foto sem precisar
+   de `preventDefault` — e, por não cancelar nada, a rolagem vertical nunca é engolida. */
 .feed .objeto {
+  touch-action: pan-y;
   position: relative;
   width: var(--objeto); aspect-ratio: 1 / 1;
   display: grid; place-items: center;
@@ -579,8 +587,11 @@ body.sem-abertura .marca-anim img { animation: none !important; transform: none 
 @media (prefers-reduced-motion: reduce) { .dica-arrasto .mao { animation: none; } }
 
 /* ---- contador e o botão de voltar pro menu ------------------------------ */
+/* ⚠️ `fixed`, não `absolute` (5ª rodada): o feed agora ROLA, e absoluto dentro dele é
+   absoluto em relação ao CONTEÚDO — o contador subiria junto com o primeiro produto e
+   nunca mais apareceria. Fixo, ele fica onde está, como no laulau. */
 .feed .contador {
-  position: absolute; left: var(--gutter); bottom: 22px; z-index: 6;
+  position: fixed; left: var(--gutter); bottom: 22px; z-index: 6;
   font-family: var(--fonte-titulo); font-size: 13px; letter-spacing: .1em;
   color: rgba(234, 228, 219, .55); pointer-events: none;
 }
@@ -588,14 +599,19 @@ body.sem-abertura .marca-anim img { animation: none !important; transform: none 
 /* a linha que diz o que a categoria é (16/09/2026). Fica logo abaixo do cabeçalho, que
    termina em 83 px, e acima da peça, que começa em 130 px no celular pequeno (medido):
    uma linha só cabe, duas não. */
+/* mesma coisa da linha do contador: `fixed` pra não rolar junto com os produtos */
 .feed .descricao-categoria {
-  position: absolute; z-index: 6;
+  position: fixed; z-index: 6;
   top: calc(var(--tarja, 0px) + 90px); left: var(--gutter); right: var(--gutter);
   margin: 0; text-align: center;
   font-size: 13px; line-height: 1.35; letter-spacing: .04em;
   color: rgba(234, 228, 219, .72); pointer-events: none;
 }
 .feed .descricao-categoria[hidden] { display: none; }
+/* ela se apresenta e sai: fixa o tempo todo, ficaria por cima da legenda de cada produto
+   que passa (5ª rodada). Quem liga o `.rolou` é o feed.js, na primeira rolagem. */
+.feed .descricao-categoria { transition: opacity .35s ease; }
+.feed.rolou .descricao-categoria { opacity: 0; }
 /* ⚠️ O BOTÃO DE VOLTAR MUDOU DE LUGAR (15/09/2026, 2ª rodada): "após o clique no menu,
    o menu pra voltar pra categorias ficou em cima da foto". Ele agora mora no CABEÇALHO
    (ver o TOPO no 01_gerar_paginas_v2.py), onde tem espaço próprio e não disputa pixel
@@ -617,6 +633,23 @@ body.sem-abertura .marca-anim img { animation: none !important; transform: none 
 .feed .fim { display: grid; justify-items: center; gap: 18px; text-align: center; max-width: 34ch; }
 .feed .fim img { width: min(64vw, 300px); }
 .feed .fim p { margin: 0; color: rgba(234, 228, 219, .8); }
+/* ⚠️ AS CATEGORIAS NO FIM DA LISTA (5ª rodada, áudio das 17:28): "já coloque ali também
+   todas as categorias, que evitam da pessoa ir na página principal para clicar em outra".
+   É o mesmo menu do rodapé; aqui ele só ganha um rótulo e respiro. */
+.feed .fim .ou-veja {
+  margin: 6px 0 -6px; font-size: 12.5px; letter-spacing: .1em; text-transform: uppercase;
+  color: rgba(234, 228, 219, .45);
+}
+/* ⚠️ NO PRETO, O MENU PRECISA DA COR CLARA. A regra geral pinta `var(--tinta)`, que é
+   a tinta escura da abertura — no fundo do feed ela some por completo (medido no primeiro
+   teste desta rodada: as categorias apareciam como manchas). Aqui ele herda o off. */
+.feed .fim .menu-categorias { justify-content: center; max-width: 30ch; }
+.feed .fim .menu-categorias a, .feed .fim .menu-categorias span { color: var(--off); }
+.feed .fim .menu-categorias a { opacity: .92; }
+.feed .fim .menu-categorias a:hover, .feed .fim .menu-categorias a:focus-visible {
+  background: var(--terracota); color: var(--off); opacity: 1;
+}
+.feed .fim .menu-categorias .vazia { opacity: .42; }
 
 /* ================================================================== RODAPÉ
    Repete a marca com a frase embaixo, o mesmo menu de categorias e as redes —

@@ -135,6 +135,12 @@
     });
   }
 
+  /* ⚠️ EXPORTADO PRA QUEM NASCE DEPOIS (5ª rodada, 17/09/2026): o cartão de fim do feed
+     também mostra todas as categorias, e ele é desenhado pelo feed.js muito depois desta
+     montagem. Em vez de o feed.js repetir a regra do "em breve" (categoria sem peça não
+     vira link), ele chama esta função no bloco novo. Uma regra, um lugar. */
+  window.aleaMenuCategorias = montarMenuCategorias;
+
   /* ------------------------------------------------------------------- redes
      Ícone só existe se o endereço existir. Ver `redes` no config.js. */
   var ICONES = {

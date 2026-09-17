@@ -9,7 +9,7 @@
      "deixar esse MENU, onde somente depois que clicar na categoria a tela ficará preta
       e apresentará o feed"                       -> o feed é uma CAMADA, e só abre no clique
      "queria que deslizasse o objeto pra cima até sumir enquanto o outro estivesse
-      roubando o lugar central"                   -> `irPara()`, com as classes do CSS
+      roubando o lugar central"                   -> era o `irPara()`; ver a 5ª rodada abaixo
      "tirar as fotos sempre sem fundo, somente o objeto"        -> `_obj.webp` no centro
      "deixando as fotos completas somente se arrastar pro lado" -> as fotos de cenário
      "somente no primeiro produto, mostrar alguma animação com setas"  -> `.dica-arrasto`
@@ -21,27 +21,44 @@
      · o produto SEMPRE volta pra primeira foto quando entra na tela (16:23);
      · voltar de uma página de produto reabre o feed no MESMO lugar (16:23).
 
-   POR QUE UMA CAMADA FIXA, E NÃO ROLAGEM DE VERDADE
-   -------------------------------------------------
-   Na v2 o feed era uma pilha de cenas grudadas, e a rolagem nativa fazia o trabalho.
-   Isso morreu quando ele pediu que o OBJETO deslizasse: rolagem move a página inteira,
-   e ele quer que a peça saia de cena enquanto a outra entra, sem nada mais se mexendo.
-   Com camada fixa, o que anima é só o que ele quer ver animar.
+   ⚠️ 5ª RODADA (17/09/2026) — A ROLAGEM VOLTOU A SER ROLAGEM DE VERDADE
+   ---------------------------------------------------------------------
+   Áudio dele das 17:27, com o site `laulau.xyz` de referência e um vídeo da tela:
 
-   O que se perde com isso é a barra de rolagem nativa — e é por isso que o feed NÃO é
-   a página de destino do Google Ads. O destino é a página de PRODUTO, que tem rolagem
-   intacta. Já era assim desde 14/09; aqui isso só ficou mais literal.
+     "o tempo de resposta dele para passar de um produto para o outro está muito
+      demorado. Às vezes eu tenho que passar o dedo umas três vezes […] Eu queria que a
+      tela fosse mais fluida, como se fosse o site do Laulau […] Pense que a gente está
+      em uma tela da Globo.com, onde você vai passando a barra e a página vai deslizando.
+      Ela não vai passando meio que página por página, produto por produto […] sempre
+      quando chegar quase no final da página, ele já vai subindo outro produto junto,
+      como se fosse uma emenda […] E se eu quiser rolar tudo de uma vez só também eu
+      consigo. Eu não fico naquele meio que travado igual tá o meu site."
+
+   O QUE CAIU, E POR QUE ISSO NÃO É "DESFAZER" O QUE ELE TINHA PEDIDO:
+     · `irPara()`, `passo()`, a trava de 1250 ms e o sequestro da roda/do dedo SAÍRAM.
+       Eram a resposta certa pro pedido de 14/09 ("um gesto = um produto", pra não passar
+       dois de uma vez). Só que "um gesto = um produto" COM TRAVA vira o que ele está
+       descrevendo agora: o gesto que chega durante a animação é jogado fora, e o dedo
+       precisa vir três vezes. O pedido novo é o oposto do antigo, e quem manda é o novo.
+     · O que ele pediu em 15/09 e CONTINUA VALENDO: um produto por tela (ninguém vê dois),
+       a peça volta pra foto 1 ao entrar, arrastar pro lado troca a foto, e voltar de uma
+       página de produto cai no mesmo lugar. Tudo isso sobrevive sem trava nenhuma.
+
+   COMO É AGORA: a camada `.feed` é um CONTÊINER QUE ROLA (`overflow-y: auto`), e cada
+   produto é um bloco de uma tela de altura, um embaixo do outro. Quem anima é o navegador,
+   com a física dele — é isso que dá o "arrastar o dedo de uma vez e ir lá pra baixo".
+   Sem `scroll-snap`: snap é exatamente o "página por página" que ele acabou de recusar.
+   Quem está na tela é medido por `IntersectionObserver` — é ele que acende o efeito da
+   peça, pinta o contador, guarda o lugar e devolve o item que saiu pra primeira foto.
+
+   O que continua valendo: o feed NÃO é a página de destino do Google Ads. O destino é a
+   página de PRODUTO, que tem texto, preço e rolagem própria.
    ========================================================================== */
 
 (function () {
   'use strict';
 
   var POS = 'alea_feed_pos';
-  /* ⚠️ 1250ms — ele pediu mais devagar na 2ª rodada de 15/09/2026 ("a transição dos
-     produtos, quando pra cima e pra baixo, está rápida"). Tem que bater com a
-     `transition` do `.feed.anima .item` no CSS: é este número que solta a trava do
-     gesto, e se ele for menor que a transição a trava abre no meio da animação. */
-  var DURACAO = 1250;
 
   var feed = document.getElementById('feed');
   var palco = document.getElementById('palco');
@@ -51,8 +68,8 @@
   var categoriaAtual = null;
   var itens = [];
   var indice = 0;
-  var travado = false;
   var aberto = false;
+  var olho = null;                 // o IntersectionObserver que diz quem está na tela
 
   var querMenosMovimento = window.matchMedia &&
     window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -159,7 +176,16 @@
     });
 
     /* O CARTÃO DE FIM. Passar do último produto não pode dar em parede: aqui o feed
-       fecha o assunto com a marca e devolve o caminho pro menu e pro orçamento. */
+       fecha o assunto com a marca e devolve o caminho pro menu e pro orçamento.
+
+       ⚠️ 5ª RODADA (17/09/2026, áudio das 17:28): "quando você chega no último produto […]
+       aparece a parte preta embaixo. Então, para eu não ter que clicar em voltar, igual tem
+       um botão lá 'voltar para as categorias', já coloque ali também TODAS AS CATEGORIAS,
+       que evitam da pessoa ir na página principal para ela clicar em outra categoria."
+       O menu aqui é o MESMO do rodapé e da abertura, montado pelo site.js (`aleaMenuCategorias`):
+       assim a regra do "em breve" — categoria sem peça não vira link — vale aqui também, sem
+       nenhuma cópia. Cada link é `#categoria` de verdade: quem troca o feed é o `hashchange`
+       do abertura.js, então o botão de voltar do navegador continua funcionando. */
     var fim = document.createElement('article');
     fim.className = 'item';
     fim.setAttribute('data-i', String(lista.length));
@@ -168,6 +194,8 @@
         '<img src="img/marca/alea_logo_claro.svg" alt="ālea">' +
         '<p data-assinatura>Onde cada impressão começa com um sonho!</p>' +
         '<a class="botao zap" data-assunto="orçamento de uma peça personalizada">Orçamentos e personalizados</a>' +
+        '<p class="ou-veja">ou veja outra categoria</p>' +
+        '<nav class="menu-categorias" data-menu-categorias aria-label="Categorias"></nav>' +
         '<button class="fechar-feed" type="button" data-fechar-feed style="position:static">← voltar pras categorias</button>' +
       '</div>';
     palco.appendChild(fim);
@@ -176,6 +204,8 @@
     categoriaAtual = catId;
 
     if (window.aleaLigarBotoes) window.aleaLigarBotoes(palco);
+    /* o menu do cartão de fim nasce aqui, depois que o site.js já montou os outros */
+    if (window.aleaMenuCategorias) window.aleaMenuCategorias();
     if (window.ALEA && window.ALEA.assinatura) {
       Array.prototype.forEach.call(palco.querySelectorAll('[data-assinatura]'), function (el) {
         el.textContent = window.ALEA.assinatura;
@@ -279,44 +309,61 @@
   /* =========================================================== a troca de produto
      "que deslizasse o objeto pra cima até sumir enquanto o outro estivesse roubando o
      lugar central" — o que sai vai pra `acima`, o que entra chega de `abaixo`. */
-  function irPara(novo, dir) {
-    if (novo < 0 || novo >= itens.length || novo === indice) return;
-    var sai = itens[indice];
-    var entra = itens[novo];
-    travado = true;
+  /* ⚠️ NÃO EXISTE MAIS "IR PRA" NEM TRAVA. Quem move a tela é o navegador, rolando o
+     contêiner — é isso que dá a física que ele pediu ("arrastar o dedo de uma vez só e já
+     vai lá pra baixo"). Daqui só sai um EMPURRÃO: levar a rolagem até o topo de um item.
 
-    entra.classList.add('visivel', dir > 0 ? 'abaixo' : 'acima');
-    /* força o navegador a assumir a posição de partida ANTES de animar. Sem esta
-       leitura, as duas mudanças de classe caem no mesmo quadro e o navegador não anima
-       nada: o item aparece direto no lugar, sem transição. Não é superstição — é como
-       o motor de layout junta mudanças. */
-    void entra.offsetHeight;
-
-    feed.classList.add('anima');
-    sai.classList.remove('ativo');
-    sai.classList.add(dir > 0 ? 'acima' : 'abaixo');
-    entra.classList.remove('abaixo', 'acima');
-    entra.classList.add('ativo');
-
-    indice = novo;
-    voltarPraPrimeira(entra);
-    if (window.aleaDistorcao) window.aleaDistorcao.montar(entra.querySelector('.objeto'));
-    pintarContador();
-    guardarPosicao();
-
-    var espera = querMenosMovimento ? 60 : DURACAO;
-    setTimeout(function () {
-      sai.classList.remove('visivel', 'acima', 'abaixo');
-      /* respiro curto DEPOIS da animação: o trackpad continua mandando eventos por uns
-         milissegundos depois que o dedo sai, e sem esta folga o último resquício do
-         mesmo gesto viraria um segundo passo — o "passou dois de uma vez" de 14/09. */
-      setTimeout(function () { travado = false; }, 90);
-    }, espera);
+     ⚠️ `behavior: 'smooth'` vai AQUI, na chamada, e nunca no CSS (`scroll-behavior`).
+     No CSS ele contamina toda rolagem programática da página — foi o defeito medido em
+     14/09/2026, quando cada quadro de uma animação virava outra rolagem suave. */
+  function irParaItem(n, suave) {
+    if (!itens.length) return;
+    n = Math.max(0, Math.min(n, itens.length - 1));
+    feed.scrollTo({ top: itens[n].offsetTop, behavior: (suave && !querMenosMovimento) ? 'smooth' : 'auto' });
   }
 
   function passo(dir) {
-    if (travado || !aberto) return;
-    irPara(indice + dir, dir);
+    if (!aberto) return;
+    irParaItem(indice + dir, true);
+  }
+
+  /* =================================================== quem está na tela, de verdade
+     Com rolagem nativa ninguém "manda" o item entrar: ele entra porque o dedo andou. Quem
+     percebe é o IntersectionObserver, e é dele que saem as quatro consequências:
+       · o contador;                     · guardar o lugar pra quem voltar de um produto;
+       · acender o efeito da peça;       · devolver à foto 1 quem saiu da tela.
+
+     ⚠️ 60% e não 50%: cada item tem uma tela de altura, então com 50% dois itens podem
+     estar "na vez" ao mesmo tempo no meio do gesto e o contador pisca. Com 60% só existe
+     um vencedor. ⚠️ E o observador só enxerga a partir do momento em que o feed é visível
+     — `visibility: hidden` é invisível pra ele, então ligar antes de abrir não adianta. */
+  /* ⚠️ A LINHA DA CATEGORIA SÓ VALE NO TOPO (5ª rodada). Ela é fixa na tela — tem que ser,
+     senão sobe junto com o primeiro produto e some pra sempre. Só que fixa o tempo todo ela
+     fica POR CIMA da legenda de cada produto que passa (visto no primeiro teste desta rodada).
+     Então ela se apresenta e sai de cena: assim que a rolagem começa, apaga. */
+  function ligarSumicoDaDescricao() {
+    feed.addEventListener('scroll', function () {
+      feed.classList.toggle('rolou', feed.scrollTop > 40);
+    }, { passive: true });
+  }
+
+  function ligarObservador() {
+    if (olho) olho.disconnect();
+    olho = new IntersectionObserver(function (entradas) {
+      entradas.forEach(function (e) {
+        var it = e.target;
+        if (e.isIntersecting && e.intersectionRatio >= 0.6) {
+          var n = parseInt(it.getAttribute('data-i'), 10);
+          if (n !== indice) { indice = n; pintarContador(); guardarPosicao(); }
+          if (window.aleaDistorcao) window.aleaDistorcao.montar(it.querySelector('.objeto'));
+        } else if (!e.isIntersecting) {
+          /* "sempre permanecer na primeira foto" (14/09/2026, 16:23): quem sai de cena
+             volta pro começo, pra não reaparecer na foto 3. */
+          voltarPraPrimeira(it);
+        }
+      });
+    }, { root: feed, threshold: [0, 0.6] });
+    itens.forEach(function (it) { olho.observe(it); });
   }
 
   function pintarContador() {
@@ -363,20 +410,25 @@
       i = (salvo !== null && salvo < itens.length) ? salvo : 0;
     }
 
-    itens.forEach(function (it) { it.classList.remove('ativo', 'visivel', 'acima', 'abaixo'); });
-    feed.classList.remove('anima');              // a entrada não anima: ela já chega pronta
     indice = Math.max(0, Math.min(i, itens.length - 1));
-    itens[indice].classList.add('visivel', 'ativo');
     voltarPraPrimeira(itens[indice]);
 
+    /* ⚠️ A ORDEM IMPORTA: visível PRIMEIRO, rolagem DEPOIS, observador por último.
+       Com o feed ainda invisível o `offsetTop` até responde, mas o observador não enxerga
+       nada e o primeiro item entraria sem efeito e sem contador. */
     feed.classList.add('aberto');
     feed.setAttribute('aria-hidden', 'false');
-    mostrarVoltar(true);
-    pintarDescricao(catId);
     document.body.classList.add('escuro', 'travado');
     document.body.classList.remove('na-abertura');
     aberto = true;
-    travado = false;
+
+    irParaItem(indice, false);                   // a entrada não anima: já chega no lugar
+    ligarObservador();
+    if (!feed.dataset.sumicoLigado) { ligarSumicoDaDescricao(); feed.dataset.sumicoLigado = '1'; }
+    feed.classList.toggle('rolou', feed.scrollTop > 40);
+
+    mostrarVoltar(true);
+    pintarDescricao(catId);
     pintarContador();
     guardarPosicao();
     if (window.aleaDistorcao) window.aleaDistorcao.montar(itens[indice].querySelector('.objeto'));
@@ -384,6 +436,7 @@
 
   function fechar() {
     if (!aberto) return;
+    if (olho) { olho.disconnect(); olho = null; }   // fechado, ninguém precisa ser observado
     feed.classList.remove('aberto');
     feed.setAttribute('aria-hidden', 'true');
     mostrarVoltar(false);
@@ -395,49 +448,40 @@
   window.aleaFeed = { abrir: abrir, fechar: fechar, aberto: function () { return aberto; } };
 
   /* ==================================================================== os gestos */
-  /* --- roda do mouse e trackpad ------------------------------------------- */
+  /* ⚠️ 5ª RODADA: A RODA E O DEDO NA VERTICAL NÃO SÃO MAIS NOSSOS.
+     Saiu o `wheel` com `preventDefault` e saiu o `touchmove` que matava a inércia. Eram a
+     resposta pro "passou dois de uma vez" de 14/09, e viraram o "tenho que passar o dedo
+     três vezes" de hoje. Rolar é do navegador; aqui só sobra o que ele não sabe fazer:
+     o arrasto HORIZONTAL, que troca a foto da peça.
+
+     Como o horizontal é capturado sem `preventDefault`: o CSS declara `touch-action: pan-y`
+     na peça, que diz ao navegador "nesta caixa só existe rolagem vertical". O gesto lateral
+     sobra pra gente sem precisar cancelar nada — e, por não cancelar, a rolagem vertical
+     nunca é engolida por engano. */
   function gavetaNaFrente() { return !!document.querySelector('.gaveta.aberta'); }
 
-  window.addEventListener('wheel', function (e) {
-    if (!aberto || gavetaNaFrente()) return;
-    if (Math.abs(e.deltaY) < 4) return;          // tremida de trackpad não conta
-    e.preventDefault();
-    passo(e.deltaY > 0 ? 1 : -1);
-  }, { passive: false });
-
-  /* --- dedo: vertical troca produto, horizontal troca foto ---------------- */
   var x0 = null, y0 = null, jaFoi = false;
-  window.addEventListener('touchstart', function (e) {
+  palco.addEventListener('touchstart', function (e) {
     if (!aberto || gavetaNaFrente()) return;
     x0 = e.touches[0].clientX;
     y0 = e.touches[0].clientY;
     jaFoi = false;
   }, { passive: true });
 
-  window.addEventListener('touchmove', function (e) {
+  palco.addEventListener('touchmove', function (e) {
     if (!aberto || gavetaNaFrente() || x0 === null || jaFoi) return;
-    /* segurar o touchmove é o que mata a INÉRCIA. Sem isto o dedo solta e o navegador
-       continua rolando sozinho por três painéis. */
-    e.preventDefault();
     var dx = x0 - e.touches[0].clientX;
     var dy = y0 - e.touches[0].clientY;
-    /* o EIXO DOMINANTE decide: andou mais na horizontal, é foto; na vertical, é
-       produto. Sem essa decisão um arrasto torto faria as duas coisas. */
-    if (Math.abs(dx) > Math.abs(dy)) {
-      if (Math.abs(dx) < 34) return;
-      jaFoi = true;
-      var item = itens[indice];
-      var fotos = fotosDo(item);
-      var atual = fotos.findIndex(function (f) { return f.classList.contains('ativa'); });
-      pedirFoto(item, (dx > 0 ? atual + 1 : atual - 1), dx > 0 ? 1 : -1);
-    } else {
-      if (Math.abs(dy) < 28) return;
-      jaFoi = true;                              // um arrasto = um passo, e só
-      passo(dy > 0 ? 1 : -1);
-    }
-  }, { passive: false });
+    /* só a horizontal é nossa, e só quando ela domina com folga: arrasto torto é rolagem */
+    if (Math.abs(dx) < 34 || Math.abs(dx) < Math.abs(dy) * 1.3) return;
+    jaFoi = true;
+    var item = itens[indice];
+    var fotos = fotosDo(item);
+    var atual = fotos.findIndex(function (f) { return f.classList.contains('ativa'); });
+    pedirFoto(item, (dx > 0 ? atual + 1 : atual - 1), dx > 0 ? 1 : -1);
+  }, { passive: true });
 
-  window.addEventListener('touchend', function () { x0 = null; }, { passive: true });
+  palco.addEventListener('touchend', function () { x0 = null; }, { passive: true });
 
   /* --- teclado ------------------------------------------------------------ */
   document.addEventListener('keydown', function (e) {
@@ -446,7 +490,8 @@
     var item = itens[indice];
     if (e.key === 'ArrowDown' || e.key === 'PageDown' || e.key === ' ') { e.preventDefault(); passo(1); }
     else if (e.key === 'ArrowUp' || e.key === 'PageUp') { e.preventDefault(); passo(-1); }
-    else if (e.key === 'Home') { e.preventDefault(); if (indice) irPara(0, -1); }
+    else if (e.key === 'Home') { e.preventDefault(); irParaItem(0, true); }
+    else if (e.key === 'End') { e.preventDefault(); irParaItem(itens.length - 1, true); }
     else if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
       var fotos = fotosDo(item);
       if (fotos.length < 2) return;
