@@ -24,6 +24,14 @@
    Paleta e tipografia continuam saindo do "Manual de Diretrizes | Alea"
    (Mirella Gaetti, 2026), páginas 4, 8 e 14.
 
+   v3.1 (17/09/2026) — A ESTAMPA OFF NA ABERTURA (áudio do Cassiano, 17/09/2026 02:07)
+     · "deixa o site igual estava, no degradê igual estava, só coloca a estampa off nele inteiro"
+       → uma camada só (`.abertura::before`) com a Estampa_Off da Mirella em ladrilho; nada mais mudou.
+       Conferido: marca e menu nas MESMAS posições do site no ar, em 6 aparelhos
+       (`_testar_abertura_gesto_v2.py --referencia https://www.aleaco.art.br/`, fora do repo).
+     · A proposta anterior (3D do Linktree + estampa terracota) foi recusada e ficou só na branch
+       `previa/3d-e-estampa-2026-09-17`.
+
    ⚠️ TIPOGRAFIA — SUBSTITUIÇÃO DECLARADA: o manual manda "Defante" nos títulos; ela é
    comercial e não veio no kit. Até ser licenciada, títulos usam "Outfit". Trocar a
    variável --fonte-titulo e somar um @font-face resolve; nada mais no site muda.
@@ -186,6 +194,22 @@ body.escuro .botao-icone:hover, body.escuro .botao-icone:focus-visible { backgro
    110 px fica como piso, pro caso de o Safari relatar as duas iguais) */
 @supports (height: 100lvh) {
   .abertura { --sob-a-barra: max(110px, 100lvh - 100svh); }
+}
+/* ⚠️ A ESTAMPA OFF POR CIMA DO DEGRADÊ, NA ABERTURA INTEIRA (Cassiano, áudio de 17/09/2026 02:07):
+   "pode deixar o site como estava e só coloca, ao invés da estampa terracota que eu te pedi, coloca a
+   estampa off, e deixa o site igual estava, no degradê igual estava, só coloca a estampa off nele inteiro".
+   Nada mais na abertura mudou: degradê, marca, frase, menu e posições são os de antes. (A proposta com o
+   3D do Linktree e a estampa terracota ficou guardada na branch `previa/3d-e-estampa-2026-09-17`.)
+   O arquivo é a Estampa_Off da Mirella em ladrilho 2×2 espelhado sem a moldura
+   (`_preparar_estampa_ladrilho_v2_off.py`): assim o tamanho em pixel sai daqui e o traço tem a mesma
+   grossura no celular e no monitor. `inset: 0` cobre também a faixa de baixo da barra do Safari. */
+.abertura::before {
+  content: ''; position: absolute; inset: 0; z-index: 0;
+  background: url(../img/marca/estampa_off_ladrilho.svg) left top / 900px auto repeat;
+  pointer-events: none;
+}
+@media (min-aspect-ratio: 3/5) {
+  .abertura::before { background-size: clamp(1000px, 90vw, 1400px) auto; background-position: center top; }
 }
 /* a mancha que se mexe devagar: dá vida sem pedir atenção */
 .abertura::after {
