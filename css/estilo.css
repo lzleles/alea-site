@@ -60,7 +60,10 @@
      Ele pediu menor em 15/09 ("diminuir o quadrado da foto pra ficar esteticamente
      mais apresentável"). Era 62svh na v2; agora 50svh, e a legenda ganhou o espaço
      que sobrou — que é o que faz a tela parecer arrumada em vez de lotada. */
-  --objeto: min(78vw, 50svh);
+  /* ⚠️ 7ª rodada (17/09/2026): 88vw é a MEDIDA do laulau — a imagem dele ocupa 343 px numa
+     tela de 390 (88%). Era 78vw aqui, e a diferença aparecia como um vão maior entre um
+     produto e o outro, que foi exatamente o que ele apontou no print. */
+  --objeto: min(88vw, 52svh);
 }
 
 *, *::before, *::after { box-sizing: border-box; }
@@ -365,6 +368,30 @@ body.marca-anima .marca-anim .l4 { animation-delay: 7.1s; }
 body.site-revelado .abertura .menu-categorias { opacity: 1; }
 body.frase-revelada .abertura .assinatura { opacity: 1; }
 
+/* ⚠️ "COMO SE NÃO TIVESSE ANIMAÇÃO" É SEM O MEIO SEGUNDO TAMBÉM — 8ª rodada, 18/09/2026.
+   A frase dele foi literal: clicar "vai tudo pra página inicial normal, COMO SE NÃO
+   TIVESSE ANIMAÇÃO". O `transition: opacity .8s` acima é parte da abertura; deixá-lo de
+   pé fazia o menu ainda levar 0,8 s pra acender depois do clique — quase um segundo de
+   espera dentro do gesto que existe justamente pra não esperar. Vale também pra quem
+   volta de uma página de produto, que já recebia o logo pronto e o menu atrasado. */
+body.sem-abertura .abertura .assinatura,
+body.sem-abertura .abertura .menu-categorias { transition: none; }
+
+/* ⚠️ ENQUANTO A ABERTURA RODA, O QUE ESTÁ INVISÍVEL NÃO RECEBE CLIQUE — 8ª rodada,
+   18/09/2026. `opacity: 0` esconde mas NÃO desliga o clique (o "fantasma clicável"
+   medido em 15/09/2026). Agora que um clique em qualquer lugar pula a abertura
+   (abertura.js), sem isto o mesmo clique podia cair numa categoria que ninguém está
+   vendo e abrir o feed errado. */
+/* ⚠️ O `:not(.site-revelado)` NÃO É ENFEITE — sem ele o menu fica morto PRA SEMPRE.
+   `marca-anima` entra no body quando a animação começa e NUNCA sai (o CSS não precisa que
+   saia). Escrito só como `body.marca-anima`, isto desligava o clique do menu DEPOIS que ele
+   já estava aceso, e o site inteiro parava de abrir categoria. Pego em 18/09/2026 pelo teste
+   de REGRESSÃO da 7ª rodada (`_testar_abertura_gesto_v6_espacamento.py`), nos dois monitores
+   — não pelo teste novo, que só olhava o instante da animação. Quem diz "a abertura acabou"
+   é `site-revelado`, que é exatamente quando o menu acende. */
+body.marca-anima:not(.site-revelado) .abertura .menu-categorias,
+body.marca-anima:not(.site-revelado) .abertura .assinatura { pointer-events: none; }
+
 /* quem já viu a abertura nesta sessão recebe o logo pronto, sem esperar de novo */
 body.sem-abertura .marca-anim img { animation: none !important; transform: none !important; opacity: 1 !important; }
 @media (prefers-reduced-motion: reduce) {
@@ -455,22 +482,50 @@ body.sem-abertura .marca-anim img { animation: none !important; transform: none 
   overscroll-behavior: contain;
   -webkit-overflow-scrolling: touch;
 }
+/* ⚠️ CHEGADA DIRETA NA SEGUNDA PÁGINA NÃO TEM MEIO SEGUNDO DE PRIMEIRA PÁGINA — 8ª rodada,
+   18/09/2026. "Ele faz como se fosse um flash, mostra o fundo da primeira página e volta
+   pra aquela segunda." O flash é esta `transition: opacity .5s`: numa troca de categoria
+   ela é o efeito, mas em quem abre o site JÁ no feed (F5 com `#pet`, link de categoria)
+   ela é meio segundo mostrando a tela errada. Quem põe e quem tira a classe é o
+   abertura.js, no quadro seguinte ao feed pintado — as trocas seguintes voltam ao normal. */
+body.sem-transicao-feed .feed { transition: none !important; }
+
 .feed .palco { position: relative; }
 
-/* ⚠️ UMA TELA POR PRODUTO — e é isto que faz o efeito que ele descreveu:
-   "se você ver um produto só, você vai pensar que já acabou os produtos; só quando você
-   rola a tela […] ele vai entrando imagem por imagem, bem suave". Não existe espiada no
-   próximo: ele ocupa a tela inteira e o de baixo entra pela emenda.
-   `svh` e não `vh`: no iPhone a barra do Safari entra e sai, e com `vh` o item fica maior
-   que a tela e sobra uma faixa preta no pé. */
+/* ⚠️ O ESPAÇAMENTO É O DO LAULAU, MEDIDO — 7ª rodada, 17/09/2026.
+   Ele mandou um print dos dois sites lado a lado: "o espaçamento do nosso está muito grande,
+   coloque ele na mesma proporção do laulau, bem próximo um do outro […] observe pela foto o
+   distanciamento de um produto para outro e faça exatamente igual".
+
+   Medido no laulau.xyz num iPhone 14 (390x844), com a página já rolada e tudo carregado:
+       imagem do produto ....... 343 x 343 px  (88% da largura da tela)
+       passo (topo de uma imagem ao topo da próxima) .... 439 px  = 0,52 da altura da tela
+       vão (fim de uma imagem ao começo da próxima) ..... 95 px
+       o preço fica 45 px abaixo da imagem, dentro desse vão
+   Ou seja: no laulau cabem QUASE DOIS produtos por tela, e o de baixo espia. Antes daqui
+   cada item tinha `min-height: 100svh` e o passo era 844 px — quase o dobro.
+
+   ⚠️ ISSO REVOGA "uma tela por produto", que era pedido DELE na 5ª rodada ("você vai pensar
+   que já acabou os produtos"). Ele viu pronto, comparou com a referência e mudou. O pedido
+   novo manda; o antigo fica aqui escrito pra ninguém "consertar" de volta sem saber.
+
+   A altura agora vem do CONTEÚDO, não de um número de tela: peça + legenda + respiro. O
+   respiro (24 px em cima e embaixo = 48 px entre dois itens) é o que aproxima o passo do
+   laulau sem apertar a legenda. Só o PRIMEIRO item carrega a folga do cabeçalho fixo, e só
+   o ÚLTIMO (o cartão de fim) volta a ocupar a tela inteira — ele é o fecho, não um produto. */
 .feed .item {
   position: relative;
-  min-height: 100svh;
-  display: grid; grid-template-rows: 1fr auto; align-items: center; justify-items: center;
-  gap: clamp(14px, 2.6vh, 26px);
-  padding: clamp(84px, 12vh, 120px) var(--gutter) clamp(54px, 9vh, 90px);
+  display: grid; grid-template-rows: auto auto; align-items: center; justify-items: center;
+  gap: clamp(8px, 1.2vh, 13px);
+  padding: clamp(9px, 1.3vh, 15px) var(--gutter);
 }
-@supports not (height: 100svh) { .feed .item { min-height: 100vh; } }
+.feed .item:first-child { padding-top: clamp(84px, 12vh, 120px); }
+.feed .item:last-child {
+  min-height: 100svh;
+  align-content: center;
+  padding-bottom: clamp(54px, 9vh, 90px);
+}
+@supports not (height: 100svh) { .feed .item:last-child { min-height: 100vh; } }
 
 /* ⚠️ A REVELAÇÃO POR ROLAGEM — 6ª rodada, 17/09/2026, e os números são MEDIDOS, não copiados
    de descrição. Ele: "no laulau é como se ela aparecesse na tela, como se não existisse ela, aí
@@ -567,7 +622,10 @@ body.sem-abertura .marca-anim img { animation: none !important; transform: none 
   display: flex; align-items: flex-end; justify-content: space-between; gap: 18px;
   text-align: left;
 }
-.feed .legenda .lado-esquerdo { display: grid; gap: 2px; }
+/* ⚠️ 7ª rodada: a legenda encolheu pra caber no vão do laulau (95 px medidos). Ela tem TRÊS
+   linhas (categoria, produto, ver produto) contra as DUAS do laulau (nome e preço) — era daí
+   que vinham os 46 px a mais entre um produto e o outro. Encolheu o respiro, não o texto. */
+.feed .legenda .lado-esquerdo { display: grid; gap: 0; }
 /* as bolinhas são o ÚNICO controle de foto que sobrou (as setas saíram por pedido
    dele). No computador não existe arrastar, então elas precisam ser clicáveis — sem
    isso, quem usa mouse nunca veria a segunda foto. */
@@ -593,8 +651,28 @@ body.sem-abertura .marca-anim img { animation: none !important; transform: none 
   font-family: var(--fonte-titulo); font-weight: 500;
   font-size: clamp(1.2rem, 2.8vw, 1.7rem); color: var(--off); white-space: nowrap;
 }
-.feed .ver { display: inline-block; font-size: 12px; letter-spacing: .08em; opacity: .7; color: var(--dourado); text-decoration: none; margin-top: 6px; }
+.feed .ver { display: inline-block; font-size: 12px; line-height: 1.3; letter-spacing: .08em; opacity: .7; color: var(--dourado); text-decoration: none; margin-top: 2px; }
 .feed .ver:hover { opacity: 1; text-decoration: underline; }
+
+/* ⚠️ TELA ESTREITA: A LEGENDA PESA MAIS, e isso aparece como vão maior entre os produtos.
+   Medido em 17/09/2026 no endereço publicado, comparando com o laulau (passo 1,28 × o objeto,
+   vão 0,277 × o objeto):
+
+       1920 .... 1,28 / 0,27     iPad ..... 1,26 / 0,26
+       1440 .... 1,31 / 0,30     iPhone 14  1,35 / 0,34
+       iPhone SE (320 px) ...... 1,41 / 0,40   ← fora da régua
+
+   A causa não é o espaçamento: é que o OBJETO encolhe com a largura da tela e o TEXTO não, porque
+   as fontes têm piso no `clamp`. Num aparelho de 320 px a legenda vira um bloco proporcionalmente
+   enorme. A cura é abaixar o piso das fontes só onde o problema existe — mexer nelas em todas as
+   telas mudaria o que ele já viu e aprovou no aparelho dele. */
+@media (max-width: 360px) {
+  .feed .item { padding: 8px var(--gutter); gap: 7px; }
+  .feed .categoria { font-size: 1.02rem; }
+  .feed .produto-mini { font-size: .76rem; }
+  .feed .valor { font-size: 1.05rem; }
+  .feed .ver { font-size: 11px; }
+}
 
 /* ---- a dica de arrastar, SÓ no primeiro produto -------------------------
    "Somente no primeiro produto, mostrar alguma animação com setas ou algo do tipo,
