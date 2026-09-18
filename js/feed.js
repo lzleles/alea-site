@@ -197,7 +197,13 @@
         '<a class="botao zap" data-assunto="orçamento de uma peça personalizada">Orçamentos e personalizados</a>' +
         '<p class="ou-veja">ou veja outra categoria</p>' +
         '<nav class="menu-categorias" data-menu-categorias aria-label="Categorias"></nav>' +
-        '<button class="fechar-feed" type="button" data-fechar-feed style="position:static">← voltar pras categorias</button>' +
+        /* ⚠️ 8ª RODADA (18/09/2026, áudio das 23:02): "tem um botão lá embaixo que está
+           escrito 'voltar para categorias'. Nós vamos só alterar a frase para 'voltar para
+           a página inicial'. Aí, se a pessoa clicar, vai ter a animação, tudo de novo."
+           O `data-voltar-inicio` é o que diz ao abertura.js pra TOCAR A ABERTURA — o botão
+           do cabeçalho, que continua só fechando, não tem esse atributo. */
+        '<button class="fechar-feed" type="button" data-fechar-feed data-voltar-inicio ' +
+                'style="position:static">← voltar para a página inicial</button>' +
       '</div>';
     palco.appendChild(fim);
 

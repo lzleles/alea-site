@@ -368,6 +368,30 @@ body.marca-anima .marca-anim .l4 { animation-delay: 7.1s; }
 body.site-revelado .abertura .menu-categorias { opacity: 1; }
 body.frase-revelada .abertura .assinatura { opacity: 1; }
 
+/* ⚠️ "COMO SE NÃO TIVESSE ANIMAÇÃO" É SEM O MEIO SEGUNDO TAMBÉM — 8ª rodada, 18/09/2026.
+   A frase dele foi literal: clicar "vai tudo pra página inicial normal, COMO SE NÃO
+   TIVESSE ANIMAÇÃO". O `transition: opacity .8s` acima é parte da abertura; deixá-lo de
+   pé fazia o menu ainda levar 0,8 s pra acender depois do clique — quase um segundo de
+   espera dentro do gesto que existe justamente pra não esperar. Vale também pra quem
+   volta de uma página de produto, que já recebia o logo pronto e o menu atrasado. */
+body.sem-abertura .abertura .assinatura,
+body.sem-abertura .abertura .menu-categorias { transition: none; }
+
+/* ⚠️ ENQUANTO A ABERTURA RODA, O QUE ESTÁ INVISÍVEL NÃO RECEBE CLIQUE — 8ª rodada,
+   18/09/2026. `opacity: 0` esconde mas NÃO desliga o clique (o "fantasma clicável"
+   medido em 15/09/2026). Agora que um clique em qualquer lugar pula a abertura
+   (abertura.js), sem isto o mesmo clique podia cair numa categoria que ninguém está
+   vendo e abrir o feed errado. */
+/* ⚠️ O `:not(.site-revelado)` NÃO É ENFEITE — sem ele o menu fica morto PRA SEMPRE.
+   `marca-anima` entra no body quando a animação começa e NUNCA sai (o CSS não precisa que
+   saia). Escrito só como `body.marca-anima`, isto desligava o clique do menu DEPOIS que ele
+   já estava aceso, e o site inteiro parava de abrir categoria. Pego em 18/09/2026 pelo teste
+   de REGRESSÃO da 7ª rodada (`_testar_abertura_gesto_v6_espacamento.py`), nos dois monitores
+   — não pelo teste novo, que só olhava o instante da animação. Quem diz "a abertura acabou"
+   é `site-revelado`, que é exatamente quando o menu acende. */
+body.marca-anima:not(.site-revelado) .abertura .menu-categorias,
+body.marca-anima:not(.site-revelado) .abertura .assinatura { pointer-events: none; }
+
 /* quem já viu a abertura nesta sessão recebe o logo pronto, sem esperar de novo */
 body.sem-abertura .marca-anim img { animation: none !important; transform: none !important; opacity: 1 !important; }
 @media (prefers-reduced-motion: reduce) {
@@ -458,6 +482,14 @@ body.sem-abertura .marca-anim img { animation: none !important; transform: none 
   overscroll-behavior: contain;
   -webkit-overflow-scrolling: touch;
 }
+/* ⚠️ CHEGADA DIRETA NA SEGUNDA PÁGINA NÃO TEM MEIO SEGUNDO DE PRIMEIRA PÁGINA — 8ª rodada,
+   18/09/2026. "Ele faz como se fosse um flash, mostra o fundo da primeira página e volta
+   pra aquela segunda." O flash é esta `transition: opacity .5s`: numa troca de categoria
+   ela é o efeito, mas em quem abre o site JÁ no feed (F5 com `#pet`, link de categoria)
+   ela é meio segundo mostrando a tela errada. Quem põe e quem tira a classe é o
+   abertura.js, no quadro seguinte ao feed pintado — as trocas seguintes voltam ao normal. */
+body.sem-transicao-feed .feed { transition: none !important; }
+
 .feed .palco { position: relative; }
 
 /* ⚠️ O ESPAÇAMENTO É O DO LAULAU, MEDIDO — 7ª rodada, 17/09/2026.

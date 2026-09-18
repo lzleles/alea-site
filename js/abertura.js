@@ -23,6 +23,15 @@
    precisa de decisão e de medida: **qual é o "maior tamanho possível"** da capivara
    nesta janela, onde fica o centro dela na tela, e a ordem dos tempos.
 
+   8ª RODADA (18/09/2026) — três pedidos dele, todos sobre ESPERAR:
+
+     1. "se eu clicar em qualquer lugar do site, ela já para a animação e vai tudo pra
+         página inicial normal, como se não tivesse animação"   → `pularAbertura()`
+     2. "eu não quero que tenha animação nenhuma na segunda página [no F5]"
+                                                                → `abreDiretoNoFeed`
+     3. "'voltar para categorias' vira 'voltar para a página inicial', e aí vai ter a
+         animação, tudo de novo, normal"                        → `tocarAbertura()`
+
    ⚠️ QUEM VÊ A ABERTURA E QUEM NÃO VÊ — a régua mudou na 4ª rodada (17/09/2026, item 2):
    "quando clica em F5 ela faz a animação perfeita igual deve ser, mas quando clico no site
    da barra de pesquisa e dou enter, ele não faz a animação e permanece como está! Quero que
@@ -107,9 +116,37 @@
     window.scrollTo(0, 0);
   }
 
-  /* A conta das quatro chegadas, escrita numa linha só (ver o bloco acima). */
-  var jaViu = chegada === 'back_forward' || (chegada === 'navigate' && veioDeDentroDoSite());
+  /* =======================================================================
+     A QUINTA CHEGADA: JÁ CAIR NA SEGUNDA PÁGINA — 8ª rodada, 18/09/2026
+     =======================================================================
+     "quando eu clico na aba pet, que abre aquela página preta do feed, se eu dou F5
+      naquela página, ele faz uma animação ali. Eu não quero que tenha animação nenhuma
+      na segunda página. […] Ele faz como se fosse um flash, mostra o fundo da primeira
+      página e volta pra aquela segunda, mas o 3D lá em cima faz a animação."
+
+     Eram DOIS defeitos na mesma tela, e cada um tem uma cura:
+
+       1. a ABERTURA rodava. O endereço tinha `#pet`, mas a régua de quem anima só olhava
+          o tipo da navegação — e `reload` sempre animava. Agora, quem chega com uma
+          categoria VÁLIDA no endereço não vê abertura nenhuma: o destino dele é o feed,
+          não a primeira tela. Vale pro F5 e vale pro link de categoria mandado no
+          WhatsApp, que é o mesmo caso: a pessoa pediu a segunda página, não a primeira.
+       2. o FLASH. O `.feed` abre com `transition: opacity .5s` — meio segundo em que a
+          primeira página aparece por baixo antes de o preto cobrir. Numa navegação
+          normal esse meio segundo é o efeito; numa chegada direta ele é o flash que ele
+          viu. `body.sem-transicao-feed` mata a transição e é retirada assim que o feed
+          está pintado (ver `aplicarEndereco`), pra não estragar as trocas seguintes.
+
+     ⚠️ A conta usa `categoriaDoEndereco()`, que confere a categoria contra o catálogo —
+     hash inventado (ou o `#abertura` do link de pular) não entra nesta regra. */
+  var abreDiretoNoFeed = !!categoriaDoEndereco();
+
+  /* A conta das chegadas, escrita numa linha só (ver os dois blocos acima). */
+  var jaViu = abreDiretoNoFeed ||
+              chegada === 'back_forward' ||
+              (chegada === 'navigate' && veioDeDentroDoSite());
   if (jaViu) corpo.classList.add('sem-abertura');
+  if (abreDiretoNoFeed) corpo.classList.add('sem-transicao-feed');
 
   var querMenosMovimento = window.matchMedia &&
     window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -218,14 +255,29 @@
     alvoFrase.textContent = '';
   }
 
+  function fraseInteira() {
+    return fraseGuardada || (window.ALEA && window.ALEA.assinatura) ||
+           (alvoFrase ? alvoFrase.textContent.trim() : '');
+  }
+
+  /* a frase pronta de uma vez: é o que o "pular" precisa, e é o mesmo caminho do
+     `prefers-reduced-motion`. Sem o `<span>` do cursor, que só faz sentido escrevendo. */
+  function escreverDeUmaVez() {
+    if (!alvoFrase) return;
+    var frase = fraseInteira();
+    alvoFrase.setAttribute('aria-label', frase);
+    alvoFrase.textContent = frase;
+    alvoFrase.classList.add('pronta');
+  }
+
   function datilografar() {
     var alvo = alvoFrase;
     if (!alvo) return;
-    var frase = fraseGuardada || (window.ALEA && window.ALEA.assinatura) || alvo.textContent.trim();
+    var frase = fraseInteira();
     alvo.setAttribute('aria-label', frase);
     corpo.classList.add('frase-revelada');
 
-    if (querMenosMovimento) { alvo.textContent = frase; alvo.classList.add('pronta'); return; }
+    if (querMenosMovimento) { escreverDeUmaVez(); return; }
 
     alvo.textContent = '';
     var letras = document.createElement('span');
@@ -238,6 +290,7 @@
 
     var i = 0;
     (function escrever() {
+      if (pulou) return;            /* clicou no meio da frase: quem termina é o pular */
       letras.textContent = frase.slice(0, ++i);
       if (i < frase.length) {
         /* ritmo irregular de propósito: passo fixo soa a máquina, e o que ele pediu
@@ -256,6 +309,46 @@
     })();
   }
 
+  /* =======================================================================
+     3b) PULAR A ABERTURA COM UM CLIQUE — 8ª rodada, 18/09/2026
+     =======================================================================
+     "pensando em pessoas ansiosas […] uma pessoa que já vai ter a habitualidade de entrar
+      no meu site, ela não aguenta esperar […] então eu quero que tenha a opção de, quando
+      a animação começar, se eu clicar em qualquer lugar do site, ela já para a animação e
+      vai tudo pra página inicial normal, como se não tivesse animação. Toda vez com um F5
+      faz a animação, mas se a pessoa quiser acabar com a animação é só clicar."
+
+     O estado de chegada JÁ EXISTE e tem nome: é o `body.sem-abertura`, o mesmo que quem
+     volta de uma página de produto recebe. Pular não é uma animação nova nem um
+     "adiantar o relógio" — é entrar nesse estado agora. Por isso aqui não se mexe em
+     tempo nenhum: tira-se `marca-anima` e põe-se `sem-abertura`, que zera transform e
+     animação com `!important` no CSS.
+
+     ⚠️ NÃO se cancela o evento (`preventDefault`): quem clicar no logo do canal ou no
+     carrinho, lá em cima, continua indo pro link. O clique pula a abertura E faz o que
+     ia fazer — é o que "clicar em qualquer lugar" quer dizer.
+
+     ⚠️ O menu e a frase ficam com `pointer-events: none` enquanto a animação roda (CSS).
+     Eles estão com `opacity: 0`, e camada invisível continua interceptando clique — foi
+     o "fantasma clicável" medido em 15/09/2026. Sem isso, o clique que ele pediu pra
+     pular podia cair numa categoria que ninguém está vendo. */
+  var pulou = false;
+  var esperaDaFrase = null;
+
+  function pularAbertura() {
+    if (pulou || !corpo.classList.contains('marca-anima')) return;
+    pulou = true;
+    if (esperaDaFrase) { clearTimeout(esperaDaFrase); esperaDaFrase = null; }
+    corpo.classList.remove('marca-anima');
+    corpo.classList.add('sem-abertura', 'marca-medida', 'site-revelado', 'frase-revelada');
+    escreverDeUmaVez();
+    medirClareira();
+  }
+
+  ['pointerdown', 'touchstart', 'keydown'].forEach(function (evento) {
+    document.addEventListener(evento, pularAbertura, { capture: true, passive: true });
+  });
+
   /* ------------------------------------------------ 4) a ordem das coisas */
   function abrirSemAnimacao() {
     corpo.classList.add('marca-medida', 'site-revelado');
@@ -264,6 +357,8 @@
   }
 
   function abrirComAnimacao() {
+    pulou = false;
+    corpo.classList.remove('sem-abertura');
     guardarEEsvaziarFrase();
     medirCapivara();
     medirClareira();
@@ -277,8 +372,24 @@
       });
     });
     /* a frase só começa DEPOIS da última letra do logo, e o menu só depois da frase
-       (quem acende o menu é o fim do datilógrafo, lá em cima). */
-    setTimeout(datilografar, FIM_DAS_LETRAS + 200);
+       (quem acende o menu é o fim do datilógrafo, lá em cima). Guardado porque o
+       "pular" precisa cancelar esta espera — senão a frase recomeçaria sozinha. */
+    esperaDaFrase = setTimeout(datilografar, FIM_DAS_LETRAS + 200);
+  }
+
+  /* =======================================================================
+     4b) TOCAR A ABERTURA DE NOVO — 8ª rodada, 18/09/2026
+     =======================================================================
+     "se a pessoa clicar 'voltar para a página inicial', vai ter a animação, tudo de novo,
+      normal. Mas se ela quiser parar a animação, ela clica em qualquer lugar do site."
+
+     Quem chama é o botão do fim do feed (ver o clique em `[data-voltar-inicio]` lá
+     embaixo). Remover `marca-anima` e repô-la num quadro seguinte é o que faz o CSS
+     recomeçar as animações do zero — a mesma dobradinha de dois quadros da primeira vez. */
+  function tocarAbertura() {
+    corpo.classList.remove('marca-anima', 'site-revelado', 'frase-revelada');
+    window.scrollTo(0, 0);
+    abrirComAnimacao();
   }
 
   if (jaViu || querMenosMovimento) {
@@ -329,6 +440,13 @@
          pediu. Fora dela, o feed decide sozinho se restaura a posição guardada. */
       window.aleaFeed.abrir(id, recarregou ? 0 : null);
       recarregou = false;
+      /* o preto já está pintado: devolve a transição pras próximas trocas de categoria,
+         que continuam com o meio segundo de sempre (ver `sem-transicao-feed` lá em cima). */
+      if (corpo.classList.contains('sem-transicao-feed')) {
+        requestAnimationFrame(function () {
+          requestAnimationFrame(function () { corpo.classList.remove('sem-transicao-feed'); });
+        });
+      }
     } else {
       window.aleaFeed.fechar();
     }
@@ -337,12 +455,23 @@
   window.addEventListener('hashchange', aplicarEndereco);
 
   document.addEventListener('click', function (e) {
-    if (e.target.closest('[data-fechar-feed]')) {
-      e.preventDefault();
-      /* tira o `#categoria` do endereço sem empilhar mais uma entrada no histórico */
-      history.replaceState(null, '', location.pathname + location.search);
-      window.aleaFeed.fechar();
-    }
+    var botao = e.target.closest('[data-fechar-feed]');
+    if (!botao) return;
+    e.preventDefault();
+    /* tira o `#categoria` do endereço sem empilhar mais uma entrada no histórico */
+    history.replaceState(null, '', location.pathname + location.search);
+    window.aleaFeed.fechar();
+
+    /* ⚠️ DOIS BOTÕES, DUAS COISAS DIFERENTES — e é de propósito (8ª rodada, 18/09/2026).
+       O do CABEÇALHO ("← categorias") é a saída rápida: fecha o feed e pronto. O do FIM
+       da segunda página passou a se chamar "voltar para a página inicial" e é o que ele
+       pediu que TOQUE A ABERTURA de novo: "vai ter a animação, tudo de novo, normal".
+       Quem marca a diferença é o `data-voltar-inicio`, no HTML do cartão de fim.
+       PARECER: ele não falou do botão do cabeçalho. Deixar os dois animando devolveria
+       o pedágio que ele mandou tirar em 14/09 ("seis segundos na quinta vez"), e agora
+       qualquer clique pula a animação — então o do fim é barato. Se ele quiser os dois
+       iguais, é trocar o atributo. */
+    if (botao.hasAttribute('data-voltar-inicio')) tocarAbertura();
   });
 
   /* o feed.js avisa quando terminou de se preparar; só então o endereço é aplicado */
