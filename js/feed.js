@@ -88,6 +88,14 @@
     return (window.aleaDinheiro && window.aleaDinheiro(v)) || 'Sob consulta';
   }
 
+  /* ⚠️ ETAPA 10 (22/09/2026): o nome "ālea" tem que sair IGUAL À LOGO — em Defante, MINÚSCULO, com
+     o macron (ā). A legenda do produto está em CAIXA ALTA (`.produto-mini`), o que viraria "ĀLEA".
+     Então o "ālea" (com ā) é embrulhado num span que NÃO sobe pra maiúscula (CSS `.marca-nome`).
+     O resto do nome do produto continua na régua da legenda. */
+  function comNomeMarca(txt) {
+    return String(txt).replace(/[āa]lea/gi, '<span class="marca-nome">ālea</span>');
+  }
+
   function nomeDaCategoria(id) {
     var c = (window.CATEGORIAS || []).filter(function (x) { return x.id === id; })[0];
     return c ? c.nome : String(id || '').toUpperCase();
@@ -194,7 +202,7 @@
         '<div class="legenda">' +
           '<span class="lado-esquerdo">' +
             '<span class="categoria">' + nomeDaCategoria(c.categoria) + '</span>' +
-            '<span class="produto-mini">' + c.produto + '</span>' +
+            '<span class="produto-mini">' + comNomeMarca(c.produto) + '</span>' +
             '<a class="ver" href="produto-' + c.pagina + '.html">ver produto →</a>' +
           '</span>' +
           (mostrarPreco ? '<span class="valor">' + (c.preco === null ? 'Sob consulta' : moeda(c.preco)) + '</span>' : '') +

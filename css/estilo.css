@@ -37,6 +37,18 @@
    variável --fonte-titulo e somar um @font-face resolve; nada mais no site muda.
    ========================================================================== */
 
+/* ⚠️ TIPOGRAFIA (etapa 10, 22/09/2026): a Defante — a fonte de TÍTULO oficial da marca
+   (identidade da Mirella) — entrou. Um único desenho serve todos os pesos (font-weight 100..900
+   aponta pro mesmo arquivo), porque é uma display de um corpo só; assim "negrito" não vira faux-bold.
+   Ela TEM o "ā" (a com macron, U+0101), então o nome `ālea` sai igual à logo. ⚠️ LICENÇA: a Defante
+   é comercial; vai na PRÉVIA pro Cassiano ver, e só ao AR depois que o Lázaro confirmar a licença
+   (a Hanken é OFL, livre). Arquivo: fonts/defante.woff2 (convertido do defante.otf que ele mandou). */
+@font-face {
+  font-family: 'Defante';
+  src: url('../fonts/defante.woff2') format('woff2');
+  font-weight: 100 900; font-style: normal; font-display: swap;
+}
+
 :root {
   --off:        #EAE4DB;
   --terracota:  #924429;
@@ -49,7 +61,7 @@
   --preto:      #14100D;   /* preto QUENTE: preto puro brigaria com a paleta de barro */
   --borda:      rgba(146, 68, 41, .16);
 
-  --fonte-titulo: 'Outfit', 'Hanken Grotesk', system-ui, sans-serif;
+  --fonte-titulo: 'Defante', 'Hanken Grotesk', system-ui, sans-serif;   /* etapa 10: era 'Outfit' */
   --fonte-corpo:  'Hanken Grotesk', system-ui, -apple-system, 'Segoe UI', sans-serif;
 
   --raio: 14px;
@@ -715,6 +727,9 @@ body.sem-transicao-feed .feed { transition: none !important; }
    que vinham os 46 px a mais entre um produto e o outro. Encolheu o respiro, não o texto. */
 /* ETAPA 5 (22/09/2026): +~1mm de respiro entre as linhas da legenda (era colado, gap 0). */
 .feed .legenda .lado-esquerdo { display: grid; gap: 4px; }
+/* ETAPA 10 (22/09/2026): o nome "ālea" no meio do título do produto fica MINÚSCULO (igual à logo,
+   em Defante com o macron), mesmo a legenda estando em caixa alta. */
+.feed .produto-mini .marca-nome { text-transform: none; }
 /* as bolinhas são o ÚNICO controle de foto que sobrou (as setas saíram por pedido
    dele). No computador não existe arrastar, então elas precisam ser clicáveis — sem
    isso, quem usa mouse nunca veria a segunda foto. */
