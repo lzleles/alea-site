@@ -877,6 +877,10 @@ body.sem-transicao-feed .feed { transition: none !important; }
 .feed .fim p[data-assinatura] {
   white-space: nowrap; font-size: clamp(0.85rem, 4.15vw, 1.4rem); letter-spacing: .01em;
 }
+/* ETAPA 12 (22/09/2026): mesma régua do rodapé — a frase com 0,705 da largura da logo, como na
+   abertura. Logo do fim = min(64vw,300px). Aqui a frase é mais larga por em (fonte do corpo +
+   letter-spacing): 0,038 deu 0,797, então o fator é 0,0338 → medido 0,71 (vence a etapa 4). */
+.feed .fim p[data-assinatura] { font-size: min(2.165vw, 10.15px); }
 /* ⚠️ AS CATEGORIAS NO FIM DA LISTA (5ª rodada, áudio das 17:28): "já coloque ali também
    todas as categorias, que evitam da pessoa ir na página principal para clicar em outra".
    É o mesmo menu do rodapé; aqui ele só ganha um rótulo e respiro. */
@@ -907,7 +911,13 @@ body.sem-transicao-feed .feed { transition: none !important; }
   text-align: center;
 }
 .rodape .marca-rodape { width: min(72vw, 300px); margin: 0 auto 14px; }
-.rodape .frase { font-family: var(--fonte-titulo); font-weight: 300; font-size: clamp(1rem, 2.2vw, 1.3rem); color: var(--dourado); margin: 0 0 26px; }
+/* ETAPA 12 (22/09/2026, áudio das 18:37): "pegue como referência a frase da página inicial —
+   o tamanho dela é proporcionalmente menor que a logo — e aplique nas logos da parte preta".
+   Medido no celular (390px, Playwright): na abertura a frase tem 0,705 da largura da logo; no
+   rodapé tinha 1,06 e no fim da lista 1,36. A fonte agora é FRAÇÃO DA LARGURA DA LOGO (a frase
+   mede ~18,6em): logo = min(72vw,300px) → fonte = 0,038 × isso. Assim a proporção vale em
+   qualquer tela, não só no celular. Era clamp(1rem, 2.2vw, 1.3rem). */
+.rodape .frase { font-family: var(--fonte-titulo); font-weight: 300; font-size: min(2.74vw, 11.4px); white-space: nowrap; color: var(--dourado); margin: 0 0 26px; }
 .rodape .orcamento {
   display: inline-block; margin-bottom: 30px; color: var(--off);
   font-size: 15.5px; text-decoration: none; border-bottom: 1.5px solid var(--dourado); padding-bottom: 3px;
