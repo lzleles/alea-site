@@ -132,17 +132,25 @@ body.travado { overflow: hidden; }
 .topo .marca .clara { display: none; }
 body.escuro .topo .marca .colorida { display: none; }
 body.escuro .topo .marca .clara { display: block; }
-body.escuro .topo { background: color-mix(in srgb, var(--preto) 72%, transparent); color: var(--off); }
+body.escuro .topo { color: var(--off); }
 /* ⚠️ ETAPA 6 (22/09/2026): no feed o botão "← categorias" fica ABAIXO da barra (absoluto), e a
-   pontinha do "g" caía dentro da foto. Prolongo o fundo escuro da barra uns 14px pra baixo — cobre
-   o "g" com ~1mm de folga — SEM mexer na barra nem no alinhamento do topo (ele pediu pra não tocar
-   no que já ficou alinhado). É só um degrau de fundo atrás do botão, nunca à frente do texto. */
+   pontinha do "g" caía na foto. Prolonguei o fundo escuro pra baixo pra cobrir o "g".
+   ⚠️ ETAPA 7 (22/09/2026): (a) o prolongamento caiu pra METADE (14px → 7px); (b) a faixa nova
+   estava com TONALIDADE diferente da barra — porque a barra tinha o `backdrop-filter` no próprio
+   elemento e a faixa num pseudo ANINHADO nesse backdrop (filtro dentro de filtro borra diferente).
+   Cura: no feed, a barra E a faixa viram pseudo-elementos IRMÃOS, com exatamente o mesmo fundo e o
+   mesmo borrão — aninhados do mesmo jeito, então rendem idêntico. O elemento .topo fica sem fundo
+   e sem filtro (passou tudo pros pseudos). */
+body.escuro .topo { background: transparent; -webkit-backdrop-filter: none; backdrop-filter: none; }
+body.escuro .topo::before,
 body.escuro .topo::after {
-  content: ''; position: absolute; left: 0; right: 0; top: 100%; height: 14px;
+  content: ''; position: absolute; left: 0; right: 0;
   background: color-mix(in srgb, var(--preto) 72%, transparent);
   -webkit-backdrop-filter: saturate(140%) blur(10px); backdrop-filter: saturate(140%) blur(10px);
   z-index: -1; pointer-events: none;
 }
+body.escuro .topo::before { top: 0; bottom: 0; }        /* a barra */
+body.escuro .topo::after  { top: 100%; height: 7px; }   /* o degrau atrás do "categorias" (metade do de antes) */
 /* na abertura o cabeçalho flutua sem fundo: o gradiente é o assunto da tela */
 body.na-abertura .topo { background: transparent; backdrop-filter: none; }
 
