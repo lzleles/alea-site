@@ -306,8 +306,86 @@
     };
   }
 
+  /* ⚠️ ETAPA 19 (22/09/2026, parte 3, áudios das 20:29-20:30): a trava não é mais só do aceite.
+     "Não pode ficar nunca sem colocar o nome do pet, sem a escolha das cores da peça e sem marcar a
+     declaração. Toda vez que clicar em comprar agora e tiver alguma dessas faltando, essa opção vai
+     mudar a cor e vai fazer aquela animação igual você fez com a declaração." E, no seguinte: se
+     escolheu tricolor/bicolor/monocromático e não digitou as cores, o mesmo.
+     Cada falta ganha a classe `faltou` (a cor), os botões tremem (a animação da declaração), o
+     recado diz O QUE falta, e a tela rola até a primeira falta — no celular ela pode estar acima
+     da dobra, e cor mudando fora da tela ninguém vê. Degradê não pede cor (a cor é combinada).
+     A cor do NOME só é cobrada quando o adicional "nome colorido" está marcado (o campo só abre
+     com ele) — mesmo raciocínio das cores da peça: escolheu a opção, tem que dizer a cor. */
+  function oQueFalta() {
+    var faltas = [];
+    var nome = document.querySelector('[data-personalizar] [name="nome_pet"]');
+    if (nome && !nome.value.trim()) faltas.push({ el: nome.closest('label') || nome, texto: 'nome do pet' });
+    var corNome = document.querySelector('[data-personalizar] [name="cor_nome"]');
+    if (corNome && !corNome.disabled && !corNome.value.trim()) {
+      faltas.push({ el: corNome.closest('label') || corNome, texto: 'cor do nome' });
+    }
+    if (caixaCores) {
+      var r = caixaCores.querySelector('input[name="cores_peca"]:checked');
+      if (!r) {
+        faltas.push({ el: caixaCores.querySelector('.rotulo-grupo') || caixaCores, texto: 'cores da peça' });
+      } else {
+        var vazios = Array.prototype.filter.call(
+          camposCores ? camposCores.querySelectorAll('input') : [], function (i) { return !i.value.trim(); });
+        vazios.forEach(function (i) {
+          var n = (i.getAttribute('name') || '').replace('cor_', '');
+          faltas.push({ el: i.closest('.campo-cor') || i, texto: 'cor ' + n });
+        });
+      }
+    }
+    if (!caixaAceite || !caixaAceite.checked) {
+      faltas.push({ el: document.querySelector('[data-aceite]'), texto: 'declaração' });
+    }
+    return faltas;
+  }
+
+  function reclamarDoQueFalta(faltas) {
+    Array.prototype.forEach.call(document.querySelectorAll('.faltou'), function (x) { x.classList.remove('faltou'); });
+    faltas.forEach(function (f) { if (f.el) f.el.classList.add('faltou'); });
+    var recado = document.querySelector('[data-recado-aceite]');
+    if (recado) {
+      var itens = faltas.map(function (f) { return f.texto; }).filter(Boolean);
+      /* "Complete antes de continuar: nome do pet, cor 2 e declaração." — sem concordância a
+         errar ("falta as cores"), qualquer que seja a mistura de faltas */
+      recado.textContent = 'Complete antes de continuar: ' + (itens.length > 1
+        ? itens.slice(0, -1).join(', ') + ' e ' + itens[itens.length - 1]
+        : itens[0]) + '.';
+      recado.hidden = false;
+    }
+    var botoes = document.querySelector('[data-botoes]');
+    if (botoes) {
+      botoes.classList.remove('tremendo');
+      void botoes.offsetWidth;        // reinicia a animação se ele clicar duas vezes
+      botoes.classList.add('tremendo');
+    }
+    var primeira = faltas.filter(function (f) { return f.el; })[0];
+    if (primeira && primeira.el.scrollIntoView) {
+      var r = primeira.el.getBoundingClientRect();
+      if (r.top < 70 || r.bottom > window.innerHeight) {
+        primeira.el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }
+  }
+
+  /* quem corrige a falta perde a cor na hora — não precisa clicar de novo pra ver sumir */
+  document.addEventListener('input', function (ev) {
+    var dono = ev.target.closest && ev.target.closest('.faltou');
+    if (dono && ev.target.value && ev.target.value.trim()) dono.classList.remove('faltou');
+  });
+  document.addEventListener('change', function (ev) {
+    if (ev.target.name === 'cores_peca' && caixaCores) {
+      var g = caixaCores.querySelector('.rotulo-grupo');
+      if (g) g.classList.remove('faltou');
+    }
+  });
+
   function porNoCarrinho(eDepoisFechar) {
-    if (!caixaAceite || !caixaAceite.checked) { reclamarDoAceite(); return; }
+    var faltas = oQueFalta();
+    if (faltas.length) { reclamarDoQueFalta(faltas); return; }
     if (!window.aleaCarrinho) return;
     var recado = document.querySelector('[data-recado-aceite]');
     if (recado) recado.hidden = true;

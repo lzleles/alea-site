@@ -1076,6 +1076,13 @@ body.sem-transicao-feed .feed { transition: none !important; }
 .aceite { display: flex; gap: 11px; align-items: flex-start; margin: 0 0 18px; font-size: 14px; color: var(--tinta-fraca); cursor: pointer; }
 .aceite input { margin: 3px 0 0; width: 19px; height: 19px; flex: none; accent-color: var(--terracota); cursor: pointer; }
 .aceite.faltou { color: var(--terracota); font-weight: 600; }
+/* ETAPA 19 (22/09/2026): a mesma "cor de falta" da declaração vale pro que mais falta na compra —
+   o nome do pet, a cor do nome (com o adicional marcado), a escolha das cores e cada cor a digitar.
+   O rótulo vira terracota e a caixa ganha a borda terracota. */
+.personalizar label.faltou, .cores-peca > .rotulo-grupo.faltou { color: var(--terracota); }
+.personalizar label.faltou input,
+.cores-campos .campo-cor.faltou input { border-color: var(--terracota); box-shadow: 0 0 0 1px var(--terracota); }
+.cores-campos .campo-cor.faltou .numero { background: var(--terracota); color: var(--off); }
 
 .personalizar { display: grid; gap: 12px; margin: 0 0 20px; }
 .personalizar label { display: grid; gap: 5px; font-size: 13px; letter-spacing: .06em; text-transform: uppercase; color: var(--dourado); font-weight: 700; }

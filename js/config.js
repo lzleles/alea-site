@@ -132,11 +132,14 @@ window.ALEA = {
      exatamente isto. */
   personalizados: {
     titulo: 'PRODUTOS PERSONALIZADOS',
-    texto: 'Por se tratar de um produto produzido sob encomenda e personalizado ' +
-           'especialmente de acordo com as suas escolhas, pedidos personalizados não ' +
-           'poderão ser cancelados ou devolvidos após a confirmação de pagamento se o ' +
-           'produto já estiver sendo fabricado, ressalvados casos de defeito, vício ' +
-           'ou erro de fabricação.',
+    /* ETAPA 18 (22/09/2026, 20:27): texto NOVO dele, palavra por palavra ("apague tudo e coloque
+       esse texto"). O anterior: "Por se tratar de um produto produzido sob encomenda e personalizado
+       especialmente de acordo com as suas escolhas, pedidos personalizados não poderão ser
+       cancelados ou devolvidos após a confirmação de pagamento se o produto já estiver sendo
+       fabricado, ressalvados casos de defeito, vício ou erro de fabricação." */
+    texto: 'Por serem feitos sob encomenda e personalizados conforme suas escolhas, os pedidos ' +
+           'não poderão ser cancelados ou devolvidos após a confirmação do pagamento caso a ' +
+           'produção já tenha começado, exceto em casos de defeito, vício ou erro de fabricação.',
     aceite: 'Declaro que revisei cuidadosamente todas as informações da ' +
             'personalização, incluindo nome, grafia e cores. Declaro, ainda, estar ' +
             'ciente e de acordo com as condições acima aplicáveis a produtos ' +
