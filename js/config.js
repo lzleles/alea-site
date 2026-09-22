@@ -87,8 +87,13 @@ window.ALEA = {
        porque quem escolhe o link é o dono da conta, e porque o Linktree conta essa visita como
        vinda do Instagram — se um dia ele quiser separar "veio do site", é aqui que se troca. */
     linktree:  'https://linktr.ee/eaibora.3d?utm_source=ig&utm_medium=social&utm_content=link_in_bio&fbclid=PAdGRleAUYWSxwZG9mAmZkaWQWUOkM91TjGzxZsGlPaArH1voSo4_jjGV4dG4DYWVtAjExAHNydGMGYXBwX2lkDzEyNDAyNDU3NDI4NzQxNAABpzXaxi12EnfVzwcyuaOEvwRaWDu6O0_U-Sq64AjEdd39UlRlaIC5LxabGdrK_aem_oa-Nn97SXEFFzUbBcxxXdA',
-    instagram: 'https://www.instagram.com/alea.co_/',
-    instagram_canal: 'https://www.instagram.com/eaibora.3d/',
+    /* ⚠️ ETAPA 2 do Cassiano (22/09/2026): "dos 3 ícones abaixo das categorias, tira os 2 do
+       Instagram, deixa só o Linktree". Vazio = o ícone não aparece (ver site.js). Os endereços
+       ficam aqui guardados pra voltar num piscar se ele mudar de ideia:
+         alea.co_        -> https://www.instagram.com/alea.co_/
+         eaibora.3d      -> https://www.instagram.com/eaibora.3d/  (o do canal segue no topo, na logo do @eaibora.3d) */
+    instagram: '',
+    instagram_canal: '',
     youtube:   '',            // https://www.youtube.com/@...
     twitch:    ''             // https://www.twitch.tv/...
   },
