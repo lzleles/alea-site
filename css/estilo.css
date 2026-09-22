@@ -133,6 +133,16 @@ body.travado { overflow: hidden; }
 body.escuro .topo .marca .colorida { display: none; }
 body.escuro .topo .marca .clara { display: block; }
 body.escuro .topo { background: color-mix(in srgb, var(--preto) 72%, transparent); color: var(--off); }
+/* ⚠️ ETAPA 6 (22/09/2026): no feed o botão "← categorias" fica ABAIXO da barra (absoluto), e a
+   pontinha do "g" caía dentro da foto. Prolongo o fundo escuro da barra uns 14px pra baixo — cobre
+   o "g" com ~1mm de folga — SEM mexer na barra nem no alinhamento do topo (ele pediu pra não tocar
+   no que já ficou alinhado). É só um degrau de fundo atrás do botão, nunca à frente do texto. */
+body.escuro .topo::after {
+  content: ''; position: absolute; left: 0; right: 0; top: 100%; height: 14px;
+  background: color-mix(in srgb, var(--preto) 72%, transparent);
+  -webkit-backdrop-filter: saturate(140%) blur(10px); backdrop-filter: saturate(140%) blur(10px);
+  z-index: -1; pointer-events: none;
+}
 /* na abertura o cabeçalho flutua sem fundo: o gradiente é o assunto da tela */
 body.na-abertura .topo { background: transparent; backdrop-filter: none; }
 
