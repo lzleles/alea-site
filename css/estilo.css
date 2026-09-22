@@ -58,7 +58,8 @@
   --tinta:      #2B2118;
   --tinta-fraca:#6B5D50;
   --papel:      #F6F3EE;
-  --preto:      #14100D;   /* preto QUENTE: preto puro brigaria com a paleta de barro */
+  --preto:      #000000;   /* ETAPA 13 (22/09/2026, 18:52): PRETO PURO, pedido dele ("preto forte intenso, igual o laulau"). Era #14100D, o preto quente. */
+  --branco:     #FFFFFF;   /* ETAPA 13: branco puro pro texto das partes escuras (feed e rodapé). O --off segue nas partes claras. */
   --borda:      rgba(146, 68, 41, .16);
 
   --fonte-titulo: 'Defante', 'Hanken Grotesk', system-ui, sans-serif;   /* etapa 10: era 'Outfit' */
@@ -144,7 +145,7 @@ body.travado { overflow: hidden; }
 .topo .marca .clara { display: none; }
 body.escuro .topo .marca .colorida { display: none; }
 body.escuro .topo .marca .clara { display: block; }
-body.escuro .topo { color: var(--off); }
+body.escuro .topo { color: var(--branco); }
 /* ⚠️ ETAPA 6 (22/09/2026): no feed o botão "← categorias" fica ABAIXO da barra (absoluto), e a
    pontinha do "g" caía na foto. Prolonguei o fundo escuro pra baixo pra cobrir o "g".
    ⚠️ ETAPA 7 (22/09/2026): (a) o prolongamento caiu pra METADE (14px → 7px); (b) a faixa nova
@@ -570,7 +571,7 @@ body.sem-abertura .marca-anim .eco-capivara { animation: none !important; transf
 .feed {
   position: fixed; inset: 0; z-index: 50;
   pointer-events: none;
-  background: var(--preto); color: var(--off);
+  background: var(--preto); color: var(--branco);
   overflow: hidden;                      /* fechado, não rola nem aparece */
   opacity: 0; visibility: hidden;
   transition: opacity .5s ease, visibility .5s;
@@ -740,10 +741,10 @@ body.sem-transicao-feed .feed { transition: none !important; }
    isso, quem usa mouse nunca veria a segunda foto. */
 .feed .pontos button {
   width: 8px; height: 8px; padding: 0; border: 0; border-radius: 50%; cursor: pointer;
-  background: rgba(234, 228, 219, .38);
+  background: rgba(255, 255, 255, .38);
   transition: background .25s ease, transform .25s ease;
 }
-.feed .pontos button.on { background: var(--off); transform: scale(1.35); }
+.feed .pontos button.on { background: var(--branco); transform: scale(1.35); }
 .feed .pontos button:focus-visible { outline: 2px solid var(--dourado); outline-offset: 3px; }
 
 /* ⚠️ ETAPA 5 (22/09/2026): o Cassiano pediu pra INVERTER tamanho e peso — sem trocar de lugar.
@@ -752,16 +753,16 @@ body.sem-transicao-feed .feed { transition: none !important; }
 .feed .categoria {
   font-family: var(--fonte-titulo); font-weight: 400;
   font-size: clamp(.82rem, 1.7vw, 1rem); line-height: 1.2;
-  letter-spacing: .14em; text-transform: uppercase; color: rgba(234, 228, 219, .78);
+  letter-spacing: .14em; text-transform: uppercase; color: rgba(255, 255, 255, .9);
 }
 .feed .produto-mini {
   font-family: var(--fonte-titulo); font-weight: 700;
   font-size: clamp(1.15rem, 2.6vw, 1.6rem); line-height: 1.05;
-  letter-spacing: .12em; text-transform: uppercase; color: var(--off);
+  letter-spacing: .12em; text-transform: uppercase; color: var(--branco);
 }
 .feed .valor {
   font-family: var(--fonte-titulo); font-weight: 500;
-  font-size: clamp(1.2rem, 2.8vw, 1.7rem); color: var(--off); white-space: nowrap;
+  font-size: clamp(1.2rem, 2.8vw, 1.7rem); color: var(--branco); white-space: nowrap;
 }
 .feed .ver { display: inline-block; font-size: 12px; line-height: 1.3; letter-spacing: .08em; opacity: .7; color: var(--dourado); text-decoration: none; margin-top: 2px; }
 .feed .ver:hover { opacity: 1; text-decoration: underline; }
@@ -799,8 +800,8 @@ body.sem-transicao-feed .feed { transition: none !important; }
   display: flex; align-items: center; gap: 9px; pointer-events: none;
   white-space: nowrap;                     /* sem isto a seta cai numa linha e o texto noutra */
   font-size: 11.5px; letter-spacing: .12em; text-transform: uppercase;
-  color: rgba(234, 228, 219, .92); text-shadow: 0 2px 10px rgba(0, 0, 0, .8);
-  background: rgba(20, 16, 13, .55); padding: 8px 15px; border-radius: 999px;
+  color: var(--branco); text-shadow: 0 2px 10px rgba(0, 0, 0, .8);
+  background: rgba(0, 0, 0, .55); padding: 8px 15px; border-radius: 999px;
   backdrop-filter: blur(3px);
   transition: opacity .45s ease;
 }
@@ -820,7 +821,7 @@ body.sem-transicao-feed .feed { transition: none !important; }
 .feed .contador {
   position: fixed; left: var(--gutter); bottom: 22px; z-index: 6;
   font-family: var(--fonte-titulo); font-size: 13px; letter-spacing: .1em;
-  color: rgba(234, 228, 219, .55); pointer-events: none;
+  color: rgba(255, 255, 255, .55); pointer-events: none;
 }
 @media (max-width: 560px) { .feed .contador { display: none; } }
 /* a linha que diz o que a categoria é (16/09/2026). Fica logo abaixo do cabeçalho, que
@@ -836,13 +837,13 @@ body.sem-transicao-feed .feed { transition: none !important; }
   margin: 0 auto; max-width: 640px; text-align: center;
   padding: clamp(96px, 15vh, 150px) var(--gutter) clamp(22px, 5vh, 46px);
   font-size: 13px; line-height: 1.5; letter-spacing: .04em;
-  color: rgba(234, 228, 219, .72); pointer-events: none;
+  color: var(--branco); pointer-events: none;
 }
 /* ETAPA 3 (22/09/2026): o TÍTULO da categoria vem antes da descrição, maior e centralizado. */
 .feed .descricao-categoria .titulo-categoria {
   display: block; font-family: var(--fonte-titulo); font-weight: 700;
   font-size: clamp(1.5rem, 7vw, 2.1rem); letter-spacing: .1em; text-transform: uppercase;
-  color: var(--off); margin-bottom: 10px;
+  color: var(--branco); margin-bottom: 10px;
 }
 .feed .descricao-categoria .texto-categoria { display: block; }
 .feed .descricao-categoria[hidden] { display: none; }
@@ -860,17 +861,17 @@ body.sem-transicao-feed .feed { transition: none !important; }
   border-radius: 999px; opacity: .75; transition: opacity .2s ease;
   text-align: left;
 }
-.voltar-categorias:hover, .voltar-categorias:focus-visible { opacity: 1; background: rgba(234, 228, 219, .14); }
+.voltar-categorias:hover, .voltar-categorias:focus-visible { opacity: 1; background: rgba(255, 255, 255, .14); }
 .feed .fechar-feed {
-  background: transparent; border: 0; color: rgba(234, 228, 219, .72);
+  background: transparent; border: 0; color: rgba(255, 255, 255, .9);
   font: inherit; font-size: 13.5px; letter-spacing: .06em; cursor: pointer; padding: 6px 0;
 }
-.feed .fechar-feed:hover { color: var(--off); text-decoration: underline; }
+.feed .fechar-feed:hover { color: var(--branco); text-decoration: underline; }
 
 /* ---- o cartão de fim do feed ------------------------------------------- */
 .feed .fim { display: grid; justify-items: center; gap: 18px; text-align: center; max-width: min(94vw, 560px); }
 .feed .fim img { width: min(64vw, 300px); }
-.feed .fim p { margin: 0; color: rgba(234, 228, 219, .8); }
+.feed .fim p { margin: 0; color: var(--branco); }
 /* ETAPA 4 (22/09/2026): a frase "Onde cada impressão começa com um sonho!" estava quebrando em
    duas linhas. Ele pediu numa linha só, o maior tamanho que couber — como na página inicial. O
    `nowrap` garante a linha única; o tamanho em vw cresce até o limite e nunca estoura a largura. */
@@ -886,7 +887,7 @@ body.sem-transicao-feed .feed { transition: none !important; }
    É o mesmo menu do rodapé; aqui ele só ganha um rótulo e respiro. */
 .feed .fim .ou-veja {
   margin: 6px 0 -6px; font-size: 12.5px; letter-spacing: .1em; text-transform: uppercase;
-  color: rgba(234, 228, 219, .45);
+  color: rgba(255, 255, 255, .45);
 }
 /* ⚠️ NO PRETO, O MENU PRECISA DA COR CLARA. A regra geral pinta `var(--tinta)`, que é
    a tinta escura da abertura — no fundo do feed ela some por completo (medido no primeiro
@@ -894,7 +895,7 @@ body.sem-transicao-feed .feed { transition: none !important; }
 /* ETAPA 5 (22/09/2026): o menu do fim ficava 3+3+1; igualar à página inicial (3+4) é só usar
    a mesma largura do menu base (34ch) em vez do 30ch, que apertava numa fileira a mais. */
 .feed .fim .menu-categorias { justify-content: center; max-width: min(94vw, 360px); }
-.feed .fim .menu-categorias a, .feed .fim .menu-categorias span { color: var(--off); }
+.feed .fim .menu-categorias a, .feed .fim .menu-categorias span { color: var(--branco); }
 .feed .fim .menu-categorias a { opacity: .92; }
 .feed .fim .menu-categorias a:hover, .feed .fim .menu-categorias a:focus-visible {
   background: var(--terracota); color: var(--off); opacity: 1;
@@ -906,7 +907,7 @@ body.sem-transicao-feed .feed { transition: none !important; }
    exatamente a lista que ele mandou em 15/09/2026. */
 .rodape {
   position: relative; z-index: 2;
-  background: var(--preto); color: rgba(234, 228, 219, .74);
+  background: var(--preto); color: var(--branco);
   padding-block: clamp(46px, 8vw, 72px) 30px; font-size: 14.5px;
   text-align: center;
 }
@@ -919,29 +920,29 @@ body.sem-transicao-feed .feed { transition: none !important; }
    qualquer tela, não só no celular. Era clamp(1rem, 2.2vw, 1.3rem). */
 .rodape .frase { font-family: var(--fonte-titulo); font-weight: 300; font-size: min(2.74vw, 11.4px); white-space: nowrap; color: var(--dourado); margin: 0 0 26px; }
 .rodape .orcamento {
-  display: inline-block; margin-bottom: 30px; color: var(--off);
+  display: inline-block; margin-bottom: 30px; color: var(--branco);
   font-size: 15.5px; text-decoration: none; border-bottom: 1.5px solid var(--dourado); padding-bottom: 3px;
 }
 .rodape .orcamento:hover { color: var(--dourado); }
 .rodape .orcamento[aria-disabled='true'] { opacity: .55; cursor: not-allowed; border-bottom-style: dashed; }
-.rodape .menu-categorias { margin: 0 auto 26px; color: rgba(234, 228, 219, .8); }
+.rodape .menu-categorias { margin: 0 auto 26px; color: var(--branco); }
 .rodape .menu-categorias a, .rodape .menu-categorias span { color: inherit; }
 .rodape .menu-categorias a:hover, .rodape .menu-categorias a:focus-visible { background: var(--dourado); color: var(--preto); }
 
 .rodape .redes { display: flex; justify-content: center; gap: 18px; margin-bottom: 26px; }
-.rodape .redes a { color: rgba(234, 228, 219, .72); transition: color .2s ease, transform .2s ease; }
-.rodape .redes a:hover { color: var(--off); transform: translateY(-2px); }
+.rodape .redes a { color: rgba(255, 255, 255, .9); transition: color .2s ease, transform .2s ease; }
+.rodape .redes a:hover { color: var(--branco); transform: translateY(-2px); }
 .rodape .redes svg { width: 22px; height: 22px; display: block; }
 
 .rodape .lei {
-  border-top: 1px solid rgba(234, 228, 219, .14); padding-top: 20px; margin: 0 auto;
+  border-top: 1px solid rgba(255, 255, 255, .14); padding-top: 20px; margin: 0 auto;
   max-width: var(--maxima); font-size: 13px; line-height: 2;
   display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 4px 8px;
 }
 /* "© ALEA 2026" com o LOGO no lugar do nome escrito — ele registrou a marca e pediu
    que o registro apareça, não a palavra solta. */
 .rodape .lei img { height: 17px; width: auto; display: inline-block; vertical-align: -3px; }
-.rodape .lei .creditos { flex-basis: 100%; opacity: .6; font-size: 12px; }
+.rodape .lei .creditos { flex-basis: 100%; opacity: .85; font-size: 12px; } /* ETAPA 13: era .6 (cinza apagado no preto puro) */
 .rodape a { color: inherit; }
 
 /* ================================================== PÁGINAS INTERNAS (produto/texto) */
