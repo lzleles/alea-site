@@ -189,6 +189,10 @@ body.na-abertura .topo { background: transparent; backdrop-filter: none; }
    invisível, pra não piscar no tamanho errado (mesma régua da `.marca-anim`). */
 .topo .marca-3d { display: block; line-height: 0; transform-origin: top left; }
 .topo .marca-3d img { display: block; height: 28px; width: auto; }
+/* ETAPA 14 (22/09/2026, áudio das 19:04): "a página toda no preto e branco, o foco inteirinho nas
+   fotos" — no FEED (body.escuro, só ele liga essa classe) o logo do canal troca pela versão P&B
+   gerada por _preparar_eaibora_pb_v1_2026-09-22.py. Nas páginas claras continua o colorido. */
+body.escuro .topo .marca-3d img { content: url("../img/marca/eaibora3d_logo_pb.webp"); }
 body.home:not(.marca-medida) .topo .marca-3d { visibility: hidden; }
 /* o primeiro quadro: já grande, parada, esperando a vez junto com a capivara */
 body.home.marca-medida:not(.marca-anima) .topo .marca-3d { transform: scale(var(--logo3d-k, 1)); }
@@ -901,6 +905,12 @@ body.sem-transicao-feed .feed { transition: none !important; }
   background: var(--terracota); color: var(--off); opacity: 1;
 }
 .feed .fim .menu-categorias .vazia { opacity: .42; }
+/* ETAPA 14 (22/09/2026, 19:06): o botão "Orçamentos e personalizados" do fim da lista era
+   terracota com letra creme. Pedido dele: "inverta — no lugar do marrom, branco; as letras,
+   preto". Hover: vira contorno branco sobre o preto (continua P&B). */
+.feed .fim .botao { background: var(--branco); color: var(--preto); }
+.feed .fim .botao:hover { background: var(--preto); color: var(--branco); box-shadow: inset 0 0 0 1.5px var(--branco); }
+.feed .fim .botao[aria-disabled='true'], .feed .fim .botao:disabled { background: var(--branco); color: var(--preto); }
 
 /* ================================================================== RODAPÉ
    Repete a marca com a frase embaixo, o mesmo menu de categorias e as redes —
