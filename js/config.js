@@ -120,9 +120,12 @@ window.ALEA = {
      retorno do site ("colocar um quadrado pra clicar com o titulo Nome Colorido +
      R$ 30,00, onde a pessoa precisa clicar pra poder responder a cor do nome").
      Nao e' estimativa nossa. Mudou o preco aqui, muda no anuncio e no que o cliente ve. */
+  /* ETAPA 20 (22/09/2026, 20:36): o título fica em maiúscula como está, SEM a exclamação; a
+     descrição sai em letra normal (CSS .detalhe-extra) e com ponto final. Eram: 'Um detalhe que
+     transforma!' e 'Deixe o nome do seu pet ainda mais especial adicionando cores!'. */
   adicionais: [
-    { id: 'nome_colorido', rotulo: 'Um detalhe que transforma!', preco: 30, libera: 'cor_nome',
-      detalhe: 'Deixe o nome do seu pet ainda mais especial adicionando cores!' }
+    { id: 'nome_colorido', rotulo: 'Um detalhe que transforma', preco: 30, libera: 'cor_nome',
+      detalhe: 'Deixe o nome do seu pet ainda mais especial adicionando cores.' }
   ],
 
   /* O TEXTO JURÍDICO DA PEÇA PERSONALIZADA, palavra por palavra como ele mandou.
