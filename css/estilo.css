@@ -582,7 +582,11 @@ body.sem-transicao-feed .feed { transition: none !important; }
   gap: clamp(8px, 1.2vh, 13px);
   padding: clamp(9px, 1.3vh, 15px) var(--gutter);
 }
-.feed .item:first-child { padding-top: clamp(84px, 12vh, 120px); }
+/* ETAPA 4 (22/09/2026): a intro em fluxo já limpa o topo, então a primeira foto não precisa
+   mais do padding grande — fica só o respiro normal. E entre um produto e o próximo entra um
+   espaço maior (o Cassiano mediu ~3mm e pediu ~1cm): a margem abaixo faz esse vão, proporcional. */
+.feed .item:first-child { padding-top: clamp(8px, 1.5vh, 18px); }
+.feed .palco > .item + .item { margin-top: clamp(26px, 5.5vh, 60px); }
 .feed .item:last-child {
   min-height: 100svh;
   align-content: center;
@@ -778,10 +782,14 @@ body.sem-transicao-feed .feed { transition: none !important; }
    termina em 83 px, e acima da peça, que começa em 130 px no celular pequeno (medido):
    uma linha só cabe, duas não. */
 /* mesma coisa da linha do contador: `fixed` pra não rolar junto com os produtos */
+/* ⚠️ ETAPA 4 (22/09/2026): a intro deixou de ser overlay FIXO e entrou NO FLUXO, acima das
+   fotos (o feed.js a insere antes do palco). Assim a primeira foto desce, o texto ganha uma
+   área limpa e legível, e ao rolar ela sobe e some aos poucos (a opacidade é do feed.js). O
+   padding de cima limpa o cabeçalho fixo; o de baixo é o respiro antes da primeira foto. */
 .feed .descricao-categoria {
-  position: fixed; z-index: 6;
-  top: calc(var(--tarja, 0px) + 84px); left: var(--gutter); right: var(--gutter);
+  position: static; z-index: 6;
   margin: 0 auto; max-width: 640px; text-align: center;
+  padding: clamp(96px, 15vh, 150px) var(--gutter) clamp(22px, 5vh, 46px);
   font-size: 13px; line-height: 1.5; letter-spacing: .04em;
   color: rgba(234, 228, 219, .72); pointer-events: none;
 }
@@ -793,10 +801,10 @@ body.sem-transicao-feed .feed { transition: none !important; }
 }
 .feed .descricao-categoria .texto-categoria { display: block; }
 .feed .descricao-categoria[hidden] { display: none; }
-/* ela se apresenta e sai: fixa o tempo todo, ficaria por cima da legenda de cada produto
-   que passa (5ª rodada). Quem liga o `.rolou` é o feed.js, na primeira rolagem. */
-.feed .descricao-categoria { transition: opacity .35s ease; }
-.feed.rolou .descricao-categoria { opacity: 0; }
+/* ETAPA 4 (22/09/2026): quem some é a opacidade que o feed.js escreve conforme a rolagem
+   (gradual, "aos poucos"). Uma transição curta suaviza cada passo. O antigo `.rolou`
+   (some tudo de uma vez) saiu. */
+.feed .descricao-categoria { transition: opacity .12s linear; }
 /* ⚠️ O BOTÃO DE VOLTAR MUDOU DE LUGAR (15/09/2026, 2ª rodada): "após o clique no menu,
    o menu pra voltar pra categorias ficou em cima da foto". Ele agora mora no CABEÇALHO
    (ver o TOPO no 01_gerar_paginas_v2.py), onde tem espaço próprio e não disputa pixel
@@ -815,9 +823,15 @@ body.sem-transicao-feed .feed { transition: none !important; }
 .feed .fechar-feed:hover { color: var(--off); text-decoration: underline; }
 
 /* ---- o cartão de fim do feed ------------------------------------------- */
-.feed .fim { display: grid; justify-items: center; gap: 18px; text-align: center; max-width: 34ch; }
+.feed .fim { display: grid; justify-items: center; gap: 18px; text-align: center; max-width: min(94vw, 560px); }
 .feed .fim img { width: min(64vw, 300px); }
 .feed .fim p { margin: 0; color: rgba(234, 228, 219, .8); }
+/* ETAPA 4 (22/09/2026): a frase "Onde cada impressão começa com um sonho!" estava quebrando em
+   duas linhas. Ele pediu numa linha só, o maior tamanho que couber — como na página inicial. O
+   `nowrap` garante a linha única; o tamanho em vw cresce até o limite e nunca estoura a largura. */
+.feed .fim p[data-assinatura] {
+  white-space: nowrap; font-size: clamp(0.85rem, 4.15vw, 1.4rem); letter-spacing: .01em;
+}
 /* ⚠️ AS CATEGORIAS NO FIM DA LISTA (5ª rodada, áudio das 17:28): "já coloque ali também
    todas as categorias, que evitam da pessoa ir na página principal para clicar em outra".
    É o mesmo menu do rodapé; aqui ele só ganha um rótulo e respiro. */

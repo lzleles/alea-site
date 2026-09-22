@@ -107,8 +107,12 @@
       el = document.createElement('div');
       el.id = 'descricao-categoria';
       el.className = 'descricao-categoria';
-      feed.appendChild(el);
+      /* ETAPA 4 (22/09/2026): a intro entra NO FLUXO, ACIMA das fotos (antes do palco), pra a
+         primeira foto descer e o texto ficar numa área limpa e legível. Some aos poucos ao rolar
+         (o scroll lá embaixo mexe na opacidade) — não some de uma vez como antes. */
+      feed.insertBefore(el, palco);
     }
+    el.style.opacity = '1';         // categoria nova: a intro reaparece inteira
     el.innerHTML = '';
     var titulo = document.createElement('span');
     titulo.className = 'titulo-categoria';
@@ -214,10 +218,11 @@
     fim.setAttribute('data-i', String(lista.length));
     fim.innerHTML =
       '<div class="fim">' +
-        '<img src="img/marca/alea_logo_claro.svg" alt="ālea">' +
+        /* ETAPA 4 (22/09/2026): o logo do fim virou a marca NOVA (Capivara Página Inicial),
+           e o "ou veja outra categoria" saiu (pedido dele). */
+        '<img src="img/marca/e_co/logo_claro.svg" alt="ālea & Co.">' +
         '<p data-assinatura>Onde cada impressão começa com um sonho!</p>' +
         '<a class="botao zap" data-assunto="orçamento de uma peça personalizada">Orçamentos e personalizados</a>' +
-        '<p class="ou-veja">ou veja outra categoria</p>' +
         '<nav class="menu-categorias" data-menu-categorias aria-label="Categorias"></nav>' +
         /* ⚠️ 8ª RODADA (18/09/2026, áudio das 23:02): "tem um botão lá embaixo que está
            escrito 'voltar para categorias'. Nós vamos só alterar a frase para 'voltar para
@@ -373,6 +378,14 @@
   function ligarSumicoDaDescricao() {
     feed.addEventListener('scroll', function () {
       feed.classList.toggle('rolou', feed.scrollTop > 40);
+      /* ETAPA 4 (22/09/2026): a intro some AOS POUCOS, junto com a rolagem — não de uma vez.
+         A opacidade acompanha o quanto já se rolou dela: em 0 está inteira, e vai a zero
+         quando quase toda a intro já subiu. "Como se estivesse passando de foto por foto." */
+      var intro = document.getElementById('descricao-categoria');
+      if (intro && !intro.hidden) {
+        var faixa = (intro.offsetHeight || 300) * 0.9;
+        intro.style.opacity = String(Math.max(0, Math.min(1, 1 - feed.scrollTop / faixa)));
+      }
       reverQuemEstaNaVez();
     }, { passive: true });
   }
