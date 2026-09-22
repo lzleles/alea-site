@@ -527,8 +527,13 @@ body.sem-abertura .marca-anim .eco-capivara { animation: none !important; transf
   gap: 2px clamp(2px, 1vw, 10px);
   font-family: var(--fonte-titulo); font-weight: 500;
   font-size: clamp(.92rem, 1.9vw, 1.12rem); letter-spacing: .14em;
-  max-width: 34ch;
+  /* ETAPA 11 (22/09/2026): a largura só precisa caber os 4 da SEGUNDA fileira; quem faz o 3+4 é a
+     quebra explícita (a `.quebra-linha`, montada no site.js). Em `ch` mudava com a fonte — em px
+     não. */
+  max-width: min(94vw, 360px);
 }
+/* a quebra que força 3 na 1ª fileira e 4 na 2ª: ocupa a linha inteira, empurrando o resto pra baixo */
+.menu-categorias .quebra-linha { flex-basis: 100%; width: 100%; height: 0; margin: 0; padding: 0; }
 .menu-categorias a, .menu-categorias span {
   position: relative; text-decoration: none; color: var(--tinta);
   padding: 9px 12px; border-radius: 999px; line-height: 1;
@@ -884,7 +889,7 @@ body.sem-transicao-feed .feed { transition: none !important; }
    teste desta rodada: as categorias apareciam como manchas). Aqui ele herda o off. */
 /* ETAPA 5 (22/09/2026): o menu do fim ficava 3+3+1; igualar à página inicial (3+4) é só usar
    a mesma largura do menu base (34ch) em vez do 30ch, que apertava numa fileira a mais. */
-.feed .fim .menu-categorias { justify-content: center; max-width: 34ch; }
+.feed .fim .menu-categorias { justify-content: center; max-width: min(94vw, 360px); }
 .feed .fim .menu-categorias a, .feed .fim .menu-categorias span { color: var(--off); }
 .feed .fim .menu-categorias a { opacity: .92; }
 .feed .fim .menu-categorias a:hover, .feed .fim .menu-categorias a:focus-visible {

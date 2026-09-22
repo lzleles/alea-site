@@ -124,6 +124,7 @@
 
     Array.prototype.forEach.call(caixas, function (caixa) {
       caixa.innerHTML = '';
+      var n = 0;
       cats.forEach(function (cat) {
         var quantos = feed.filter(function (i) { return i.categoria === cat.id; }).length;
         if (!quantos && C.esconder_categorias_vazias) return;
@@ -140,6 +141,17 @@
           el.innerHTML = cat.nome + '<small>em breve</small>';
         }
         caixa.appendChild(el);
+        n++;
+        /* ⚠️ ETAPA 11 (22/09/2026): o Cassiano quer o menu SEMPRE 3 na primeira fileira e 4 na
+           segunda (como na página inicial). A quebra natural do flex dependia da largura das
+           letras — com a fonte nova (Defante) ela virou 3+3+1 / 4+2+1. Uma quebra explícita depois
+           do 3º item (um elemento que ocupa a linha toda) garante o 3+4 em QUALQUER fonte. */
+        if (n === 3) {
+          var quebra = document.createElement('span');
+          quebra.className = 'quebra-linha';
+          quebra.setAttribute('aria-hidden', 'true');
+          caixa.appendChild(quebra);
+        }
       });
     });
   }
