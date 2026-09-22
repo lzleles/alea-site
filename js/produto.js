@@ -384,10 +384,15 @@
         alvo = caixaCores.querySelector('input[name="cores_peca"]');
       }
       if (alvo && alvo.focus) { try { alvo.focus({ preventScroll: true }); } catch (e) { alvo.focus(); } }
-      var r = primeira.el.getBoundingClientRect();
-      if (r.top < 70 || r.bottom > window.innerHeight) {
-        primeira.el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }
+      /* ⚠️ ETAPA 25 (22/09/2026, 20:53, com vídeo): centralizar NÃO basta no celular — o teclado
+         sobe, e a barrinha de "completar automaticamente" do iPhone fica POR CIMA do campo. Ele pediu
+         o alinhamento que ele mesmo fez no vídeo: a falta logo ABAIXO do cabeçalho, sobrando a tela
+         de baixo pro teclado e pra barrinha. E SEMPRE, a cada clique — não só quando está fora da
+         tela. O cabeçalho é medido na hora (a altura muda com a tarja e com o tamanho da tela). */
+      var topo = document.querySelector('.topo');
+      var folga = (topo ? Math.max(0, topo.getBoundingClientRect().bottom) : 0) + 18;
+      var y = window.scrollY + primeira.el.getBoundingClientRect().top - folga;
+      window.scrollTo({ top: Math.max(0, y), behavior: 'smooth' });
     }
   }
 
