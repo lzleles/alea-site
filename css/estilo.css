@@ -142,13 +142,15 @@ body.escuro .topo { color: var(--off); }
    mesmo borrão — aninhados do mesmo jeito, então rendem idêntico. O elemento .topo fica sem fundo
    e sem filtro (passou tudo pros pseudos). */
 body.escuro .topo { background: transparent; -webkit-backdrop-filter: none; backdrop-filter: none; }
-/* ⚠️ ETAPA 8 (22/09/2026): a faixa de baixo borrava MENOS que a barra — porque um degrau
-   separado de 7px é fino demais pra o `blur(10px)` se desenvolver (borrão precisa de área). A
-   cura: UMA camada só, que cobre a barra E os 7px de baixo (bottom:-7px), com um único borrão
-   uniforme. Assim o de baixo fica com o mesmo embaçamento do de cima, tudo no mesmo tom. */
+/* ⚠️ ETAPA 9 (22/09/2026): o tom "diferente" perto do "categorias" NÃO era o borrão — era a
+   TRANSLUCIDEZ. A 72% a barra deixa a foto vazar, e onde a foto é clara (o vermelho) a própria
+   barra clareia; o pedaço sobre o vermelho ficava mais claro que o pedaço sobre a foto escura.
+   Blur não conserta isso. A cura é OPACIDADE: a 92% a foto quase não vaza, então a barra fica no
+   MESMO tom em toda a largura, não importa o que passe atrás. Uma camada só, borrão uniforme, e
+   o degrau abaixo do "categorias" mais justo (bottom:-4px) — some a "banda clara" e o espaço a mais. */
 body.escuro .topo::before {
   content: ''; position: absolute; left: 0; right: 0; top: 0; bottom: -7px;
-  background: color-mix(in srgb, var(--preto) 72%, transparent);
+  background: color-mix(in srgb, var(--preto) 92%, transparent);
   -webkit-backdrop-filter: saturate(140%) blur(10px); backdrop-filter: saturate(140%) blur(10px);
   z-index: -1; pointer-events: none;
 }
