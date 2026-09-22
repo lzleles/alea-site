@@ -585,12 +585,44 @@
      nunca é engolida por engano. */
   function gavetaNaFrente() { return !!document.querySelector('.gaveta.aberta'); }
 
-  var x0 = null, y0 = null, jaFoi = false;
+  /* ⚠️ ETAPA 16 (22/09/2026, áudios das 19:25): "melhorou, mas tem hora que dá certo, tem hora
+     que não". A régua da etapa 15 (mais foto visível) é uma ADIVINHAÇÃO de qual peça ele quer —
+     entre duas peças meio visíveis, ela chuta. A regra dele elimina o chute:
+       · tocou numa peça → a tela rola até a FOTO dela ficar no CENTRO, e ela vira a peça EM FOCO;
+       · arrastar pro lado troca a foto da peça onde o DEDO COMEÇOU o gesto; fora de qualquer peça,
+         a que está em foco (se ainda aparece), e só na falta das duas a de mais evidência.
+     E o toque NÃO pula mais pro próximo produto ("ele desregula e vai pra qualquer lugar"). */
+  var emFoco = null;
+
+  /* ⚠️ A posição sai da CADEIA de offsetTop até o feed, não do getBoundingClientRect: a peça
+     que acabou de entrar ainda está na animação de revelação (translateY de ~103 px, ver o CSS),
+     e a caixa da tela mente essa distância — medido no teste, a foto parava 103 px acima do centro. */
+  function posNoFeed(el) {
+    var y = 0;
+    while (el && el !== feed) { y += el.offsetTop; el = el.offsetParent; }
+    return y;
+  }
+
+  function centralizarPeca(item) {
+    var alvo = item.querySelector('.area-objeto') || item;
+    var topo = posNoFeed(alvo) + alvo.offsetHeight / 2 - feed.clientHeight / 2;
+    feed.scrollTo({ top: Math.max(0, topo), behavior: querMenosMovimento ? 'auto' : 'smooth' });
+  }
+
+  function aindaNaTela(item) {
+    if (!item) return false;
+    var fr = feed.getBoundingClientRect(), r = item.getBoundingClientRect();
+    return r.bottom > fr.top && r.top < fr.bottom;
+  }
+
+  var x0 = null, y0 = null, jaFoi = false, pecaDoDedo = null;
   palco.addEventListener('touchstart', function (e) {
     if (!aberto || gavetaNaFrente()) return;
     x0 = e.touches[0].clientX;
     y0 = e.touches[0].clientY;
     jaFoi = false;
+    var it = e.target.closest && e.target.closest('#palco > .item');
+    pecaDoDedo = (it && fotosDo(it).length) ? it : null;
   }, { passive: true });
 
   palco.addEventListener('touchmove', function (e) {
@@ -600,8 +632,8 @@
     /* só a horizontal é nossa, e só quando ela domina com folga: arrasto torto é rolagem */
     if (Math.abs(dx) < 34 || Math.abs(dx) < Math.abs(dy) * 1.3) return;
     jaFoi = true;
-    reverQuemEstaNaVez();            // ETAPA 15: mede NA HORA do gesto quem está em evidência
-    var item = itens[indice];
+    var item = pecaDoDedo || (aindaNaTela(emFoco) ? emFoco : null);
+    if (!item) { reverQuemEstaNaVez(); item = itens[indice]; }   // ETAPA 15: o último recurso
     var fotos = fotosDo(item);
     var atual = fotos.findIndex(function (f) { return f.classList.contains('ativa'); });
     pedirFoto(item, (dx > 0 ? atual + 1 : atual - 1), dx > 0 ? 1 : -1);
@@ -639,9 +671,14 @@
       pedirFoto(item, n, n > atual ? 1 : -1);
       return;
     }
-    /* "um toque, próximo produto" (14/09). Link e botão seguem o seu caminho. */
+    /* ETAPA 16: saiu o "um toque, próximo produto" (14/09) — pulava a tela quando ele só queria
+       olhar a foto. Agora o toque CENTRALIZA a peça tocada e a põe em foco. Link e botão seguem
+       o seu caminho; toque no vão entre peças não faz nada. */
     if (e.target.closest('a, button')) return;
-    passo(1);
+    var peca = e.target.closest('#palco > .item');
+    if (!peca || !fotosDo(peca).length) return;
+    emFoco = peca;
+    centralizarPeca(peca);
   });
 
   document.dispatchEvent(new CustomEvent('alea:feed-pronto'));
