@@ -692,7 +692,8 @@ body.sem-transicao-feed .feed { transition: none !important; }
 /* ⚠️ 7ª rodada: a legenda encolheu pra caber no vão do laulau (95 px medidos). Ela tem TRÊS
    linhas (categoria, produto, ver produto) contra as DUAS do laulau (nome e preço) — era daí
    que vinham os 46 px a mais entre um produto e o outro. Encolheu o respiro, não o texto. */
-.feed .legenda .lado-esquerdo { display: grid; gap: 0; }
+/* ETAPA 5 (22/09/2026): +~1mm de respiro entre as linhas da legenda (era colado, gap 0). */
+.feed .legenda .lado-esquerdo { display: grid; gap: 4px; }
 /* as bolinhas são o ÚNICO controle de foto que sobrou (as setas saíram por pedido
    dele). No computador não existe arrastar, então elas precisam ser clicáveis — sem
    isso, quem usa mouse nunca veria a segunda foto. */
@@ -704,15 +705,18 @@ body.sem-transicao-feed .feed { transition: none !important; }
 .feed .pontos button.on { background: var(--off); transform: scale(1.35); }
 .feed .pontos button:focus-visible { outline: 2px solid var(--dourado); outline-offset: 3px; }
 
+/* ⚠️ ETAPA 5 (22/09/2026): o Cassiano pediu pra INVERTER tamanho e peso — sem trocar de lugar.
+   Antes a CATEGORIA (PET) era a maior e em negrito e o PRODUTO (ĀLEA BOWL WAVE) o menor. Agora é
+   o contrário: o PRODUTO manda (maior, negrito, claro) e a categoria vira o rótulo pequeno. */
 .feed .categoria {
-  font-family: var(--fonte-titulo); font-weight: 700;
-  font-size: clamp(1.15rem, 2.6vw, 1.6rem); line-height: 1.05;
-  letter-spacing: .12em; text-transform: uppercase; color: var(--off);
-}
-.feed .produto-mini {
   font-family: var(--fonte-titulo); font-weight: 400;
   font-size: clamp(.82rem, 1.7vw, 1rem); line-height: 1.2;
   letter-spacing: .14em; text-transform: uppercase; color: rgba(234, 228, 219, .78);
+}
+.feed .produto-mini {
+  font-family: var(--fonte-titulo); font-weight: 700;
+  font-size: clamp(1.15rem, 2.6vw, 1.6rem); line-height: 1.05;
+  letter-spacing: .12em; text-transform: uppercase; color: var(--off);
 }
 .feed .valor {
   font-family: var(--fonte-titulo); font-weight: 500;
@@ -735,8 +739,8 @@ body.sem-transicao-feed .feed { transition: none !important; }
    telas mudaria o que ele já viu e aprovou no aparelho dele. */
 @media (max-width: 360px) {
   .feed .item { padding: 8px var(--gutter); gap: 7px; }
-  .feed .categoria { font-size: 1.02rem; }
-  .feed .produto-mini { font-size: .76rem; }
+  .feed .categoria { font-size: .76rem; }
+  .feed .produto-mini { font-size: 1.02rem; }
   .feed .valor { font-size: 1.05rem; }
   .feed .ver { font-size: 11px; }
 }
@@ -842,7 +846,9 @@ body.sem-transicao-feed .feed { transition: none !important; }
 /* ⚠️ NO PRETO, O MENU PRECISA DA COR CLARA. A regra geral pinta `var(--tinta)`, que é
    a tinta escura da abertura — no fundo do feed ela some por completo (medido no primeiro
    teste desta rodada: as categorias apareciam como manchas). Aqui ele herda o off. */
-.feed .fim .menu-categorias { justify-content: center; max-width: 30ch; }
+/* ETAPA 5 (22/09/2026): o menu do fim ficava 3+3+1; igualar à página inicial (3+4) é só usar
+   a mesma largura do menu base (34ch) em vez do 30ch, que apertava numa fileira a mais. */
+.feed .fim .menu-categorias { justify-content: center; max-width: 34ch; }
 .feed .fim .menu-categorias a, .feed .fim .menu-categorias span { color: var(--off); }
 .feed .fim .menu-categorias a { opacity: .92; }
 .feed .fim .menu-categorias a:hover, .feed .fim .menu-categorias a:focus-visible {
