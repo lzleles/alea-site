@@ -142,15 +142,16 @@ body.escuro .topo { color: var(--off); }
    mesmo borrão — aninhados do mesmo jeito, então rendem idêntico. O elemento .topo fica sem fundo
    e sem filtro (passou tudo pros pseudos). */
 body.escuro .topo { background: transparent; -webkit-backdrop-filter: none; backdrop-filter: none; }
-body.escuro .topo::before,
-body.escuro .topo::after {
-  content: ''; position: absolute; left: 0; right: 0;
+/* ⚠️ ETAPA 8 (22/09/2026): a faixa de baixo borrava MENOS que a barra — porque um degrau
+   separado de 7px é fino demais pra o `blur(10px)` se desenvolver (borrão precisa de área). A
+   cura: UMA camada só, que cobre a barra E os 7px de baixo (bottom:-7px), com um único borrão
+   uniforme. Assim o de baixo fica com o mesmo embaçamento do de cima, tudo no mesmo tom. */
+body.escuro .topo::before {
+  content: ''; position: absolute; left: 0; right: 0; top: 0; bottom: -7px;
   background: color-mix(in srgb, var(--preto) 72%, transparent);
   -webkit-backdrop-filter: saturate(140%) blur(10px); backdrop-filter: saturate(140%) blur(10px);
   z-index: -1; pointer-events: none;
 }
-body.escuro .topo::before { top: 0; bottom: 0; }        /* a barra */
-body.escuro .topo::after  { top: 100%; height: 7px; }   /* o degrau atrás do "categorias" (metade do de antes) */
 /* na abertura o cabeçalho flutua sem fundo: o gradiente é o assunto da tela */
 body.na-abertura .topo { background: transparent; backdrop-filter: none; }
 
