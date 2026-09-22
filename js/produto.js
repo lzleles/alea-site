@@ -319,26 +319,31 @@
   function oQueFalta() {
     var faltas = [];
     var nome = document.querySelector('[data-personalizar] [name="nome_pet"]');
-    if (nome && !nome.value.trim()) faltas.push({ el: nome.closest('label') || nome, texto: 'nome do pet' });
+    if (nome && !nome.value.trim()) faltas.push({ el: nome.closest('label') || nome, texto: 'Por favor, digite o nome do pet.' });
     var corNome = document.querySelector('[data-personalizar] [name="cor_nome"]');
     if (corNome && !corNome.disabled && !corNome.value.trim()) {
-      faltas.push({ el: corNome.closest('label') || corNome, texto: 'cor do nome' });
+      faltas.push({ el: corNome.closest('label') || corNome, texto: 'Por favor, digite a cor do nome.' });
     }
     if (caixaCores) {
       var r = caixaCores.querySelector('input[name="cores_peca"]:checked');
       if (!r) {
-        faltas.push({ el: caixaCores.querySelector('.rotulo-grupo') || caixaCores, texto: 'cores da peça' });
+        /* ETAPA 24: treme e muda de cor o rótulo E cada opção (tricolor, bicolor, monocromático,
+           degradê) — "e todos os nomes que tiverem ali" */
+        faltas.push({ el: caixaCores.querySelector('.rotulo-grupo') || caixaCores, texto: 'Por favor, selecione a cor da peça.' });
+        Array.prototype.forEach.call(caixaCores.querySelectorAll('.cores-opcoes label'), function (l) {
+          faltas.push({ el: l, texto: null });
+        });
       } else {
         var vazios = Array.prototype.filter.call(
           camposCores ? camposCores.querySelectorAll('input') : [], function (i) { return !i.value.trim(); });
         vazios.forEach(function (i) {
           var n = (i.getAttribute('name') || '').replace('cor_', '');
-          faltas.push({ el: i.closest('.campo-cor') || i, texto: 'cor ' + n });
+          faltas.push({ el: i.closest('.campo-cor') || i, texto: 'Por favor, digite a cor ' + n + ' da peça.' });
         });
       }
     }
     if (!caixaAceite || !caixaAceite.checked) {
-      faltas.push({ el: document.querySelector('[data-aceite]'), texto: 'declaração' });
+      faltas.push({ el: document.querySelector('[data-aceite]'), texto: 'Por favor, marque a declaração.' });
     }
     return faltas;
   }
@@ -346,14 +351,18 @@
   function reclamarDoQueFalta(faltas) {
     Array.prototype.forEach.call(document.querySelectorAll('.faltou'), function (x) { x.classList.remove('faltou'); });
     faltas.forEach(function (f) { if (f.el) f.el.classList.add('faltou'); });
+    /* ETAPA 23 (22/09/2026, 20:44): "quero que trema TUDO o que está faltando na tela", não só os
+       botões. Cada falta treme junto (mesma animação), reiniciada a cada clique. */
+    Array.prototype.forEach.call(document.querySelectorAll('.treme-falta'), function (x) { x.classList.remove('treme-falta'); });
+    faltas.forEach(function (f) { if (f.el) { void f.el.offsetWidth; f.el.classList.add('treme-falta'); } });
     var recado = document.querySelector('[data-recado-aceite]');
     if (recado) {
       var itens = faltas.map(function (f) { return f.texto; }).filter(Boolean);
-      /* "Complete antes de continuar: nome do pet, cor 2 e declaração." — sem concordância a
-         errar ("falta as cores"), qualquer que seja a mistura de faltas */
-      recado.textContent = 'Complete antes de continuar: ' + (itens.length > 1
-        ? itens.slice(0, -1).join(', ') + ' e ' + itens[itens.length - 1]
-        : itens[0]) + '.';
+      /* ETAPA 24 (22/09/2026, 20:45): a frase é SÓ a da PRIMEIRA falta, de cima pra baixo ("será
+         sempre o primeiro item que está faltando") — a lista `faltas` já nasce na ordem da página.
+         As outras faltas não somem: continuam com a cor e tremendo. Era "Complete antes de
+         continuar: nome do pet, cores da peça e declaração." */
+      recado.textContent = itens[0];
       recado.hidden = false;
     }
     var botoes = document.querySelector('[data-botoes]');
@@ -364,6 +373,17 @@
     }
     var primeira = faltas.filter(function (f) { return f.el; })[0];
     if (primeira && primeira.el.scrollIntoView) {
+      /* ETAPA 22 (22/09/2026, 20:43): "a tela subiu pro nome do pet, mas o cursor não foi pra
+         janela — coloque o cursor direto nela". O foco vai pro CAMPO da primeira falta (no
+         celular isso já abre o teclado). Tem que ser AQUI, dentro do clique: o iPhone só aceita
+         foco programático durante o gesto. `preventScroll` pra o foco não dar um pulo seco por
+         cima da rolagem suave, que é quem centraliza. */
+      var alvo = primeira.el.matches && primeira.el.matches('input') ? primeira.el
+               : primeira.el.querySelector ? primeira.el.querySelector('input') : null;
+      if (!alvo && caixaCores && primeira.el.classList.contains('rotulo-grupo')) {
+        alvo = caixaCores.querySelector('input[name="cores_peca"]');
+      }
+      if (alvo && alvo.focus) { try { alvo.focus({ preventScroll: true }); } catch (e) { alvo.focus(); } }
       var r = primeira.el.getBoundingClientRect();
       if (r.top < 70 || r.bottom > window.innerHeight) {
         primeira.el.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -378,8 +398,8 @@
   });
   document.addEventListener('change', function (ev) {
     if (ev.target.name === 'cores_peca' && caixaCores) {
-      var g = caixaCores.querySelector('.rotulo-grupo');
-      if (g) g.classList.remove('faltou');
+      Array.prototype.forEach.call(caixaCores.querySelectorAll('.rotulo-grupo, .cores-opcoes label'),
+        function (x) { x.classList.remove('faltou'); });
     }
   });
 

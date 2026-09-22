@@ -1080,7 +1080,7 @@ body.sem-transicao-feed .feed { transition: none !important; }
    o nome do pet, a cor do nome (com o adicional marcado), a escolha das cores e cada cor a digitar.
    O rótulo vira terracota e a caixa ganha a borda terracota. */
 .personalizar label.faltou, .cores-peca > .rotulo-grupo.faltou { color: var(--terracota); }
-.personalizar label.faltou input,
+.personalizar label.faltou input[type="text"],
 .cores-campos .campo-cor.faltou input { border-color: var(--terracota); box-shadow: 0 0 0 1px var(--terracota); }
 .cores-campos .campo-cor.faltou .numero { background: var(--terracota); color: var(--off); }
 
@@ -1234,3 +1234,13 @@ body.sem-transicao-feed .feed { transition: none !important; }
 /* ETAPA 20 (22/09/2026): a DESCRIÇÃO do adicional sai em letra normal (o título continua em
    maiúscula, como ele quis). O `.personalizar label` (0,1,1) deixava tudo em caixa alta. */
 .personalizar label.extra .detalhe-extra { text-transform: none; letter-spacing: 0; }
+
+/* ETAPA 23 (22/09/2026): o que falta treme junto com os botões (a mesma animação `tremer`). */
+.treme-falta { animation: tremer .45s ease-in-out 1; }
+@media (prefers-reduced-motion: reduce) { .treme-falta { animation: none; } }
+
+/* ETAPA 24: sem cor escolhida, cada opção (tricolor, bicolor…) também muda de cor */
+.cores-opcoes label.faltou { color: var(--terracota); font-weight: 600; }
+
+/* ETAPA 24: a frase da falta (acima do Comprar agora) na MESMA cor das faltas. Ela saía cinza: o`n   `.produto-topo p` (0,1,1) vencia o vermelho do `.recado-aceite` (0,1,0) — medido no print. */
+.produto-topo p.recado-aceite { color: var(--terracota); font-weight: 600; }
