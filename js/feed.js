@@ -361,7 +361,17 @@
   function irParaItem(n, suave) {
     if (!itens.length) return;
     n = Math.max(0, Math.min(n, itens.length - 1));
-    feed.scrollTo({ top: itens[n].offsetTop, behavior: (suave && !querMenosMovimento) ? 'smooth' : 'auto' });
+    feed.scrollTo({ top: topoNoFeed(itens[n]), behavior: (suave && !querMenosMovimento) ? 'smooth' : 'auto' });
+  }
+
+  /* ⚠️ ETAPA 15 (22/09/2026, áudio das 19:16): `offsetTop` MENTIA desde a etapa 4. O `.palco` é
+     `position: relative`, então o `offsetTop` de cada item conta a partir do PALCO — mas desde a
+     etapa 4 a intro da categoria (título + texto) mora ACIMA do palco, dentro do feed. Toda conta
+     de posição ficava deslocada pela altura da intro (~350 px no celular): o "item na vez" era o
+     de BAIXO, e arrastar o dedo em cima da Cláudia trocava a foto do produto seguinte. A régua
+     agora é a caixa real na tela (getBoundingClientRect), que não depende de quem é o pai. */
+  function topoNoFeed(el) {
+    return feed.scrollTop + el.getBoundingClientRect().top - feed.getBoundingClientRect().top;
   }
 
   function passo(dir) {
@@ -428,15 +438,25 @@
      piscando entre eles conforme a ordem em que o navegador avisa.
 
      A régua que não depende do tamanho do item: **está na vez quem tem o centro mais perto do
-     centro da tela**. Uma conta só, no evento de rolagem, sem observador nenhum. */
+     centro da tela**. Uma conta só, no evento de rolagem, sem observador nenhum.
+
+     ⚠️ ETAPA 15 (22/09/2026): a régua virou a DELE — "tem que mudar a foto que estiver em maior
+     evidência na tela". Está na vez quem tem MAIS FOTO VISÍVEL (altura da `.area-objeto` dentro
+     da janela do feed), medida na caixa real da tela. Empate (duas fotos inteiras) → a mais perto
+     do centro. O cartão de fim, que não tem foto, é medido pela caixa dele. */
   function quemEstaNaVez() {
     if (!itens.length) return 0;
-    var meio = feed.scrollTop + feed.clientHeight / 2;
-    var melhor = 0, menor = Infinity;
+    var fr = feed.getBoundingClientRect();
+    var meio = fr.top + fr.height / 2;
+    var melhor = 0, maisVisivel = -1, menor = Infinity;
     for (var i = 0; i < itens.length; i++) {
-      var it = itens[i];
-      var d = Math.abs((it.offsetTop + it.offsetHeight / 2) - meio);
-      if (d < menor) { menor = d; melhor = i; }
+      var alvo = itens[i].querySelector('.area-objeto') || itens[i].querySelector('.fim') || itens[i];
+      var r = alvo.getBoundingClientRect();
+      var visivel = Math.max(0, Math.min(r.bottom, fr.bottom) - Math.max(r.top, fr.top));
+      var d = Math.abs((r.top + r.height / 2) - meio);
+      if (visivel > maisVisivel + 1 || (Math.abs(visivel - maisVisivel) <= 1 && d < menor)) {
+        maisVisivel = visivel; menor = d; melhor = i;
+      }
     }
     return melhor;
   }
@@ -580,6 +600,7 @@
     /* só a horizontal é nossa, e só quando ela domina com folga: arrasto torto é rolagem */
     if (Math.abs(dx) < 34 || Math.abs(dx) < Math.abs(dy) * 1.3) return;
     jaFoi = true;
+    reverQuemEstaNaVez();            // ETAPA 15: mede NA HORA do gesto quem está em evidência
     var item = itens[indice];
     var fotos = fotosDo(item);
     var atual = fotos.findIndex(function (f) { return f.classList.contains('ativa'); });
@@ -612,7 +633,7 @@
     var bolinha = e.target.closest('[data-foto]');
     if (bolinha) {
       var n = parseInt(bolinha.getAttribute('data-foto'), 10);
-      var item = itens[indice];
+      var item = bolinha.closest('.item') || itens[indice];   // ETAPA 15: a bolinha é DA peça dela
       var fotos = fotosDo(item);
       var atual = fotos.findIndex(function (f) { return f.classList.contains('ativa'); });
       pedirFoto(item, n, n > atual ? 1 : -1);
