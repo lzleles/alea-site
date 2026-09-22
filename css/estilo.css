@@ -120,7 +120,13 @@ body.travado { overflow: hidden; }
 }
 /* a marca e o "← categorias" empilhados: ele pediu o botão EMBAIXO do logo, não ao
    lado (3ª rodada). O canto esquerdo vira uma coluna; o resto do cabeçalho não muda. */
-.topo .canto-marca { display: grid; justify-items: start; gap: 2px; }
+.topo .canto-marca { position: relative; display: grid; justify-items: start; gap: 2px; }
+/* ⚠️ ETAPA 3 (22/09/2026): no feed o botão "← categorias" aparecia DENTRO da coluna e, como
+   o `.topo` centraliza tudo na vertical (`align-items:center`), a coluna de 2 linhas empurrava
+   a CAPIVARA pra cima — ela ficava desalinhada do logo do canal, da conta e da sacola. O
+   Cassiano pediu os quatro na mesma linha, igual na página inicial. Tirando o botão do fluxo
+   (absoluto, logo abaixo da marca), a coluna volta a ter só a marca e alinha com o resto. */
+.topo .voltar-categorias { position: absolute; top: 100%; left: 0; margin-top: 1px; white-space: nowrap; }
 .topo .marca img { height: 28px; width: auto; }
 /* no escuro o logo colorido dá lugar à versão clara — troca por CSS, sem JS */
 .topo .marca .clara { display: none; }
@@ -774,11 +780,18 @@ body.sem-transicao-feed .feed { transition: none !important; }
 /* mesma coisa da linha do contador: `fixed` pra não rolar junto com os produtos */
 .feed .descricao-categoria {
   position: fixed; z-index: 6;
-  top: calc(var(--tarja, 0px) + 90px); left: var(--gutter); right: var(--gutter);
-  margin: 0; text-align: center;
-  font-size: 13px; line-height: 1.35; letter-spacing: .04em;
+  top: calc(var(--tarja, 0px) + 84px); left: var(--gutter); right: var(--gutter);
+  margin: 0 auto; max-width: 640px; text-align: center;
+  font-size: 13px; line-height: 1.5; letter-spacing: .04em;
   color: rgba(234, 228, 219, .72); pointer-events: none;
 }
+/* ETAPA 3 (22/09/2026): o TÍTULO da categoria vem antes da descrição, maior e centralizado. */
+.feed .descricao-categoria .titulo-categoria {
+  display: block; font-family: var(--fonte-titulo); font-weight: 700;
+  font-size: clamp(1.5rem, 7vw, 2.1rem); letter-spacing: .1em; text-transform: uppercase;
+  color: var(--off); margin-bottom: 10px;
+}
+.feed .descricao-categoria .texto-categoria { display: block; }
 .feed .descricao-categoria[hidden] { display: none; }
 /* ela se apresenta e sai: fixa o tempo todo, ficaria por cima da legenda de cada produto
    que passa (5ª rodada). Quem liga o `.rolou` é o feed.js, na primeira rolagem. */

@@ -96,18 +96,31 @@
   /* A linha que explica a categoria, no topo do feed (pedido de 16/09/2026). Nasce aqui e
      não no index.html porque o feed inteiro é desenhado por este arquivo. Categoria sem
      descrição não ganha linha vazia: o elemento some. */
+  /* ⚠️ ETAPA 3 (22/09/2026): antes das fotos vem o TÍTULO da categoria (o nome, maior) e,
+     embaixo, a descrição — centralizados (pedido do Cassiano). O título aparece sempre que há
+     categoria; a descrição some quando está vazia, sem deixar linha vazia. */
   function pintarDescricao(id) {
     var c = (window.CATEGORIAS || []).filter(function (x) { return x.id === id; })[0];
     var texto = c && c.descricao ? c.descricao : '';
     var el = document.getElementById('descricao-categoria');
     if (!el) {
-      el = document.createElement('p');
+      el = document.createElement('div');
       el.id = 'descricao-categoria';
       el.className = 'descricao-categoria';
       feed.appendChild(el);
     }
-    el.textContent = texto;
-    el.hidden = !texto;
+    el.innerHTML = '';
+    var titulo = document.createElement('span');
+    titulo.className = 'titulo-categoria';
+    titulo.textContent = nomeDaCategoria(id);
+    el.appendChild(titulo);
+    if (texto) {
+      var p = document.createElement('span');
+      p.className = 'texto-categoria';
+      p.textContent = texto;
+      el.appendChild(p);
+    }
+    el.hidden = !id;
   }
 
   /* ======================================================================= desenho */
