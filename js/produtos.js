@@ -1,3 +1,12 @@
+/* CATALOGO:
+   nome: produtos
+   categoria: UTIL
+   objetivo: Define categorias, itens do feed e fichas de produto e valida referências e materiais do catálogo.
+   entrada: Dados comerciais editados diretamente no arquivo
+   saida: Objetos globais de categorias, vitrine e produtos, além de alertas no console
+   status: ativo (cabecalho proposto pelo Codex em 2026-09-20, confianca ALTA; conferir na proxima vez que o script rodar)
+   validado_em: TBD
+*/
 /* =============================================================================
    produtos.js — O CATÁLOGO. É o único arquivo que muda no dia a dia.
    =============================================================================

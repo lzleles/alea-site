@@ -1,3 +1,12 @@
+/* CATALOGO:
+   nome: distorcao
+   categoria: UTIL
+   objetivo: Aplica transições WebGL entre fotos do produto, com degradação segura para CSS quando o efeito não está disponível.
+   entrada: Imagens do DOM, mapa de deslocamento e comandos de troca de foto
+   saida: Canvas WebGL, animações de transição e eventos de foto
+   status: ativo (cabecalho proposto pelo Codex em 2026-09-20, confianca ALTA; conferir na proxima vez que o script rodar)
+   validado_em: TBD
+*/
 /* =============================================================================
    distorcao.js — a troca de foto com distorção, dentro de um produto
    =============================================================================

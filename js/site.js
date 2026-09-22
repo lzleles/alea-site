@@ -1,3 +1,12 @@
+/* CATALOGO:
+   nome: site
+   categoria: UTIL
+   objetivo: Inicializa recursos comuns do site, incluindo compras, contatos, categorias, redes e gavetas de conta e carrinho.
+   entrada: Configuração global, catálogos e DOM de cada página
+   saida: Links, menus, redes, campos preenchidos e gavetas interativas
+   status: ativo (cabecalho proposto pelo Codex em 2026-09-20, confianca ALTA; conferir na proxima vez que o script rodar)
+   validado_em: TBD
+*/
 /* =============================================================================
    site.js — o que vale em TODA página (abertura, feed, produto, textos)
    =============================================================================

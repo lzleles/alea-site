@@ -1,3 +1,12 @@
+/* CATALOGO:
+   nome: produto
+   categoria: UTIL
+   objetivo: Controla galeria, tela cheia, personalização, preço, aceite e inclusão de produtos no carrinho.
+   entrada: DOM da página, configuração comercial e dados do produto
+   saida: Galeria interativa, item personalizado e comandos para o carrinho
+   status: ativo (cabecalho proposto pelo Codex em 2026-09-20, confianca ALTA; conferir na proxima vez que o script rodar)
+   validado_em: TBD
+*/
 /* =============================================================================
    produto.js — o que só a página de produto faz
    =============================================================================

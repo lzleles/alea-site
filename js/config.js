@@ -1,3 +1,12 @@
+/* CATALOGO:
+   nome: config
+   categoria: UTIL
+   objetivo: Centraliza contatos, medição, redes, regras comerciais e opções de personalização usadas pelo site.
+   entrada: Valores editados diretamente no arquivo
+   saida: Objeto global window.ALEA
+   status: ativo (cabecalho proposto pelo Codex em 2026-09-20, confianca ALTA; conferir na proxima vez que o script rodar)
+   validado_em: TBD
+*/
 /* =============================================================================
    config.js — os valores que mudam. Mexe aqui, não no resto do site.
    =============================================================================

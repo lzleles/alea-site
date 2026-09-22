@@ -306,8 +306,12 @@ body.tem-clareira .abertura::before {
    tamanho errado. */
 .marca-anim {
   position: relative;
-  width: min(92vw, 900px); aspect-ratio: 3448.89 / 748.01;
-  --cap-x: 19%; --cap-y: 53%;
+  /* REBRAND 22/09/2026: a caixa cresceu pra baixo pra caber o "& Co." (viewBox
+     0 0 3462.47 970.75). A capivara continua no MESMO lugar em unidade de logo — só a
+     moldura aumentou. `--cap-x/--cap-y` são o centro dela na caixa NOVA (medidos: x 0..1236,
+     y 2..748 num viewBox 3462,47 × 970,75), e é a origem de tudo que cresce e encolhe. */
+  width: min(92vw, 900px); aspect-ratio: 3462.47 / 970.75;
+  --cap-x: 17.85%; --cap-y: 38.64%;
   visibility: hidden;                    /* liberada pelo JS, ver acima */
 }
 .marca-anim img { position: absolute; inset: 0; width: 100%; height: 100%; }
@@ -346,15 +350,61 @@ body.marca-anima .marca-anim .letra {
   transform-origin: var(--cap-x) var(--cap-y);
   animation: letra-sai-da-capivara 1s cubic-bezier(.22, .78, .3, 1) both;
 }
-/* as letras entram depois que a capivara assentou: 1,4s de pausa + 3,6s de trajeto */
-body.marca-anima .marca-anim .l1 { animation-delay: 5.0s; }
-body.marca-anima .marca-anim .l2 { animation-delay: 5.7s; }
-body.marca-anima .marca-anim .l3 { animation-delay: 6.4s; }
-body.marca-anima .marca-anim .l4 { animation-delay: 7.1s; }
+/* REBRAND 22/09/2026 (ajuste do Cassiano, 15:41): as letras entram DEPOIS que o "& Co."
+   mergulhou na capivara — 1,4s de pausa + 3,6s de trajeto + 1,0s do "& Co." indo reto pra
+   esquerda (na velocidade das letras) = 6,0s. */
+body.marca-anima .marca-anim .l1 { animation-delay: 6.0s; }
+body.marca-anima .marca-anim .l2 { animation-delay: 6.7s; }
+body.marca-anima .marca-anim .l3 { animation-delay: 7.4s; }
+body.marca-anima .marca-anim .l4 { animation-delay: 8.1s; }
 @keyframes letra-sai-da-capivara {
   from { transform: scale(.04); opacity: 0; }
   30%  { opacity: 1; }
   to   { transform: none; opacity: 1; }
+}
+
+/* REBRAND 22/09/2026 — O "& Co." QUE ENTRA NA CAPIVARA (`.eco-capivara`).
+   Áudio do Cassiano (15:05): "aquele & Co. […] vai entrar para dentro da capivara, para o
+   lado esquerdo, para só depois o ālea sair da capivara". Ela nasce GRANDE, colada à
+   capivara — como divide o mesmo viewBox, o MESMO transform da capivara a mantém no lugar em
+   qualquer escala. Quando a capivara assenta, esta peça encolhe pra dentro do centro da
+   capivara (a mesma origem das letras, o caminho inverso) e some. Só existe na animação: no
+   repouso e pra quem pula, fica invisível (a marca parada não tem "& Co." ao lado). */
+.marca-anim .eco-capivara { opacity: 0; }
+body.marca-medida:not(.marca-anima) .marca-anim .eco-capivara {
+  transform: translate(var(--cap-dx, 0px), var(--cap-dy, 0px)) scale(var(--cap-k, 3));
+  transform-origin: var(--cap-x) var(--cap-y);
+  opacity: 1;
+}
+body.marca-anima .marca-anim .eco-capivara {
+  transform-origin: var(--cap-x) var(--cap-y);
+  animation: eco-entra-na-capivara 4.6s cubic-bezier(.34, .01, .2, 1) 1.4s both;
+}
+/* AJUSTE do Cassiano (15:41): ele entra RETO PRA ESQUERDA (não na diagonal encolhendo pro
+   centro) e NA VELOCIDADE DAS LETRAS (1s). Os 3,6s primeiros são o trajeto colado à capivara
+   (mesma curva dela); o último 1s é o mergulho horizontal, com a curva das letras. */
+@keyframes eco-entra-na-capivara {
+  from    { transform: translate(var(--cap-dx, 0px), var(--cap-dy, 0px)) scale(var(--cap-k, 3)); opacity: 1; }
+  78.26%  { transform: none; opacity: 1;
+            animation-timing-function: cubic-bezier(.22, .78, .3, 1); }  /* 3,6s: assentou ao lado */
+  to      { transform: translateX(-18%); opacity: 0; }                   /* 4,6s: foi reto pra esquerda, pra dentro da capivara */
+}
+
+/* REBRAND 22/09/2026 — O "& Co." QUE APARECE EMBAIXO (`.eco-final`).
+   AJUSTE do Cassiano (15:41): ele NÃO sobe de baixo — ele desce COMO SE ESTIVESSE ESCONDIDO
+   ATRÁS DO ālea, escorregando de trás dele pra baixo até aparecer, no mesmo alinhamento da
+   logo e na velocidade das letras (1s). Por isso esta peça fica ATRÁS das letras no HTML
+   (vem antes delas), e parte de cima (translateY negativo, dentro do ālea) descendo até o
+   lugar. Começa depois da última letra (8,1s + 1s = 9,1s). No repouso e pra quem pula, já
+   entra visível (é parte da marca parada). */
+.marca-anim .eco-final { opacity: 0; }
+body.marca-anima .marca-anim .eco-final {
+  animation: eco-final-desce-de-tras 1s cubic-bezier(.22, .78, .3, 1) 9.1s both;
+}
+@keyframes eco-final-desce-de-tras {
+  from { opacity: 0; transform: translateY(-26%); }   /* escondido atrás do ālea */
+  35%  { opacity: 1; }                                 /* já saiu de trás das letras, mostra */
+  to   { opacity: 1; transform: none; }                /* no lugar dele, embaixo */
 }
 
 /* o resto da tela só aparece quando a capivara já chegou — é o "revelando o site".
@@ -392,10 +442,17 @@ body.sem-abertura .abertura .menu-categorias { transition: none; }
 body.marca-anima:not(.site-revelado) .abertura .menu-categorias,
 body.marca-anima:not(.site-revelado) .abertura .assinatura { pointer-events: none; }
 
-/* quem já viu a abertura nesta sessão recebe o logo pronto, sem esperar de novo */
-body.sem-abertura .marca-anim img { animation: none !important; transform: none !important; opacity: 1 !important; }
+/* quem já viu a abertura nesta sessão recebe o logo pronto, sem esperar de novo.
+   ⚠️ REBRAND 22/09/2026: o `.eco-capivara` NÃO entra aqui — ele é transitório (o "& Co." que
+   mergulha na capivara), e a marca PARADA não tem "& Co." ao lado. No logo pronto ele fica
+   invisível; quem aparece embaixo é o `.eco-final`, que o `:not()` deixa passar pra opacity 1. */
+body.sem-abertura .marca-anim img:not(.eco-capivara) {
+  animation: none !important; transform: none !important; opacity: 1 !important;
+}
+body.sem-abertura .marca-anim .eco-capivara { animation: none !important; transform: none !important; opacity: 0 !important; }
 @media (prefers-reduced-motion: reduce) {
-  .marca-anim img { animation: none !important; transform: none !important; opacity: 1 !important; }
+  .marca-anim img:not(.eco-capivara) { animation: none !important; transform: none !important; opacity: 1 !important; }
+  .marca-anim .eco-capivara { animation: none !important; transform: none !important; opacity: 0 !important; }
   .abertura::after { animation: none; }
 }
 

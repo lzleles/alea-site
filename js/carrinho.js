@@ -1,3 +1,12 @@
+/* CATALOGO:
+   nome: carrinho
+   categoria: UTIL
+   objetivo: Mantém carrinho, dados locais e histórico de pedidos e prepara o fechamento da compra pelo WhatsApp.
+   entrada: DOM, configuração global e dados do localStorage
+   saida: Gavetas, contador, histórico local e mensagem de pedido no WhatsApp
+   status: ativo (cabecalho proposto pelo Codex em 2026-09-20, confianca ALTA; conferir na proxima vez que o script rodar)
+   validado_em: TBD
+*/
 /* =============================================================================
    carrinho.js — o carrinho e a conta, os dois botões que ele pediu no canto
    =============================================================================

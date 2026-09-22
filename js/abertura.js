@@ -1,3 +1,12 @@
+/* CATALOGO:
+   nome: abertura
+   categoria: UTIL
+   objetivo: Controla a animação de abertura e encaminha categorias, recargas e retornos para o estado correto do feed.
+   entrada: DOM, catálogo global, hash, navegação, sessão e preferências do navegador
+   saida: Classes visuais, animação da marca e abertura ou fechamento do feed
+   status: ativo (cabecalho proposto pelo Codex em 2026-09-20, confianca ALTA; conferir na proxima vez que o script rodar)
+   validado_em: TBD
+*/
 /* =============================================================================
    abertura.js — a primeira tela: a marca que se monta, a frase e o menu
    =============================================================================
@@ -49,11 +58,13 @@
   /* Os tempos, num lugar só. Têm que bater com os `animation-delay` do CSS. */
   var PAUSA_CAPIVARA_MS = 1400;    // ela fica PARADA, gigante, antes de andar (3ª rodada)
   var CAPIVARA_MS = 3600;          // e leva 3,6s indo devagar pro lugar dela
+  var ECO_ENTRA_MS = 1000;         // REBRAND 22/09 (ajuste 15:41): "& Co." vai reto pra esquerda na velocidade das letras
   var LETRA_MS = 1000;             // cada letra leva 1s pra sair da capivara
   var ENTRE_LETRAS_MS = 700;       // e a seguinte parte 0,7s depois da anterior
   var LETRAS = 4;
-  var FIM_DAS_LETRAS = PAUSA_CAPIVARA_MS + CAPIVARA_MS +
-                       ENTRE_LETRAS_MS * (LETRAS - 1) + LETRA_MS;                 // 8,1s
+  var ECO_FINAL_MS = 1000;         // REBRAND 22/09 (ajuste 15:41): "& Co." desce de trás do ālea na velocidade das letras
+  var FIM_DAS_LETRAS = PAUSA_CAPIVARA_MS + CAPIVARA_MS + ECO_ENTRA_MS +
+                       ENTRE_LETRAS_MS * (LETRAS - 1) + LETRA_MS;                 // 8,9s
 
   /* =======================================================================
      1) F5 VOLTA PRO COMEÇO — e por que isso não é automático
@@ -165,8 +176,11 @@
      feita aqui e não escrita à mão no CSS: "o maior tamanho possível" muda com a
      janela, e um número fixo ficaria certo num aparelho e errado nos outros.
      ======================================================================= */
-  var CX0 = 79, CX1 = 1234, LARG_VB = 3448.89;
-  var CY0 = 62, CY1 = 736, ALT_VB = 748.01;
+  /* REBRAND 22/09/2026: o viewBox das peças cresceu pra caber o "& Co." (0 0 3462.47 970.75).
+     A capivara ficou nas MESMAS coordenadas de logo — só a moldura aumentou. Caixa dela medida
+     na render: x 0..1236, y 2..748. */
+  var CX0 = 0, CX1 = 1236, LARG_VB = 3462.47;
+  var CY0 = 2, CY1 = 748, ALT_VB = 970.75;
   var FOLGA_LARGURA = 0.92;        // quanto da janela a capivara pode ocupar
   var FOLGA_ALTURA = 0.80;
 
@@ -374,7 +388,8 @@
     /* a frase só começa DEPOIS da última letra do logo, e o menu só depois da frase
        (quem acende o menu é o fim do datilógrafo, lá em cima). Guardado porque o
        "pular" precisa cancelar esta espera — senão a frase recomeçaria sozinha. */
-    esperaDaFrase = setTimeout(datilografar, FIM_DAS_LETRAS + 200);
+    /* REBRAND 22/09: a frase só depois que o "& Co." apareceu embaixo (FIM + os 0,6s dele) */
+    esperaDaFrase = setTimeout(datilografar, FIM_DAS_LETRAS + ECO_FINAL_MS + 200);
   }
 
   /* =======================================================================

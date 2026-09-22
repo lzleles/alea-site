@@ -58,9 +58,12 @@
        marca ele tem lugar próprio e não disputa pixel com nada.
        Quem liga e desliga é o feed.js. -->
   <span class="canto-marca">
+    <!-- REBRAND 22/09/2026: o topo esquerdo perdeu o logotipo inteiro da ālea e ficou SÓ a
+         capivara em miniatura (pedido do Cassiano em áudio). Peça gerada por
+         _montar_marca_e_co_v1_rebrand_2026-09-22.py. -->
     <a class="marca" href="index.html" aria-label="ālea — início">
-      <img class="colorida" src="img/marca/alea_logo.svg" alt="ālea" width="129" height="28">
-      <img class="clara" src="img/marca/alea_logo_claro.svg" alt="ālea" width="129" height="28">
+      <img class="colorida" src="img/marca/e_co/capivara_mini.svg" alt="ālea" width="46" height="28">
+      <img class="clara" src="img/marca/e_co/capivara_mini_claro.svg" alt="ālea" width="46" height="28">
     </a>
     <button class="voltar-categorias" type="button" data-fechar-feed hidden>&larr; categorias</button>
   </span>
@@ -102,12 +105,22 @@
          sobrepostas e sem transformação nenhuma, elas remontam o logotipo exato. É isso
          que deixa cada letra "sair de dentro da capivara" com uma linha de CSS — basta
          escalá-la em torno do centro da capivara. Nenhuma medida de letra no meio. -->
+    <!-- REBRAND 22/09/2026: as SETE peças (não mais cinco) têm o MESMO viewBox NOVO
+         (0 0 3462.47 970.75, gerado por _montar_marca_e_co_v1_rebrand_2026-09-22.py) — a caixa
+         do kit cresceu pra baixo pra caber o "& Co.". Sobrepostas e sem transformação, remontam
+         a marca nova exata. A ordem dos áudios dele (15:05): a capivara entra COM o "& Co." do
+         lado (`.eco-capivara`); quando ela assenta, o "& Co." mergulha nela; então o ālea sai
+         letra por letra; e no fim o "& Co." aparece embaixo (`.eco-final`). -->
     <div class="marca-anim" aria-hidden="true">
-      <img class="capivara" src="img/marca/alea_capivara.svg" alt="">
-      <img class="letra l1" src="img/marca/alea_letra1.svg" alt="">
-      <img class="letra l2" src="img/marca/alea_letra2.svg" alt="">
-      <img class="letra l3" src="img/marca/alea_letra3.svg" alt="">
-      <img class="letra l4" src="img/marca/alea_letra4.svg" alt="">
+      <img class="eco-capivara" src="img/marca/e_co/eco_capivara.svg" alt="">
+      <img class="capivara" src="img/marca/e_co/capivara.svg" alt="">
+      <!-- o "& Co." final vem ANTES das letras de propósito: ele desce de TRÁS do ālea, então
+           tem que ficar atrás delas na pilha (ajuste do Cassiano, 15:41). -->
+      <img class="eco-final" src="img/marca/e_co/eco_final.svg" alt="">
+      <img class="letra l1" src="img/marca/e_co/letra1.svg" alt="">
+      <img class="letra l2" src="img/marca/e_co/letra2.svg" alt="">
+      <img class="letra l3" src="img/marca/e_co/letra3.svg" alt="">
+      <img class="letra l4" src="img/marca/e_co/letra4.svg" alt="">
     </div>
 
     <!-- a frase vai INTEIRA no HTML (Google e leitor de tela leem mesmo sem JS); o JS

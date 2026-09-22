@@ -1,3 +1,12 @@
+/* CATALOGO:
+   nome: feed
+   categoria: UTIL
+   objetivo: Desenha o feed por categoria e controla rolagem, fotos, contador, restauração de posição e cartão final.
+   entrada: Catálogo global, configuração, DOM, gestos e sessionStorage
+   saida: Feed de produtos, filtros visuais, navegação e posição persistida
+   status: ativo (cabecalho proposto pelo Codex em 2026-09-20, confianca ALTA; conferir na proxima vez que o script rodar)
+   validado_em: TBD
+*/
 /* =============================================================================
    feed.js — o feed: um objeto por tela, preto, deslizando pra cima
    =============================================================================
