@@ -499,6 +499,59 @@
     catch (e) { /* aba anônima */ }
   }
 
+  /* ⚠️ ETAPA 17 (22/09/2026, parte 3, item 2): "voltar pra página da categoria, de onde eu parei,
+     da mesma forma que deixei a tela — se estava alinhada volta alinhada, se estava bagunçada volta
+     bagunçada". O `POS` acima só guarda QUAL produto; isto guarda a TELA: a rolagem exata, a foto
+     que cada peça estava mostrando e a peça em foco. Gravado na hora de sair pro produto (clique
+     no "ver produto", duplo toque, e o `pagehide` como rede). Quem pede a volta exata é o botão
+     "voltar para o feed" da página de produto (site.js), pela marca `alea_voltar_exato`. */
+  var EXATO = 'alea_feed_exato', VOLTA = 'alea_voltar_exato';
+
+  function guardarEstadoExato(topoForcado) {
+    if (!aberto || !categoriaAtual) return;
+    var fotos = itens.map(function (it) {
+      return Math.max(0, fotosDo(it).findIndex(function (f) { return f.classList.contains('ativa'); }));
+    });
+    var estado = { cat: categoriaAtual, top: (typeof topoForcado === 'number') ? topoForcado : feed.scrollTop,
+                   fotos: fotos, foco: emFoco ? itens.indexOf(emFoco) : -1 };
+    try { sessionStorage.setItem(EXATO, JSON.stringify(estado)); } catch (e) { /* aba anônima */ }
+  }
+
+  function estadoExatoPedido(catId) {
+    try {
+      if (sessionStorage.getItem(VOLTA) !== catId) return null;
+      sessionStorage.removeItem(VOLTA);                 // vale UMA volta; F5 depois não repete
+      var e = JSON.parse(sessionStorage.getItem(EXATO) || 'null');
+      return (e && e.cat === catId) ? e : null;
+    } catch (err) { return null; }
+  }
+
+  /* põe a foto N na peça SEM animação — é restauração, não gesto. A lona WebGL ainda não montou
+     (a página acabou de carregar) e, quando montar, parte da <img> que tiver a classe `ativa`. */
+  function fixarFoto(item, n) {
+    var fotos = fotosDo(item), pontos = item.querySelectorAll('.pontos button');
+    if (n < 0 || n >= fotos.length) return;
+    fotos.forEach(function (f, k) { f.classList.toggle('ativa', k === n); });
+    Array.prototype.forEach.call(pontos, function (p, k) { p.classList.toggle('on', k === n); });
+    var objeto = item.querySelector('.objeto');
+    if (objeto) objeto.classList.toggle('com-cenario', !fotos[n].classList.contains('recorte'));
+    if (n > 0) { var dica = item.querySelector('[data-dica]'); if (dica) dica.classList.add('some'); }
+  }
+
+  function restaurarRolagem(top) {
+    var mexeu = false;
+    function marcar() { mexeu = true; }
+    ['touchstart', 'wheel', 'keydown'].forEach(function (ev) {
+      feed.addEventListener(ev, marcar, { passive: true, once: true });
+    });
+    function aplicar() { if (!mexeu) { feed.scrollTop = top; reverQuemEstaNaVez(); } }
+    aplicar();
+    requestAnimationFrame(function () { requestAnimationFrame(aplicar); });
+    if (document.readyState !== 'complete') window.addEventListener('load', aplicar, { once: true });
+    try { if (document.fonts && document.fonts.ready) document.fonts.ready.then(aplicar); } catch (e) { /* nada */ }
+    setTimeout(aplicar, 600);
+  }
+
   function posicaoGuardada(catId) {
     try {
       var p = JSON.parse(sessionStorage.getItem(POS) || 'null');
@@ -532,7 +585,13 @@
     }
 
     indice = Math.max(0, Math.min(i, itens.length - 1));
-    voltarPraPrimeira(itens[indice]);
+    var exato = estadoExatoPedido(catId);             // ETAPA 17
+    if (exato) {
+      itens.forEach(function (it, k) { fixarFoto(it, exato.fotos[k] || 0); });
+      emFoco = (exato.foco >= 0 && itens[exato.foco]) ? itens[exato.foco] : null;
+    } else {
+      voltarPraPrimeira(itens[indice]);
+    }
 
     /* ⚠️ A ORDEM IMPORTA: visível PRIMEIRO, rolagem DEPOIS, observador por último.
        Com o feed ainda invisível o `offsetTop` até responde, mas o observador não enxerga
@@ -543,16 +602,27 @@
     document.body.classList.remove('na-abertura');
     aberto = true;
 
-    irParaItem(indice, false);                   // a entrada não anima: já chega no lugar
-    itens.forEach(function (it) { it.classList.remove('revelado'); });   // categoria nova, entrada nova
+    if (exato) {
+      /* a volta é a MESMA tela: as peças já reveladas (sem a animação de entrada, que faria
+         parecer outra tela). A ROLAGEM vai no fim do abrir — ver lá embaixo por quê. */
+      itens.forEach(function (it) { it.classList.add('revelado'); });
+    } else {
+      irParaItem(indice, false);                   // a entrada não anima: já chega no lugar
+      itens.forEach(function (it) { it.classList.remove('revelado'); });   // categoria nova, entrada nova
+    }
     ligarObservador();
-    ligarRevelacao();
+    if (!exato) ligarRevelacao();
     if (!feed.dataset.sumicoLigado) { ligarSumicoDaDescricao(); feed.dataset.sumicoLigado = '1'; }
     feed.classList.toggle('rolou', feed.scrollTop > 40);
     reverQuemEstaNaVez();
 
     mostrarVoltar(true);
     pintarDescricao(catId);
+    /* ⚠️ ETAPA 17 — A ROLAGEM EXATA TEM QUE VIR DEPOIS DA INTRO. Medido no teste: posta antes do
+       `pintarDescricao`, a intro (título + texto, ~340 px no celular) entrava ACIMA e empurrava tudo
+       pra baixo — voltava 337 px fora. E o que ainda carrega (fonte, foto) pode mexer de novo, então
+       a rolagem é reaplicada no `load` e no `fonts.ready`, a menos que a pessoa já tenha mexido. */
+    if (exato) restaurarRolagem(exato.top);
     pintarContador();
     guardarPosicao();
     if (window.aleaDistorcao) window.aleaDistorcao.montar(itens[indice].querySelector('.objeto'));
@@ -674,12 +744,31 @@
     /* ETAPA 16: saiu o "um toque, próximo produto" (14/09) — pulava a tela quando ele só queria
        olhar a foto. Agora o toque CENTRALIZA a peça tocada e a põe em foco. Link e botão seguem
        o seu caminho; toque no vão entre peças não faz nada. */
+    var link = e.target.closest('a[href^="produto-"]');
+    if (link) { guardarEstadoExato(); return; }     // ETAPA 17: sai pro produto lembrando a tela
     if (e.target.closest('a, button')) return;
     var peca = e.target.closest('#palco > .item');
     if (!peca || !fotosDo(peca).length) return;
+    /* ETAPA 17 (parte 3, item 1): DUPLO TOQUE em qualquer foto entra no produto, como o "ver
+       produto". Contado à mão (dois toques em 350 ms na MESMA peça): o `dblclick` não chega no
+       iPhone com `touch-action: pan-y`. O 1º toque já começou a centralizar — então a tela que se
+       guarda é a de ANTES do 1º toque, que é a que ele deixou. */
+    var agora = Date.now();
+    if (ultimoToque && ultimoToque.peca === peca && agora - ultimoToque.t < 350) {
+      var ver = peca.querySelector('a.ver[href]');
+      guardarEstadoExato(ultimoToque.topo);
+      sairGuardado = true;                          // o pagehide não sobrescreve com a tela meio rolada
+      ultimoToque = null;
+      if (ver) { location.href = ver.getAttribute('href'); return; }
+    }
+    ultimoToque = { peca: peca, t: agora, topo: feed.scrollTop };
     emFoco = peca;
     centralizarPeca(peca);
   });
+  var ultimoToque = null;
+  /* rede: qualquer saída da página com o feed aberto guarda a tela (link do cabeçalho, sacola…) */
+  window.addEventListener('pagehide', function () { if (aberto && !sairGuardado) guardarEstadoExato(); });
+  var sairGuardado = false;
 
   document.dispatchEvent(new CustomEvent('alea:feed-pronto'));
 })();

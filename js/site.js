@@ -290,8 +290,27 @@
     });
   }
 
+  /* ------------------------------------------- "voltar para o feed" (ETAPA 17)
+     Parte 3, item 2 (22/09/2026): o botão levava pra `index.html` — a PRIMEIRA página. Tem que
+     voltar pra categoria e pra tela exata de onde a pessoa saiu. O feed.js guardou essa tela em
+     `alea_feed_exato` quando ela saiu; aqui o botão aponta pra `index.html#<categoria>` (que abre
+     direto no feed, sem abertura) e deixa a marca `alea_voltar_exato` pedindo a restauração.
+     Sem tela guardada (chegou no produto por link de fora), segue pra primeira página. */
+  function ligarVoltarProFeed() {
+    Array.prototype.forEach.call(document.querySelectorAll('a.voltar'), function (a) {
+      var e = null;
+      try { e = JSON.parse(sessionStorage.getItem('alea_feed_exato') || 'null'); } catch (err) { /* nada */ }
+      if (!e || !e.cat) return;
+      a.setAttribute('href', 'index.html#' + e.cat);
+      a.addEventListener('click', function () {
+        try { sessionStorage.setItem('alea_voltar_exato', e.cat); } catch (err) { /* aba anônima */ }
+      });
+    });
+  }
+
   /* -------------------------------------------------------------------- início */
   function iniciar() {
+    ligarVoltarProFeed();
     preencherContato();
     montarMenuCategorias();
     montarRedes();
