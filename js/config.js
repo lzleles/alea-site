@@ -168,11 +168,78 @@ window.ALEA = {
     opcoes: [
       { id: 'tricolor',      rotulo: 'Tricolor',      campos: 3 },
       { id: 'bicolor',       rotulo: 'Bicolor',       campos: 2 },
-      { id: 'monocromatico', rotulo: 'Monocromático', campos: 1 },
-      { id: 'degrade',       rotulo: 'Degradê',       campos: 0,
-        aviso: 'Por se tratar de filamentos específicos e sazonais, após a confirmação ' +
-               'de pagamento entraremos em contato pra informar as cores disponíveis!' }
+      { id: 'monocromatico', rotulo: 'Monocromático', campos: 1 }
+      /* ETAPA 52 (23/09/2026, 14:03): Degradê DESCARTADO de todos os comedouros — "vai me dar muita dor de
+         cabeça (...) às vezes eu não vou ter o filamento, ele vai ficar chateado". Era:
+         { id: 'degrade', rotulo: 'Degradê', campos: 0, aviso: 'Por se tratar de filamentos específicos e sazonais...' } */
     ]
+  },
+
+  /* FILAMENTOS À VENDA — a lista que vira as opções de cor da peça (23/09/2026, pedido dele às 13:19).
+     -------------------------------------------------------------------------------
+     O cliente escolhe o ACABAMENTO (Básico, Fosco, Perolizado) e só então a janela da cor abre,
+     com as cores DAQUELE acabamento. Ele vê o nome simples; o PEDIDO que chega pro Cassiano leva
+     também o nome ORIGINAL do filamento (regra dele: "pra mim aparece o nome original").
+       site ...... o que o cliente lê (português, sem Lite/Basic/Matte/Silk)
+       original .. Marca · Tipo · Acabamento · Cor, EXATO como ele falou (nunca normalizar)
+     ⚠ TESTE: Azul, Amarelo e Verde nos 3 acabamentos, pra ele ver o desenho. Os ORIGINAIS abaixo
+     são provisórios ("a confirmar") — a lista real vem dele e substitui esta. */
+  filamentos: {
+    /* ETAPA 55: cada cor com o CÓDIGO OFICIAL da cor (hex) — é ele que pinta a peça na janela 3D.
+       Fosco = as 5 que ele escolheu (msg 546). Básico e Perolizado seguem de TESTE (Azul/Amarelo/Verde e Dourado). */
+    basico: [
+      { site: 'Azul',        hex: '#0A2989', original: 'Bambu Lab · PLA · Basic · Blue (10601)' },
+      { site: 'Amarelo',     hex: '#F4EE2A', original: 'Bambu Lab · PLA · Basic · Yellow (10400)' },
+      { site: 'Verde',       hex: '#00AE42', original: 'Bambu Lab · PLA · Basic · Bambu Green (10501)' }
+    ],
+    fosco: [
+      { site: 'Amarelo',     hex: '#F7D959', original: 'Bambu Lab · PLA · Matte · Lemon Yellow (11400)' },
+      { site: 'Rosa',        hex: '#E8AFCF', original: 'Bambu Lab · PLA · Matte · Sakura Pink (11201)' },
+      { site: 'Azul Claro',  hex: '#A3D8E1', original: 'Bambu Lab · PLA · Matte · Ice Blue (11601)' },
+      { site: 'Azul Escuro', hex: '#042F56', original: 'Bambu Lab · PLA · Matte · Dark Blue (11602)' },
+      { site: 'Terracota',   hex: '#B15533', original: 'Bambu Lab · PLA · Matte · Terracotta (11203)' }
+    ],
+    perolizado: [
+      { site: 'Azul',        hex: '#147BD1', original: 'Bambu Lab · PLA · Silk · Blue (13601)' },
+      { site: 'Verde',       hex: '#4CE4A0', original: 'Bambu Lab · PLA · Silk · Green (13502)' },
+      { site: 'Dourado',     hex: '#E5B03D', original: 'Bambu Lab · PLA · Silk · Gold (13401)' }
+    ]
+  },
+  /* como cada acabamento aparece (a ordem é a da tela) e o que ele acrescenta ao nome da cor:
+     Básico não acrescenta nada ("Azul"); Fosco e Perolizado sim ("Azul Fosco", "Azul Perolizado"). */
+  acabamentos: [
+    { id: 'basico',     rotulo: 'Básico',     sufixo: '' },
+    { id: 'fosco',      rotulo: 'Fosco',      sufixo: ' Fosco' },
+    { id: 'perolizado', rotulo: 'Perolizado', sufixo: ' Perolizado' }
+  ],
+
+  /* A JANELA 3D "Personalize aqui" (protótipo, 23/09/2026, áudios dele das 14:27 e 14:30).
+     -------------------------------------------------------------------------------
+     Por produto (slug): o .glb (a peça do arquivo dele, sem o nome), o _nome.json (onde o nome original estava
+     gravado), a fonte da gravação e as cores. `original` é a peça como ele fotografou (nome OFICIAL + código);
+     as abas trazem as cores pra trocar. Protótipo: só a aba Fosco, com as 5 que ele escolheu (todas Bambu Lab
+     PLA Matte, cor = código oficial do Bambu Studio). Os nomes simples estão PROPOSTOS a ele (msg 547). */
+  modelos3d: {
+    'bowl-wave': {
+      glb: 'modelos/luke_g.glb',
+      nome: 'modelos/luke_g_nome.json',
+      fonte: 'fonts/defante.otf',
+      original: {
+        topo:      { site: 'Laranja', hex: '#FF671F', acabamento: 'basico', oficial: 'Bambu Lab · PLA · Lite · Orange (16301)' },
+        principal: { site: 'Branco',  hex: '#FFFFFF', acabamento: 'fosco',  oficial: 'Bambu Lab · PLA · Matte · Ivory White (11100)' },
+        base:      { site: 'Cinza',   hex: '#9B9EA0', acabamento: 'fosco',  oficial: 'Bambu Lab · PLA · Matte · Ash Gray (11102)' }
+      },
+      abas: [
+        { id: 'original', rotulo: 'Original' },
+        { id: 'fosco', rotulo: 'Fosco', cores: [
+          { site: 'Amarelo',     hex: '#F7D959', oficial: 'Bambu Lab · PLA · Matte · Lemon Yellow (11400)' },
+          { site: 'Rosa',        hex: '#E8AFCF', oficial: 'Bambu Lab · PLA · Matte · Sakura Pink (11201)' },
+          { site: 'Azul Claro',  hex: '#A3D8E1', oficial: 'Bambu Lab · PLA · Matte · Ice Blue (11601)' },
+          { site: 'Azul Escuro', hex: '#042F56', oficial: 'Bambu Lab · PLA · Matte · Dark Blue (11602)' },
+          { site: 'Terracota',   hex: '#B15533', oficial: 'Bambu Lab · PLA · Matte · Terracotta (11203)' }
+        ] }
+      ]
+    }
   },
 
   /* Onde entrega. "a combinar" faz o site dizer "consulte o frete" em vez de prometer

@@ -42,9 +42,96 @@
   'use strict';
 
   var colmeia = document.querySelector('[data-colmeia]');
+
+  /* ⚠️ ETAPA 59 (3) (23/09/2026, vídeo das 16:40): "o cabeçalho continua mexendo". A 57 resolveu o arrastar pros
+     LADOS; o que sobrou é o QUIQUE vertical do Safari no começo e no fim da página (a página passa do limite e volta,
+     e o cabeçalho vai junto). O `overscroll-behavior: none` não segurou no iPhone dele, então aqui o gesto é
+     cancelado na origem: no começo da página puxando pra baixo, ou no fim puxando pra cima, o toque não rola.
+     Dentro do que rola sozinho (sacola, conta, janela de personalizar) nada muda. Só na página de produto. */
+  (function semQuique() {
+    var y0 = 0;
+    document.addEventListener('touchstart', function (e) { if (e.touches.length === 1) y0 = e.touches[0].clientY; }, { passive: true });
+    document.addEventListener('touchmove', function (e) {
+      if (e.touches.length !== 1) return;
+      for (var el = e.target; el && el !== document.body && el !== document.documentElement; el = el.parentElement) {
+        var cs = getComputedStyle(el);
+        if ((cs.overflowY === 'auto' || cs.overflowY === 'scroll') && el.scrollHeight > el.clientHeight + 1) return;
+        if (el.tagName === 'CANVAS') return;           // a peça 3D gira pelo dedo
+      }
+      var se = document.scrollingElement || document.documentElement;
+      var dy = e.touches[0].clientY - y0;
+      var noTopo = se.scrollTop <= 0, noFim = se.scrollTop + window.innerHeight >= se.scrollHeight - 1;
+      if ((noTopo && dy > 0) || (noFim && dy < 0)) e.preventDefault();
+    }, { passive: false });
+  })();
+
+  /* ⚠️ ETAPA 58 (1) (23/09/2026, 16:08): "sempre que abrir qualquer produto, a foto do MEIO é a da capa; o resto
+     pode ser em qualquer ordem". Qual favo fica no meio depende da largura (quantos cabem por linha), então é
+     MEDIDO: acha o favo mais perto do centro da colmeia e põe a capa (data-favo=0) naquela posição. Cada favo
+     leva o próprio data-favo, então a tela cheia continua abrindo a foto certa. */
+  function capaNoMeio() {
+    if (!colmeia) return;
+    var favos = Array.prototype.slice.call(colmeia.querySelectorAll('.favo'));
+    var capa = colmeia.querySelector('.favo[data-favo="0"]');
+    if (!capa || favos.length < 3) return;
+    var cx = colmeia.getBoundingClientRect(), mx = cx.left + cx.width / 2, my = cx.top + cx.height / 2;
+    var melhor = 0, dist = Infinity;
+    favos.forEach(function (f, k) {
+      var r = f.getBoundingClientRect(), d = Math.hypot(r.left + r.width / 2 - mx, r.top + r.height / 2 - my);
+      if (d < dist) { dist = d; melhor = k; }
+    });
+    var alvo = favos[melhor];
+    if (alvo === capa) return;
+    var depoisCapa = capa.nextSibling, depoisAlvo = alvo.nextSibling;
+    colmeia.insertBefore(capa, depoisAlvo === capa ? alvo : depoisAlvo);
+    colmeia.insertBefore(alvo, depoisCapa);
+  }
+  capaNoMeio();
+  var capaEspera = null;
+  window.addEventListener('resize', function () { clearTimeout(capaEspera); capaEspera = setTimeout(capaNoMeio, 200); });
   var telacheia = document.querySelector('[data-telacheia]');
   var caixaAceite = document.querySelector('[data-aceite-caixa]');
   var botaoComprar = document.querySelector('[data-comprar-agora]');
+
+  /* ⚠️ ETAPA 53 (23/09/2026, 14:27, protótipo): botão "Personalize aqui" -> janela com a peça em 3D, nome
+     gravado ao vivo e cores trocando na hora (js/personalizar3d.js). Só aparece no produto que tem modelo 3D
+     no config.js; o three.js só é baixado no clique. */
+  (function botaoPersonalizar3D() {
+    var slug = botaoComprar && botaoComprar.getAttribute('data-slug');
+    var cfg3d = slug && ((window.ALEA || {}).modelos3d || {})[slug];
+    var form = document.querySelector('[data-personalizar]');
+    if (!cfg3d || !form) return;
+    var im = document.createElement('script');
+    im.type = 'importmap';
+    im.setAttribute('data-alea', '');
+    im.textContent = JSON.stringify({ imports: {
+      'three': 'https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js',
+      'three/addons/': 'https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/',
+      'three-mesh-bvh': 'https://cdn.jsdelivr.net/npm/three-mesh-bvh@0.8.3/build/index.module.js',
+      'three-bvh-csg': 'https://cdn.jsdelivr.net/npm/three-bvh-csg@0.0.17/build/index.module.js' } });
+    document.head.appendChild(im);
+    /* ETAPA 55 (15:12, "essa parte a gente não vai mais precisar (...) vai estar inteira no Personalize aqui"):
+       o formulário some da página e só aparece DENTRO da janela (o personalizar3d.js o move pra lá). O botão fica
+       FORA do formulário, no lugar onde o formulário estava. */
+    var b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'botao personalizar-3d';
+    b.textContent = 'Personalize aqui';
+    form.parentNode.insertBefore(b, form);
+    form.classList.add('mora-na-janela');
+    var aberto = false;
+    function abrir(depoisDeMontar, opcoes) {
+      if (aberto) { if (depoisDeMontar) depoisDeMontar(); return; }
+      aberto = true;
+      b.classList.add('carregando');
+      import('./personalizar3d.js').then(function (m) {
+        return m.abrirJanela3D(cfg3d, function () { aberto = false; }, depoisDeMontar, opcoes || {});
+      }).catch(function (e) { aberto = false; console.warn('janela 3D', e); })
+        .then(function () { b.classList.remove('carregando'); });
+    }
+    b.addEventListener('click', function () { abrir(); });
+    window.aleaAbrirPersonalizar = abrir;
+  })();
   var botaoSacola = document.querySelector('[data-add-carrinho]');
   if (!colmeia && !botaoComprar) return;
 
@@ -197,16 +284,63 @@
     alvoValor.innerHTML = (t === null) ? '<small>Sob consulta</small>' : window.aleaDinheiro(t);
   }
 
+  /* ⚠️ ETAPA 52 (23/09/2026, 14:03, áudio dele): a COR DO NOME ganha a mesma janelinha das cores da
+     peça — Básico · Fosco · Perolizado e, depois, a lista de cores daquele acabamento. O campo de texto
+     que o gerador escreve é TROCADO aqui (o gerador segue igual; a troca vive no JS, num lugar só). */
+  var FIL_ = (window.ALEA || {}).filamentos || {};
+  var ACAB_ = (window.ALEA || {}).acabamentos || [];
+  var corNomeBox = null;
+  (function trocarCorDoNome() {
+    var velho = document.querySelector('[data-personalizar] input[name="cor_nome"]');
+    if (!velho) return;
+    var caixa = document.createElement('div');
+    caixa.className = 'campo-cor campo-cor-nome';
+    caixa.setAttribute('data-parte', 'nome');
+    caixa.innerHTML = '<div class="acabamentos">' + ACAB_.map(function (ac) {
+        return '<label class="acabamento"><input type="radio" name="acab_nome" value="' + ac.id + '" disabled> ' +
+          ac.rotulo + '</label>';
+      }).join('') + '</div>' +
+      '<select name="cor_nome" disabled aria-label="Cor do nome"><option value=""></option></select>';   /* ETAPA 59: travada = sem frase */
+    velho.parentNode.replaceChild(caixa, velho);
+    corNomeBox = caixa;
+    caixa.addEventListener('change', function (ev) {
+      var rad = ev.target.closest && ev.target.closest('.acabamento input');
+      if (!rad) return;
+      var sel = caixa.querySelector('select');
+      sel.innerHTML = '<option value="">Escolha a cor</option>' + (FIL_[rad.value] || []).map(function (f) {
+        return '<option value="' + f.site + '">' + f.site + '</option>'; }).join('');
+      sel.disabled = false;
+      var rot = caixa.closest('label'); if (rot) rot.classList.remove('faltou');
+      try { sel.focus({ preventScroll: true }); } catch (e) { sel.focus(); }
+    });
+  })();
+
+  function travarCorDoNome(liberar) {
+    if (!corNomeBox) return;
+    var sel = corNomeBox.querySelector('select');
+    Array.prototype.forEach.call(corNomeBox.querySelectorAll('.acabamento input'), function (r) {
+      r.disabled = !liberar; if (!liberar) r.checked = false;
+    });
+    sel.disabled = true;
+    sel.innerHTML = '<option value="">' + (liberar ? 'Escolha o acabamento acima' : '') + '</option>';
+  }
+
+  function corDoNomeEscolhida() {
+    if (!corNomeBox) return { texto: '', original: '', escolha: null };
+    var ac = corNomeBox.querySelector('.acabamento input:checked');
+    var sel = corNomeBox.querySelector('select');
+    if (!ac || !sel.value) return { texto: '', original: '', escolha: null };
+    var def = ACAB_.filter(function (x) { return x.id === ac.value; })[0] || { sufixo: '' };
+    var fil = (FIL_[ac.value] || []).filter(function (f) { return f.site === sel.value; })[0];
+    return { texto: sel.value + def.sufixo, original: fil ? fil.original : sel.value + def.sufixo,
+             escolha: { acabamento: ac.value, cor: sel.value } };
+  }
+
   Array.prototype.forEach.call(document.querySelectorAll('[data-extra]'), function (rot) {
     var caixa = rot.querySelector('[data-extra-caixa]');
-    var liberado = document.querySelector('[name="cor_nome"]');
     caixa.addEventListener('change', function () {
       rot.classList.toggle('marcado', caixa.checked);
-      if (liberado) {
-        liberado.disabled = !caixa.checked;
-        if (!caixa.checked) liberado.value = '';
-        else liberado.focus();
-      }
+      travarCorDoNome(caixa.checked);
       repintarPreco();
     });
   });
@@ -255,23 +389,53 @@
        Base; bicolor: Principal, Base (palavras dele); monocromático: Principal (a peça inteira é a
        cor principal — dedução minha, avisada a ele). E cada caixa ganha um exemplo como o da cor
        do nome, com cores SORTEADAS: "Ex.: <cor> Sólido, <cor> Fosco, <cor> Perolizado…". */
-    var PARTES = { 3: ['Topo', 'Principal', 'Base'], 2: ['Principal', 'Base'], 1: ['Principal'] };
+    /* ETAPA 58 (3) (16:11): no BICOLOR "a primeira cor é a do topo, a segunda serve pro meio e a base" */
+    var PARTES = { 3: ['Topo', 'Principal', 'Base'], 2: ['Topo', 'Principal'], 1: ['Principal'] };
     var partes = PARTES[quantos] || [];
     /* ETAPA 27 (21:09, "aliás, melhor"): o quadradinho da esquerda SAI de vez; a caixa branca fica
        onde está (mesmo recuo), e o nome vai EM CIMA dela, como os outros rótulos do formulário:
        "Cor do topo", "Cor principal", "Cor da base". É um <label> de verdade (clicar no nome põe o
        cursor na caixa) e herda o estilo do `.personalizar label`. */
     var NOME_DA_PARTE = { Topo: 'Cor do topo', Principal: 'Cor principal', Base: 'Cor da base' };
+    /* ⚠️ ETAPA 51 (23/09/2026, 13:19, pedido dele): a cor sai de uma LISTA, não mais digitada. "No lugar
+       do Cor Principal, com a mesma letra, tamanho e cor, só vai mudar pra Básico, Fosco e Perolizado,
+       com a mesma bolinha do Monocromático; só quando a pessoa clicar em alguma dessas, deixa clicar na
+       janela pra escolher a cor correspondente ao acabamento." A lista vem de ALEA.filamentos (config.js).
+       No tricolor/bicolor o nome da parte ("Cor do topo"...) passa pra DENTRO da janela, como a primeira
+       linha dela — sem isso o cliente não saberia qual janela é o topo e qual é a base. */
+    var FIL = (window.ALEA || {}).filamentos || {};
+    var ACAB = (window.ALEA || {}).acabamentos || [];
     for (var k = 1; k <= quantos; k++) {
       var parte = partes[k - 1] || ('Cor ' + k);
       var titulo = NOME_DA_PARTE[parte] || parte;
-      var linha = document.createElement('label');
+      var linha = document.createElement('div');
       linha.className = 'campo-cor';
-      linha.innerHTML = '<span class="nome-parte">' + titulo + '</span>' +
-        '<input type="text" name="cor_' + k + '" maxlength="40" data-parte="' + parte.toLowerCase() + '" ' +
-        'placeholder="' + exemploDeCor(k, quantos) + '">';
+      linha.setAttribute('data-parte', parte.toLowerCase());
+      linha.setAttribute('data-titulo', titulo);
+      var bolinhas = ACAB.map(function (ac) {
+        return '<label class="acabamento"><input type="radio" name="acab_' + k + '" value="' + ac.id + '"> ' +
+          ac.rotulo + '</label>';
+      }).join('');
+      linha.innerHTML = '<div class="acabamentos">' + bolinhas + '</div>' +
+        '<select name="cor_' + k + '" data-parte="' + parte.toLowerCase() + '" disabled ' +
+        'aria-label="' + titulo + '"><option value="">' + (quantos > 1 ? titulo :
+        'Escolha o acabamento acima') + '</option></select>';
       camposCores.appendChild(linha);
     }
+    camposCores.onchange = function (ev) {
+      var rad = ev.target.closest && ev.target.closest('.acabamento input');
+      if (!rad) return;
+      var dono = rad.closest('.campo-cor');
+      var sel = dono.querySelector('select');
+      var tit = dono.getAttribute('data-titulo') || 'Cor';
+      var lista = FIL[rad.value] || [];
+      sel.innerHTML = '<option value="">' + (quantos > 1 ? tit + ': escolha a cor' : 'Escolha a cor') + '</option>' +
+        lista.map(function (f) { return '<option value="' + f.site + '">' + f.site + '</option>'; }).join('');
+      sel.disabled = false;
+      dono.classList.remove('faltou');
+      try { sel.focus({ preventScroll: true }); } catch (e) { sel.focus(); }
+    };
+    return;
     var primeiro = camposCores.querySelector('input');
     if (primeiro) primeiro.focus();
   }
@@ -287,12 +451,27 @@
     if (!caixaCores) return null;
     var r = caixaCores.querySelector('input[name="cores_peca"]:checked');
     if (!r) return null;
-    var lista = Array.prototype.map.call(
-      camposCores.querySelectorAll('input'), function (i) { return i.value.trim(); }
-    ).filter(function (v) { return v; });
+    /* ETAPA 51: cada janela devolve acabamento + cor. `cores` é o que o cliente lê ("Azul Fosco");
+       `originais` é o nome EXATO do filamento, que vai só no pedido pro Cassiano; `escolhas` serve pro
+       "editar" da sacola remontar as janelas. */
+    var FIL = (window.ALEA || {}).filamentos || {};
+    var ACAB = (window.ALEA || {}).acabamentos || [];
+    var escolhas = [], lista = [], originais = [];
+    Array.prototype.forEach.call(camposCores.querySelectorAll('.campo-cor'), function (c) {
+      var ac = c.querySelector('.acabamento input:checked');
+      var sel = c.querySelector('select');
+      if (!ac || !sel || !sel.value) return;
+      var def = ACAB.filter(function (x) { return x.id === ac.value; })[0] || { sufixo: '' };
+      var fil = (FIL[ac.value] || []).filter(function (f) { return f.site === sel.value; })[0];
+      escolhas.push({ acabamento: ac.value, cor: sel.value });
+      lista.push(sel.value + def.sufixo);
+      originais.push(fil ? fil.original : sel.value + def.sufixo);
+    });
     return {
       modo: r.parentNode.textContent.trim(),
       cores: lista,
+      originais: originais,
+      escolhas: escolhas,
       a_combinar: !!r.getAttribute('data-aviso')
     };
   }
@@ -323,10 +502,15 @@
       nome: botaoComprar.getAttribute('data-nome'),
       preco: precoTotal(),
       capa: botaoComprar.getAttribute('data-capa'),
+      /* ETAPA 58 (9): a miniatura é a PEÇA COMO O CLIENTE MONTOU (foto da janela 3D); sem ela, a capa */
+      miniatura: window.aleaMiniatura3D || null,
       material: botaoComprar.getAttribute('data-material'),
       personalizacao: {
         nome_pet: campo('nome_pet'),
-        cor_nome: campo('cor_nome'),
+        sem_nome: !campo('nome_pet') && !!(document.querySelector('[data-personalizar]') || { hasAttribute: function () { return false; } }).hasAttribute('data-sem-nome'),
+        cor_nome: corDoNomeEscolhida().texto,
+        cor_nome_original: corDoNomeEscolhida().original,
+        cor_nome_escolha: corDoNomeEscolhida().escolha,
         cores: coresEscolhidas()
       },
       extras: extras,
@@ -350,10 +534,18 @@
   function oQueFalta() {
     var faltas = [];
     var nome = document.querySelector('[data-personalizar] [name="nome_pet"]');
-    if (nome && !nome.value.trim()) faltas.push({ el: nome.closest('label') || nome, texto: 'Por favor, digite o nome do pet.' });
-    var corNome = document.querySelector('[data-personalizar] [name="cor_nome"]');
-    if (corNome && !corNome.disabled && !corNome.value.trim()) {
-      faltas.push({ el: corNome.closest('label') || corNome, texto: 'Por favor, digite a cor do nome.' });
+    /* ETAPA 58 (8): "Deseja mesmo não adicionar nome?" -> Sim marca o formulário (data-sem-nome) e o nome não é cobrado */
+    var formSN = document.querySelector('[data-personalizar]');
+    var semNome = formSN && formSN.hasAttribute('data-sem-nome');
+    if (nome && !nome.value.trim() && !semNome) faltas.push({ el: nome.closest('label') || nome, texto: 'Por favor, digite o nome do pet.' });
+    /* ETAPA 52: com o detalhe marcado, cobra o acabamento e depois a cor do nome */
+    if (corNomeBox && !corNomeBox.querySelector('.acabamento input').disabled) {
+      var rotNome = corNomeBox.closest('label') || corNomeBox;
+      if (!corNomeBox.querySelector('.acabamento input:checked')) {
+        faltas.push({ el: rotNome, texto: 'Por favor, escolha o acabamento da cor do nome.' });
+      } else if (!corNomeBox.querySelector('select').value) {
+        faltas.push({ el: rotNome, texto: 'Por favor, escolha a cor do nome.' });
+      }
     }
     if (caixaCores) {
       var r = caixaCores.querySelector('input[name="cores_peca"]:checked');
@@ -365,14 +557,16 @@
           faltas.push({ el: l, texto: null });
         });
       } else {
-        var vazios = Array.prototype.filter.call(
-          camposCores ? camposCores.querySelectorAll('input') : [], function (i) { return !i.value.trim(); });
-        vazios.forEach(function (i) {
-          var parte = i.getAttribute('data-parte');
-          var qual = parte === 'topo' ? 'a cor do topo' : parte === 'base' ? 'a cor da base'
-                   : parte === 'principal' ? 'a cor principal'
-                   : 'a cor ' + (i.getAttribute('name') || '').replace('cor_', '') + ' da peça';
-          faltas.push({ el: i.closest('.campo-cor') || i, texto: 'Por favor, digite ' + qual + '.' });
+        /* ETAPA 51: cada janela cobra primeiro o ACABAMENTO e depois a COR */
+        Array.prototype.forEach.call(camposCores ? camposCores.querySelectorAll('.campo-cor') : [], function (c) {
+          var parte = c.getAttribute('data-parte');
+          var qual = parte === 'topo' ? 'da cor do topo' : parte === 'base' ? 'da cor da base' : 'da cor principal';
+          var qual2 = parte === 'topo' ? 'a cor do topo' : parte === 'base' ? 'a cor da base' : 'a cor principal';
+          if (!c.querySelector('.acabamento input:checked')) {
+            faltas.push({ el: c, texto: 'Por favor, escolha o acabamento ' + qual + '.' });
+          } else if (!c.querySelector('select').value) {
+            faltas.push({ el: c, texto: 'Por favor, escolha ' + qual2 + '.' });
+          }
         });
       }
     }
@@ -381,6 +575,16 @@
     }
     return faltas;
   }
+
+  /* a posição do print do Cassiano (msg 629/654): o pé dos botões encostado no pé da parte VISÍVEL da tela */
+  function irParaOsBotoes(suave) {
+    var botoes = document.querySelector('[data-botoes]');
+    if (!botoes) return;
+    var altura = window.visualViewport ? window.visualViewport.height : window.innerHeight;
+    var y = window.scrollY + botoes.getBoundingClientRect().bottom - altura + 16;
+    window.scrollTo({ top: Math.max(0, y), behavior: suave ? 'smooth' : 'auto' });
+  }
+  window.aleaIrParaOsBotoes = irParaOsBotoes;
 
   function reclamarDoQueFalta(faltas) {
     Array.prototype.forEach.call(document.querySelectorAll('.faltou'), function (x) { x.classList.remove('faltou'); });
@@ -412,8 +616,9 @@
          celular isso já abre o teclado). Tem que ser AQUI, dentro do clique: o iPhone só aceita
          foco programático durante o gesto. `preventScroll` pra o foco não dar um pulo seco por
          cima da rolagem suave, que é quem centraliza. */
-      var alvo = primeira.el.matches && primeira.el.matches('input') ? primeira.el
-               : primeira.el.querySelector ? primeira.el.querySelector('input') : null;
+      var alvo = primeira.el.matches && primeira.el.matches('input, select') ? primeira.el
+               : primeira.el.querySelector ? (primeira.el.querySelector('select:not([disabled])') ||
+                 primeira.el.querySelector('input')) : null;
       if (!alvo && caixaCores && primeira.el.classList.contains('rotulo-grupo')) {
         alvo = caixaCores.querySelector('input[name="cores_peca"]');
       }
@@ -423,10 +628,17 @@
          o alinhamento que ele mesmo fez no vídeo: a falta logo ABAIXO do cabeçalho, sobrando a tela
          de baixo pro teclado e pra barrinha. E SEMPRE, a cada clique — não só quando está fora da
          tela. O cabeçalho é medido na hora (a altura muda com a tarja e com o tamanho da tela). */
-      var topo = document.querySelector('.topo');
-      var folga = (topo ? Math.max(0, topo.getBoundingClientRect().bottom) : 0) + 18;
-      var y = window.scrollY + primeira.el.getBoundingClientRect().top - folga;
-      window.scrollTo({ top: Math.max(0, y), behavior: 'smooth' });
+      if (primeira.el.closest && primeira.el.closest('.janela3d')) { /* dentro da janela: quem posiciona é ela */ }
+      else if (primeira.el.closest && primeira.el.closest('[data-aceite]')) {
+        /* ⚠️ ETAPA 58 (4) (16:13, com print): faltando SÓ a declaração, a tela para com a declaração, a frase e os
+           botões no PÉ da parte visível (logo acima da barra do Safari) — sem rolar até a parte preta — e treme ali */
+        irParaOsBotoes(true);
+      } else {
+        var topo = document.querySelector('.topo');
+        var folga = (topo ? Math.max(0, topo.getBoundingClientRect().bottom) : 0) + 18;
+        var y = window.scrollY + primeira.el.getBoundingClientRect().top - folga;
+        window.scrollTo({ top: Math.max(0, y), behavior: 'smooth' });
+      }
     }
   }
 
@@ -436,6 +648,9 @@
     if (dono && ev.target.value && ev.target.value.trim()) dono.classList.remove('faltou');
   });
   document.addEventListener('change', function (ev) {
+    if (ev.target.matches && ev.target.matches('.campo-cor select') && ev.target.value) {
+      var dono = ev.target.closest('.faltou'); if (dono) dono.classList.remove('faltou');
+    }
     if (ev.target.name === 'cores_peca' && caixaCores) {
       Array.prototype.forEach.call(caixaCores.querySelectorAll('.rotulo-grupo, .cores-opcoes label'),
         function (x) { x.classList.remove('faltou'); });
@@ -447,14 +662,14 @@
      esta criação à sua Sacola de Compras." ("fazer somente a primeira frase"), com × pra fechar. Some
      sozinha em 5 s. Cores e fonte são as da ālea; só a posição e o desenho seguem o modelo. */
   var avisoTimer = null;
-  function avisarQueEntrou(capa) {
+  function avisarQueEntrou(capa, miniatura) {
     var velho = document.querySelector('.aviso-sacola');
     if (velho) velho.parentNode.removeChild(velho);
     var a = document.createElement('div');
     a.className = 'aviso-sacola';
     a.setAttribute('role', 'status');
     a.innerHTML =
-      '<div class="miniatura"><img alt="" src="img/produtos/' + capa + '_obj_m.webp" ' +
+      '<div class="miniatura"><img alt="" src="' + (miniatura || ('img/produtos/' + capa + '_obj_m.webp')) + '" ' +
       'onerror="this.onerror=null;this.src=&quot;img/produtos/' + capa + '_m.jpg&quot;"></div>' +
       '<p>Você adicionou esta criação à sua sacola de compras.</p>' +   // 22:36 minúsculo; 22:38 sem negrito
       '<button type="button" class="fechar-aviso" aria-label="Fechar aviso">&times;</button>';
@@ -493,16 +708,29 @@
       var cx = rot && rot.querySelector('[data-extra-caixa]');
       if (cx && !cx.checked) { cx.checked = true; cx.dispatchEvent(new Event('change', { bubbles: true })); }
     });
-    var corNome = document.querySelector('[data-personalizar] [name="cor_nome"]');
-    if (corNome && p.cor_nome) corNome.value = p.cor_nome;
+    /* ETAPA 52: a cor do nome volta com acabamento e cor (os pedidos antigos, em texto, não voltam) */
+    if (corNomeBox && p.cor_nome_escolha) {
+      var rn = corNomeBox.querySelector('.acabamento input[value="' + p.cor_nome_escolha.acabamento + '"]');
+      if (rn) {
+        rn.checked = true; rn.dispatchEvent(new Event('change', { bubbles: true }));
+        corNomeBox.querySelector('select').value = p.cor_nome_escolha.cor;
+      }
+    }
     if (caixaCores && p.cores && p.cores.modo) {
       var r = Array.prototype.filter.call(caixaCores.querySelectorAll('input[name="cores_peca"]'),
         function (x) { return x.parentNode.textContent.trim() === p.cores.modo; })[0];
       if (r) {
         r.checked = true;
         desenharCamposDeCor(r);
-        Array.prototype.forEach.call(camposCores.querySelectorAll('input'), function (inp, k) {
-          inp.value = (p.cores.cores || [])[k] || '';
+        /* ETAPA 51: remonta acabamento (bolinha) e cor (lista) de cada janela */
+        Array.prototype.forEach.call(camposCores.querySelectorAll('.campo-cor'), function (c, k) {
+          var e = (p.cores.escolhas || [])[k];
+          if (!e) return;
+          var rad = c.querySelector('.acabamento input[value="' + e.acabamento + '"]');
+          if (!rad) return;
+          rad.checked = true;
+          rad.dispatchEvent(new Event('change', { bubbles: true }));
+          c.querySelector('select').value = e.cor;
         });
       }
     }
@@ -511,22 +739,33 @@
     /* ETAPA 47 (22:51): "o cliente não quer saber do topo, ele só quer editar — tem que cair direto no
        NOME DO PET". A tela para com o rótulo "Nome do pet" logo abaixo do cabeçalho (a mesma régua da
        trava de compra). Reaplica no `load`: as fotos da colmeia, carregando, empurram o formulário. */
-    function cairNoNome() {
-      var alvo = nome && (nome.closest('label') || nome);
-      if (!alvo) return;
-      var topo = document.querySelector('.topo');
-      var folga = (topo ? Math.max(0, topo.getBoundingClientRect().bottom) : 0) + 18;
-      window.scrollTo(0, Math.max(0, window.scrollY + alvo.getBoundingClientRect().top - folga));
-    }
+    /* ⚠️ ETAPA 58 (11) (16:24, com 2 prints — substitui a ETAPA 47): "editar" volta pra esta página PARADA na
+       posição dos botões (Personalize aqui, declaração, Comprar à vista) e JÁ com a janela de personalizar aberta,
+       tudo preenchido, a peça de frente, centralizada e parada. */
+    if (p.sem_nome) { var fsn = document.querySelector('[data-personalizar]'); if (fsn) fsn.setAttribute('data-sem-nome', ''); }
+    if (p.cores && p.cores.escolhas) window.aleaMiniatura3D = item.miniatura || null;
     if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
-    requestAnimationFrame(cairNoNome);
-    if (document.readyState !== 'complete') window.addEventListener('load', cairNoNome, { once: true });
-    setTimeout(cairNoNome, 400);
+    function abrirEditando() {
+      irParaOsBotoes(false);
+      if (window.aleaAbrirPersonalizar) window.aleaAbrirPersonalizar(null, { parado: true });
+    }
+    if (document.readyState === 'complete') setTimeout(abrirEditando, 50);
+    else window.addEventListener('load', function () { setTimeout(abrirEditando, 50); }, { once: true });
   })();
 
   function porNoCarrinho(eDepoisFechar) {
     var faltas = oQueFalta();
-    if (faltas.length) { reclamarDoQueFalta(faltas); return; }
+    if (faltas.length) {
+      /* ETAPA 55: o formulário mora na janela — faltou algo, a janela abre e a falta treme lá dentro */
+      /* ETAPA 57 (15:54): "só é pra abrir a parte de personalizar se ele esqueceu de personalizar alguma coisa
+         obrigatória" — faltando SÓ a declaração (que fica na página), treme a página, como antes */
+      var formP = document.querySelector('[data-personalizar]');
+      var faltaDentro = formP && faltas.some(function (f) { return f.el && formP.contains(f.el); });
+      if (window.aleaAbrirPersonalizar && faltaDentro) {
+        window.aleaAbrirPersonalizar(function () { setTimeout(function () { reclamarDoQueFalta(oQueFalta()); if (window.aleaIrParaFalta) window.aleaIrParaFalta(); }, 60); });
+      } else { reclamarDoQueFalta(faltas); }
+      return;
+    }
     if (!window.aleaCarrinho) return;
     var recado = document.querySelector('[data-recado-aceite]');
     if (recado) recado.hidden = true;
@@ -547,7 +786,7 @@
       if (window.aleaGaveta) window.aleaGaveta.abrir('carrinho');
       return;
     }
-    avisarQueEntrou(botaoComprar.getAttribute('data-capa'));
+    avisarQueEntrou(botaoComprar.getAttribute('data-capa'), window.aleaMiniatura3D);
     Array.prototype.forEach.call(document.querySelectorAll('.topo [data-abrir="carrinho"], [data-add-carrinho]'), function (b) {
       b.classList.remove('sacola-pulou');
       void b.offsetWidth;

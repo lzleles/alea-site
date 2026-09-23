@@ -1382,3 +1382,184 @@ body { position: relative; max-width: 100%; }
    quadrado branco) — 'pra dar a impressão de um produto 3D', como a 1ª foto do feed. O recorte já
    era o arquivo usado (`_obj_m.webp`); o que tirava o efeito era o fundo branco do CSS. */
 .linha-carrinho img { background: transparent; border-radius: 0; }
+
+/* ETAPA 51 (23/09/2026, 13:19): Básico · Fosco · Perolizado NO LUGAR do rótulo "Cor principal", com a
+   MESMA letra, tamanho e cor do rótulo (dourado, 13px, maiúscula) e a MESMA bolinha do Monocromático.
+   A janela da cor é uma lista, travada até escolher o acabamento. */
+.cores-campos .campo-cor .acabamentos { display: flex; flex-wrap: wrap; gap: 6px 18px; }
+.cores-campos .campo-cor .acabamento {
+  display: flex; align-items: center; gap: 8px; cursor: pointer;
+  font-size: 13px; letter-spacing: .06em; text-transform: uppercase; color: var(--dourado); font-weight: 700;
+}
+.cores-campos .campo-cor .acabamento input { width: 19px; height: 19px; accent-color: var(--terracota); cursor: pointer; margin: 0; }
+.cores-campos .campo-cor select {
+  font: inherit; font-size: 15.5px; color: var(--tinta); padding: 11px 13px;
+  border: 1px solid var(--borda); border-radius: 10px; background: #fff; width: 100%;
+}
+.cores-campos .campo-cor select:disabled { background: #EFEAE2; color: var(--tinta-fraca); cursor: not-allowed; }
+.cores-campos .campo-cor.faltou .acabamento { color: var(--terracota); }
+.cores-campos .campo-cor.faltou select { border-color: var(--terracota); box-shadow: 0 0 0 1px var(--terracota); }
+
+/* ETAPA 52 (23/09/2026, 14:03): Tricolor/Bicolor/Monocromático na COR do rótulo "Cores da peça" (dourado),
+   com a grafia de hoje (só a primeira maiúscula). Básico/Fosco/Perolizado em PRETO, com a mesma fonte e o
+   mesmo jeito de escrita do Tricolor (desfaz o dourado/maiúscula da etapa 51). Vale também na cor do nome. */
+/* ETAPA 52b (14:04, áudio seguinte): o Tricolor/Bicolor/Monocromático fica EXATAMENTE como o rótulo "Cores
+   da peça" — maiúscula, dourado, mesmo tamanho ("não quero maior do que o cores da peça"). E o Básico/Fosco/
+   Perolizado herda o formato que o Tricolor tinha (primeira maiúscula, preto, 15,5 px). */
+.cores-opcoes label { color: var(--dourado); font-size: 13px; letter-spacing: .06em; text-transform: uppercase; font-weight: 700; }
+.cores-campos .campo-cor .acabamento, .campo-cor-nome .acabamento {
+  font-size: 15.5px; letter-spacing: 0; text-transform: none; color: var(--tinta); font-weight: 400;
+  display: flex; align-items: center; gap: 8px; cursor: pointer;
+}
+.campo-cor-nome { display: grid; gap: 8px; }
+.campo-cor-nome .acabamentos { display: flex; flex-wrap: wrap; gap: 6px 18px; }
+.campo-cor-nome .acabamento input { width: 19px; height: 19px; accent-color: var(--terracota); cursor: pointer; margin: 0; }
+.campo-cor-nome .acabamento input:disabled { cursor: not-allowed; }
+.campo-cor-nome .acabamento:has(input:disabled) { color: var(--tinta-fraca); cursor: not-allowed; }
+.campo-cor-nome select {
+  font: inherit; font-size: 15.5px; text-transform: none; letter-spacing: 0; color: var(--tinta);
+  padding: 11px 13px; border: 1px solid var(--borda); border-radius: 10px; background: #fff; width: 100%;
+}
+.campo-cor-nome select:disabled { background: #EFEAE2; color: var(--tinta-fraca); cursor: not-allowed; }
+.cores-campos .campo-cor.faltou .acabamento, label.faltou .campo-cor-nome .acabamento { color: var(--terracota); }
+label.faltou .campo-cor-nome select { border-color: var(--terracota); box-shadow: 0 0 0 1px var(--terracota); }
+.campo-cor-nome select, .campo-cor-nome option { font-weight: 400; }
+
+/* ETAPA 53 (23/09/2026, 14:27): a janela 3D "Personalize aqui" — menor que a tela, fundo do site EMBAÇADO
+   ("pro cliente não sair daquela janela"). Peça à esquerda (no celular, em cima), escolhas à direita. */
+.personalizar .personalizar-3d { width: 100%; }
+.personalizar .personalizar-3d.carregando { opacity: .6; pointer-events: none; }
+html.janela3d-aberta { overflow: hidden; }
+.janela3d-fundo {
+  position: fixed; inset: 0; z-index: 90; display: grid; place-items: center; padding: 16px;
+  background: rgba(20, 16, 12, .35); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+  opacity: 0; transition: opacity .22s ease;
+}
+.janela3d-fundo.visivel { opacity: 1; }
+.janela3d {
+  position: relative; width: min(960px, 100%); max-height: calc(100dvh - 32px); overflow: auto;
+  display: grid; grid-template-columns: 1.25fr 1fr; background: var(--papel, #F5EFE6);
+  border-radius: 18px; box-shadow: 0 20px 60px rgba(0,0,0,.35);
+}
+.janela3d-palco { position: relative; min-height: 420px; background: #000; border-radius: 18px 0 0 18px; }
+.janela3d-palco canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; }
+.janela3d-dica, .janela3d-carregando { position: absolute; left: 0; right: 0; text-align: center; color: #bbb; font-size: 12.5px; margin: 0; pointer-events: none; }
+.janela3d-dica { bottom: 10px; }
+.janela3d-carregando { top: 50%; }
+.janela3d-lado { padding: 22px 20px 20px; display: grid; gap: 14px; align-content: start; }
+.janela3d-lado h2 { margin: 0; font-family: var(--fonte-titulo); font-size: 22px; }
+.janela3d-rotulo { display: grid; gap: 6px; font-size: 13px; letter-spacing: .06em; text-transform: uppercase; color: var(--dourado); font-weight: 700; }
+.janela3d-rotulo input {
+  font: inherit; font-size: 15.5px; text-transform: none; letter-spacing: 0; font-weight: 400; color: var(--tinta);
+  padding: 11px 13px; border: 1px solid var(--borda); border-radius: 10px; background: #fff;
+}
+.janela3d-abas { display: flex; gap: 8px; border-bottom: 1px solid var(--borda); }
+.janela3d-abas button {
+  font: inherit; font-size: 15px; background: none; border: 0; padding: 8px 4px; cursor: pointer; color: var(--tinta-fraca);
+  border-bottom: 2px solid transparent; margin-bottom: -1px;
+}
+.janela3d-abas button[aria-selected="true"] { color: var(--tinta); border-bottom-color: var(--terracota); font-weight: 600; }
+.janela3d-zonas { display: grid; gap: 12px; }
+.janela3d-zona { display: grid; gap: 6px; }
+.janela3d-bolas { display: flex; flex-wrap: wrap; gap: 10px; }
+.janela3d-bola {
+  display: grid; justify-items: center; gap: 4px; background: none; border: 0; padding: 0; cursor: pointer;
+  font: inherit; font-size: 11.5px; color: var(--tinta); width: 58px;
+}
+.janela3d-bola::before {
+  content: ""; width: 34px; height: 34px; border-radius: 50%; background: var(--c);
+  box-shadow: inset 0 0 0 1px rgba(0,0,0,.18); outline: 2px solid transparent; outline-offset: 2px;
+}
+.janela3d-bola.ativa::before { outline-color: var(--terracota); }
+.janela3d-bola span { line-height: 1.15; text-align: center; }
+.janela3d-aviso { font-size: 12px; color: var(--tinta-fraca); margin: 0; }
+.janela3d-fechar {
+  position: absolute; top: 8px; right: 10px; z-index: 2; width: 36px; height: 36px; border-radius: 50%;
+  border: 0; background: rgba(255,255,255,.85); font-size: 22px; line-height: 1; cursor: pointer;
+}
+@media (max-width: 760px) {
+  .janela3d { grid-template-columns: 1fr; }
+  .janela3d-palco { min-height: 46dvh; border-radius: 18px 18px 0 0; }
+}
+
+/* ETAPA 55 (23/09/2026, executar das 15:23):
+   1. o formulário SÓ aparece dentro da janela "Personalize aqui";
+   2. fundo de ESTÚDIO (degradê bege-acinzentado, tom médio) no lugar do preto — as duas cores vêm do JS e mudam
+      conforme a peça fica clara ou escura, com transição suave. */
+.personalizar.mora-na-janela { display: none; }
+.janela3d-form .personalizar.mora-na-janela { display: grid; margin: 0; }
+.personalizar-3d { width: 100%; margin: 0 0 20px; }
+.janela3d-palco {
+  --estudio-centro: #E6DFD3; --estudio-borda: #BFB5A5;
+  background: radial-gradient(ellipse 75% 70% at 50% 45%, var(--estudio-centro), var(--estudio-borda));
+  transition: --estudio-centro .4s, --estudio-borda .4s;
+}
+.janela3d-dica, .janela3d-carregando { color: rgba(40,32,24,.55); }
+.janela3d-lado { max-height: calc(100dvh - 32px); overflow: auto; }
+@media (max-width: 760px) { .janela3d-lado { max-height: none; overflow: visible; } }
+
+/* ETAPA 56 (23/09/2026, executar das 15:43): UM PASSO POR VEZ, janela estática; no celular a janela ocupa só a
+   parte visível da tela (o JS acerta a altura com o teclado aberto): a peça em cima encolhe, o passo fica embaixo. */
+.passo-escondido { display: none !important; }
+.janela3d-passo { font-family: var(--fonte-corpo); font-size: 13px; font-weight: 400; color: var(--tinta-fraca); margin-left: 6px; }
+.janela3d-nav { display: grid; grid-template-columns: repeat(var(--n, 1), 1fr); gap: 10px; }
+.janela3d-nav[data-quantos="2"] { --n: 2; }
+.janela3d-nav[data-quantos="3"] { --n: 3; }
+.janela3d-nav .botao { width: 100%; }
+.janela3d-nav .botao-sec {
+  font: inherit; font-size: 15px; border-radius: 999px; padding: 12px 10px; cursor: pointer;
+  background: transparent; color: var(--terracota); border: 1.5px solid var(--terracota);
+}
+.janela3d-fundo { overscroll-behavior: contain; touch-action: none; }
+.janela3d, .janela3d-lado { overscroll-behavior: contain; }
+.janela3d-lado { touch-action: pan-y; }
+@media (max-width: 760px) {
+  .janela3d-fundo { padding: 8px; align-items: end; bottom: auto; }
+  .janela3d { display: flex; flex-direction: column; height: 100%; max-height: 100%; overflow: hidden; }
+  .janela3d-palco { flex: 1 1 auto; min-height: 0; height: auto; }
+  .janela3d-lado { flex: 0 0 auto; padding: 14px 16px 16px; gap: 10px; }
+  .janela3d-lado h2 { font-size: 19px; }
+  .janela3d-aviso { display: none; }
+}
+
+/* ETAPA 57 (23/09/2026, executar das 16:00) ------------------------------------------------------------
+   1. a MOLDURA das gavetas: fixa, do tamanho da tela, corta o que passa da borda (as gavetas fechadas ficam
+      dentro dela, fora da vista, sem aumentar a página). Ela não pega toque; a gaveta aberta sim.
+      E a trava do eixo X passa de `hidden` pra `clip`: `hidden` transforma a página em caixa de rolagem (o que
+      atrapalha o Safari com o que é fixo); `clip` só corta. */
+/* `clip` e não `hidden`: `hidden` ainda é caixa de rolagem, e o foco no botão da gaveta (que nasce fora da
+   vista) fazia a moldura ROLAR sozinha 390 px pro lado — a sacola abria fora da tela (medido no WebKit) */
+.moldura-gavetas { position: fixed; inset: 0; overflow: clip; pointer-events: none; z-index: 80; }
+.moldura-gavetas > .gaveta { position: absolute; pointer-events: auto; }
+html, body { overflow-x: clip; }
+/* 3. "Os botõezinhos estão brancos, parece que estão disponíveis": travados, ficam no MESMO tom da janela
+      travada de baixo, com o nome apagado; só ficam brancos quando marca "Um detalhe que transforma". */
+.campo-cor-nome .acabamento input:disabled {
+  -webkit-appearance: none; appearance: none; width: 19px; height: 19px; border-radius: 50%; margin: 0;
+  background: #EFEAE2; border: 1.5px solid var(--borda); cursor: not-allowed;
+}
+.campo-cor-nome .acabamento:has(input:disabled) { color: var(--tinta-fraca); opacity: .75; }
+
+/* ETAPA 58 (8): a perguntinha "Deseja mesmo não adicionar nome?" por cima do passo, dentro da janela */
+.janela3d-lado { position: relative; }
+.janela3d-pergunta {
+  position: absolute; inset: 0; z-index: 3; display: grid; align-content: center; gap: 14px; padding: 20px;
+  background: color-mix(in srgb, var(--papel, #F5EFE6) 96%, transparent); border-radius: 0 0 18px 18px;
+}
+.janela3d-pergunta p { margin: 0; font-family: var(--fonte-titulo); font-size: 19px; text-align: center; color: var(--tinta); }
+
+/* ETAPA 59: o recadinho do passo (acima do Voltar), no estilo do "Por favor, selecione a cor da peça."; e o detalhe
+   INATIVO quando o cliente escolheu ficar sem nome (apagado, mesmo tom das opções travadas) */
+.janela3d-recado { margin: 0; color: var(--terracota); font-weight: 600; font-size: 14px; }
+.personalizar .extra.inativo { background: #EFEAE2; border-color: var(--borda); opacity: .7; cursor: not-allowed; }
+.personalizar .extra.inativo .titulo-extra { color: var(--tinta-fraca); }
+
+/* ETAPA 60: a película que pega o toque nas opções travadas (o iPhone não entrega toque em campo desativado) e o
+   quadradinho do detalhe APAGADO quando o cliente escolheu ficar sem nome (mesmo tom das bolinhas travadas) */
+.campo-cor-nome { position: relative; }
+.campo-cor-nome .trava-toque { position: absolute; inset: 0; z-index: 2; background: transparent; cursor: not-allowed; }
+.campo-cor-nome .trava-toque[hidden] { display: none; }
+.personalizar .extra.inativo input[type="checkbox"] {
+  -webkit-appearance: none; appearance: none; width: 20px; height: 20px; margin: 0; border-radius: 5px;
+  background: #EFEAE2; border: 1.5px solid var(--borda); cursor: not-allowed;
+}

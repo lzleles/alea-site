@@ -133,6 +133,7 @@
     var p = i.personalizacao || {};
     var partes = [];
     if (p.nome_pet) partes.push('Nome: ' + p.nome_pet);    // ETAPA 44 (22:38): N maiúsculo
+    else if (p.sem_nome) partes.push('Nome: sem nome');      // ETAPA 58 (8): o cliente confirmou que não quer nome
     if (p.cor) partes.push('cores da peça: ' + p.cor);      // formato antigo, ainda no aparelho de quem já comprou
     /* as cores viraram escolha (Tricolor, Bicolor, Monocromático, Degradê) em
        15/09/2026. O Degradê não traz cor nenhuma: traz a combinação a fazer depois. */
@@ -142,7 +143,13 @@
         : (p.cores.modo + (p.cores.cores && p.cores.cores.length
             ? ': ' + p.cores.cores.join(', ') : '')));
     }
-    if (p.cor_nome) partes.push('cor do nome: ' + p.cor_nome);
+    /* ETAPA 51 (23/09/2026): no PEDIDO (a mensagem que chega pro Cassiano) vai também o nome ORIGINAL de
+       cada filamento — o cliente escolheu "Azul Fosco", ele precisa ler a bobina exata. Na sacola não. */
+    if (comMaterial && p.cores && p.cores.originais && p.cores.originais.length) {
+      partes.push('filamentos: ' + p.cores.originais.join(' / '));
+    }
+    if (p.cor_nome) partes.push('cor do nome: ' + p.cor_nome +
+      (comMaterial && p.cor_nome_original ? ' (' + p.cor_nome_original + ')' : ''));
     (i.extras || []).forEach(function (x) {
       partes.push(x.rotulo + ' (+' + window.aleaDinheiro(x.preco) + ')');
     });
@@ -196,7 +203,7 @@
         /* miniatura: o recorte quando existe, a foto normal quando nao. Nem toda peca
            tem recorte (ver `recorte` no produtos.js), e imagem quebrada no carrinho e'
            a ultima coisa que alguem quer ver antes de fechar um pedido. */
-        '<img src="img/produtos/' + i.capa + '_obj_m.webp" alt="" loading="lazy" ' +
+        '<img src="' + (i.miniatura || ('img/produtos/' + i.capa + '_obj_m.webp')) + '" alt="" loading="lazy" ' +
         'onerror="this.onerror=null;this.src=&quot;img/produtos/' + i.capa + '_m.jpg&quot;">' +
         '<div class="lado"><div class="cabeca-linha"><div class="titulo">' + i.nome + '</div>' +
         '<button class="tirar-x" type="button" data-tirar="' + n + '" aria-label="Tirar ' + i.nome +
@@ -238,7 +245,7 @@
     a.setAttribute('role', 'alertdialog');
     a.setAttribute('aria-label', 'Remover item da sacola');
     a.innerHTML =
-      '<div class="miniatura"><img alt="" src="img/produtos/' + i.capa + '_obj_m.webp" ' +
+      '<div class="miniatura"><img alt="" src="' + (i.miniatura || ('img/produtos/' + i.capa + '_obj_m.webp')) + '" ' +
       'onerror="this.onerror=null;this.src=&quot;img/produtos/' + i.capa + '_m.jpg&quot;"></div>' +
       '<div class="texto"><p>Tem certeza de que deseja remover este item da sua sacola?</p>' +
       '<div class="escolha"><button type="button" class="botao" data-remover-sim="' + n + '">Sim</button>' +
