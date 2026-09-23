@@ -259,6 +259,33 @@
       'O frete é calculado no fechamento, pelo CEP. Peça personalizada só entra em ' +
       'produção depois da confirmação do pagamento.</p>');
 
+    /* ⚠️ ETAPA 40 (22:23, vídeo + 2 prints do modelo): "na página da sacola é pra deixar só a
+       sacola" — a PRIMEIRA tela tem que caber inteira no telefone (título, produtos, Subtotal e o
+       botão lá embaixo), e só ROLANDO aparece o "Continue comprando". E o site de baixo não pode
+       rolar junto ("parece que está rodando a segunda tela"). Então a sacola vira UMA página que rola
+       sozinha: a `.tela-sacola` ocupa exatamente a altura visível (100dvh) e o `.rodape-extra` mora
+       depois dela, fora da primeira tela. Monta aqui, movendo os pedaços do molde. */
+    (function () {
+      var g = document.getElementById('gaveta-carrinho');
+      if (!g) return;
+      var rod = g.querySelector('[data-rodape-gaveta]');
+      var tela = document.createElement('div');
+      tela.className = 'tela-sacola';
+      var principal = document.createElement('div');
+      principal.className = 'rodape-principal';
+      var extra = document.createElement('div');
+      extra.className = 'rodape-extra';
+      Array.prototype.slice.call(rod.children).forEach(function (el) {
+        (el.matches('.total-carrinho, [data-fechar-pedido]') ? principal : extra).appendChild(el);
+      });
+      tela.appendChild(g.querySelector('header'));
+      tela.appendChild(g.querySelector('[data-corpo]'));
+      tela.appendChild(principal);
+      g.insertBefore(tela, rod);
+      g.insertBefore(extra, rod);
+      g.removeChild(rod);
+    })();
+
     molde('conta', 'Sua conta ālea',
       '<p class="vazio">Carregando…</p>', '');
 

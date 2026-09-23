@@ -1319,3 +1319,21 @@ body.sem-transicao-feed .feed { transition: none !important; }
 .linha-carrinho.mexeu { animation: linha-mexeu .9s ease-out 1; border-radius: 10px; }
 .linha-carrinho.mexeu .passos .n { display: inline-block; animation: numero-respira .45s ease-out 1; }
 @media (prefers-reduced-motion: reduce) { .linha-carrinho.mexeu, .linha-carrinho.mexeu .passos .n { animation: none; } }
+
+/* ETAPA 40 (22:23): a SACOLA é uma página própria que rola sozinha (o site de baixo não rola junto).
+   A 1ª tela (.tela-sacola) cabe exata na altura VISÍVEL do celular — 100dvh, que acompanha a barra
+   do Safari entrando e saindo (o 100vh não acompanha e fazia o rodapé pular). Subtotal e o botão
+   ficam no pé dessa tela; o "Continue comprando" e o aviso do frete só aparecem rolando. */
+#gaveta-carrinho {
+  bottom: auto; height: calc(100vh - var(--tarja, 0px));
+  display: block; overflow-y: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch;
+}
+#gaveta-carrinho .tela-sacola { min-height: calc(100vh - var(--tarja, 0px)); display: flex; flex-direction: column; }
+@supports (height: 100dvh) {
+  #gaveta-carrinho { height: calc(100dvh - var(--tarja, 0px)); }
+  #gaveta-carrinho .tela-sacola { min-height: calc(100dvh - var(--tarja, 0px)); }
+}
+#gaveta-carrinho .corpo { flex: 1; overflow: visible; }
+#gaveta-carrinho .rodape-principal { padding: 16px 20px 20px; border-top: 1px solid var(--borda); display: grid; gap: 12px; }
+#gaveta-carrinho .rodape-extra { padding: 18px 20px 34px; display: grid; gap: 12px; }
+body.travado { overflow: hidden; overscroll-behavior: none; }
