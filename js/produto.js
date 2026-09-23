@@ -686,7 +686,7 @@
     if (faltas.length) {
       /* ETAPA 55: o formulário mora na janela — faltou algo, a janela abre e a falta treme lá dentro */
       if (window.aleaAbrirPersonalizar) {
-        window.aleaAbrirPersonalizar(function () { setTimeout(function () { reclamarDoQueFalta(oQueFalta()); }, 60); });
+        window.aleaAbrirPersonalizar(function () { setTimeout(function () { reclamarDoQueFalta(oQueFalta()); if (window.aleaIrParaFalta) window.aleaIrParaFalta(); }, 60); });
       } else { reclamarDoQueFalta(faltas); }
       return;
     }

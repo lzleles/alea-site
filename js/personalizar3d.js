@@ -5,7 +5,7 @@
              pet GRAVADO ao vivo e as cores da peça e do nome trocando na hora, conforme o formulário.
    entrada: ALEA.modelos3d[slug] e ALEA.filamentos (config.js); o formulário [data-personalizar] da página
    saida: a janela (modal); o formulário de verdade MORA dentro dela enquanto está aberta
-   status: protótipo v2 (23/09/2026, etapa 55)
+   status: protótipo v3 (23/09/2026, etapa 56)
    validado_em: 23/09/2026 (teste headless desktop e 390 px)
 */
 /* =============================================================================
@@ -23,6 +23,16 @@
      3. "A peça está com muita iluminação (...) dependendo do jeito que eu giro, não vejo o nome": a luz agora anda
         COM a câmera (vem sempre de onde você olha, um pouco de cima), então nenhum lado fica estourado ou apagado
         e o nome aparece em qualquer ângulo.
+   v3 (etapa 56, 15:33-15:43, "executar" das 15:43):
+     1. "Quando eu clicar em Nome do pet, a tela fica nessa posição (...) e você vira a peça pra frente e ela fica
+        parada pra ele ver o nome sendo transformado na hora": no celular a janela acompanha a parte VISÍVEL da tela
+        (visualViewport) — com o teclado aberto, o campo fica logo acima dele e a peça continua inteira em cima; e
+        tocar no nome para o giro e traz o nome de frente.
+     2. "A tela de trás está mexendo (...) a de trás não pode nunca mexer": a página fica TRAVADA (body fixo no
+        lugar) enquanto a janela está aberta — o mesmo remédio da sacola (etapa 40).
+     4. "Tive uma ideia melhor (...) totalmente estática": UM PASSO POR VEZ — 1 Nome do pet [Próximo];
+        2 "Um detalhe que transforma" + cor do nome [Voltar] [Pular] [Próximo]; 3 Cores da peça [Voltar] [Pronto].
+        A janela tem só a altura do passo e não rola.
    ============================================================================= */
 
 var ACABAMENTO_MATERIAL = {           // como cada acabamento reflete a luz
@@ -43,7 +53,7 @@ export async function abrirJanela3D(cfg, aoFechar, aoMontar) {
       '<div class="janela3d-palco"><canvas></canvas><p class="janela3d-dica">Arraste para girar</p>' +
         '<p class="janela3d-carregando">Carregando a peça…</p></div>' +
       '<div class="janela3d-lado">' +
-        '<h2>Personalize</h2>' +
+        '<h2>Personalize <small class="janela3d-passo"></small></h2>' +
         '<div class="janela3d-form"></div>' +
         '<p class="janela3d-aviso">Simulação. A cor na tela pode variar um pouco da peça real.</p>' +
         '<button type="button" class="botao janela3d-pronto">Pronto</button>' +
@@ -52,6 +62,73 @@ export async function abrirJanela3D(cfg, aoFechar, aoMontar) {
   document.body.appendChild(fundo);
   if (form) { form.parentNode.insertBefore(lugarDoForm, form); fundo.querySelector('.janela3d-form').appendChild(form); }
   document.documentElement.classList.add('janela3d-aberta');
+
+  /* (2) o fundo NÃO mexe: a página fica presa no lugar enquanto a janela está aberta */
+  var rolagemAntes = window.scrollY || 0;
+  document.body.style.position = 'fixed';
+  document.body.style.top = (-rolagemAntes) + 'px';
+  document.body.style.left = '0'; document.body.style.right = '0';
+
+  /* (1) a janela ocupa só a parte VISÍVEL da tela: com o teclado aberto ela encolhe por cima dele */
+  var vv = window.visualViewport;
+  function acompanharTela() {
+    if (!vv) return;
+    fundo.style.height = vv.height + 'px';
+    fundo.style.top = vv.offsetTop + 'px';
+  }
+  if (vv) { vv.addEventListener('resize', acompanharTela); vv.addEventListener('scroll', acompanharTela); acompanharTela(); }
+
+  /* (4) UM PASSO POR VEZ */
+  var passos = [];
+  if (form) {
+    var nomeRot = (form.querySelector('[name="nome_pet"]') || {}).closest ? form.querySelector('[name="nome_pet"]').closest('label') : null;
+    var extraRot = form.querySelector('[data-extra]');
+    var corNomeRot = form.querySelector('.campo-cor-nome') ? form.querySelector('.campo-cor-nome').closest('label') : null;
+    var coresRot = form.querySelector('[data-cores-peca]');
+    passos = [[nomeRot], [extraRot, corNomeRot], [coresRot]].map(function (els) { return els.filter(Boolean); })
+      .filter(function (els) { return els.length; });
+  }
+  var nav = document.createElement('div');
+  nav.className = 'janela3d-nav';
+  var passoAtual = 0;
+  var botaoPronto = fundo.querySelector('.janela3d-pronto');
+  botaoPronto.parentNode.insertBefore(nav, botaoPronto);
+  botaoPronto.style.display = 'none';   // o Pronto agora é o do último passo
+  function mostrarPasso(i) {
+    passoAtual = Math.max(0, Math.min(passos.length - 1, i));
+    passos.forEach(function (els, k) { els.forEach(function (el) { el.classList.toggle('passo-escondido', k !== passoAtual); }); });
+    var ultimo = passoAtual === passos.length - 1;
+    var html = '';
+    if (passoAtual > 0) html += '<button type="button" class="botao-sec" data-nav="voltar">Voltar</button>';
+    if (passoAtual === 1) html += '<button type="button" class="botao-sec" data-nav="pular">Pular</button>';
+    html += ultimo ? '<button type="button" class="botao" data-nav="pronto">Pronto</button>'
+                   : '<button type="button" class="botao" data-nav="proximo">Próximo</button>';
+    nav.innerHTML = html;
+    nav.setAttribute('data-quantos', String(nav.children.length));
+    fundo.querySelector('.janela3d-passo').textContent = (passoAtual + 1) + ' de ' + passos.length;
+  }
+  nav.addEventListener('click', function (e) {
+    var b = e.target.closest('[data-nav]'); if (!b) return;
+    var acao = b.getAttribute('data-nav');
+    if (acao === 'voltar') mostrarPasso(passoAtual - 1);
+    else if (acao === 'proximo') mostrarPasso(passoAtual + 1);
+    else if (acao === 'pular') {
+      /* pular = sem o adicional de R$ 30: desmarca (o produto.js trava a cor do nome e tira do preço) */
+      var cx = form && form.querySelector('[data-extra-caixa]');
+      if (cx && cx.checked) { cx.checked = false; cx.dispatchEvent(new Event('change', { bubbles: true })); }
+      mostrarPasso(passoAtual + 1);
+    }
+    else if (acao === 'pronto') fechar();
+  });
+  /* a trava de compra marca a falta com .faltou: a janela abre no passo da PRIMEIRA falta */
+  window.aleaIrParaFalta = function () {
+    var f = form && form.querySelector('.faltou');
+    if (!f) return;
+    for (var k = 0; k < passos.length; k++) {
+      if (passos[k].some(function (el) { return el === f || el.contains(f); })) { mostrarPasso(k); return; }
+    }
+  };
+  mostrarPasso(0);
   requestAnimationFrame(function () { fundo.classList.add('visivel'); });
   var palco = fundo.querySelector('.janela3d-palco');
   var canvas = fundo.querySelector('canvas');
@@ -61,10 +138,16 @@ export async function abrirJanela3D(cfg, aoFechar, aoMontar) {
   function fechar() {
     if (!vivo) return;
     vivo = false;
+    passos.forEach(function (els) { els.forEach(function (el) { el.classList.remove('passo-escondido'); }); });
+    document.body.style.position = ''; document.body.style.top = ''; document.body.style.left = ''; document.body.style.right = '';
+    if (vv) { vv.removeEventListener('resize', acompanharTela); vv.removeEventListener('scroll', acompanharTela); }
+    window.aleaIrParaFalta = null;
     if (form && lugarDoForm.parentNode) lugarDoForm.parentNode.insertBefore(form, lugarDoForm);
     if (lugarDoForm.parentNode) lugarDoForm.parentNode.removeChild(lugarDoForm);
     fundo.classList.remove('visivel');
     document.documentElement.classList.remove('janela3d-aberta');
+    window.scrollTo(0, rolagemAntes);
+    requestAnimationFrame(function () { window.scrollTo(0, rolagemAntes); });
     setTimeout(function () { if (limpar) limpar(); if (fundo.parentNode) fundo.parentNode.removeChild(fundo); }, 250);
     if (aoFechar) aoFechar();
   }
@@ -111,8 +194,14 @@ export async function abrirJanela3D(cfg, aoFechar, aoMontar) {
   function redimensionar() {
     var w = palco.clientWidth, h = palco.clientHeight;
     renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix();
+    if (raioPeca && controles) {
+      var d = camera.position.clone().sub(controles.target);
+      camera.position.copy(controles.target).addScaledVector(d.normalize(), distanciaQueCabe());
+      if (typeof frente !== 'undefined' && frente) frente.copy(controles.target).addScaledVector(direcao, distanciaQueCabe());
+    }
   }
   window.addEventListener('resize', redimensionar);
+  if (window.ResizeObserver) new ResizeObserver(redimensionar).observe(palco);
   redimensionar();
   (function laco() { if (!vivo) return; controles.update(); renderer.render(cena, camera); requestAnimationFrame(laco); })();
 
@@ -184,7 +273,7 @@ export async function abrirJanela3D(cfg, aoFechar, aoMontar) {
   var avaliador = new CSG.Evaluator();
   avaliador.useGroups = true;
   avaliador.attributes = ['position', 'normal'];
-  var resultado = null, preenchida = null, nomeColorido = false;
+  var resultado = null, preenchida = null, nomeColorido = false, frente = null;
 
   function gravar(nome) {
     nome = (nome || '').trim();
@@ -253,8 +342,16 @@ export async function abrirJanela3D(cfg, aoFechar, aoMontar) {
     cena.add(s);
   })();
   controles.target.copy(centro);
-  var dist = Math.max(tam.x, tam.y, tam.z) * 2.6;
-  camera.position.set(centro.x, centro.y + dist * 0.35, centro.z + dist);
+  /* enquadrar pela esfera da peça e pelo MENOR dos dois ângulos de visão: no celular o palco é alto e estreito,
+     e medir só pela altura deixava a peça cortada dos lados (visto no teste de 390 px, etapa 56) */
+  var raioPeca = caixa.getBoundingSphere(new THREE.Sphere()).radius;
+  var direcao = new THREE.Vector3(0, 0.35, 1).normalize();
+  function distanciaQueCabe() {
+    var v = THREE.MathUtils.degToRad(camera.fov) / 2, h = Math.atan(Math.tan(v) * camera.aspect);
+    return raioPeca * 0.82 / Math.sin(Math.min(v, h));
+  }
+  camera.position.copy(centro).addScaledVector(direcao, distanciaQueCabe());
+  controles.maxDistance = distanciaQueCabe() * 1.8;
   controles.update();
 
   /* ---------------- o formulário manda na peça */
@@ -307,6 +404,17 @@ export async function abrirJanela3D(cfg, aoFechar, aoMontar) {
     ajustarFundo(ordemZonas.map(function (z) { return '#' + mats[z].color.getHexString(); }));
   }
   var campoNome = form && form.querySelector('[name="nome_pet"]');
+  frente = camera.position.clone();
+  function virarPraFrente() {
+    controles.autoRotate = false;
+    var de = camera.position.clone(), t0 = performance.now();
+    (function passo() {
+      var u = Math.min(1, (performance.now() - t0) / 600), e = 1 - Math.pow(1 - u, 3);
+      camera.position.lerpVectors(de, frente, e);
+      if (u < 1 && vivo) requestAnimationFrame(passo);
+    })();
+  }
+  if (campoNome) campoNome.addEventListener('focus', virarPraFrente);
   gravar((campoNome && campoNome.value) || quadro.text_info.text || '');
   aplicarForm();
   fundo.querySelector('.janela3d-carregando').hidden = true;
@@ -322,6 +430,7 @@ export async function abrirJanela3D(cfg, aoFechar, aoMontar) {
 
   limpar = function () {
     if (form) { form.removeEventListener('input', aoMexer); form.removeEventListener('change', aoMexer); }
+    if (campoNome) campoNome.removeEventListener('focus', virarPraFrente);
     window.removeEventListener('resize', redimensionar);
     renderer.dispose();
   };

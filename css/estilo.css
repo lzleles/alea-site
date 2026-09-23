@@ -1497,3 +1497,27 @@ html.janela3d-aberta { overflow: hidden; }
 .janela3d-dica, .janela3d-carregando { color: rgba(40,32,24,.55); }
 .janela3d-lado { max-height: calc(100dvh - 32px); overflow: auto; }
 @media (max-width: 760px) { .janela3d-lado { max-height: none; overflow: visible; } }
+
+/* ETAPA 56 (23/09/2026, executar das 15:43): UM PASSO POR VEZ, janela estática; no celular a janela ocupa só a
+   parte visível da tela (o JS acerta a altura com o teclado aberto): a peça em cima encolhe, o passo fica embaixo. */
+.passo-escondido { display: none !important; }
+.janela3d-passo { font-family: var(--fonte-corpo); font-size: 13px; font-weight: 400; color: var(--tinta-fraca); margin-left: 6px; }
+.janela3d-nav { display: grid; grid-template-columns: repeat(var(--n, 1), 1fr); gap: 10px; }
+.janela3d-nav[data-quantos="2"] { --n: 2; }
+.janela3d-nav[data-quantos="3"] { --n: 3; }
+.janela3d-nav .botao { width: 100%; }
+.janela3d-nav .botao-sec {
+  font: inherit; font-size: 15px; border-radius: 999px; padding: 12px 10px; cursor: pointer;
+  background: transparent; color: var(--terracota); border: 1.5px solid var(--terracota);
+}
+.janela3d-fundo { overscroll-behavior: contain; touch-action: none; }
+.janela3d, .janela3d-lado { overscroll-behavior: contain; }
+.janela3d-lado { touch-action: pan-y; }
+@media (max-width: 760px) {
+  .janela3d-fundo { padding: 8px; align-items: end; bottom: auto; }
+  .janela3d { display: flex; flex-direction: column; height: 100%; max-height: 100%; overflow: hidden; }
+  .janela3d-palco { flex: 1 1 auto; min-height: 0; height: auto; }
+  .janela3d-lado { flex: 0 0 auto; padding: 14px 16px 16px; gap: 10px; }
+  .janela3d-lado h2 { font-size: 19px; }
+  .janela3d-aviso { display: none; }
+}
