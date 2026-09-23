@@ -1539,3 +1539,11 @@ html, body { overflow-x: clip; }
   background: #EFEAE2; border: 1.5px solid var(--borda); cursor: not-allowed;
 }
 .campo-cor-nome .acabamento:has(input:disabled) { color: var(--tinta-fraca); opacity: .75; }
+
+/* ETAPA 58 (8): a perguntinha "Deseja mesmo não adicionar nome?" por cima do passo, dentro da janela */
+.janela3d-lado { position: relative; }
+.janela3d-pergunta {
+  position: absolute; inset: 0; z-index: 3; display: grid; align-content: center; gap: 14px; padding: 20px;
+  background: color-mix(in srgb, var(--papel, #F5EFE6) 96%, transparent); border-radius: 0 0 18px 18px;
+}
+.janela3d-pergunta p { margin: 0; font-family: var(--fonte-titulo); font-size: 19px; text-align: center; color: var(--tinta); }

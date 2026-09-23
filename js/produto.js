@@ -42,6 +42,31 @@
   'use strict';
 
   var colmeia = document.querySelector('[data-colmeia]');
+
+  /* ⚠️ ETAPA 58 (1) (23/09/2026, 16:08): "sempre que abrir qualquer produto, a foto do MEIO é a da capa; o resto
+     pode ser em qualquer ordem". Qual favo fica no meio depende da largura (quantos cabem por linha), então é
+     MEDIDO: acha o favo mais perto do centro da colmeia e põe a capa (data-favo=0) naquela posição. Cada favo
+     leva o próprio data-favo, então a tela cheia continua abrindo a foto certa. */
+  function capaNoMeio() {
+    if (!colmeia) return;
+    var favos = Array.prototype.slice.call(colmeia.querySelectorAll('.favo'));
+    var capa = colmeia.querySelector('.favo[data-favo="0"]');
+    if (!capa || favos.length < 3) return;
+    var cx = colmeia.getBoundingClientRect(), mx = cx.left + cx.width / 2, my = cx.top + cx.height / 2;
+    var melhor = 0, dist = Infinity;
+    favos.forEach(function (f, k) {
+      var r = f.getBoundingClientRect(), d = Math.hypot(r.left + r.width / 2 - mx, r.top + r.height / 2 - my);
+      if (d < dist) { dist = d; melhor = k; }
+    });
+    var alvo = favos[melhor];
+    if (alvo === capa) return;
+    var depoisCapa = capa.nextSibling, depoisAlvo = alvo.nextSibling;
+    colmeia.insertBefore(capa, depoisAlvo === capa ? alvo : depoisAlvo);
+    colmeia.insertBefore(alvo, depoisCapa);
+  }
+  capaNoMeio();
+  var capaEspera = null;
+  window.addEventListener('resize', function () { clearTimeout(capaEspera); capaEspera = setTimeout(capaNoMeio, 200); });
   var telacheia = document.querySelector('[data-telacheia]');
   var caixaAceite = document.querySelector('[data-aceite-caixa]');
   var botaoComprar = document.querySelector('[data-comprar-agora]');
@@ -73,12 +98,12 @@
     form.parentNode.insertBefore(b, form);
     form.classList.add('mora-na-janela');
     var aberto = false;
-    function abrir(depoisDeMontar) {
+    function abrir(depoisDeMontar, opcoes) {
       if (aberto) { if (depoisDeMontar) depoisDeMontar(); return; }
       aberto = true;
       b.classList.add('carregando');
       import('./personalizar3d.js').then(function (m) {
-        return m.abrirJanela3D(cfg3d, function () { aberto = false; }, depoisDeMontar);
+        return m.abrirJanela3D(cfg3d, function () { aberto = false; }, depoisDeMontar, opcoes || {});
       }).catch(function (e) { aberto = false; console.warn('janela 3D', e); })
         .then(function () { b.classList.remove('carregando'); });
     }
@@ -342,7 +367,8 @@
        Base; bicolor: Principal, Base (palavras dele); monocromático: Principal (a peça inteira é a
        cor principal — dedução minha, avisada a ele). E cada caixa ganha um exemplo como o da cor
        do nome, com cores SORTEADAS: "Ex.: <cor> Sólido, <cor> Fosco, <cor> Perolizado…". */
-    var PARTES = { 3: ['Topo', 'Principal', 'Base'], 2: ['Principal', 'Base'], 1: ['Principal'] };
+    /* ETAPA 58 (3) (16:11): no BICOLOR "a primeira cor é a do topo, a segunda serve pro meio e a base" */
+    var PARTES = { 3: ['Topo', 'Principal', 'Base'], 2: ['Topo', 'Principal'], 1: ['Principal'] };
     var partes = PARTES[quantos] || [];
     /* ETAPA 27 (21:09, "aliás, melhor"): o quadradinho da esquerda SAI de vez; a caixa branca fica
        onde está (mesmo recuo), e o nome vai EM CIMA dela, como os outros rótulos do formulário:
@@ -454,9 +480,12 @@
       nome: botaoComprar.getAttribute('data-nome'),
       preco: precoTotal(),
       capa: botaoComprar.getAttribute('data-capa'),
+      /* ETAPA 58 (9): a miniatura é a PEÇA COMO O CLIENTE MONTOU (foto da janela 3D); sem ela, a capa */
+      miniatura: window.aleaMiniatura3D || null,
       material: botaoComprar.getAttribute('data-material'),
       personalizacao: {
         nome_pet: campo('nome_pet'),
+        sem_nome: !campo('nome_pet') && !!(document.querySelector('[data-personalizar]') || { hasAttribute: function () { return false; } }).hasAttribute('data-sem-nome'),
         cor_nome: corDoNomeEscolhida().texto,
         cor_nome_original: corDoNomeEscolhida().original,
         cor_nome_escolha: corDoNomeEscolhida().escolha,
@@ -483,7 +512,10 @@
   function oQueFalta() {
     var faltas = [];
     var nome = document.querySelector('[data-personalizar] [name="nome_pet"]');
-    if (nome && !nome.value.trim()) faltas.push({ el: nome.closest('label') || nome, texto: 'Por favor, digite o nome do pet.' });
+    /* ETAPA 58 (8): "Deseja mesmo não adicionar nome?" -> Sim marca o formulário (data-sem-nome) e o nome não é cobrado */
+    var formSN = document.querySelector('[data-personalizar]');
+    var semNome = formSN && formSN.hasAttribute('data-sem-nome');
+    if (nome && !nome.value.trim() && !semNome) faltas.push({ el: nome.closest('label') || nome, texto: 'Por favor, digite o nome do pet.' });
     /* ETAPA 52: com o detalhe marcado, cobra o acabamento e depois a cor do nome */
     if (corNomeBox && !corNomeBox.querySelector('.acabamento input').disabled) {
       var rotNome = corNomeBox.closest('label') || corNomeBox;
@@ -521,6 +553,16 @@
     }
     return faltas;
   }
+
+  /* a posição do print do Cassiano (msg 629/654): o pé dos botões encostado no pé da parte VISÍVEL da tela */
+  function irParaOsBotoes(suave) {
+    var botoes = document.querySelector('[data-botoes]');
+    if (!botoes) return;
+    var altura = window.visualViewport ? window.visualViewport.height : window.innerHeight;
+    var y = window.scrollY + botoes.getBoundingClientRect().bottom - altura + 16;
+    window.scrollTo({ top: Math.max(0, y), behavior: suave ? 'smooth' : 'auto' });
+  }
+  window.aleaIrParaOsBotoes = irParaOsBotoes;
 
   function reclamarDoQueFalta(faltas) {
     Array.prototype.forEach.call(document.querySelectorAll('.faltou'), function (x) { x.classList.remove('faltou'); });
@@ -564,10 +606,17 @@
          o alinhamento que ele mesmo fez no vídeo: a falta logo ABAIXO do cabeçalho, sobrando a tela
          de baixo pro teclado e pra barrinha. E SEMPRE, a cada clique — não só quando está fora da
          tela. O cabeçalho é medido na hora (a altura muda com a tarja e com o tamanho da tela). */
-      var topo = document.querySelector('.topo');
-      var folga = (topo ? Math.max(0, topo.getBoundingClientRect().bottom) : 0) + 18;
-      var y = window.scrollY + primeira.el.getBoundingClientRect().top - folga;
-      window.scrollTo({ top: Math.max(0, y), behavior: 'smooth' });
+      if (primeira.el.closest && primeira.el.closest('.janela3d')) { /* dentro da janela: quem posiciona é ela */ }
+      else if (primeira.el.closest && primeira.el.closest('[data-aceite]')) {
+        /* ⚠️ ETAPA 58 (4) (16:13, com print): faltando SÓ a declaração, a tela para com a declaração, a frase e os
+           botões no PÉ da parte visível (logo acima da barra do Safari) — sem rolar até a parte preta — e treme ali */
+        irParaOsBotoes(true);
+      } else {
+        var topo = document.querySelector('.topo');
+        var folga = (topo ? Math.max(0, topo.getBoundingClientRect().bottom) : 0) + 18;
+        var y = window.scrollY + primeira.el.getBoundingClientRect().top - folga;
+        window.scrollTo({ top: Math.max(0, y), behavior: 'smooth' });
+      }
     }
   }
 
@@ -591,14 +640,14 @@
      esta criação à sua Sacola de Compras." ("fazer somente a primeira frase"), com × pra fechar. Some
      sozinha em 5 s. Cores e fonte são as da ālea; só a posição e o desenho seguem o modelo. */
   var avisoTimer = null;
-  function avisarQueEntrou(capa) {
+  function avisarQueEntrou(capa, miniatura) {
     var velho = document.querySelector('.aviso-sacola');
     if (velho) velho.parentNode.removeChild(velho);
     var a = document.createElement('div');
     a.className = 'aviso-sacola';
     a.setAttribute('role', 'status');
     a.innerHTML =
-      '<div class="miniatura"><img alt="" src="img/produtos/' + capa + '_obj_m.webp" ' +
+      '<div class="miniatura"><img alt="" src="' + (miniatura || ('img/produtos/' + capa + '_obj_m.webp')) + '" ' +
       'onerror="this.onerror=null;this.src=&quot;img/produtos/' + capa + '_m.jpg&quot;"></div>' +
       '<p>Você adicionou esta criação à sua sacola de compras.</p>' +   // 22:36 minúsculo; 22:38 sem negrito
       '<button type="button" class="fechar-aviso" aria-label="Fechar aviso">&times;</button>';
@@ -668,17 +717,18 @@
     /* ETAPA 47 (22:51): "o cliente não quer saber do topo, ele só quer editar — tem que cair direto no
        NOME DO PET". A tela para com o rótulo "Nome do pet" logo abaixo do cabeçalho (a mesma régua da
        trava de compra). Reaplica no `load`: as fotos da colmeia, carregando, empurram o formulário. */
-    function cairNoNome() {
-      var alvo = nome && (nome.closest('label') || nome);
-      if (!alvo) return;
-      var topo = document.querySelector('.topo');
-      var folga = (topo ? Math.max(0, topo.getBoundingClientRect().bottom) : 0) + 18;
-      window.scrollTo(0, Math.max(0, window.scrollY + alvo.getBoundingClientRect().top - folga));
-    }
+    /* ⚠️ ETAPA 58 (11) (16:24, com 2 prints — substitui a ETAPA 47): "editar" volta pra esta página PARADA na
+       posição dos botões (Personalize aqui, declaração, Comprar à vista) e JÁ com a janela de personalizar aberta,
+       tudo preenchido, a peça de frente, centralizada e parada. */
+    if (p.sem_nome) { var fsn = document.querySelector('[data-personalizar]'); if (fsn) fsn.setAttribute('data-sem-nome', ''); }
+    if (p.cores && p.cores.escolhas) window.aleaMiniatura3D = item.miniatura || null;
     if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
-    requestAnimationFrame(cairNoNome);
-    if (document.readyState !== 'complete') window.addEventListener('load', cairNoNome, { once: true });
-    setTimeout(cairNoNome, 400);
+    function abrirEditando() {
+      irParaOsBotoes(false);
+      if (window.aleaAbrirPersonalizar) window.aleaAbrirPersonalizar(null, { parado: true });
+    }
+    if (document.readyState === 'complete') setTimeout(abrirEditando, 50);
+    else window.addEventListener('load', function () { setTimeout(abrirEditando, 50); }, { once: true });
   })();
 
   function porNoCarrinho(eDepoisFechar) {
@@ -714,7 +764,7 @@
       if (window.aleaGaveta) window.aleaGaveta.abrir('carrinho');
       return;
     }
-    avisarQueEntrou(botaoComprar.getAttribute('data-capa'));
+    avisarQueEntrou(botaoComprar.getAttribute('data-capa'), window.aleaMiniatura3D);
     Array.prototype.forEach.call(document.querySelectorAll('.topo [data-abrir="carrinho"], [data-add-carrinho]'), function (b) {
       b.classList.remove('sacola-pulou');
       void b.offsetWidth;

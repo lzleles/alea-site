@@ -5,7 +5,7 @@
              pet GRAVADO ao vivo e as cores da peça e do nome trocando na hora, conforme o formulário.
    entrada: ALEA.modelos3d[slug] e ALEA.filamentos (config.js); o formulário [data-personalizar] da página
    saida: a janela (modal); o formulário de verdade MORA dentro dela enquanto está aberta
-   status: protótipo v3 (23/09/2026, etapa 56)
+   status: protótipo v4 (23/09/2026, etapa 58)
    validado_em: 23/09/2026 (teste headless desktop e 390 px)
 */
 /* =============================================================================
@@ -33,6 +33,11 @@
      4. "Tive uma ideia melhor (...) totalmente estática": UM PASSO POR VEZ — 1 Nome do pet [Próximo];
         2 "Um detalhe que transforma" + cor do nome [Voltar] [Pular] [Próximo]; 3 Cores da peça [Voltar] [Pronto].
         A janela tem só a altura do passo e não rola.
+   v4 (etapa 58, "executar" das 16:25): sem o "Pular"; bicolor = topo (cor 1) + meio e base (cor 2); nome: abre com
+      o ORIGINAL, apagar no passo 1 volta o original, sair do passo 1 em branco pergunta "Deseja mesmo não adicionar
+      nome?" (Sim = peça sem nome); em peça escura a sombra da letra CLAREIA (sem contorno nem brilho — "o mais real
+      possível"); toque na peça = de frente e parada; "editar" abre de frente e parado; a foto da peça montada vira
+      a MINIATURA da sacola.
    ============================================================================= */
 
 var ACABAMENTO_MATERIAL = {           // como cada acabamento reflete a luz
@@ -41,7 +46,8 @@ var ACABAMENTO_MATERIAL = {           // como cada acabamento reflete a luz
   perolizado: { roughness: 0.32, metalness: 0.3 }
 };
 
-export async function abrirJanela3D(cfg, aoFechar, aoMontar) {
+export async function abrirJanela3D(cfg, aoFechar, aoMontar, opcoes) {
+  opcoes = opcoes || {};
   /* ---------------- a janela (monta ANTES de baixar o 3D: o formulário já fica usável) */
   var form = document.querySelector('[data-personalizar]');
   var lugarDoForm = document.createComment('lugar do formulário');
@@ -100,7 +106,6 @@ export async function abrirJanela3D(cfg, aoFechar, aoMontar) {
     var ultimo = passoAtual === passos.length - 1;
     var html = '';
     if (passoAtual > 0) html += '<button type="button" class="botao-sec" data-nav="voltar">Voltar</button>';
-    if (passoAtual === 1) html += '<button type="button" class="botao-sec" data-nav="pular">Pular</button>';
     html += ultimo ? '<button type="button" class="botao" data-nav="pronto">Pronto</button>'
                    : '<button type="button" class="botao" data-nav="proximo">Próximo</button>';
     nav.innerHTML = html;
@@ -110,8 +115,13 @@ export async function abrirJanela3D(cfg, aoFechar, aoMontar) {
   nav.addEventListener('click', function (e) {
     var b = e.target.closest('[data-nav]'); if (!b) return;
     var acao = b.getAttribute('data-nav');
-    if (acao === 'voltar') mostrarPasso(passoAtual - 1);
-    else if (acao === 'proximo') mostrarPasso(passoAtual + 1);
+    if (acao === 'voltar') { mostrarPasso(passoAtual - 1); if (window.aleaGravarNome) window.aleaGravarNome(); }
+    else if (acao === 'proximo') {
+      var cn = form && form.querySelector('[name="nome_pet"]');
+      if (passoAtual === 0 && cn && !cn.value.trim()) { perguntarSemNome(); return; }
+      mostrarPasso(passoAtual + 1);
+      if (window.aleaGravarNome) window.aleaGravarNome();
+    }
     else if (acao === 'pular') {
       /* pular = sem o adicional de R$ 30: desmarca (o produto.js trava a cor do nome e tira do preço) */
       var cx = form && form.querySelector('[data-extra-caixa]');
@@ -120,6 +130,27 @@ export async function abrirJanela3D(cfg, aoFechar, aoMontar) {
     }
     else if (acao === 'pronto') fechar();
   });
+  /* (8) "Deseja mesmo não adicionar nome?" — Sim: segue sem nome (e o Comprar deixa passar); Não: volta pro campo */
+  function perguntarSemNome() {
+    var velho = fundo.querySelector('.janela3d-pergunta'); if (velho) velho.remove();
+    var q = document.createElement('div');
+    q.className = 'janela3d-pergunta';
+    q.innerHTML = '<p>Deseja mesmo não adicionar nome?</p><div class="janela3d-nav" data-quantos="2">' +
+      '<button type="button" class="botao-sec" data-sn="nao">Não</button>' +
+      '<button type="button" class="botao" data-sn="sim">Sim</button></div>';
+    fundo.querySelector('.janela3d-lado').appendChild(q);
+    q.addEventListener('click', function (e) {
+      var b = e.target.closest('[data-sn]'); if (!b) return;
+      q.remove();
+      var cn = form.querySelector('[name="nome_pet"]');
+      if (b.getAttribute('data-sn') === 'sim') {
+        form.setAttribute('data-sem-nome', '');
+        mostrarPasso(1);
+        if (window.aleaGravarNome) window.aleaGravarNome();
+      } else if (cn) { try { cn.focus({ preventScroll: true }); } catch (e2) { cn.focus(); } }
+    });
+  }
+
   /* a trava de compra marca a falta com .faltou: a janela abre no passo da PRIMEIRA falta */
   window.aleaIrParaFalta = function () {
     var f = form && form.querySelector('.faltou');
@@ -135,8 +166,22 @@ export async function abrirJanela3D(cfg, aoFechar, aoMontar) {
   var vivo = true;
   var limpar = null;
 
+  function fotografar() {
+    /* (9) a MINIATURA da sacola: a peça como o cliente montou, de frente, fundo transparente, 240 px */
+    try {
+      if (!renderer || !frente) return;
+      var antes = camera.position.clone();
+      camera.position.copy(frente); camera.lookAt(controles.target); renderer.render(cena, camera);
+      var c2 = document.createElement('canvas'); c2.width = c2.height = 240;
+      var cv = renderer.domElement, lado = Math.min(cv.width, cv.height);
+      c2.getContext('2d').drawImage(cv, (cv.width - lado) / 2, (cv.height - lado) / 2, lado, lado, 0, 0, 240, 240);
+      window.aleaMiniatura3D = c2.toDataURL('image/webp', 0.85);
+      camera.position.copy(antes);
+    } catch (e) { /* sem miniatura, a sacola usa a capa */ }
+  }
   function fechar() {
     if (!vivo) return;
+    fotografar();
     vivo = false;
     passos.forEach(function (els) { els.forEach(function (el) { el.classList.remove('passo-escondido'); }); });
     document.body.style.position = ''; document.body.style.top = ''; document.body.style.left = ''; document.body.style.right = '';
@@ -387,7 +432,7 @@ export async function abrirJanela3D(cfg, aoFechar, aoMontar) {
     if (modo) {
       var e = Array.prototype.map.call(campos, escolhaDoCampo);
       if (modo.value === 'tricolor') { escolha.topo = e[0]; escolha.principal = e[1]; escolha.base = e[2]; }
-      else if (modo.value === 'bicolor') { escolha.topo = e[0]; escolha.principal = e[0]; escolha.base = e[1]; }
+      else if (modo.value === 'bicolor') { escolha.topo = e[0]; escolha.principal = e[1]; escolha.base = e[1]; }
       else if (modo.value === 'monocromatico') { escolha.topo = escolha.principal = escolha.base = e[0]; }
     }
     ordemZonas.forEach(function (z) {
@@ -400,10 +445,25 @@ export async function abrirJanela3D(cfg, aoFechar, aoMontar) {
     nomeColorido = !!corNome;
     if (preenchida) preenchida.visible = nomeColorido;
     if (corNome) pintar(matLetra, corNome.hex, corNome.acab);
-    else { matLetra.color.copy(mats.principal.color).multiplyScalar(0.72); matLetra.roughness = mats.principal.roughness; matLetra.metalness = mats.principal.metalness; }
+    else {
+      /* (6) a letra é a MESMA cor da peça; só a sombra de dentro muda de tom pra ler: peça escura -> um pouco mais
+         clara; peça clara -> um pouco mais escura. Sem contorno, sem brilho (o cliente não pode achar que vem assim) */
+      var Lp = luminancia('#' + mats.principal.color.getHexString());
+      if (Lp < 0.18) matLetra.color.copy(mats.principal.color).lerp(new THREE.Color(0xffffff), 0.12);
+      else matLetra.color.copy(mats.principal.color).multiplyScalar(0.72);
+      matLetra.roughness = mats.principal.roughness; matLetra.metalness = mats.principal.metalness;
+    }
     ajustarFundo(ordemZonas.map(function (z) { return '#' + mats[z].color.getHexString(); }));
   }
   var campoNome = form && form.querySelector('[name="nome_pet"]');
+  /* (7) o NOME na peça: abre com o original da foto; digitou, muda; apagou no passo 1, volta o original; saiu do
+     passo 1 em branco (confirmado), a peça fica lisa */
+  function nomeParaMostrar() {
+    var v = campoNome ? campoNome.value.trim() : '';
+    if (v) return v;
+    return passoAtual === 0 ? (quadro.text_info.text || '') : '';
+  }
+  window.aleaGravarNome = function () { gravar(nomeParaMostrar()); };
   frente = camera.position.clone();
   function virarPraFrente() {
     controles.autoRotate = false;
@@ -415,14 +475,25 @@ export async function abrirJanela3D(cfg, aoFechar, aoMontar) {
     })();
   }
   if (campoNome) campoNome.addEventListener('focus', virarPraFrente);
-  gravar((campoNome && campoNome.value) || quadro.text_info.text || '');
+  /* (10) TOQUE (sem arrastar) na peça: vira de frente e para; só volta a mexer se arrastar */
+  var toque = null;
+  canvas.addEventListener('pointerdown', function (e) { toque = { x: e.clientX, y: e.clientY, t: performance.now() }; });
+  canvas.addEventListener('pointerup', function (e) {
+    if (!toque) return;
+    var mexeu = Math.hypot(e.clientX - toque.x, e.clientY - toque.y), tempo = performance.now() - toque.t;
+    toque = null;
+    if (mexeu < 8 && tempo < 350) virarPraFrente();
+  });
+  if (opcoes.parado) { controles.autoRotate = false; camera.position.copy(frente); controles.update(); }
+  gravar(nomeParaMostrar());
   aplicarForm();
   fundo.querySelector('.janela3d-carregando').hidden = true;
   var espera = null;
   function aoMexer(ev) {
     if (ev.target === campoNome) {
       clearTimeout(espera);
-      espera = setTimeout(function () { gravar(campoNome.value || quadro.text_info.text || ''); }, 60);
+      if (campoNome.value.trim() && form) form.removeAttribute('data-sem-nome');
+      espera = setTimeout(function () { gravar(nomeParaMostrar()); }, 60);
     }
     setTimeout(aplicarForm, 0);   // depois que o produto.js redesenhar as janelas de cor
   }
