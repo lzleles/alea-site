@@ -253,7 +253,7 @@
         return '<label class="acabamento"><input type="radio" name="acab_nome" value="' + ac.id + '" disabled> ' +
           ac.rotulo + '</label>';
       }).join('') + '</div>' +
-      '<select name="cor_nome" disabled aria-label="Cor do nome"><option value="">Marque o detalhe acima</option></select>';
+      '<select name="cor_nome" disabled aria-label="Cor do nome"><option value="">Marque a opção acima para escolher</option></select>';
     velho.parentNode.replaceChild(caixa, velho);
     corNomeBox = caixa;
     caixa.addEventListener('change', function (ev) {
@@ -275,7 +275,7 @@
       r.disabled = !liberar; if (!liberar) r.checked = false;
     });
     sel.disabled = true;
-    sel.innerHTML = '<option value="">' + (liberar ? 'Escolha o acabamento acima' : 'Marque o detalhe acima') + '</option>';
+    sel.innerHTML = '<option value="">' + (liberar ? 'Escolha o acabamento acima' : 'Marque a opção acima para escolher') + '</option>';
   }
 
   function corDoNomeEscolhida() {
@@ -685,7 +685,11 @@
     var faltas = oQueFalta();
     if (faltas.length) {
       /* ETAPA 55: o formulário mora na janela — faltou algo, a janela abre e a falta treme lá dentro */
-      if (window.aleaAbrirPersonalizar) {
+      /* ETAPA 57 (15:54): "só é pra abrir a parte de personalizar se ele esqueceu de personalizar alguma coisa
+         obrigatória" — faltando SÓ a declaração (que fica na página), treme a página, como antes */
+      var formP = document.querySelector('[data-personalizar]');
+      var faltaDentro = formP && faltas.some(function (f) { return f.el && formP.contains(f.el); });
+      if (window.aleaAbrirPersonalizar && faltaDentro) {
         window.aleaAbrirPersonalizar(function () { setTimeout(function () { reclamarDoQueFalta(oQueFalta()); if (window.aleaIrParaFalta) window.aleaIrParaFalta(); }, 60); });
       } else { reclamarDoQueFalta(faltas); }
       return;

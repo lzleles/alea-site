@@ -1521,3 +1521,21 @@ html.janela3d-aberta { overflow: hidden; }
   .janela3d-lado h2 { font-size: 19px; }
   .janela3d-aviso { display: none; }
 }
+
+/* ETAPA 57 (23/09/2026, executar das 16:00) ------------------------------------------------------------
+   1. a MOLDURA das gavetas: fixa, do tamanho da tela, corta o que passa da borda (as gavetas fechadas ficam
+      dentro dela, fora da vista, sem aumentar a página). Ela não pega toque; a gaveta aberta sim.
+      E a trava do eixo X passa de `hidden` pra `clip`: `hidden` transforma a página em caixa de rolagem (o que
+      atrapalha o Safari com o que é fixo); `clip` só corta. */
+/* `clip` e não `hidden`: `hidden` ainda é caixa de rolagem, e o foco no botão da gaveta (que nasce fora da
+   vista) fazia a moldura ROLAR sozinha 390 px pro lado — a sacola abria fora da tela (medido no WebKit) */
+.moldura-gavetas { position: fixed; inset: 0; overflow: clip; pointer-events: none; z-index: 80; }
+.moldura-gavetas > .gaveta { position: absolute; pointer-events: auto; }
+html, body { overflow-x: clip; }
+/* 3. "Os botõezinhos estão brancos, parece que estão disponíveis": travados, ficam no MESMO tom da janela
+      travada de baixo, com o nome apagado; só ficam brancos quando marca "Um detalhe que transforma". */
+.campo-cor-nome .acabamento input:disabled {
+  -webkit-appearance: none; appearance: none; width: 19px; height: 19px; border-radius: 50%; margin: 0;
+  background: #EFEAE2; border: 1.5px solid var(--borda); cursor: not-allowed;
+}
+.campo-cor-nome .acabamento:has(input:disabled) { color: var(--tinta-fraca); opacity: .75; }

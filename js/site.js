@@ -242,7 +242,21 @@
         '<button type="button" aria-label="Fechar" data-fechar-gaveta>&times;</button></header>' +
         '<div class="corpo" data-corpo>' + corpo + '</div>' +
         (rodape ? '<div class="rodape-gaveta" data-rodape-gaveta>' + rodape + '</div>' : '');
-      document.body.appendChild(g);
+      /* ⚠️ ETAPA 57 (23/09/2026, vídeos do Cassiano 15:52-15:55): a página arrastava pros LADOS e o cabeçalho
+         ia junto — também no site do ar, então a trava da etapa 46 (overflow-x) não segurava no Safari dele. Causa
+         medida no WebKit (390 px): as gavetas FECHADAS moram fora da tela (x 390 a 780), e o Safari deixa arrastar
+         até elas. Agora elas moram DENTRO de uma moldura fixa do tamanho exato da tela, que corta o que passa da
+         borda: não sobra nada pra arrastar, e a animação de abrir continua a mesma. */
+      var moldura = document.getElementById('moldura-gavetas');
+      if (!moldura) {
+        moldura = document.createElement('div');
+        moldura.id = 'moldura-gavetas';
+        moldura.className = 'moldura-gavetas';
+        /* reserva pra Safari antigo sem `overflow: clip`: se a moldura rolar, volta pro zero */
+        moldura.addEventListener('scroll', function () { moldura.scrollLeft = 0; moldura.scrollTop = 0; });
+        document.body.appendChild(moldura);
+      }
+      moldura.appendChild(g);
       return g;
     };
 
