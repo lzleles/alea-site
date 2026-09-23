@@ -101,12 +101,15 @@ window.ALEA = {
   /* A FICHA PADRÃO DA PEÇA (ditada por ele em 15/09/2026).
      Vale pra todo produto que não escrever a sua própria no produtos.js.
      `material` fica de fora de propósito: ele é PERGUNTADO peça a peça pelo
-     01_gerar_paginas_v1.py, porque muda de peça pra peça (PLA ou PETG). */
+     01_gerar_paginas_v1.py, porque muda de peça pra peça (PLA ou PETG).
+     ETAPA 31 (22/09/2026, 21:33): CORES termina com "entre filamento básico, fosco ou perolizado."
+     (palavras dele; era "entre filamentos básicos, foscos ou brilhosos." — "perolizado" é o nome
+     que ele passou a usar pro acabamento, como no exemplo da cor do nome). */
   ficha_padrao: {
     personalizacao: 'Nome do pet em baixo relevo na cor do objeto.',
     producao: 'Sob encomenda, 3 dias úteis após a confirmação de pagamento!',
-    cores: 'Totalmente personalizável, podendo escolher entre filamentos básicos, ' +
-           'foscos ou brilhosos.'
+    cores: 'Totalmente personalizável, podendo escolher entre filamento básico, ' +
+           'fosco ou perolizado.'
   },
 
   /* ADICIONAIS DE PERSONALIZACAO — o que soma no preco da peca.
