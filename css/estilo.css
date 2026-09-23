@@ -1382,3 +1382,20 @@ body { position: relative; max-width: 100%; }
    quadrado branco) — 'pra dar a impressão de um produto 3D', como a 1ª foto do feed. O recorte já
    era o arquivo usado (`_obj_m.webp`); o que tirava o efeito era o fundo branco do CSS. */
 .linha-carrinho img { background: transparent; border-radius: 0; }
+
+/* ETAPA 51 (23/09/2026, 13:19): Básico · Fosco · Perolizado NO LUGAR do rótulo "Cor principal", com a
+   MESMA letra, tamanho e cor do rótulo (dourado, 13px, maiúscula) e a MESMA bolinha do Monocromático.
+   A janela da cor é uma lista, travada até escolher o acabamento. */
+.cores-campos .campo-cor .acabamentos { display: flex; flex-wrap: wrap; gap: 6px 18px; }
+.cores-campos .campo-cor .acabamento {
+  display: flex; align-items: center; gap: 8px; cursor: pointer;
+  font-size: 13px; letter-spacing: .06em; text-transform: uppercase; color: var(--dourado); font-weight: 700;
+}
+.cores-campos .campo-cor .acabamento input { width: 19px; height: 19px; accent-color: var(--terracota); cursor: pointer; margin: 0; }
+.cores-campos .campo-cor select {
+  font: inherit; font-size: 15.5px; color: var(--tinta); padding: 11px 13px;
+  border: 1px solid var(--borda); border-radius: 10px; background: #fff; width: 100%;
+}
+.cores-campos .campo-cor select:disabled { background: #EFEAE2; color: var(--tinta-fraca); cursor: not-allowed; }
+.cores-campos .campo-cor.faltou .acabamento { color: var(--terracota); }
+.cores-campos .campo-cor.faltou select { border-color: var(--terracota); box-shadow: 0 0 0 1px var(--terracota); }

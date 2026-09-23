@@ -262,16 +262,45 @@
        "Cor do topo", "Cor principal", "Cor da base". É um <label> de verdade (clicar no nome põe o
        cursor na caixa) e herda o estilo do `.personalizar label`. */
     var NOME_DA_PARTE = { Topo: 'Cor do topo', Principal: 'Cor principal', Base: 'Cor da base' };
+    /* ⚠️ ETAPA 51 (23/09/2026, 13:19, pedido dele): a cor sai de uma LISTA, não mais digitada. "No lugar
+       do Cor Principal, com a mesma letra, tamanho e cor, só vai mudar pra Básico, Fosco e Perolizado,
+       com a mesma bolinha do Monocromático; só quando a pessoa clicar em alguma dessas, deixa clicar na
+       janela pra escolher a cor correspondente ao acabamento." A lista vem de ALEA.filamentos (config.js).
+       No tricolor/bicolor o nome da parte ("Cor do topo"...) passa pra DENTRO da janela, como a primeira
+       linha dela — sem isso o cliente não saberia qual janela é o topo e qual é a base. */
+    var FIL = (window.ALEA || {}).filamentos || {};
+    var ACAB = (window.ALEA || {}).acabamentos || [];
     for (var k = 1; k <= quantos; k++) {
       var parte = partes[k - 1] || ('Cor ' + k);
       var titulo = NOME_DA_PARTE[parte] || parte;
-      var linha = document.createElement('label');
+      var linha = document.createElement('div');
       linha.className = 'campo-cor';
-      linha.innerHTML = '<span class="nome-parte">' + titulo + '</span>' +
-        '<input type="text" name="cor_' + k + '" maxlength="40" data-parte="' + parte.toLowerCase() + '" ' +
-        'placeholder="' + exemploDeCor(k, quantos) + '">';
+      linha.setAttribute('data-parte', parte.toLowerCase());
+      linha.setAttribute('data-titulo', titulo);
+      var bolinhas = ACAB.map(function (ac) {
+        return '<label class="acabamento"><input type="radio" name="acab_' + k + '" value="' + ac.id + '"> ' +
+          ac.rotulo + '</label>';
+      }).join('');
+      linha.innerHTML = '<div class="acabamentos">' + bolinhas + '</div>' +
+        '<select name="cor_' + k + '" data-parte="' + parte.toLowerCase() + '" disabled ' +
+        'aria-label="' + titulo + '"><option value="">' + (quantos > 1 ? titulo :
+        'Escolha o acabamento acima') + '</option></select>';
       camposCores.appendChild(linha);
     }
+    camposCores.onchange = function (ev) {
+      var rad = ev.target.closest && ev.target.closest('.acabamento input');
+      if (!rad) return;
+      var dono = rad.closest('.campo-cor');
+      var sel = dono.querySelector('select');
+      var tit = dono.getAttribute('data-titulo') || 'Cor';
+      var lista = FIL[rad.value] || [];
+      sel.innerHTML = '<option value="">' + (quantos > 1 ? tit + ': escolha a cor' : 'Escolha a cor') + '</option>' +
+        lista.map(function (f) { return '<option value="' + f.site + '">' + f.site + '</option>'; }).join('');
+      sel.disabled = false;
+      dono.classList.remove('faltou');
+      try { sel.focus({ preventScroll: true }); } catch (e) { sel.focus(); }
+    };
+    return;
     var primeiro = camposCores.querySelector('input');
     if (primeiro) primeiro.focus();
   }
@@ -287,12 +316,27 @@
     if (!caixaCores) return null;
     var r = caixaCores.querySelector('input[name="cores_peca"]:checked');
     if (!r) return null;
-    var lista = Array.prototype.map.call(
-      camposCores.querySelectorAll('input'), function (i) { return i.value.trim(); }
-    ).filter(function (v) { return v; });
+    /* ETAPA 51: cada janela devolve acabamento + cor. `cores` é o que o cliente lê ("Azul Fosco");
+       `originais` é o nome EXATO do filamento, que vai só no pedido pro Cassiano; `escolhas` serve pro
+       "editar" da sacola remontar as janelas. */
+    var FIL = (window.ALEA || {}).filamentos || {};
+    var ACAB = (window.ALEA || {}).acabamentos || [];
+    var escolhas = [], lista = [], originais = [];
+    Array.prototype.forEach.call(camposCores.querySelectorAll('.campo-cor'), function (c) {
+      var ac = c.querySelector('.acabamento input:checked');
+      var sel = c.querySelector('select');
+      if (!ac || !sel || !sel.value) return;
+      var def = ACAB.filter(function (x) { return x.id === ac.value; })[0] || { sufixo: '' };
+      var fil = (FIL[ac.value] || []).filter(function (f) { return f.site === sel.value; })[0];
+      escolhas.push({ acabamento: ac.value, cor: sel.value });
+      lista.push(sel.value + def.sufixo);
+      originais.push(fil ? fil.original : sel.value + def.sufixo);
+    });
     return {
       modo: r.parentNode.textContent.trim(),
       cores: lista,
+      originais: originais,
+      escolhas: escolhas,
       a_combinar: !!r.getAttribute('data-aviso')
     };
   }
@@ -365,14 +409,16 @@
           faltas.push({ el: l, texto: null });
         });
       } else {
-        var vazios = Array.prototype.filter.call(
-          camposCores ? camposCores.querySelectorAll('input') : [], function (i) { return !i.value.trim(); });
-        vazios.forEach(function (i) {
-          var parte = i.getAttribute('data-parte');
-          var qual = parte === 'topo' ? 'a cor do topo' : parte === 'base' ? 'a cor da base'
-                   : parte === 'principal' ? 'a cor principal'
-                   : 'a cor ' + (i.getAttribute('name') || '').replace('cor_', '') + ' da peça';
-          faltas.push({ el: i.closest('.campo-cor') || i, texto: 'Por favor, digite ' + qual + '.' });
+        /* ETAPA 51: cada janela cobra primeiro o ACABAMENTO e depois a COR */
+        Array.prototype.forEach.call(camposCores ? camposCores.querySelectorAll('.campo-cor') : [], function (c) {
+          var parte = c.getAttribute('data-parte');
+          var qual = parte === 'topo' ? 'da cor do topo' : parte === 'base' ? 'da cor da base' : 'da cor principal';
+          var qual2 = parte === 'topo' ? 'a cor do topo' : parte === 'base' ? 'a cor da base' : 'a cor principal';
+          if (!c.querySelector('.acabamento input:checked')) {
+            faltas.push({ el: c, texto: 'Por favor, escolha o acabamento ' + qual + '.' });
+          } else if (!c.querySelector('select').value) {
+            faltas.push({ el: c, texto: 'Por favor, escolha ' + qual2 + '.' });
+          }
         });
       }
     }
@@ -412,8 +458,9 @@
          celular isso já abre o teclado). Tem que ser AQUI, dentro do clique: o iPhone só aceita
          foco programático durante o gesto. `preventScroll` pra o foco não dar um pulo seco por
          cima da rolagem suave, que é quem centraliza. */
-      var alvo = primeira.el.matches && primeira.el.matches('input') ? primeira.el
-               : primeira.el.querySelector ? primeira.el.querySelector('input') : null;
+      var alvo = primeira.el.matches && primeira.el.matches('input, select') ? primeira.el
+               : primeira.el.querySelector ? (primeira.el.querySelector('select:not([disabled])') ||
+                 primeira.el.querySelector('input')) : null;
       if (!alvo && caixaCores && primeira.el.classList.contains('rotulo-grupo')) {
         alvo = caixaCores.querySelector('input[name="cores_peca"]');
       }
@@ -436,6 +483,9 @@
     if (dono && ev.target.value && ev.target.value.trim()) dono.classList.remove('faltou');
   });
   document.addEventListener('change', function (ev) {
+    if (ev.target.matches && ev.target.matches('.campo-cor select') && ev.target.value) {
+      var dono = ev.target.closest('.faltou'); if (dono) dono.classList.remove('faltou');
+    }
     if (ev.target.name === 'cores_peca' && caixaCores) {
       Array.prototype.forEach.call(caixaCores.querySelectorAll('.rotulo-grupo, .cores-opcoes label'),
         function (x) { x.classList.remove('faltou'); });
@@ -501,8 +551,15 @@
       if (r) {
         r.checked = true;
         desenharCamposDeCor(r);
-        Array.prototype.forEach.call(camposCores.querySelectorAll('input'), function (inp, k) {
-          inp.value = (p.cores.cores || [])[k] || '';
+        /* ETAPA 51: remonta acabamento (bolinha) e cor (lista) de cada janela */
+        Array.prototype.forEach.call(camposCores.querySelectorAll('.campo-cor'), function (c, k) {
+          var e = (p.cores.escolhas || [])[k];
+          if (!e) return;
+          var rad = c.querySelector('.acabamento input[value="' + e.acabamento + '"]');
+          if (!rad) return;
+          rad.checked = true;
+          rad.dispatchEvent(new Event('change', { bubbles: true }));
+          c.querySelector('select').value = e.cor;
         });
       }
     }

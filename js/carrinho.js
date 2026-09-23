@@ -142,6 +142,11 @@
         : (p.cores.modo + (p.cores.cores && p.cores.cores.length
             ? ': ' + p.cores.cores.join(', ') : '')));
     }
+    /* ETAPA 51 (23/09/2026): no PEDIDO (a mensagem que chega pro Cassiano) vai também o nome ORIGINAL de
+       cada filamento — o cliente escolheu "Azul Fosco", ele precisa ler a bobina exata. Na sacola não. */
+    if (comMaterial && p.cores && p.cores.originais && p.cores.originais.length) {
+      partes.push('filamentos: ' + p.cores.originais.join(' / '));
+    }
     if (p.cor_nome) partes.push('cor do nome: ' + p.cor_nome);
     (i.extras || []).forEach(function (x) {
       partes.push(x.rotulo + ' (+' + window.aleaDinheiro(x.preco) + ')');

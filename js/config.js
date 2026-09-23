@@ -175,6 +175,40 @@ window.ALEA = {
     ]
   },
 
+  /* FILAMENTOS À VENDA — a lista que vira as opções de cor da peça (23/09/2026, pedido dele às 13:19).
+     -------------------------------------------------------------------------------
+     O cliente escolhe o ACABAMENTO (Básico, Fosco, Perolizado) e só então a janela da cor abre,
+     com as cores DAQUELE acabamento. Ele vê o nome simples; o PEDIDO que chega pro Cassiano leva
+     também o nome ORIGINAL do filamento (regra dele: "pra mim aparece o nome original").
+       site ...... o que o cliente lê (português, sem Lite/Basic/Matte/Silk)
+       original .. Marca · Tipo · Acabamento · Cor, EXATO como ele falou (nunca normalizar)
+     ⚠ TESTE: Azul, Amarelo e Verde nos 3 acabamentos, pra ele ver o desenho. Os ORIGINAIS abaixo
+     são provisórios ("a confirmar") — a lista real vem dele e substitui esta. */
+  filamentos: {
+    basico: [
+      { site: 'Azul',     original: 'a confirmar · PLA · Basic · Azul' },
+      { site: 'Amarelo',  original: 'a confirmar · PLA · Basic · Amarelo' },
+      { site: 'Verde',    original: 'a confirmar · PLA · Basic · Verde' }
+    ],
+    fosco: [
+      { site: 'Azul',     original: 'a confirmar · PLA · Matte · Azul' },
+      { site: 'Amarelo',  original: 'a confirmar · PLA · Matte · Amarelo' },
+      { site: 'Verde',    original: 'a confirmar · PLA · Matte · Verde' }
+    ],
+    perolizado: [
+      { site: 'Azul',     original: 'a confirmar · PLA · Silk · Azul' },
+      { site: 'Amarelo',  original: 'a confirmar · PLA · Silk · Amarelo' },
+      { site: 'Verde',    original: 'a confirmar · PLA · Silk · Verde' }
+    ]
+  },
+  /* como cada acabamento aparece (a ordem é a da tela) e o que ele acrescenta ao nome da cor:
+     Básico não acrescenta nada ("Azul"); Fosco e Perolizado sim ("Azul Fosco", "Azul Perolizado"). */
+  acabamentos: [
+    { id: 'basico',     rotulo: 'Básico',     sufixo: '' },
+    { id: 'fosco',      rotulo: 'Fosco',      sufixo: ' Fosco' },
+    { id: 'perolizado', rotulo: 'Perolizado', sufixo: ' Perolizado' }
+  ],
+
   /* Onde entrega. "a combinar" faz o site dizer "consulte o frete" em vez de prometer
      entrega que não existe.
      ⚠️ A palavra "frete" saiu de perto do preço por pedido dele (15/09/2026). Ela
