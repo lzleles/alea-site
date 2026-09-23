@@ -343,6 +343,25 @@
     });
   }
 
+  /* --------------------------------------------------- a conta no servidor (22/09/2026)
+     Os arquivos da conta e da memória da visita só carregam quando `api_conta` está
+     preenchido no config.js. Carregar DAQUI, e não com <script> em cada página, é de
+     propósito: as páginas de produto são GERADAS, e uma tag escrita à mão nelas some na
+     próxima geração. Assim nenhum HTML muda, e desligar é apagar uma linha. */
+  function carregarConta() {
+    if (!C.api_conta) return;
+    var css = document.createElement('link');
+    css.rel = 'stylesheet';
+    css.href = 'css/conta.css';
+    document.head.appendChild(css);
+    ['js/rastro.js', 'js/conta.js'].forEach(function (src) {
+      var s = document.createElement('script');
+      s.src = src;
+      s.async = false;              // rastro antes da conta: a conta usa o aparelho do rastro
+      document.body.appendChild(s);
+    });
+  }
+
   /* -------------------------------------------------------------------- início */
   function iniciar() {
     ligarVoltarProFeed();
@@ -351,6 +370,7 @@
     montarRedes();
     montarGavetas();
     window.aleaLigarBotoes();     // as páginas de produto já nascem prontas no HTML
+    carregarConta();
     document.dispatchEvent(new CustomEvent('alea:site-pronto'));
   }
 
