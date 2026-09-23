@@ -221,6 +221,16 @@
   var caixaCores = document.querySelector('[data-cores-peca]');
   var camposCores = document.querySelector('[data-cores-campos]');
 
+  /* três cores DIFERENTES a cada caixa, sorteadas — nomes no masculino, como no exemplo da cor do
+     nome ("Amarelo Sólido, Branco Fosco, Azul Perolizado…") */
+  var CORES_EXEMPLO = ['Amarelo', 'Branco', 'Azul', 'Verde', 'Vermelho', 'Preto', 'Rosa', 'Laranja',
+                       'Roxo', 'Cinza', 'Dourado', 'Prata', 'Bege', 'Marrom', 'Lilás', 'Turquesa'];
+  function exemploDeCor() {
+    var monte = CORES_EXEMPLO.slice(), tres = [];
+    for (var i = 0; i < 3; i++) tres.push(monte.splice(Math.floor(Math.random() * monte.length), 1)[0]);
+    return 'Ex.: ' + tres[0] + ' Sólido, ' + tres[1] + ' Fosco, ' + tres[2] + ' Perolizado…';
+  }
+
   function desenharCamposDeCor(radio) {
     if (!camposCores) return;
     camposCores.innerHTML = '';
@@ -233,12 +243,26 @@
       return;
     }
     var quantos = parseInt(radio.getAttribute('data-campos'), 10) || 0;
+    /* ⚠️ ETAPA 26 (22/09/2026, 21:04-21:08): "cor 1, cor 2, cor 3 fica muito feio pro cliente". O
+       quadradinho da esquerda deixa de ser número e diz ONDE vai a cor — tricolor: Topo, Principal,
+       Base; bicolor: Principal, Base (palavras dele); monocromático: Principal (a peça inteira é a
+       cor principal — dedução minha, avisada a ele). E cada caixa ganha um exemplo como o da cor
+       do nome, com cores SORTEADAS: "Ex.: <cor> Sólido, <cor> Fosco, <cor> Perolizado…". */
+    var PARTES = { 3: ['Topo', 'Principal', 'Base'], 2: ['Principal', 'Base'], 1: ['Principal'] };
+    var partes = PARTES[quantos] || [];
+    /* ETAPA 27 (21:09, "aliás, melhor"): o quadradinho da esquerda SAI de vez; a caixa branca fica
+       onde está (mesmo recuo), e o nome vai EM CIMA dela, como os outros rótulos do formulário:
+       "Cor do topo", "Cor principal", "Cor da base". É um <label> de verdade (clicar no nome põe o
+       cursor na caixa) e herda o estilo do `.personalizar label`. */
+    var NOME_DA_PARTE = { Topo: 'Cor do topo', Principal: 'Cor principal', Base: 'Cor da base' };
     for (var k = 1; k <= quantos; k++) {
-      var linha = document.createElement('div');
+      var parte = partes[k - 1] || ('Cor ' + k);
+      var titulo = NOME_DA_PARTE[parte] || parte;
+      var linha = document.createElement('label');
       linha.className = 'campo-cor';
-      linha.innerHTML = '<span class="numero">' + k + '</span>' +
-        '<input type="text" name="cor_' + k + '" maxlength="40" ' +
-        'placeholder="Cor ' + k + '" aria-label="Cor ' + k + ' da peça">';
+      linha.innerHTML = '<span class="nome-parte">' + titulo + '</span>' +
+        '<input type="text" name="cor_' + k + '" maxlength="40" data-parte="' + parte.toLowerCase() + '" ' +
+        'placeholder="' + exemploDeCor() + '">';
       camposCores.appendChild(linha);
     }
     var primeiro = camposCores.querySelector('input');
@@ -337,8 +361,11 @@
         var vazios = Array.prototype.filter.call(
           camposCores ? camposCores.querySelectorAll('input') : [], function (i) { return !i.value.trim(); });
         vazios.forEach(function (i) {
-          var n = (i.getAttribute('name') || '').replace('cor_', '');
-          faltas.push({ el: i.closest('.campo-cor') || i, texto: 'Por favor, digite a cor ' + n + ' da peça.' });
+          var parte = i.getAttribute('data-parte');
+          var qual = parte === 'topo' ? 'a cor do topo' : parte === 'base' ? 'a cor da base'
+                   : parte === 'principal' ? 'a cor principal'
+                   : 'a cor ' + (i.getAttribute('name') || '').replace('cor_', '') + ' da peça';
+          faltas.push({ el: i.closest('.campo-cor') || i, texto: 'Por favor, digite ' + qual + '.' });
         });
       }
     }

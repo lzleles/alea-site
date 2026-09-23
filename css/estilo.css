@@ -1244,3 +1244,7 @@ body.sem-transicao-feed .feed { transition: none !important; }
 
 /* ETAPA 24: a frase da falta (acima do Comprar agora) na MESMA cor das faltas. Ela saía cinza: o`n   `.produto-topo p` (0,1,1) vencia o vermelho do `.recado-aceite` (0,1,0) — medido no print. */
 .produto-topo p.recado-aceite { color: var(--terracota); font-weight: 600; }
+
+/* ETAPA 27 (substitui a 26, que nao chegou a subir): sem quadradinho; o nome da parte vai EM CIMA
+   da caixa, e a caixa guarda o MESMO recuo de antes (28px do quadradinho + 10px de vao). */
+.cores-campos .campo-cor { display: grid; grid-template-columns: 1fr; gap: 5px; padding-left: 38px; }
