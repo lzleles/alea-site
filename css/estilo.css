@@ -1372,3 +1372,13 @@ body { position: relative; max-width: 100%; }
 .aviso-sacola.confirmar .texto p { padding: 0; }
 .aviso-sacola.confirmar .escolha { display: flex; gap: 10px; }
 .aviso-sacola.confirmar .escolha .botao { padding: 9px 22px; font-size: 14.5px; }
+
+/* ETAPA 49 (23:03): o PONTINHO solto à esquerda da 2ª fileira do menu — era o separador '·' que a regra
+   `.menu-categorias span::before` punha também na `.quebra-linha` (um <span> invisível, etapa 11).
+   Vale pros três menus: abertura, rodapé e fim da lista. */
+.menu-categorias .quebra-linha::before { content: none; }
+
+/* ETAPA 50 (23:04): a miniatura da sacola é a peça SEM FUNDO, direto sobre o bege da sacola (sem o
+   quadrado branco) — 'pra dar a impressão de um produto 3D', como a 1ª foto do feed. O recorte já
+   era o arquivo usado (`_obj_m.webp`); o que tirava o efeito era o fundo branco do CSS. */
+.linha-carrinho img { background: transparent; border-radius: 0; }
