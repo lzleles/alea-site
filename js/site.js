@@ -254,10 +254,11 @@
       '<p class="vazio">Sua sacola está vazia.</p>',
       '<div class="total-carrinho"><span>Subtotal:</span> <strong data-total>—</strong></div>' +
       '<button class="botao" type="button" data-fechar-pedido disabled>Fechar pedido</button>' +
-      '<button class="continuar-comprando" type="button" data-fechar-gaveta>Continue comprando</button>' +
-      '<p style="font-size:12.5px;color:var(--tinta-fraca);margin:0;text-align:center">' +
-      'O frete é calculado no fechamento, pelo CEP. Peça personalizada só entra em ' +
-      'produção depois da confirmação do pagamento.</p>');
+      '<button class="continuar-comprando" type="button" data-fechar-gaveta>Continue comprando</button>');
+    /* ETAPA 41 (22:29): saiu da sacola, a pedido dele, o aviso "O frete é calculado no fechamento,
+       pelo CEP. Peça personalizada só entra em produção depois da confirmação do pagamento." — o
+       frete segue sendo dito na mensagem do WhatsApp ("Frete: a combinar pelo CEP") e a regra da
+       produção está na página de Trocas e no texto de Produtos Personalizados. */
 
     /* ⚠️ ETAPA 40 (22:23, vídeo + 2 prints do modelo): "na página da sacola é pra deixar só a
        sacola" — a PRIMEIRA tela tem que caber inteira no telefone (título, produtos, Subtotal e o
