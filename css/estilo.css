@@ -1286,3 +1286,28 @@ body.sem-transicao-feed .feed { transition: none !important; }
    da embalagem, é trocar este número (ou mandar a foto da caixa pra medir). */
 :root { --craft: #C9A57B; }
 .botao-icone.tem-item svg path:first-child { fill: var(--craft); }
+
+/* ETAPA 36: o × no canto da linha (o único que tira da sacola), fino e discreto como no modelo */
+.linha-carrinho .cabeca-linha { display: grid; grid-template-columns: 1fr auto; gap: 10px; align-items: start; }
+.linha-carrinho .tirar-x {
+  background: transparent; border: 0; cursor: pointer; font: inherit; font-size: 22px; font-weight: 300;
+  line-height: 1; color: var(--tinta-fraca); padding: 0 2px; min-width: 28px; min-height: 28px;
+}
+.linha-carrinho .tirar-x:hover { color: var(--terracota); }
+
+/* ETAPA 37 (22:09): no celular a sacola preenche a TELA INTEIRA, sem a faixa no canto nem a sombra
+   ("não vai ter borda igual a gente tem ali no cantinho"). A faixa aparecia nos celulares mais
+   largos que 420 px (o teto da gaveta). No computador ela segue gaveta lateral. */
+@media (max-width: 760px) {
+  #gaveta-carrinho { width: 100vw; }
+  #gaveta-carrinho.aberta { box-shadow: none; }
+}
+/* o pulinho da sacola do topo quando um produto entra sem abrir a sacola */
+@keyframes sacola-pula { 0%, 100% { transform: scale(1); } 40% { transform: scale(1.18); } 70% { transform: scale(.94); } }
+.botao-icone.sacola-pulou { animation: sacola-pula .5s ease-out 1; }
+@media (prefers-reduced-motion: reduce) { .botao-icone.sacola-pulou { animation: none; } }
+
+/* ETAPA 38: a sacola do lado do "Comprar agora" acompanha a do topo — cheia = corpo kraft, sem número */
+.sacola-cheia .botao-sacola svg path:first-child { fill: var(--craft); }
+.botao-sacola.sacola-pulou { animation: sacola-pula .5s ease-out 1; }
+@media (prefers-reduced-motion: reduce) { .botao-sacola.sacola-pulou { animation: none; } }

@@ -90,11 +90,14 @@
       salvar();
     },
     remover: function (i) { itens.splice(i, 1); salvar(); },
-    /* "se eu clicar em menos, o produto é removido" — o − com 1 unidade tira a linha */
+    /* ⚠️ ETAPA 36 (22:06, "pensando melhor"): o − NUNCA tira da sacola — com 1 unidade ele não
+       faz nada. "A pessoa pode clicar sem querer e tirar o produto que demorou pra personalizar."
+       Quem tira é SÓ o × no canto da linha, como no modelo dele. (Era: − com 1 removia.) */
     mudarQuantidade: function (i, passo) {
       if (!itens[i]) return;
       var n = qtd(itens[i]) + passo;
-      if (n < 1) itens.splice(i, 1); else itens[i].qtd = n;
+      if (n < 1) return;
+      itens[i].qtd = n;
       salvar();
     },
     limpar: function () { itens = []; salvar(); }
@@ -102,6 +105,9 @@
 
   /* ------------------------------------------------------------- o contador */
   function pintarContador() {
+    /* ETAPA 38 (22:10): a sacola ao lado do "Comprar agora" também fica cor de kraft quando há item
+       — SEM número (o número só lá em cima). Uma classe no <html> serve as duas sacolas. */
+    document.documentElement.classList.toggle('sacola-cheia', pecas() > 0);
     Array.prototype.forEach.call(document.querySelectorAll('[data-abrir="carrinho"]'), function (b) {
       var n = pecas();
       b.classList.toggle('tem-item', n > 0);
@@ -158,7 +164,9 @@
            a ultima coisa que alguem quer ver antes de fechar um pedido. */
         '<img src="img/produtos/' + i.capa + '_obj_m.webp" alt="" loading="lazy" ' +
         'onerror="this.onerror=null;this.src=&quot;img/produtos/' + i.capa + '_m.jpg&quot;">' +
-        '<div class="lado"><div class="titulo">' + i.nome + '</div>' +
+        '<div class="lado"><div class="cabeca-linha"><div class="titulo">' + i.nome + '</div>' +
+        '<button class="tirar-x" type="button" data-tirar="' + n + '" aria-label="Tirar ' + i.nome +
+        ' da sacola" title="Tirar da sacola">&times;</button></div>' +
         '<div class="detalhe">' + (descreverItem(i) || 'sem personalização') + '</div>' +
         '<div class="quantidade"><span>Quantidade</span>' +
           '<span class="passos">' +

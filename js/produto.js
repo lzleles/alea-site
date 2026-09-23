@@ -449,8 +449,21 @@
     var recado = document.querySelector('[data-recado-aceite]');
     if (recado) recado.hidden = true;
     window.aleaCarrinho.adicionar(montarItem());
-    if (eDepoisFechar && window.aleaCarrinho.fecharPedido()) return;   // foi pro WhatsApp
-    if (window.aleaGaveta) window.aleaGaveta.abrir('carrinho');
+    /* ⚠️ ETAPA 37 (22/09/2026, 22:09): os dois botões passam a fazer coisas DIFERENTES.
+       · a SACOLA ao lado só adiciona — "não vai abrir a sacola, pra ele continuar no site e
+         continuar comprando". O aviso de que entrou é a sacola do topo, que já fica cor de kraft
+         e ganha o número, e agora dá um pulinho (ver `.sacola-pulou` no CSS);
+       · o COMPRAR AGORA adiciona e ABRE a sacola, em tela cheia (era: ia direto pro WhatsApp). O
+         WhatsApp continua sendo o botão de fechar pedido DENTRO da sacola. */
+    if (eDepoisFechar) {
+      if (window.aleaGaveta) window.aleaGaveta.abrir('carrinho');
+      return;
+    }
+    Array.prototype.forEach.call(document.querySelectorAll('.topo [data-abrir="carrinho"], [data-add-carrinho]'), function (b) {
+      b.classList.remove('sacola-pulou');
+      void b.offsetWidth;
+      b.classList.add('sacola-pulou');
+    });
   }
 
   if (caixaAceite) {
