@@ -5,7 +5,7 @@
              pet GRAVADO ao vivo e as cores da peça e do nome trocando na hora, conforme o formulário.
    entrada: ALEA.modelos3d[slug] e ALEA.filamentos (config.js); o formulário [data-personalizar] da página
    saida: a janela (modal); o formulário de verdade MORA dentro dela enquanto está aberta
-   status: protótipo v4 (23/09/2026, etapa 58)
+   status: protótipo v5 (23/09/2026, etapa 59)
    validado_em: 23/09/2026 (teste headless desktop e 390 px)
 */
 /* =============================================================================
@@ -38,6 +38,9 @@
       nome?" (Sim = peça sem nome); em peça escura a sombra da letra CLAREIA (sem contorno nem brilho — "o mais real
       possível"); toque na peça = de frente e parada; "editar" abre de frente e parado; a foto da peça montada vira
       a MINIATURA da sacola.
+   v5 (etapa 59, 16:38-16:43): no passo 2, SEM NOME o "Um detalhe que transforma" fica inativo (não cobra cor de um
+      nome que não existe) e tentar mexer treme e avisa "Por favor, volte e coloque o nome do seu pet."; COM nome,
+      tocar no acabamento antes de marcar o detalhe treme e avisa "Marque a opção acima para personalizar.".
    ============================================================================= */
 
 var ACABAMENTO_MATERIAL = {           // como cada acabamento reflete a luz
@@ -94,14 +97,58 @@ export async function abrirJanela3D(cfg, aoFechar, aoMontar, opcoes) {
     passos = [[nomeRot], [extraRot, corNomeRot], [coresRot]].map(function (els) { return els.filter(Boolean); })
       .filter(function (els) { return els.length; });
   }
+  var recadoPasso = document.createElement('p');
+  recadoPasso.className = 'janela3d-recado';
+  recadoPasso.hidden = true;
   var nav = document.createElement('div');
   nav.className = 'janela3d-nav';
   var passoAtual = 0;
   var botaoPronto = fundo.querySelector('.janela3d-pronto');
+  botaoPronto.parentNode.insertBefore(recadoPasso, botaoPronto);
   botaoPronto.parentNode.insertBefore(nav, botaoPronto);
   botaoPronto.style.display = 'none';   // o Pronto agora é o do último passo
+  function avisarNoPasso(texto, alvos) {
+    recadoPasso.textContent = texto; recadoPasso.hidden = false;
+    (alvos || []).concat([recadoPasso]).forEach(function (el) {
+      if (!el) return; el.classList.remove('treme-falta'); void el.offsetWidth; el.classList.add('treme-falta');
+    });
+  }
+  function semNomeConfirmado() {
+    var cn = form && form.querySelector('[name="nome_pet"]');
+    return !!(form && form.hasAttribute('data-sem-nome') && cn && !cn.value.trim());
+  }
+  function acertarDetalhe() {
+    var ext = form && form.querySelector('[data-extra]');
+    if (!ext) return;
+    var inativo = semNomeConfirmado();
+    ext.classList.toggle('inativo', inativo);
+    var cx = ext.querySelector('[data-extra-caixa]');
+    if (inativo && cx && cx.checked) { cx.checked = false; cx.dispatchEvent(new Event('change', { bubbles: true })); }
+  }
+  /* o toque "proibido" é pego ANTES de chegar no quadradinho / na bolinha (fase de captura) */
+  if (form) form.addEventListener('click', function (e) {
+    if (passoAtual !== 1) return;
+    var ext = e.target.closest && e.target.closest('[data-extra]');
+    var acab = e.target.closest && e.target.closest('.campo-cor-nome .acabamento');
+    if (!ext && !acab) return;
+    var blocoNome = form.querySelector('.campo-cor-nome');
+    blocoNome = blocoNome && (blocoNome.closest('label') || blocoNome);
+    if (semNomeConfirmado()) {
+      e.preventDefault(); e.stopPropagation();
+      avisarNoPasso('Por favor, volte e coloque o nome do seu pet.', [form.querySelector('[data-extra]'), blocoNome]);
+      return;
+    }
+    var cx = form.querySelector('[data-extra-caixa]');
+    if (acab && cx && !cx.checked) {
+      e.preventDefault(); e.stopPropagation();
+      avisarNoPasso('Marque a opção acima para personalizar.', [form.querySelector('[data-extra]'), blocoNome]);
+    }
+  }, true);
+
   function mostrarPasso(i) {
     passoAtual = Math.max(0, Math.min(passos.length - 1, i));
+    recadoPasso.hidden = true;
+    acertarDetalhe();
     passos.forEach(function (els, k) { els.forEach(function (el) { el.classList.toggle('passo-escondido', k !== passoAtual); }); });
     var ultimo = passoAtual === passos.length - 1;
     var html = '';
@@ -184,6 +231,7 @@ export async function abrirJanela3D(cfg, aoFechar, aoMontar, opcoes) {
     fotografar();
     vivo = false;
     passos.forEach(function (els) { els.forEach(function (el) { el.classList.remove('passo-escondido'); }); });
+    var extI = form && form.querySelector('[data-extra]'); if (extI) extI.classList.remove('inativo');
     document.body.style.position = ''; document.body.style.top = ''; document.body.style.left = ''; document.body.style.right = '';
     if (vv) { vv.removeEventListener('resize', acompanharTela); vv.removeEventListener('scroll', acompanharTela); }
     window.aleaIrParaFalta = null;
@@ -424,6 +472,7 @@ export async function abrirJanela3D(cfg, aoFechar, aoMontar, opcoes) {
     palco.style.setProperty('--estudio-borda', estudio[1]);
   }
   function aplicarForm() {
+    var cxD = form && form.querySelector('[data-extra-caixa]'); if (cxD && cxD.checked) recadoPasso.hidden = true;
     if (!form) return;
     /* cores da peça: tricolor = topo/principal/base; bicolor = principal (+ topo) e base; mono = tudo igual */
     var modo = form.querySelector('input[name="cores_peca"]:checked');

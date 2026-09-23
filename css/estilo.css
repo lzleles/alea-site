@@ -1547,3 +1547,9 @@ html, body { overflow-x: clip; }
   background: color-mix(in srgb, var(--papel, #F5EFE6) 96%, transparent); border-radius: 0 0 18px 18px;
 }
 .janela3d-pergunta p { margin: 0; font-family: var(--fonte-titulo); font-size: 19px; text-align: center; color: var(--tinta); }
+
+/* ETAPA 59: o recadinho do passo (acima do Voltar), no estilo do "Por favor, selecione a cor da peça."; e o detalhe
+   INATIVO quando o cliente escolheu ficar sem nome (apagado, mesmo tom das opções travadas) */
+.janela3d-recado { margin: 0; color: var(--terracota); font-weight: 600; font-size: 14px; }
+.personalizar .extra.inativo { background: #EFEAE2; border-color: var(--borda); opacity: .7; cursor: not-allowed; }
+.personalizar .extra.inativo .titulo-extra { color: var(--tinta-fraca); }

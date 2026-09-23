@@ -43,6 +43,28 @@
 
   var colmeia = document.querySelector('[data-colmeia]');
 
+  /* ⚠️ ETAPA 59 (3) (23/09/2026, vídeo das 16:40): "o cabeçalho continua mexendo". A 57 resolveu o arrastar pros
+     LADOS; o que sobrou é o QUIQUE vertical do Safari no começo e no fim da página (a página passa do limite e volta,
+     e o cabeçalho vai junto). O `overscroll-behavior: none` não segurou no iPhone dele, então aqui o gesto é
+     cancelado na origem: no começo da página puxando pra baixo, ou no fim puxando pra cima, o toque não rola.
+     Dentro do que rola sozinho (sacola, conta, janela de personalizar) nada muda. Só na página de produto. */
+  (function semQuique() {
+    var y0 = 0;
+    document.addEventListener('touchstart', function (e) { if (e.touches.length === 1) y0 = e.touches[0].clientY; }, { passive: true });
+    document.addEventListener('touchmove', function (e) {
+      if (e.touches.length !== 1) return;
+      for (var el = e.target; el && el !== document.body && el !== document.documentElement; el = el.parentElement) {
+        var cs = getComputedStyle(el);
+        if ((cs.overflowY === 'auto' || cs.overflowY === 'scroll') && el.scrollHeight > el.clientHeight + 1) return;
+        if (el.tagName === 'CANVAS') return;           // a peça 3D gira pelo dedo
+      }
+      var se = document.scrollingElement || document.documentElement;
+      var dy = e.touches[0].clientY - y0;
+      var noTopo = se.scrollTop <= 0, noFim = se.scrollTop + window.innerHeight >= se.scrollHeight - 1;
+      if ((noTopo && dy > 0) || (noFim && dy < 0)) e.preventDefault();
+    }, { passive: false });
+  })();
+
   /* ⚠️ ETAPA 58 (1) (23/09/2026, 16:08): "sempre que abrir qualquer produto, a foto do MEIO é a da capa; o resto
      pode ser em qualquer ordem". Qual favo fica no meio depende da largura (quantos cabem por linha), então é
      MEDIDO: acha o favo mais perto do centro da colmeia e põe a capa (data-favo=0) naquela posição. Cada favo
@@ -278,7 +300,7 @@
         return '<label class="acabamento"><input type="radio" name="acab_nome" value="' + ac.id + '" disabled> ' +
           ac.rotulo + '</label>';
       }).join('') + '</div>' +
-      '<select name="cor_nome" disabled aria-label="Cor do nome"><option value="">Marque a opção acima para escolher</option></select>';
+      '<select name="cor_nome" disabled aria-label="Cor do nome"><option value=""></option></select>';   /* ETAPA 59: travada = sem frase */
     velho.parentNode.replaceChild(caixa, velho);
     corNomeBox = caixa;
     caixa.addEventListener('change', function (ev) {
@@ -300,7 +322,7 @@
       r.disabled = !liberar; if (!liberar) r.checked = false;
     });
     sel.disabled = true;
-    sel.innerHTML = '<option value="">' + (liberar ? 'Escolha o acabamento acima' : 'Marque a opção acima para escolher') + '</option>';
+    sel.innerHTML = '<option value="">' + (liberar ? 'Escolha o acabamento acima' : '') + '</option>';
   }
 
   function corDoNomeEscolhida() {
