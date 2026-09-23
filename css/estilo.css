@@ -1311,3 +1311,11 @@ body.sem-transicao-feed .feed { transition: none !important; }
 .sacola-cheia .botao-sacola svg path:first-child { fill: var(--craft); }
 .botao-sacola.sacola-pulou { animation: sacola-pula .5s ease-out 1; }
 @media (prefers-reduced-motion: reduce) { .botao-sacola.sacola-pulou { animation: none; } }
+
+/* ETAPA 39: o brilho SUAVE na linha cuja quantidade mudou — um fundo kraft bem claro que acende e
+   se apaga em 0,9 s, e o número dá um respiro leve. Só nela; as outras não se mexem. */
+@keyframes linha-mexeu { 0% { background: transparent; } 25% { background: color-mix(in srgb, var(--craft) 18%, transparent); } 100% { background: transparent; } }
+@keyframes numero-respira { 0%, 100% { transform: scale(1); } 40% { transform: scale(1.12); } }
+.linha-carrinho.mexeu { animation: linha-mexeu .9s ease-out 1; border-radius: 10px; }
+.linha-carrinho.mexeu .passos .n { display: inline-block; animation: numero-respira .45s ease-out 1; }
+@media (prefers-reduced-motion: reduce) { .linha-carrinho.mexeu, .linha-carrinho.mexeu .passos .n { animation: none; } }

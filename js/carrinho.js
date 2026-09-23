@@ -98,7 +98,9 @@
       var n = qtd(itens[i]) + passo;
       if (n < 1) return;
       itens[i].qtd = n;
+      soALinha = i;          // ETAPA 39: repinta SÓ esta linha (ver `atualizarLinha`)
       salvar();
+      soALinha = null;
     },
     limpar: function () { itens = []; salvar(); }
   };
@@ -137,6 +139,27 @@
     });
     if (i.material) partes.push(i.material);
     return partes.join(' · ');
+  }
+
+  /* ⚠️ ETAPA 39 (22:16, com vídeo): "quando eu aumento um produto, treme os DOIS produtos". Causa:
+     cada + ou − redesenhava a sacola INTEIRA (innerHTML), e as fotos de todas as linhas recarregavam
+     — o pisca que ele viu como tremor. Agora a quantidade atualiza só o número, o preço da linha e
+     o subtotal, no lugar; e a linha mexida ganha um brilho suave (`.mexeu`) pra mostrar que é ela. */
+  var soALinha = null;
+  function atualizarLinha(n) {
+    var g = document.getElementById('gaveta-carrinho');
+    var linha = g && g.querySelectorAll('.linha-carrinho')[n];
+    var i = itens[n];
+    if (!linha || !i) { pintarGaveta(); return; }
+    linha.querySelector('.passos .n').textContent = qtd(i);
+    linha.querySelector('.valor-linha').textContent = i.preco ? window.aleaDinheiro(i.preco * qtd(i)) : 'Sob consulta';
+    var alvoTotal = g.querySelector('[data-total]');
+    if (alvoTotal) {
+      alvoTotal.textContent = window.aleaDinheiro(total()) + (temSobConsulta() ? ' + itens sob consulta' : '');
+    }
+    linha.classList.remove('mexeu');
+    void linha.offsetWidth;
+    linha.classList.add('mexeu');
   }
 
   function pintarGaveta() {
@@ -293,7 +316,7 @@
 
     document.addEventListener('alea:carrinho', function () {
       pintarContador();
-      pintarGaveta();
+      if (soALinha !== null) atualizarLinha(soALinha); else pintarGaveta();
     });
     document.addEventListener('alea:gaveta', function (e) {
       if (e.detail.id === 'conta') pintarConta();
