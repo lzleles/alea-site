@@ -221,14 +221,21 @@
   var caixaCores = document.querySelector('[data-cores-peca]');
   var camposCores = document.querySelector('[data-cores-campos]');
 
-  /* três cores DIFERENTES a cada caixa, sorteadas — nomes no masculino, como no exemplo da cor do
-     nome ("Amarelo Sólido, Branco Fosco, Azul Perolizado…") */
-  var CORES_EXEMPLO = ['Amarelo', 'Branco', 'Azul', 'Verde', 'Vermelho', 'Preto', 'Rosa', 'Laranja',
-                       'Roxo', 'Cinza', 'Dourado', 'Prata', 'Bege', 'Marrom', 'Lilás', 'Turquesa'];
-  function exemploDeCor() {
-    var monte = CORES_EXEMPLO.slice(), tres = [];
-    for (var i = 0; i < 3; i++) tres.push(monte.splice(Math.floor(Math.random() * monte.length), 1)[0]);
-    return 'Ex.: ' + tres[0] + ' Sólido, ' + tres[1] + ' Fosco, ' + tres[2] + ' Perolizado…';
+  /* ⚠️ ETAPA 28 (22/09/2026, 21:19): o SORTEIO saiu — "algumas não têm tantas opções por se tratar
+     de filamento". Agora é UMA cor por caixa, FIXA, na ordem que ele ditou, de cima pra baixo:
+     1ª caixa "Ex.: Azul Fosco…", 2ª "Ex.: Verde…", 3ª "Ex.: Branco Perolizado…" (a ordem das 21:23,
+     que substitui a das 21:19; o "Verde" sem acabamento é literal dele). No bicolor valem as duas
+     primeiras; no monocromático, a primeira. */
+  /* ETAPA 29 (21:25): no BICOLOR, "por se tratar de somente 2 janelas, iremos colocar mais de uma":
+     Cor principal "Ex.: Vermelho, Laranja Fosco…" e Cor da base "Ex.: Amarelo Perolizado, Prata…".
+     O tricolor segue a lista de cima; o monocromático, a primeira dela (até ele dizer outra). */
+  var EXEMPLO_POR_CAIXA = ['Ex.: Azul Fosco…', 'Ex.: Verde…', 'Ex.: Branco Perolizado…'];
+  var EXEMPLO_BICOLOR = ['Ex.: Vermelho, Laranja Fosco…', 'Ex.: Amarelo Perolizado, Prata…'];
+  /* ETAPA 30 (21:28): o MONOCROMÁTICO ganhou o dele — "Ex.: Roxo Perolizado, Rosa Fosco, Dourado…" */
+  var EXEMPLO_MONO = ['Ex.: Roxo Perolizado, Rosa Fosco, Dourado…'];
+  function exemploDeCor(k, quantos) {
+    var lista = quantos === 2 ? EXEMPLO_BICOLOR : quantos === 1 ? EXEMPLO_MONO : EXEMPLO_POR_CAIXA;
+    return lista[k - 1] || lista[0];
   }
 
   function desenharCamposDeCor(radio) {
@@ -262,7 +269,7 @@
       linha.className = 'campo-cor';
       linha.innerHTML = '<span class="nome-parte">' + titulo + '</span>' +
         '<input type="text" name="cor_' + k + '" maxlength="40" data-parte="' + parte.toLowerCase() + '" ' +
-        'placeholder="' + exemploDeCor() + '">';
+        'placeholder="' + exemploDeCor(k, quantos) + '">';
       camposCores.appendChild(linha);
     }
     var primeiro = camposCores.querySelector('input');
