@@ -45,6 +45,39 @@
   var telacheia = document.querySelector('[data-telacheia]');
   var caixaAceite = document.querySelector('[data-aceite-caixa]');
   var botaoComprar = document.querySelector('[data-comprar-agora]');
+
+  /* ⚠️ ETAPA 53 (23/09/2026, 14:27, protótipo): botão "Personalize aqui" -> janela com a peça em 3D, nome
+     gravado ao vivo e cores trocando na hora (js/personalizar3d.js). Só aparece no produto que tem modelo 3D
+     no config.js; o three.js só é baixado no clique. */
+  (function botaoPersonalizar3D() {
+    var slug = botaoComprar && botaoComprar.getAttribute('data-slug');
+    var cfg3d = slug && ((window.ALEA || {}).modelos3d || {})[slug];
+    var form = document.querySelector('[data-personalizar]');
+    if (!cfg3d || !form) return;
+    var im = document.createElement('script');
+    im.type = 'importmap';
+    im.setAttribute('data-alea', '');
+    im.textContent = JSON.stringify({ imports: {
+      'three': 'https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js',
+      'three/addons/': 'https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/',
+      'three-mesh-bvh': 'https://cdn.jsdelivr.net/npm/three-mesh-bvh@0.8.3/build/index.module.js',
+      'three-bvh-csg': 'https://cdn.jsdelivr.net/npm/three-bvh-csg@0.0.17/build/index.module.js' } });
+    document.head.appendChild(im);
+    var b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'botao personalizar-3d';
+    b.textContent = 'Personalize aqui';
+    form.insertBefore(b, form.firstChild);
+    var aberto = false;
+    b.addEventListener('click', function () {
+      if (aberto) return; aberto = true;
+      b.classList.add('carregando');
+      import('./personalizar3d.js').then(function (m) {
+        return m.abrirJanela3D(cfg3d, function () { aberto = false; });
+      }).catch(function (e) { aberto = false; console.warn('janela 3D', e); })
+        .then(function () { b.classList.remove('carregando'); });
+    });
+  })();
   var botaoSacola = document.querySelector('[data-add-carrinho]');
   if (!colmeia && !botaoComprar) return;
 

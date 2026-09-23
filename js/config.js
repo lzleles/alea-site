@@ -209,6 +209,35 @@ window.ALEA = {
     { id: 'perolizado', rotulo: 'Perolizado', sufixo: ' Perolizado' }
   ],
 
+  /* A JANELA 3D "Personalize aqui" (protótipo, 23/09/2026, áudios dele das 14:27 e 14:30).
+     -------------------------------------------------------------------------------
+     Por produto (slug): o .glb (a peça do arquivo dele, sem o nome), o _nome.json (onde o nome original estava
+     gravado), a fonte da gravação e as cores. `original` é a peça como ele fotografou (nome OFICIAL + código);
+     as abas trazem as cores pra trocar. Protótipo: só a aba Fosco, com as 5 que ele escolheu (todas Bambu Lab
+     PLA Matte, cor = código oficial do Bambu Studio). Os nomes simples estão PROPOSTOS a ele (msg 547). */
+  modelos3d: {
+    'bowl-wave': {
+      glb: 'modelos/luke_g.glb',
+      nome: 'modelos/luke_g_nome.json',
+      fonte: 'fonts/defante.otf',
+      original: {
+        topo:      { site: 'Laranja', hex: '#FF671F', acabamento: 'basico', oficial: 'Bambu Lab · PLA · Lite · Orange (16301)' },
+        principal: { site: 'Branco',  hex: '#FFFFFF', acabamento: 'fosco',  oficial: 'Bambu Lab · PLA · Matte · Ivory White (11100)' },
+        base:      { site: 'Cinza',   hex: '#9B9EA0', acabamento: 'fosco',  oficial: 'Bambu Lab · PLA · Matte · Ash Gray (11102)' }
+      },
+      abas: [
+        { id: 'original', rotulo: 'Original' },
+        { id: 'fosco', rotulo: 'Fosco', cores: [
+          { site: 'Amarelo',     hex: '#F7D959', oficial: 'Bambu Lab · PLA · Matte · Lemon Yellow (11400)' },
+          { site: 'Rosa',        hex: '#E8AFCF', oficial: 'Bambu Lab · PLA · Matte · Sakura Pink (11201)' },
+          { site: 'Azul Claro',  hex: '#A3D8E1', oficial: 'Bambu Lab · PLA · Matte · Ice Blue (11601)' },
+          { site: 'Azul Escuro', hex: '#042F56', oficial: 'Bambu Lab · PLA · Matte · Dark Blue (11602)' },
+          { site: 'Terracota',   hex: '#B15533', oficial: 'Bambu Lab · PLA · Matte · Terracotta (11203)' }
+        ] }
+      ]
+    }
+  },
+
   /* Onde entrega. "a combinar" faz o site dizer "consulte o frete" em vez de prometer
      entrega que não existe.
      ⚠️ A palavra "frete" saiu de perto do preço por pedido dele (15/09/2026). Ela

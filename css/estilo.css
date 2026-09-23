@@ -1424,3 +1424,60 @@ body { position: relative; max-width: 100%; }
 .cores-campos .campo-cor.faltou .acabamento, label.faltou .campo-cor-nome .acabamento { color: var(--terracota); }
 label.faltou .campo-cor-nome select { border-color: var(--terracota); box-shadow: 0 0 0 1px var(--terracota); }
 .campo-cor-nome select, .campo-cor-nome option { font-weight: 400; }
+
+/* ETAPA 53 (23/09/2026, 14:27): a janela 3D "Personalize aqui" — menor que a tela, fundo do site EMBAÇADO
+   ("pro cliente não sair daquela janela"). Peça à esquerda (no celular, em cima), escolhas à direita. */
+.personalizar .personalizar-3d { width: 100%; }
+.personalizar .personalizar-3d.carregando { opacity: .6; pointer-events: none; }
+html.janela3d-aberta { overflow: hidden; }
+.janela3d-fundo {
+  position: fixed; inset: 0; z-index: 90; display: grid; place-items: center; padding: 16px;
+  background: rgba(20, 16, 12, .35); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+  opacity: 0; transition: opacity .22s ease;
+}
+.janela3d-fundo.visivel { opacity: 1; }
+.janela3d {
+  position: relative; width: min(960px, 100%); max-height: calc(100dvh - 32px); overflow: auto;
+  display: grid; grid-template-columns: 1.25fr 1fr; background: var(--papel, #F5EFE6);
+  border-radius: 18px; box-shadow: 0 20px 60px rgba(0,0,0,.35);
+}
+.janela3d-palco { position: relative; min-height: 420px; background: #000; border-radius: 18px 0 0 18px; }
+.janela3d-palco canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; }
+.janela3d-dica, .janela3d-carregando { position: absolute; left: 0; right: 0; text-align: center; color: #bbb; font-size: 12.5px; margin: 0; pointer-events: none; }
+.janela3d-dica { bottom: 10px; }
+.janela3d-carregando { top: 50%; }
+.janela3d-lado { padding: 22px 20px 20px; display: grid; gap: 14px; align-content: start; }
+.janela3d-lado h2 { margin: 0; font-family: var(--fonte-titulo); font-size: 22px; }
+.janela3d-rotulo { display: grid; gap: 6px; font-size: 13px; letter-spacing: .06em; text-transform: uppercase; color: var(--dourado); font-weight: 700; }
+.janela3d-rotulo input {
+  font: inherit; font-size: 15.5px; text-transform: none; letter-spacing: 0; font-weight: 400; color: var(--tinta);
+  padding: 11px 13px; border: 1px solid var(--borda); border-radius: 10px; background: #fff;
+}
+.janela3d-abas { display: flex; gap: 8px; border-bottom: 1px solid var(--borda); }
+.janela3d-abas button {
+  font: inherit; font-size: 15px; background: none; border: 0; padding: 8px 4px; cursor: pointer; color: var(--tinta-fraca);
+  border-bottom: 2px solid transparent; margin-bottom: -1px;
+}
+.janela3d-abas button[aria-selected="true"] { color: var(--tinta); border-bottom-color: var(--terracota); font-weight: 600; }
+.janela3d-zonas { display: grid; gap: 12px; }
+.janela3d-zona { display: grid; gap: 6px; }
+.janela3d-bolas { display: flex; flex-wrap: wrap; gap: 10px; }
+.janela3d-bola {
+  display: grid; justify-items: center; gap: 4px; background: none; border: 0; padding: 0; cursor: pointer;
+  font: inherit; font-size: 11.5px; color: var(--tinta); width: 58px;
+}
+.janela3d-bola::before {
+  content: ""; width: 34px; height: 34px; border-radius: 50%; background: var(--c);
+  box-shadow: inset 0 0 0 1px rgba(0,0,0,.18); outline: 2px solid transparent; outline-offset: 2px;
+}
+.janela3d-bola.ativa::before { outline-color: var(--terracota); }
+.janela3d-bola span { line-height: 1.15; text-align: center; }
+.janela3d-aviso { font-size: 12px; color: var(--tinta-fraca); margin: 0; }
+.janela3d-fechar {
+  position: absolute; top: 8px; right: 10px; z-index: 2; width: 36px; height: 36px; border-radius: 50%;
+  border: 0; background: rgba(255,255,255,.85); font-size: 22px; line-height: 1; cursor: pointer;
+}
+@media (max-width: 760px) {
+  .janela3d { grid-template-columns: 1fr; }
+  .janela3d-palco { min-height: 46dvh; border-radius: 18px 18px 0 0; }
+}
