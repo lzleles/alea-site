@@ -65,9 +65,13 @@
     document.dispatchEvent(new CustomEvent('alea:carrinho'));
   }
 
+  /* ETAPA 33: cada linha ganhou QUANTIDADE (o "− 1 +" do modelo dele). Item antigo, gravado
+     antes disto no aparelho de alguém, não tem o campo: vale 1. */
+  function qtd(i) { return Math.max(1, parseInt(i.qtd, 10) || 1); }
   function total() {
-    return itens.reduce(function (s, i) { return s + (i.preco || 0); }, 0);
+    return itens.reduce(function (s, i) { return s + (i.preco || 0) * qtd(i); }, 0);
   }
+  function pecas() { return itens.reduce(function (s, i) { return s + qtd(i); }, 0); }
   function temSobConsulta() {
     return itens.some(function (i) { return !i.preco; });
   }
@@ -78,7 +82,7 @@
        e aí quem chamou abre a gaveta, que explica o que falta. */
     fecharPedido: function () { return fecharPedido(); },
     itens: function () { return itens.slice(); },
-    quantos: function () { return itens.length; },
+    quantos: function () { return pecas(); },
     total: total,
     adicionar: function (item) {
       item.quando = new Date().toISOString();
@@ -86,13 +90,20 @@
       salvar();
     },
     remover: function (i) { itens.splice(i, 1); salvar(); },
+    /* "se eu clicar em menos, o produto é removido" — o − com 1 unidade tira a linha */
+    mudarQuantidade: function (i, passo) {
+      if (!itens[i]) return;
+      var n = qtd(itens[i]) + passo;
+      if (n < 1) itens.splice(i, 1); else itens[i].qtd = n;
+      salvar();
+    },
     limpar: function () { itens = []; salvar(); }
   };
 
   /* ------------------------------------------------------------- o contador */
   function pintarContador() {
     Array.prototype.forEach.call(document.querySelectorAll('[data-abrir="carrinho"]'), function (b) {
-      var n = itens.length;
+      var n = pecas();
       b.classList.toggle('tem-item', n > 0);
       var bolinha = b.querySelector('[data-quantos]');
       if (bolinha) bolinha.textContent = String(n);
@@ -130,24 +141,32 @@
     var botao = g.querySelector('[data-fechar-pedido]');
 
     if (!itens.length) {
-      corpo.innerHTML = '<p class="vazio">Seu carrinho está vazio.</p>';
+      corpo.innerHTML = '<p class="vazio">Sua sacola está vazia.</p>';
       if (alvoTotal) alvoTotal.textContent = '—';
       if (botao) botao.disabled = true;
       return;
     }
 
     corpo.innerHTML = itens.map(function (i, n) {
-      var valor = i.preco ? window.aleaDinheiro(i.preco) : 'Sob consulta';
+      var valor = i.preco ? window.aleaDinheiro(i.preco * qtd(i)) : 'Sob consulta';
+      /* ETAPA 33: o layout do modelo — foto à esquerda; à direita o nome, o que foi escolhido,
+         a linha "Quantidade  − 1 +" com o traço embaixo, e o preço por último. Saiu o "tirar":
+         quem tira é o − com 1 unidade. */
       return '<div class="linha-carrinho">' +
         /* miniatura: o recorte quando existe, a foto normal quando nao. Nem toda peca
            tem recorte (ver `recorte` no produtos.js), e imagem quebrada no carrinho e'
            a ultima coisa que alguem quer ver antes de fechar um pedido. */
         '<img src="img/produtos/' + i.capa + '_obj_m.webp" alt="" loading="lazy" ' +
         'onerror="this.onerror=null;this.src=&quot;img/produtos/' + i.capa + '_m.jpg&quot;">' +
-        '<div><div class="titulo">' + i.nome + '</div>' +
+        '<div class="lado"><div class="titulo">' + i.nome + '</div>' +
         '<div class="detalhe">' + (descreverItem(i) || 'sem personalização') + '</div>' +
-        '<button class="tirar" type="button" data-tirar="' + n + '">tirar</button></div>' +
-        '<div>' + valor + '</div></div>';
+        '<div class="quantidade"><span>Quantidade</span>' +
+          '<span class="passos">' +
+          '<button type="button" data-qtd="' + n + '" data-passo="-1" aria-label="Diminuir quantidade">−</button>' +
+          '<span class="n" aria-live="polite">' + qtd(i) + '</span>' +
+          '<button type="button" data-qtd="' + n + '" data-passo="1" aria-label="Aumentar quantidade">+</button>' +
+          '</span></div>' +
+        '<div class="valor-linha">' + valor + '</div></div></div>';
     }).join('');
 
     if (alvoTotal) {
@@ -164,7 +183,9 @@
   function textoDoPedido() {
     var linhas = ['Olá! Quero fechar este pedido pelo site da ālea:', ''];
     itens.forEach(function (i, n) {
-      linhas.push((n + 1) + ') ' + i.nome + (i.preco ? ' — ' + window.aleaDinheiro(i.preco) : ' — sob consulta'));
+      var q = qtd(i);
+      linhas.push((n + 1) + ') ' + (q > 1 ? q + 'x ' : '') + i.nome +
+        (i.preco ? ' — ' + window.aleaDinheiro(i.preco * q) : ' — sob consulta'));
       var d = descreverItem(i);
       if (d) linhas.push('   ' + d);
     });
@@ -253,6 +274,12 @@
     document.addEventListener('click', function (e) {
       var tirar = e.target.closest('[data-tirar]');
       if (tirar) { window.aleaCarrinho.remover(parseInt(tirar.getAttribute('data-tirar'), 10)); return; }
+      var passo = e.target.closest('[data-qtd]');
+      if (passo) {
+        window.aleaCarrinho.mudarQuantidade(parseInt(passo.getAttribute('data-qtd'), 10),
+                                           parseInt(passo.getAttribute('data-passo'), 10));
+        return;
+      }
       if (e.target.closest('[data-fechar-pedido]')) fecharPedido();
     });
 

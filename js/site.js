@@ -246,11 +246,16 @@
       return g;
     };
 
-    molde('carrinho', 'Seu carrinho',
-      '<p class="vazio">Seu carrinho está vazio.</p>',
-      '<div class="total-carrinho"><span>Total</span><span data-total>—</span></div>' +
+    /* ETAPA 33 (22/09/2026, 21:42, com print de referência): o LAYOUT do carrinho segue o modelo
+       que ele mandou — "mantenha minha fonte, cor, tudo, só quero o layout, design e posições" —
+       e fica no rodapé: Subtotal centralizado, o botão largo, e "Continue comprando" sublinhado
+       embaixo (fecha a gaveta). O aviso do frete continua, pequeno, por último. */
+    molde('carrinho', 'Sua Sacola de Compras',          // 21:44: o título do modelo, pedido dele
+      '<p class="vazio">Sua sacola está vazia.</p>',
+      '<div class="total-carrinho"><span>Subtotal:</span> <strong data-total>—</strong></div>' +
       '<button class="botao" type="button" data-fechar-pedido disabled>Fechar pedido</button>' +
-      '<p style="font-size:12.5px;color:var(--tinta-fraca);margin:0">' +
+      '<button class="continuar-comprando" type="button" data-fechar-gaveta>Continue comprando</button>' +
+      '<p style="font-size:12.5px;color:var(--tinta-fraca);margin:0;text-align:center">' +
       'O frete é calculado no fechamento, pelo CEP. Peça personalizada só entra em ' +
       'produção depois da confirmação do pagamento.</p>');
 

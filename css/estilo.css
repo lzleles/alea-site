@@ -1248,3 +1248,34 @@ body.sem-transicao-feed .feed { transition: none !important; }
 /* ETAPA 27 (substitui a 26, que nao chegou a subir): sem quadradinho; o nome da parte vai EM CIMA
    da caixa, e a caixa guarda o MESMO recuo de antes (28px do quadradinho + 10px de vao). */
 .cores-campos .campo-cor { display: grid; grid-template-columns: 1fr; gap: 5px; padding-left: 38px; }
+
+/* ETAPA 33 (22/09/2026, 21:42): o LAYOUT do carrinho no modelo que ele mandou (fonte e cores são as
+   nossas; só as posições mudam). Título centralizado com o × à direita; cada linha com a foto à
+   esquerda e, à direita, nome · detalhe · "Quantidade  − 1 +" com traço embaixo · preço. No rodapé:
+   Subtotal centralizado, o botão largo e o "Continue comprando" sublinhado. */
+.gaveta header { position: relative; justify-content: center; }
+.gaveta header h2 { text-align: center; }
+.gaveta header button { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); margin: 0; }
+.linha-carrinho { grid-template-columns: 72px 1fr; gap: 16px; padding: 16px 0; }
+.linha-carrinho img { width: 72px; height: 72px; }
+.linha-carrinho .lado { display: grid; gap: 6px; min-width: 0; }
+.linha-carrinho .quantidade {
+  display: flex; align-items: center; justify-content: space-between;
+  font-size: 14px; color: var(--tinta); padding: 6px 0 8px; border-bottom: 1px solid var(--tinta-fraca);
+}
+.linha-carrinho .passos { display: inline-flex; align-items: center; gap: 14px; }
+.linha-carrinho .passos button {
+  background: transparent; border: 0; cursor: pointer; font: inherit; font-size: 20px; line-height: 1;
+  color: var(--tinta); padding: 2px 6px; min-width: 32px; min-height: 32px;
+}
+.linha-carrinho .passos button:hover { color: var(--terracota); }
+.linha-carrinho .passos .n { min-width: 1.4em; text-align: center; font-weight: 600; }
+.linha-carrinho .valor-linha { font-size: 14.5px; color: var(--tinta-fraca); }
+.total-carrinho { justify-content: center; gap: 6px; align-items: baseline; }
+.total-carrinho span { font-weight: 400; }
+.gaveta .rodape-gaveta .botao { width: 100%; }
+.continuar-comprando {
+  background: transparent; border: 0; cursor: pointer; font: inherit; font-size: 15px;
+  color: var(--tinta); text-decoration: underline; text-underline-offset: 3px; padding: 4px; justify-self: center;
+}
+.total-carrinho > span { font-family: var(--fonte-corpo); font-weight: 400; font-size: 15.5px; color: var(--tinta-fraca); }  /* 'Subtotal:' leve, o valor forte - como no modelo */

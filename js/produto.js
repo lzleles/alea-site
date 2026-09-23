@@ -377,7 +377,7 @@
       }
     }
     if (!caixaAceite || !caixaAceite.checked) {
-      faltas.push({ el: document.querySelector('[data-aceite]'), texto: 'Por favor, marque a declaração.' });
+      faltas.push({ el: document.querySelector('[data-aceite]'), texto: 'Por favor, aceite os termos da declaração.' });   // ETAPA 32 (21:38): frase dele
     }
     return faltas;
   }
