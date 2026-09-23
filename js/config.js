@@ -1,3 +1,12 @@
+/* CATALOGO:
+   nome: config
+   categoria: UTIL
+   objetivo: Centraliza contatos, medição, redes, regras comerciais e opções de personalização usadas pelo site.
+   entrada: Valores editados diretamente no arquivo
+   saida: Objeto global window.ALEA
+   status: ativo (cabecalho proposto pelo Codex em 2026-09-20, confianca ALTA; conferir na proxima vez que o script rodar)
+   validado_em: TBD
+*/
 /* =============================================================================
    config.js — os valores que mudam. Mexe aqui, não no resto do site.
    =============================================================================
@@ -78,8 +87,13 @@ window.ALEA = {
        porque quem escolhe o link é o dono da conta, e porque o Linktree conta essa visita como
        vinda do Instagram — se um dia ele quiser separar "veio do site", é aqui que se troca. */
     linktree:  'https://linktr.ee/eaibora.3d?utm_source=ig&utm_medium=social&utm_content=link_in_bio&fbclid=PAdGRleAUYWSxwZG9mAmZkaWQWUOkM91TjGzxZsGlPaArH1voSo4_jjGV4dG4DYWVtAjExAHNydGMGYXBwX2lkDzEyNDAyNDU3NDI4NzQxNAABpzXaxi12EnfVzwcyuaOEvwRaWDu6O0_U-Sq64AjEdd39UlRlaIC5LxabGdrK_aem_oa-Nn97SXEFFzUbBcxxXdA',
-    instagram: 'https://www.instagram.com/alea.co_/',
-    instagram_canal: 'https://www.instagram.com/eaibora.3d/',
+    /* ⚠️ ETAPA 2 do Cassiano (22/09/2026): "dos 3 ícones abaixo das categorias, tira os 2 do
+       Instagram, deixa só o Linktree". Vazio = o ícone não aparece (ver site.js). Os endereços
+       ficam aqui guardados pra voltar num piscar se ele mudar de ideia:
+         alea.co_        -> https://www.instagram.com/alea.co_/
+         eaibora.3d      -> https://www.instagram.com/eaibora.3d/  (o do canal segue no topo, na logo do @eaibora.3d) */
+    instagram: '',
+    instagram_canal: '',
     youtube:   '',            // https://www.youtube.com/@...
     twitch:    ''             // https://www.twitch.tv/...
   },
@@ -87,12 +101,15 @@ window.ALEA = {
   /* A FICHA PADRÃO DA PEÇA (ditada por ele em 15/09/2026).
      Vale pra todo produto que não escrever a sua própria no produtos.js.
      `material` fica de fora de propósito: ele é PERGUNTADO peça a peça pelo
-     01_gerar_paginas_v1.py, porque muda de peça pra peça (PLA ou PETG). */
+     01_gerar_paginas_v1.py, porque muda de peça pra peça (PLA ou PETG).
+     ETAPA 31 (22/09/2026, 21:33): CORES termina com "entre filamento básico, fosco ou perolizado."
+     (palavras dele; era "entre filamentos básicos, foscos ou brilhosos." — "perolizado" é o nome
+     que ele passou a usar pro acabamento, como no exemplo da cor do nome). */
   ficha_padrao: {
     personalizacao: 'Nome do pet em baixo relevo na cor do objeto.',
     producao: 'Sob encomenda, 3 dias úteis após a confirmação de pagamento!',
-    cores: 'Totalmente personalizável, podendo escolher entre filamentos básicos, ' +
-           'foscos ou brilhosos.'
+    cores: 'Totalmente personalizável, podendo escolher entre filamento básico, ' +
+           'fosco ou perolizado.'
   },
 
   /* ADICIONAIS DE PERSONALIZACAO — o que soma no preco da peca.
@@ -106,9 +123,12 @@ window.ALEA = {
      retorno do site ("colocar um quadrado pra clicar com o titulo Nome Colorido +
      R$ 30,00, onde a pessoa precisa clicar pra poder responder a cor do nome").
      Nao e' estimativa nossa. Mudou o preco aqui, muda no anuncio e no que o cliente ve. */
+  /* ETAPA 20 (22/09/2026, 20:36): o título fica em maiúscula como está, SEM a exclamação; a
+     descrição sai em letra normal (CSS .detalhe-extra) e com ponto final. Eram: 'Um detalhe que
+     transforma!' e 'Deixe o nome do seu pet ainda mais especial adicionando cores!'. */
   adicionais: [
-    { id: 'nome_colorido', rotulo: 'Um detalhe que transforma!', preco: 30, libera: 'cor_nome',
-      detalhe: 'Deixe o nome do seu pet ainda mais especial adicionando cores!' }
+    { id: 'nome_colorido', rotulo: 'Um detalhe que transforma', preco: 30, libera: 'cor_nome',
+      detalhe: 'Deixe o nome do seu pet ainda mais especial adicionando cores.' }
   ],
 
   /* O TEXTO JURÍDICO DA PEÇA PERSONALIZADA, palavra por palavra como ele mandou.
@@ -118,11 +138,14 @@ window.ALEA = {
      exatamente isto. */
   personalizados: {
     titulo: 'PRODUTOS PERSONALIZADOS',
-    texto: 'Por se tratar de um produto produzido sob encomenda e personalizado ' +
-           'especialmente de acordo com as suas escolhas, pedidos personalizados não ' +
-           'poderão ser cancelados ou devolvidos após a confirmação de pagamento se o ' +
-           'produto já estiver sendo fabricado, ressalvados casos de defeito, vício ' +
-           'ou erro de fabricação.',
+    /* ETAPA 18 (22/09/2026, 20:27): texto NOVO dele, palavra por palavra ("apague tudo e coloque
+       esse texto"). O anterior: "Por se tratar de um produto produzido sob encomenda e personalizado
+       especialmente de acordo com as suas escolhas, pedidos personalizados não poderão ser
+       cancelados ou devolvidos após a confirmação de pagamento se o produto já estiver sendo
+       fabricado, ressalvados casos de defeito, vício ou erro de fabricação." */
+    texto: 'Por serem feitos sob encomenda e personalizados conforme suas escolhas, os pedidos ' +
+           'não poderão ser cancelados ou devolvidos após a confirmação do pagamento caso a ' +
+           'produção já tenha começado, exceto em casos de defeito, vício ou erro de fabricação.',
     aceite: 'Declaro que revisei cuidadosamente todas as informações da ' +
             'personalização, incluindo nome, grafia e cores. Declaro, ainda, estar ' +
             'ciente e de acordo com as condições acima aplicáveis a produtos ' +

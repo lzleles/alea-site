@@ -37,6 +37,18 @@
    variável --fonte-titulo e somar um @font-face resolve; nada mais no site muda.
    ========================================================================== */
 
+/* ⚠️ TIPOGRAFIA (etapa 10, 22/09/2026): a Defante — a fonte de TÍTULO oficial da marca
+   (identidade da Mirella) — entrou. Um único desenho serve todos os pesos (font-weight 100..900
+   aponta pro mesmo arquivo), porque é uma display de um corpo só; assim "negrito" não vira faux-bold.
+   Ela TEM o "ā" (a com macron, U+0101), então o nome `ālea` sai igual à logo. ⚠️ LICENÇA: a Defante
+   é comercial; vai na PRÉVIA pro Cassiano ver, e só ao AR depois que o Lázaro confirmar a licença
+   (a Hanken é OFL, livre). Arquivo: fonts/defante.woff2 (convertido do defante.otf que ele mandou). */
+@font-face {
+  font-family: 'Defante';
+  src: url('../fonts/defante.woff2') format('woff2');
+  font-weight: 100 900; font-style: normal; font-display: swap;
+}
+
 :root {
   --off:        #EAE4DB;
   --terracota:  #924429;
@@ -46,10 +58,11 @@
   --tinta:      #2B2118;
   --tinta-fraca:#6B5D50;
   --papel:      #F6F3EE;
-  --preto:      #14100D;   /* preto QUENTE: preto puro brigaria com a paleta de barro */
+  --preto:      #000000;   /* ETAPA 13 (22/09/2026, 18:52): PRETO PURO, pedido dele ("preto forte intenso, igual o laulau"). Era #14100D, o preto quente. */
+  --branco:     #FFFFFF;   /* ETAPA 13: branco puro pro texto das partes escuras (feed e rodapé). O --off segue nas partes claras. */
   --borda:      rgba(146, 68, 41, .16);
 
-  --fonte-titulo: 'Outfit', 'Hanken Grotesk', system-ui, sans-serif;
+  --fonte-titulo: 'Defante', 'Hanken Grotesk', system-ui, sans-serif;   /* etapa 10: era 'Outfit' */
   --fonte-corpo:  'Hanken Grotesk', system-ui, -apple-system, 'Segoe UI', sans-serif;
 
   --raio: 14px;
@@ -120,13 +133,40 @@ body.travado { overflow: hidden; }
 }
 /* a marca e o "← categorias" empilhados: ele pediu o botão EMBAIXO do logo, não ao
    lado (3ª rodada). O canto esquerdo vira uma coluna; o resto do cabeçalho não muda. */
-.topo .canto-marca { display: grid; justify-items: start; gap: 2px; }
+.topo .canto-marca { position: relative; display: grid; justify-items: start; gap: 2px; }
+/* ⚠️ ETAPA 3 (22/09/2026): no feed o botão "← categorias" aparecia DENTRO da coluna e, como
+   o `.topo` centraliza tudo na vertical (`align-items:center`), a coluna de 2 linhas empurrava
+   a CAPIVARA pra cima — ela ficava desalinhada do logo do canal, da conta e da sacola. O
+   Cassiano pediu os quatro na mesma linha, igual na página inicial. Tirando o botão do fluxo
+   (absoluto, logo abaixo da marca), a coluna volta a ter só a marca e alinha com o resto. */
+.topo .voltar-categorias { position: absolute; top: 100%; left: 0; margin-top: 1px; white-space: nowrap; }
 .topo .marca img { height: 28px; width: auto; }
 /* no escuro o logo colorido dá lugar à versão clara — troca por CSS, sem JS */
 .topo .marca .clara { display: none; }
 body.escuro .topo .marca .colorida { display: none; }
 body.escuro .topo .marca .clara { display: block; }
-body.escuro .topo { background: color-mix(in srgb, var(--preto) 72%, transparent); color: var(--off); }
+body.escuro .topo { color: var(--branco); }
+/* ⚠️ ETAPA 6 (22/09/2026): no feed o botão "← categorias" fica ABAIXO da barra (absoluto), e a
+   pontinha do "g" caía na foto. Prolonguei o fundo escuro pra baixo pra cobrir o "g".
+   ⚠️ ETAPA 7 (22/09/2026): (a) o prolongamento caiu pra METADE (14px → 7px); (b) a faixa nova
+   estava com TONALIDADE diferente da barra — porque a barra tinha o `backdrop-filter` no próprio
+   elemento e a faixa num pseudo ANINHADO nesse backdrop (filtro dentro de filtro borra diferente).
+   Cura: no feed, a barra E a faixa viram pseudo-elementos IRMÃOS, com exatamente o mesmo fundo e o
+   mesmo borrão — aninhados do mesmo jeito, então rendem idêntico. O elemento .topo fica sem fundo
+   e sem filtro (passou tudo pros pseudos). */
+body.escuro .topo { background: transparent; -webkit-backdrop-filter: none; backdrop-filter: none; }
+/* ⚠️ ETAPA 9 (22/09/2026): o tom "diferente" perto do "categorias" NÃO era o borrão — era a
+   TRANSLUCIDEZ. A 72% a barra deixa a foto vazar, e onde a foto é clara (o vermelho) a própria
+   barra clareia; o pedaço sobre o vermelho ficava mais claro que o pedaço sobre a foto escura.
+   Blur não conserta isso. A cura é OPACIDADE: a 92% a foto quase não vaza, então a barra fica no
+   MESMO tom em toda a largura, não importa o que passe atrás. Uma camada só, borrão uniforme, e
+   o degrau abaixo do "categorias" mais justo (bottom:-4px) — some a "banda clara" e o espaço a mais. */
+body.escuro .topo::before {
+  content: ''; position: absolute; left: 0; right: 0; top: 0; bottom: -7px;
+  background: color-mix(in srgb, var(--preto) 92%, transparent);
+  -webkit-backdrop-filter: saturate(140%) blur(10px); backdrop-filter: saturate(140%) blur(10px);
+  z-index: -1; pointer-events: none;
+}
 /* na abertura o cabeçalho flutua sem fundo: o gradiente é o assunto da tela */
 body.na-abertura .topo { background: transparent; backdrop-filter: none; }
 
@@ -149,6 +189,10 @@ body.na-abertura .topo { background: transparent; backdrop-filter: none; }
    invisível, pra não piscar no tamanho errado (mesma régua da `.marca-anim`). */
 .topo .marca-3d { display: block; line-height: 0; transform-origin: top left; }
 .topo .marca-3d img { display: block; height: 28px; width: auto; }
+/* ETAPA 14 (22/09/2026, áudio das 19:04): "a página toda no preto e branco, o foco inteirinho nas
+   fotos" — no FEED (body.escuro, só ele liga essa classe) o logo do canal troca pela versão P&B
+   gerada por _preparar_eaibora_pb_v1_2026-09-22.py. Nas páginas claras continua o colorido. */
+body.escuro .topo .marca-3d img { content: url("../img/marca/eaibora3d_logo_pb.webp"); }
 body.home:not(.marca-medida) .topo .marca-3d { visibility: hidden; }
 /* o primeiro quadro: já grande, parada, esperando a vez junto com a capivara */
 body.home.marca-medida:not(.marca-anima) .topo .marca-3d { transform: scale(var(--logo3d-k, 1)); }
@@ -306,8 +350,12 @@ body.tem-clareira .abertura::before {
    tamanho errado. */
 .marca-anim {
   position: relative;
-  width: min(92vw, 900px); aspect-ratio: 3448.89 / 748.01;
-  --cap-x: 19%; --cap-y: 53%;
+  /* REBRAND 22/09/2026: a caixa cresceu pra baixo pra caber o "& Co." (viewBox
+     0 0 3462.47 970.75). A capivara continua no MESMO lugar em unidade de logo — só a
+     moldura aumentou. `--cap-x/--cap-y` são o centro dela na caixa NOVA (medidos: x 0..1236,
+     y 2..748 num viewBox 3462,47 × 970,75), e é a origem de tudo que cresce e encolhe. */
+  width: min(92vw, 900px); aspect-ratio: 3462.47 / 970.75;
+  --cap-x: 17.85%; --cap-y: 38.64%;
   visibility: hidden;                    /* liberada pelo JS, ver acima */
 }
 .marca-anim img { position: absolute; inset: 0; width: 100%; height: 100%; }
@@ -346,15 +394,61 @@ body.marca-anima .marca-anim .letra {
   transform-origin: var(--cap-x) var(--cap-y);
   animation: letra-sai-da-capivara 1s cubic-bezier(.22, .78, .3, 1) both;
 }
-/* as letras entram depois que a capivara assentou: 1,4s de pausa + 3,6s de trajeto */
-body.marca-anima .marca-anim .l1 { animation-delay: 5.0s; }
-body.marca-anima .marca-anim .l2 { animation-delay: 5.7s; }
-body.marca-anima .marca-anim .l3 { animation-delay: 6.4s; }
-body.marca-anima .marca-anim .l4 { animation-delay: 7.1s; }
+/* REBRAND 22/09/2026 (ajuste do Cassiano, 15:41): as letras entram DEPOIS que o "& Co."
+   mergulhou na capivara — 1,4s de pausa + 3,6s de trajeto + 1,0s do "& Co." indo reto pra
+   esquerda (na velocidade das letras) = 6,0s. */
+body.marca-anima .marca-anim .l1 { animation-delay: 6.0s; }
+body.marca-anima .marca-anim .l2 { animation-delay: 6.7s; }
+body.marca-anima .marca-anim .l3 { animation-delay: 7.4s; }
+body.marca-anima .marca-anim .l4 { animation-delay: 8.1s; }
 @keyframes letra-sai-da-capivara {
   from { transform: scale(.04); opacity: 0; }
   30%  { opacity: 1; }
   to   { transform: none; opacity: 1; }
+}
+
+/* REBRAND 22/09/2026 — O "& Co." QUE ENTRA NA CAPIVARA (`.eco-capivara`).
+   Áudio do Cassiano (15:05): "aquele & Co. […] vai entrar para dentro da capivara, para o
+   lado esquerdo, para só depois o ālea sair da capivara". Ela nasce GRANDE, colada à
+   capivara — como divide o mesmo viewBox, o MESMO transform da capivara a mantém no lugar em
+   qualquer escala. Quando a capivara assenta, esta peça encolhe pra dentro do centro da
+   capivara (a mesma origem das letras, o caminho inverso) e some. Só existe na animação: no
+   repouso e pra quem pula, fica invisível (a marca parada não tem "& Co." ao lado). */
+.marca-anim .eco-capivara { opacity: 0; }
+body.marca-medida:not(.marca-anima) .marca-anim .eco-capivara {
+  transform: translate(var(--cap-dx, 0px), var(--cap-dy, 0px)) scale(var(--cap-k, 3));
+  transform-origin: var(--cap-x) var(--cap-y);
+  opacity: 1;
+}
+body.marca-anima .marca-anim .eco-capivara {
+  transform-origin: var(--cap-x) var(--cap-y);
+  animation: eco-entra-na-capivara 4.6s cubic-bezier(.34, .01, .2, 1) 1.4s both;
+}
+/* AJUSTE do Cassiano (15:41): ele entra RETO PRA ESQUERDA (não na diagonal encolhendo pro
+   centro) e NA VELOCIDADE DAS LETRAS (1s). Os 3,6s primeiros são o trajeto colado à capivara
+   (mesma curva dela); o último 1s é o mergulho horizontal, com a curva das letras. */
+@keyframes eco-entra-na-capivara {
+  from    { transform: translate(var(--cap-dx, 0px), var(--cap-dy, 0px)) scale(var(--cap-k, 3)); opacity: 1; }
+  78.26%  { transform: none; opacity: 1;
+            animation-timing-function: cubic-bezier(.22, .78, .3, 1); }  /* 3,6s: assentou ao lado */
+  to      { transform: translateX(-18%); opacity: 0; }                   /* 4,6s: foi reto pra esquerda, pra dentro da capivara */
+}
+
+/* REBRAND 22/09/2026 — O "& Co." QUE APARECE EMBAIXO (`.eco-final`).
+   AJUSTE do Cassiano (15:41): ele NÃO sobe de baixo — ele desce COMO SE ESTIVESSE ESCONDIDO
+   ATRÁS DO ālea, escorregando de trás dele pra baixo até aparecer, no mesmo alinhamento da
+   logo e na velocidade das letras (1s). Por isso esta peça fica ATRÁS das letras no HTML
+   (vem antes delas), e parte de cima (translateY negativo, dentro do ālea) descendo até o
+   lugar. Começa depois da última letra (8,1s + 1s = 9,1s). No repouso e pra quem pula, já
+   entra visível (é parte da marca parada). */
+.marca-anim .eco-final { opacity: 0; }
+body.marca-anima .marca-anim .eco-final {
+  animation: eco-final-desce-de-tras 1s cubic-bezier(.22, .78, .3, 1) 9.1s both;
+}
+@keyframes eco-final-desce-de-tras {
+  from { opacity: 0; transform: translateY(-26%); }   /* escondido atrás do ālea */
+  35%  { opacity: 1; }                                 /* já saiu de trás das letras, mostra */
+  to   { opacity: 1; transform: none; }                /* no lugar dele, embaixo */
 }
 
 /* o resto da tela só aparece quando a capivara já chegou — é o "revelando o site".
@@ -392,10 +486,17 @@ body.sem-abertura .abertura .menu-categorias { transition: none; }
 body.marca-anima:not(.site-revelado) .abertura .menu-categorias,
 body.marca-anima:not(.site-revelado) .abertura .assinatura { pointer-events: none; }
 
-/* quem já viu a abertura nesta sessão recebe o logo pronto, sem esperar de novo */
-body.sem-abertura .marca-anim img { animation: none !important; transform: none !important; opacity: 1 !important; }
+/* quem já viu a abertura nesta sessão recebe o logo pronto, sem esperar de novo.
+   ⚠️ REBRAND 22/09/2026: o `.eco-capivara` NÃO entra aqui — ele é transitório (o "& Co." que
+   mergulha na capivara), e a marca PARADA não tem "& Co." ao lado. No logo pronto ele fica
+   invisível; quem aparece embaixo é o `.eco-final`, que o `:not()` deixa passar pra opacity 1. */
+body.sem-abertura .marca-anim img:not(.eco-capivara) {
+  animation: none !important; transform: none !important; opacity: 1 !important;
+}
+body.sem-abertura .marca-anim .eco-capivara { animation: none !important; transform: none !important; opacity: 0 !important; }
 @media (prefers-reduced-motion: reduce) {
-  .marca-anim img { animation: none !important; transform: none !important; opacity: 1 !important; }
+  .marca-anim img:not(.eco-capivara) { animation: none !important; transform: none !important; opacity: 1 !important; }
+  .marca-anim .eco-capivara { animation: none !important; transform: none !important; opacity: 0 !important; }
   .abertura::after { animation: none; }
 }
 
@@ -431,8 +532,13 @@ body.sem-abertura .marca-anim img { animation: none !important; transform: none 
   gap: 2px clamp(2px, 1vw, 10px);
   font-family: var(--fonte-titulo); font-weight: 500;
   font-size: clamp(.92rem, 1.9vw, 1.12rem); letter-spacing: .14em;
-  max-width: 34ch;
+  /* ETAPA 11 (22/09/2026): a largura só precisa caber os 4 da SEGUNDA fileira; quem faz o 3+4 é a
+     quebra explícita (a `.quebra-linha`, montada no site.js). Em `ch` mudava com a fonte — em px
+     não. */
+  max-width: min(94vw, 360px);
 }
+/* a quebra que força 3 na 1ª fileira e 4 na 2ª: ocupa a linha inteira, empurrando o resto pra baixo */
+.menu-categorias .quebra-linha { flex-basis: 100%; width: 100%; height: 0; margin: 0; padding: 0; }
 .menu-categorias a, .menu-categorias span {
   position: relative; text-decoration: none; color: var(--tinta);
   padding: 9px 12px; border-radius: 999px; line-height: 1;
@@ -469,7 +575,7 @@ body.sem-abertura .marca-anim img { animation: none !important; transform: none 
 .feed {
   position: fixed; inset: 0; z-index: 50;
   pointer-events: none;
-  background: var(--preto); color: var(--off);
+  background: var(--preto); color: var(--branco);
   overflow: hidden;                      /* fechado, não rola nem aparece */
   opacity: 0; visibility: hidden;
   transition: opacity .5s ease, visibility .5s;
@@ -519,7 +625,11 @@ body.sem-transicao-feed .feed { transition: none !important; }
   gap: clamp(8px, 1.2vh, 13px);
   padding: clamp(9px, 1.3vh, 15px) var(--gutter);
 }
-.feed .item:first-child { padding-top: clamp(84px, 12vh, 120px); }
+/* ETAPA 4 (22/09/2026): a intro em fluxo já limpa o topo, então a primeira foto não precisa
+   mais do padding grande — fica só o respiro normal. E entre um produto e o próximo entra um
+   espaço maior (o Cassiano mediu ~3mm e pediu ~1cm): a margem abaixo faz esse vão, proporcional. */
+.feed .item:first-child { padding-top: clamp(8px, 1.5vh, 18px); }
+.feed .palco > .item + .item { margin-top: clamp(26px, 5.5vh, 60px); }
 .feed .item:last-child {
   min-height: 100svh;
   align-content: center;
@@ -625,31 +735,38 @@ body.sem-transicao-feed .feed { transition: none !important; }
 /* ⚠️ 7ª rodada: a legenda encolheu pra caber no vão do laulau (95 px medidos). Ela tem TRÊS
    linhas (categoria, produto, ver produto) contra as DUAS do laulau (nome e preço) — era daí
    que vinham os 46 px a mais entre um produto e o outro. Encolheu o respiro, não o texto. */
-.feed .legenda .lado-esquerdo { display: grid; gap: 0; }
+/* ETAPA 5 (22/09/2026): +~1mm de respiro entre as linhas da legenda (era colado, gap 0). */
+.feed .legenda .lado-esquerdo { display: grid; gap: 4px; }
+/* ETAPA 10 (22/09/2026): o nome "ālea" no meio do título do produto fica MINÚSCULO (igual à logo,
+   em Defante com o macron), mesmo a legenda estando em caixa alta. */
+.feed .produto-mini .marca-nome { text-transform: none; }
 /* as bolinhas são o ÚNICO controle de foto que sobrou (as setas saíram por pedido
    dele). No computador não existe arrastar, então elas precisam ser clicáveis — sem
    isso, quem usa mouse nunca veria a segunda foto. */
 .feed .pontos button {
   width: 8px; height: 8px; padding: 0; border: 0; border-radius: 50%; cursor: pointer;
-  background: rgba(234, 228, 219, .38);
+  background: rgba(255, 255, 255, .38);
   transition: background .25s ease, transform .25s ease;
 }
-.feed .pontos button.on { background: var(--off); transform: scale(1.35); }
+.feed .pontos button.on { background: var(--branco); transform: scale(1.35); }
 .feed .pontos button:focus-visible { outline: 2px solid var(--dourado); outline-offset: 3px; }
 
+/* ⚠️ ETAPA 5 (22/09/2026): o Cassiano pediu pra INVERTER tamanho e peso — sem trocar de lugar.
+   Antes a CATEGORIA (PET) era a maior e em negrito e o PRODUTO (ĀLEA BOWL WAVE) o menor. Agora é
+   o contrário: o PRODUTO manda (maior, negrito, claro) e a categoria vira o rótulo pequeno. */
 .feed .categoria {
-  font-family: var(--fonte-titulo); font-weight: 700;
-  font-size: clamp(1.15rem, 2.6vw, 1.6rem); line-height: 1.05;
-  letter-spacing: .12em; text-transform: uppercase; color: var(--off);
-}
-.feed .produto-mini {
   font-family: var(--fonte-titulo); font-weight: 400;
   font-size: clamp(.82rem, 1.7vw, 1rem); line-height: 1.2;
-  letter-spacing: .14em; text-transform: uppercase; color: rgba(234, 228, 219, .78);
+  letter-spacing: .14em; text-transform: uppercase; color: rgba(255, 255, 255, .9);
+}
+.feed .produto-mini {
+  font-family: var(--fonte-titulo); font-weight: 700;
+  font-size: clamp(1.15rem, 2.6vw, 1.6rem); line-height: 1.05;
+  letter-spacing: .12em; text-transform: uppercase; color: var(--branco);
 }
 .feed .valor {
   font-family: var(--fonte-titulo); font-weight: 500;
-  font-size: clamp(1.2rem, 2.8vw, 1.7rem); color: var(--off); white-space: nowrap;
+  font-size: clamp(1.2rem, 2.8vw, 1.7rem); color: var(--branco); white-space: nowrap;
 }
 .feed .ver { display: inline-block; font-size: 12px; line-height: 1.3; letter-spacing: .08em; opacity: .7; color: var(--dourado); text-decoration: none; margin-top: 2px; }
 .feed .ver:hover { opacity: 1; text-decoration: underline; }
@@ -668,8 +785,8 @@ body.sem-transicao-feed .feed { transition: none !important; }
    telas mudaria o que ele já viu e aprovou no aparelho dele. */
 @media (max-width: 360px) {
   .feed .item { padding: 8px var(--gutter); gap: 7px; }
-  .feed .categoria { font-size: 1.02rem; }
-  .feed .produto-mini { font-size: .76rem; }
+  .feed .categoria { font-size: .76rem; }
+  .feed .produto-mini { font-size: 1.02rem; }
   .feed .valor { font-size: 1.05rem; }
   .feed .ver { font-size: 11px; }
 }
@@ -687,8 +804,8 @@ body.sem-transicao-feed .feed { transition: none !important; }
   display: flex; align-items: center; gap: 9px; pointer-events: none;
   white-space: nowrap;                     /* sem isto a seta cai numa linha e o texto noutra */
   font-size: 11.5px; letter-spacing: .12em; text-transform: uppercase;
-  color: rgba(234, 228, 219, .92); text-shadow: 0 2px 10px rgba(0, 0, 0, .8);
-  background: rgba(20, 16, 13, .55); padding: 8px 15px; border-radius: 999px;
+  color: var(--branco); text-shadow: 0 2px 10px rgba(0, 0, 0, .8);
+  background: rgba(0, 0, 0, .55); padding: 8px 15px; border-radius: 999px;
   backdrop-filter: blur(3px);
   transition: opacity .45s ease;
 }
@@ -708,25 +825,36 @@ body.sem-transicao-feed .feed { transition: none !important; }
 .feed .contador {
   position: fixed; left: var(--gutter); bottom: 22px; z-index: 6;
   font-family: var(--fonte-titulo); font-size: 13px; letter-spacing: .1em;
-  color: rgba(234, 228, 219, .55); pointer-events: none;
+  color: rgba(255, 255, 255, .55); pointer-events: none;
 }
 @media (max-width: 560px) { .feed .contador { display: none; } }
 /* a linha que diz o que a categoria é (16/09/2026). Fica logo abaixo do cabeçalho, que
    termina em 83 px, e acima da peça, que começa em 130 px no celular pequeno (medido):
    uma linha só cabe, duas não. */
 /* mesma coisa da linha do contador: `fixed` pra não rolar junto com os produtos */
+/* ⚠️ ETAPA 4 (22/09/2026): a intro deixou de ser overlay FIXO e entrou NO FLUXO, acima das
+   fotos (o feed.js a insere antes do palco). Assim a primeira foto desce, o texto ganha uma
+   área limpa e legível, e ao rolar ela sobe e some aos poucos (a opacidade é do feed.js). O
+   padding de cima limpa o cabeçalho fixo; o de baixo é o respiro antes da primeira foto. */
 .feed .descricao-categoria {
-  position: fixed; z-index: 6;
-  top: calc(var(--tarja, 0px) + 90px); left: var(--gutter); right: var(--gutter);
-  margin: 0; text-align: center;
-  font-size: 13px; line-height: 1.35; letter-spacing: .04em;
-  color: rgba(234, 228, 219, .72); pointer-events: none;
+  position: static; z-index: 6;
+  margin: 0 auto; max-width: 640px; text-align: center;
+  padding: clamp(96px, 15vh, 150px) var(--gutter) clamp(22px, 5vh, 46px);
+  font-size: 13px; line-height: 1.5; letter-spacing: .04em;
+  color: var(--branco); pointer-events: none;
 }
+/* ETAPA 3 (22/09/2026): o TÍTULO da categoria vem antes da descrição, maior e centralizado. */
+.feed .descricao-categoria .titulo-categoria {
+  display: block; font-family: var(--fonte-titulo); font-weight: 700;
+  font-size: clamp(1.5rem, 7vw, 2.1rem); letter-spacing: .1em; text-transform: uppercase;
+  color: var(--branco); margin-bottom: 10px;
+}
+.feed .descricao-categoria .texto-categoria { display: block; }
 .feed .descricao-categoria[hidden] { display: none; }
-/* ela se apresenta e sai: fixa o tempo todo, ficaria por cima da legenda de cada produto
-   que passa (5ª rodada). Quem liga o `.rolou` é o feed.js, na primeira rolagem. */
-.feed .descricao-categoria { transition: opacity .35s ease; }
-.feed.rolou .descricao-categoria { opacity: 0; }
+/* ETAPA 4 (22/09/2026): quem some é a opacidade que o feed.js escreve conforme a rolagem
+   (gradual, "aos poucos"). Uma transição curta suaviza cada passo. O antigo `.rolou`
+   (some tudo de uma vez) saiu. */
+.feed .descricao-categoria { transition: opacity .12s linear; }
 /* ⚠️ O BOTÃO DE VOLTAR MUDOU DE LUGAR (15/09/2026, 2ª rodada): "após o clique no menu,
    o menu pra voltar pra categorias ficou em cima da foto". Ele agora mora no CABEÇALHO
    (ver o TOPO no 01_gerar_paginas_v2.py), onde tem espaço próprio e não disputa pixel
@@ -737,70 +865,94 @@ body.sem-transicao-feed .feed { transition: none !important; }
   border-radius: 999px; opacity: .75; transition: opacity .2s ease;
   text-align: left;
 }
-.voltar-categorias:hover, .voltar-categorias:focus-visible { opacity: 1; background: rgba(234, 228, 219, .14); }
+.voltar-categorias:hover, .voltar-categorias:focus-visible { opacity: 1; background: rgba(255, 255, 255, .14); }
 .feed .fechar-feed {
-  background: transparent; border: 0; color: rgba(234, 228, 219, .72);
+  background: transparent; border: 0; color: rgba(255, 255, 255, .9);
   font: inherit; font-size: 13.5px; letter-spacing: .06em; cursor: pointer; padding: 6px 0;
 }
-.feed .fechar-feed:hover { color: var(--off); text-decoration: underline; }
+.feed .fechar-feed:hover { color: var(--branco); text-decoration: underline; }
 
 /* ---- o cartão de fim do feed ------------------------------------------- */
-.feed .fim { display: grid; justify-items: center; gap: 18px; text-align: center; max-width: 34ch; }
+.feed .fim { display: grid; justify-items: center; gap: 18px; text-align: center; max-width: min(94vw, 560px); }
 .feed .fim img { width: min(64vw, 300px); }
-.feed .fim p { margin: 0; color: rgba(234, 228, 219, .8); }
+.feed .fim p { margin: 0; color: var(--branco); }
+/* ETAPA 4 (22/09/2026): a frase "Onde cada impressão começa com um sonho!" estava quebrando em
+   duas linhas. Ele pediu numa linha só, o maior tamanho que couber — como na página inicial. O
+   `nowrap` garante a linha única; o tamanho em vw cresce até o limite e nunca estoura a largura. */
+.feed .fim p[data-assinatura] {
+  white-space: nowrap; font-size: clamp(0.85rem, 4.15vw, 1.4rem); letter-spacing: .01em;
+}
+/* ETAPA 12 (22/09/2026): mesma régua do rodapé — a frase com 0,705 da largura da logo, como na
+   abertura. Logo do fim = min(64vw,300px). Aqui a frase é mais larga por em (fonte do corpo +
+   letter-spacing): 0,038 deu 0,797, então o fator é 0,0338 → medido 0,71 (vence a etapa 4). */
+.feed .fim p[data-assinatura] { font-size: min(2.165vw, 10.15px); }
 /* ⚠️ AS CATEGORIAS NO FIM DA LISTA (5ª rodada, áudio das 17:28): "já coloque ali também
    todas as categorias, que evitam da pessoa ir na página principal para clicar em outra".
    É o mesmo menu do rodapé; aqui ele só ganha um rótulo e respiro. */
 .feed .fim .ou-veja {
   margin: 6px 0 -6px; font-size: 12.5px; letter-spacing: .1em; text-transform: uppercase;
-  color: rgba(234, 228, 219, .45);
+  color: rgba(255, 255, 255, .45);
 }
 /* ⚠️ NO PRETO, O MENU PRECISA DA COR CLARA. A regra geral pinta `var(--tinta)`, que é
    a tinta escura da abertura — no fundo do feed ela some por completo (medido no primeiro
    teste desta rodada: as categorias apareciam como manchas). Aqui ele herda o off. */
-.feed .fim .menu-categorias { justify-content: center; max-width: 30ch; }
-.feed .fim .menu-categorias a, .feed .fim .menu-categorias span { color: var(--off); }
+/* ETAPA 5 (22/09/2026): o menu do fim ficava 3+3+1; igualar à página inicial (3+4) é só usar
+   a mesma largura do menu base (34ch) em vez do 30ch, que apertava numa fileira a mais. */
+.feed .fim .menu-categorias { justify-content: center; max-width: min(94vw, 360px); }
+.feed .fim .menu-categorias a, .feed .fim .menu-categorias span { color: var(--branco); }
 .feed .fim .menu-categorias a { opacity: .92; }
 .feed .fim .menu-categorias a:hover, .feed .fim .menu-categorias a:focus-visible {
   background: var(--terracota); color: var(--off); opacity: 1;
 }
 .feed .fim .menu-categorias .vazia { opacity: .42; }
+/* ETAPA 14 (22/09/2026, 19:06): o botão "Orçamentos e personalizados" do fim da lista era
+   terracota com letra creme. Pedido dele: "inverta — no lugar do marrom, branco; as letras,
+   preto". Hover: vira contorno branco sobre o preto (continua P&B). */
+.feed .fim .botao { background: var(--branco); color: var(--preto); }
+.feed .fim .botao:hover { background: var(--preto); color: var(--branco); box-shadow: inset 0 0 0 1.5px var(--branco); }
+.feed .fim .botao[aria-disabled='true'], .feed .fim .botao:disabled { background: var(--branco); color: var(--preto); }
 
 /* ================================================================== RODAPÉ
    Repete a marca com a frase embaixo, o mesmo menu de categorias e as redes —
    exatamente a lista que ele mandou em 15/09/2026. */
 .rodape {
   position: relative; z-index: 2;
-  background: var(--preto); color: rgba(234, 228, 219, .74);
+  background: var(--preto); color: var(--branco);
   padding-block: clamp(46px, 8vw, 72px) 30px; font-size: 14.5px;
   text-align: center;
 }
 .rodape .marca-rodape { width: min(72vw, 300px); margin: 0 auto 14px; }
-.rodape .frase { font-family: var(--fonte-titulo); font-weight: 300; font-size: clamp(1rem, 2.2vw, 1.3rem); color: var(--dourado); margin: 0 0 26px; }
+/* ETAPA 12 (22/09/2026, áudio das 18:37): "pegue como referência a frase da página inicial —
+   o tamanho dela é proporcionalmente menor que a logo — e aplique nas logos da parte preta".
+   Medido no celular (390px, Playwright): na abertura a frase tem 0,705 da largura da logo; no
+   rodapé tinha 1,06 e no fim da lista 1,36. A fonte agora é FRAÇÃO DA LARGURA DA LOGO (a frase
+   mede ~18,6em): logo = min(72vw,300px) → fonte = 0,038 × isso. Assim a proporção vale em
+   qualquer tela, não só no celular. Era clamp(1rem, 2.2vw, 1.3rem). */
+.rodape .frase { font-family: var(--fonte-titulo); font-weight: 300; font-size: min(2.74vw, 11.4px); white-space: nowrap; color: var(--dourado); margin: 0 0 26px; }
 .rodape .orcamento {
-  display: inline-block; margin-bottom: 30px; color: var(--off);
+  display: inline-block; margin-bottom: 30px; color: var(--branco);
   font-size: 15.5px; text-decoration: none; border-bottom: 1.5px solid var(--dourado); padding-bottom: 3px;
 }
 .rodape .orcamento:hover { color: var(--dourado); }
 .rodape .orcamento[aria-disabled='true'] { opacity: .55; cursor: not-allowed; border-bottom-style: dashed; }
-.rodape .menu-categorias { margin: 0 auto 26px; color: rgba(234, 228, 219, .8); }
+.rodape .menu-categorias { margin: 0 auto 26px; color: var(--branco); }
 .rodape .menu-categorias a, .rodape .menu-categorias span { color: inherit; }
 .rodape .menu-categorias a:hover, .rodape .menu-categorias a:focus-visible { background: var(--dourado); color: var(--preto); }
 
 .rodape .redes { display: flex; justify-content: center; gap: 18px; margin-bottom: 26px; }
-.rodape .redes a { color: rgba(234, 228, 219, .72); transition: color .2s ease, transform .2s ease; }
-.rodape .redes a:hover { color: var(--off); transform: translateY(-2px); }
+.rodape .redes a { color: rgba(255, 255, 255, .9); transition: color .2s ease, transform .2s ease; }
+.rodape .redes a:hover { color: var(--branco); transform: translateY(-2px); }
 .rodape .redes svg { width: 22px; height: 22px; display: block; }
 
 .rodape .lei {
-  border-top: 1px solid rgba(234, 228, 219, .14); padding-top: 20px; margin: 0 auto;
+  border-top: 1px solid rgba(255, 255, 255, .14); padding-top: 20px; margin: 0 auto;
   max-width: var(--maxima); font-size: 13px; line-height: 2;
   display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 4px 8px;
 }
 /* "© ALEA 2026" com o LOGO no lugar do nome escrito — ele registrou a marca e pediu
    que o registro apareça, não a palavra solta. */
 .rodape .lei img { height: 17px; width: auto; display: inline-block; vertical-align: -3px; }
-.rodape .lei .creditos { flex-basis: 100%; opacity: .6; font-size: 12px; }
+.rodape .lei .creditos { flex-basis: 100%; opacity: .85; font-size: 12px; } /* ETAPA 13: era .6 (cinza apagado no preto puro) */
 .rodape a { color: inherit; }
 
 /* ================================================== PÁGINAS INTERNAS (produto/texto) */
@@ -924,6 +1076,13 @@ body.sem-transicao-feed .feed { transition: none !important; }
 .aceite { display: flex; gap: 11px; align-items: flex-start; margin: 0 0 18px; font-size: 14px; color: var(--tinta-fraca); cursor: pointer; }
 .aceite input { margin: 3px 0 0; width: 19px; height: 19px; flex: none; accent-color: var(--terracota); cursor: pointer; }
 .aceite.faltou { color: var(--terracota); font-weight: 600; }
+/* ETAPA 19 (22/09/2026): a mesma "cor de falta" da declaração vale pro que mais falta na compra —
+   o nome do pet, a cor do nome (com o adicional marcado), a escolha das cores e cada cor a digitar.
+   O rótulo vira terracota e a caixa ganha a borda terracota. */
+.personalizar label.faltou, .cores-peca > .rotulo-grupo.faltou { color: var(--terracota); }
+.personalizar label.faltou input[type="text"],
+.cores-campos .campo-cor.faltou input { border-color: var(--terracota); box-shadow: 0 0 0 1px var(--terracota); }
+.cores-campos .campo-cor.faltou .numero { background: var(--terracota); color: var(--off); }
 
 .personalizar { display: grid; gap: 12px; margin: 0 0 20px; }
 .personalizar label { display: grid; gap: 5px; font-size: 13px; letter-spacing: .06em; text-transform: uppercase; color: var(--dourado); font-weight: 700; }
@@ -1071,3 +1230,155 @@ body.sem-transicao-feed .feed { transition: none !important; }
   font-size: 14px; line-height: 1.5; padding: 10px var(--gutter); text-align: center;
 }
 .tarja-config code { background: rgba(255, 255, 255, .45); padding: 1px 6px; border-radius: 5px; font-size: 13px; }
+
+/* ETAPA 20 (22/09/2026): a DESCRIÇÃO do adicional sai em letra normal (o título continua em
+   maiúscula, como ele quis). O `.personalizar label` (0,1,1) deixava tudo em caixa alta. */
+.personalizar label.extra .detalhe-extra { text-transform: none; letter-spacing: 0; }
+
+/* ETAPA 23 (22/09/2026): o que falta treme junto com os botões (a mesma animação `tremer`). */
+.treme-falta { animation: tremer .45s ease-in-out 1; }
+@media (prefers-reduced-motion: reduce) { .treme-falta { animation: none; } }
+
+/* ETAPA 24: sem cor escolhida, cada opção (tricolor, bicolor…) também muda de cor */
+.cores-opcoes label.faltou { color: var(--terracota); font-weight: 600; }
+
+/* ETAPA 24: a frase da falta (acima do Comprar agora) na MESMA cor das faltas. Ela saía cinza: o`n   `.produto-topo p` (0,1,1) vencia o vermelho do `.recado-aceite` (0,1,0) — medido no print. */
+.produto-topo p.recado-aceite { color: var(--terracota); font-weight: 600; }
+
+/* ETAPA 27 (substitui a 26, que nao chegou a subir): sem quadradinho; o nome da parte vai EM CIMA
+   da caixa, e a caixa guarda o MESMO recuo de antes (28px do quadradinho + 10px de vao). */
+.cores-campos .campo-cor { display: grid; grid-template-columns: 1fr; gap: 5px; padding-left: 38px; }
+
+/* ETAPA 33 (22/09/2026, 21:42): o LAYOUT do carrinho no modelo que ele mandou (fonte e cores são as
+   nossas; só as posições mudam). Título centralizado com o × à direita; cada linha com a foto à
+   esquerda e, à direita, nome · detalhe · "Quantidade  − 1 +" com traço embaixo · preço. No rodapé:
+   Subtotal centralizado, o botão largo e o "Continue comprando" sublinhado. */
+.gaveta header { position: relative; justify-content: center; }
+.gaveta header h2 { text-align: center; }
+.gaveta header button { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); margin: 0; }
+.linha-carrinho { grid-template-columns: 72px 1fr; gap: 16px; padding: 16px 0; }
+.linha-carrinho img { width: 72px; height: 72px; }
+.linha-carrinho .lado { display: grid; gap: 6px; min-width: 0; }
+.linha-carrinho .quantidade {
+  display: flex; align-items: center; justify-content: space-between;
+  font-size: 14px; color: var(--tinta); padding: 6px 0 8px; border-bottom: 1px solid var(--tinta-fraca);
+}
+.linha-carrinho .passos { display: inline-flex; align-items: center; gap: 14px; }
+.linha-carrinho .passos button {
+  background: transparent; border: 0; cursor: pointer; font: inherit; font-size: 20px; line-height: 1;
+  color: var(--tinta); padding: 2px 6px; min-width: 32px; min-height: 32px;
+}
+.linha-carrinho .passos button:hover { color: var(--terracota); }
+.linha-carrinho .passos .n { min-width: 1.4em; text-align: center; font-weight: 600; }
+.linha-carrinho .valor-linha { font-size: 14.5px; color: var(--tinta-fraca); }
+.total-carrinho { justify-content: center; gap: 6px; align-items: baseline; }
+.total-carrinho span { font-weight: 400; }
+.gaveta .rodape-gaveta .botao { width: 100%; }
+.continuar-comprando {
+  background: transparent; border: 0; cursor: pointer; font: inherit; font-size: 15px;
+  color: var(--tinta); text-decoration: underline; text-underline-offset: 3px; padding: 4px; justify-self: center;
+}
+.total-carrinho > span { font-family: var(--fonte-corpo); font-weight: 400; font-size: 15.5px; color: var(--tinta-fraca); }  /* 'Subtotal:' leve, o valor forte - como no modelo */
+
+/* ETAPA 35 (22/09/2026, 21:52): com algo na sacola, o CORPO da sacola do topo ganha a cor do PAPEL
+   KRAFT — "a minha embalagem é da cor do papel craft". Vazia, fica só o traço. O contador (a
+   bolinha com o número) segue o nosso, sem mudar. A cor é um kraft médio; se ele quiser o tom exato
+   da embalagem, é trocar este número (ou mandar a foto da caixa pra medir). */
+:root { --craft: #C9A57B; }
+.botao-icone.tem-item svg path:first-child { fill: var(--craft); }
+
+/* ETAPA 36: o × no canto da linha (o único que tira da sacola), fino e discreto como no modelo */
+.linha-carrinho .cabeca-linha { display: grid; grid-template-columns: 1fr auto; gap: 10px; align-items: start; }
+.linha-carrinho .tirar-x {
+  background: transparent; border: 0; cursor: pointer; font: inherit; font-size: 22px; font-weight: 300;
+  line-height: 1; color: var(--tinta-fraca); padding: 0 2px; min-width: 28px; min-height: 28px;
+}
+.linha-carrinho .tirar-x:hover { color: var(--terracota); }
+
+/* ETAPA 37 (22:09): no celular a sacola preenche a TELA INTEIRA, sem a faixa no canto nem a sombra
+   ("não vai ter borda igual a gente tem ali no cantinho"). A faixa aparecia nos celulares mais
+   largos que 420 px (o teto da gaveta). No computador ela segue gaveta lateral. */
+@media (max-width: 760px) {
+  #gaveta-carrinho { width: 100vw; }
+  #gaveta-carrinho.aberta { box-shadow: none; }
+}
+/* o pulinho da sacola do topo quando um produto entra sem abrir a sacola */
+@keyframes sacola-pula { 0%, 100% { transform: scale(1); } 40% { transform: scale(1.18); } 70% { transform: scale(.94); } }
+.botao-icone.sacola-pulou { animation: sacola-pula .5s ease-out 1; }
+@media (prefers-reduced-motion: reduce) { .botao-icone.sacola-pulou { animation: none; } }
+
+/* ETAPA 38: a sacola do lado do "Comprar agora" acompanha a do topo — cheia = corpo kraft, sem número */
+.sacola-cheia .botao-sacola svg path:first-child { fill: var(--craft); }
+.botao-sacola.sacola-pulou { animation: sacola-pula .5s ease-out 1; }
+@media (prefers-reduced-motion: reduce) { .botao-sacola.sacola-pulou { animation: none; } }
+
+/* ETAPA 39: o brilho SUAVE na linha cuja quantidade mudou — um fundo kraft bem claro que acende e
+   se apaga em 0,9 s, e o número dá um respiro leve. Só nela; as outras não se mexem. */
+@keyframes linha-mexeu { 0% { background: transparent; } 25% { background: color-mix(in srgb, var(--craft) 18%, transparent); } 100% { background: transparent; } }
+@keyframes numero-respira { 0%, 100% { transform: scale(1); } 40% { transform: scale(1.12); } }
+.linha-carrinho.mexeu { animation: linha-mexeu .9s ease-out 1; border-radius: 10px; }
+.linha-carrinho.mexeu .passos .n { display: inline-block; animation: numero-respira .45s ease-out 1; }
+@media (prefers-reduced-motion: reduce) { .linha-carrinho.mexeu, .linha-carrinho.mexeu .passos .n { animation: none; } }
+
+/* ETAPA 40 (22:23): a SACOLA é uma página própria que rola sozinha (o site de baixo não rola junto).
+   A 1ª tela (.tela-sacola) cabe exata na altura VISÍVEL do celular — 100dvh, que acompanha a barra
+   do Safari entrando e saindo (o 100vh não acompanha e fazia o rodapé pular). Subtotal e o botão
+   ficam no pé dessa tela; o "Continue comprando" e o aviso do frete só aparecem rolando. */
+#gaveta-carrinho {
+  bottom: auto; height: calc(100vh - var(--tarja, 0px));
+  display: block; overflow-y: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch;
+}
+#gaveta-carrinho .tela-sacola { min-height: calc(100vh - var(--tarja, 0px)); display: flex; flex-direction: column; }
+@supports (height: 100dvh) {
+  #gaveta-carrinho { height: calc(100dvh - var(--tarja, 0px)); }
+  #gaveta-carrinho .tela-sacola { min-height: calc(100dvh - var(--tarja, 0px)); }
+}
+#gaveta-carrinho .corpo { flex: 1; overflow: visible; }
+#gaveta-carrinho .rodape-principal { padding: 16px 20px 20px; border-top: 1px solid var(--borda); display: grid; gap: 12px; }
+#gaveta-carrinho .rodape-extra { padding: 18px 20px 34px; display: grid; gap: 12px; }
+body.travado { overflow: hidden; overscroll-behavior: none; }
+a.continuar-comprando { display: inline-block; text-align: center; }  /* ETAPA 42: virou link (vai pra página inicial) */
+
+/* ETAPA 43: a janelinha "Você adicionou esta criação à sua Sacola de Compras." (layout do modelo:
+   miniatura à esquerda num fundo mais escuro, texto à direita, × no canto), logo abaixo do topo */
+.aviso-sacola {
+  position: fixed; left: var(--gutter, 16px); right: var(--gutter, 16px); z-index: 70;
+  display: grid; grid-template-columns: 92px 1fr auto; align-items: stretch;
+  background: var(--papel); border-radius: 14px; overflow: hidden;
+  box-shadow: 0 10px 30px -12px rgba(0, 0, 0, .35);
+  opacity: 0; transform: translateY(-8px); transition: opacity .25s ease, transform .25s ease;
+}
+.aviso-sacola.visivel { opacity: 1; transform: none; }
+.aviso-sacola .miniatura { background: color-mix(in srgb, var(--off) 70%, var(--tinta) 6%); display: grid; place-items: center; padding: 8px; }
+.aviso-sacola .miniatura img { width: 100%; height: 76px; object-fit: contain; }
+.aviso-sacola p { margin: 0; padding: 14px 4px 14px 14px; font-size: 14.5px; line-height: 1.45; color: var(--tinta); align-self: center; }
+.aviso-sacola .fechar-aviso { background: transparent; border: 0; cursor: pointer; font-size: 24px; font-weight: 300; line-height: 1; color: var(--tinta-fraca); padding: 10px 12px; align-self: start; }
+@media (prefers-reduced-motion: reduce) { .aviso-sacola { transition: none; } }
+.linha-carrinho .editar-item { justify-self: start; font-size: 13.5px; color: var(--tinta); text-decoration: underline; text-underline-offset: 3px; }  /* ETAPA 45 */
+
+/* ⚠️ ETAPA 46 (22/09/2026, 22:43, vídeo no iPhone): dois defeitos da página de produto.
+   1. "Não pode mexer pros lados" — a página arrastava na horizontal. As gavetas (sacola e conta)
+      moram FORA da tela, à direita (translateX 100%), e o Safari deixa arrastar até elas. Trava do
+      eixo X na página inteira; as gavetas continuam abrindo por cima.
+   2. "Trava o cabeçalho: quando vou pra baixo rápido e volto rápido, ele sobe tampando a logo" — é o
+      ELÁSTICO do iPhone (a página passa do topo e quica); o cabeçalho é fixo, mas o conteúdo quica
+      por baixo e por cima dele. `overscroll-behavior: none` desliga o quique; o cabeçalho fica parado. */
+html, body { overflow-x: hidden; overscroll-behavior: none; }
+body { position: relative; max-width: 100%; }
+
+/* ETAPA 48: a janelinha de CONFIRMAR a remoção — mesmo desenho da de "adicionou", por cima da sacola */
+.aviso-sacola.confirmar { z-index: 95; grid-template-columns: 92px 1fr; }
+.aviso-sacola.confirmar .texto { padding: 14px; display: grid; gap: 12px; align-content: center; }
+.aviso-sacola.confirmar .texto p { padding: 0; }
+.aviso-sacola.confirmar .escolha { display: flex; gap: 10px; }
+.aviso-sacola.confirmar .escolha .botao { padding: 9px 22px; font-size: 14.5px; }
+
+/* ETAPA 49 (23:03): o PONTINHO solto à esquerda da 2ª fileira do menu — era o separador '·' que a regra
+   `.menu-categorias span::before` punha também na `.quebra-linha` (um <span> invisível, etapa 11).
+   Vale pros três menus: abertura, rodapé e fim da lista. */
+.menu-categorias .quebra-linha::before { content: none; }
+
+/* ETAPA 50 (23:04): a miniatura da sacola é a peça SEM FUNDO, direto sobre o bege da sacola (sem o
+   quadrado branco) — 'pra dar a impressão de um produto 3D', como a 1ª foto do feed. O recorte já
+   era o arquivo usado (`_obj_m.webp`); o que tirava o efeito era o fundo branco do CSS. */
+.linha-carrinho img { background: transparent; border-radius: 0; }

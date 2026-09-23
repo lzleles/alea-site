@@ -1,3 +1,12 @@
+/* CATALOGO:
+   nome: site
+   categoria: UTIL
+   objetivo: Inicializa recursos comuns do site, incluindo compras, contatos, categorias, redes e gavetas de conta e carrinho.
+   entrada: Configuração global, catálogos e DOM de cada página
+   saida: Links, menus, redes, campos preenchidos e gavetas interativas
+   status: ativo (cabecalho proposto pelo Codex em 2026-09-20, confianca ALTA; conferir na proxima vez que o script rodar)
+   validado_em: TBD
+*/
 /* =============================================================================
    site.js — o que vale em TODA página (abertura, feed, produto, textos)
    =============================================================================
@@ -115,6 +124,7 @@
 
     Array.prototype.forEach.call(caixas, function (caixa) {
       caixa.innerHTML = '';
+      var n = 0;
       cats.forEach(function (cat) {
         var quantos = feed.filter(function (i) { return i.categoria === cat.id; }).length;
         if (!quantos && C.esconder_categorias_vazias) return;
@@ -131,6 +141,17 @@
           el.innerHTML = cat.nome + '<small>em breve</small>';
         }
         caixa.appendChild(el);
+        n++;
+        /* ⚠️ ETAPA 11 (22/09/2026): o Cassiano quer o menu SEMPRE 3 na primeira fileira e 4 na
+           segunda (como na página inicial). A quebra natural do flex dependia da largura das
+           letras — com a fonte nova (Defante) ela virou 3+3+1 / 4+2+1. Uma quebra explícita depois
+           do 3º item (um elemento que ocupa a linha toda) garante o 3+4 em QUALQUER fonte. */
+        if (n === 3) {
+          var quebra = document.createElement('span');
+          quebra.className = 'quebra-linha';
+          quebra.setAttribute('aria-hidden', 'true');
+          caixa.appendChild(quebra);
+        }
       });
     });
   }
@@ -225,13 +246,48 @@
       return g;
     };
 
-    molde('carrinho', 'Seu carrinho',
-      '<p class="vazio">Seu carrinho está vazio.</p>',
-      '<div class="total-carrinho"><span>Total</span><span data-total>—</span></div>' +
+    /* ETAPA 33 (22/09/2026, 21:42, com print de referência): o LAYOUT do carrinho segue o modelo
+       que ele mandou — "mantenha minha fonte, cor, tudo, só quero o layout, design e posições" —
+       e fica no rodapé: Subtotal centralizado, o botão largo, e "Continue comprando" sublinhado
+       embaixo (fecha a gaveta). O aviso do frete continua, pequeno, por último. */
+    molde('carrinho', 'Sua Sacola de Compras',          // 21:44: o título do modelo, pedido dele
+      '<p class="vazio">Sua sacola está vazia.</p>',
+      '<div class="total-carrinho"><span>Subtotal:</span> <strong data-total>—</strong></div>' +
       '<button class="botao" type="button" data-fechar-pedido disabled>Fechar pedido</button>' +
-      '<p style="font-size:12.5px;color:var(--tinta-fraca);margin:0">' +
-      'O frete é calculado no fechamento, pelo CEP. Peça personalizada só entra em ' +
-      'produção depois da confirmação do pagamento.</p>');
+      /* ETAPA 42 (22:30): o × do topo FECHA e deixa a pessoa exatamente onde estava; o "Continue
+         comprando" leva pra PÁGINA INICIAL. Por isso ele virou link de verdade, não mais fechar. */
+      '<a class="continuar-comprando" href="index.html">Continue comprando</a>');
+    /* ETAPA 41 (22:29): saiu da sacola, a pedido dele, o aviso "O frete é calculado no fechamento,
+       pelo CEP. Peça personalizada só entra em produção depois da confirmação do pagamento." — o
+       frete segue sendo dito na mensagem do WhatsApp ("Frete: a combinar pelo CEP") e a regra da
+       produção está na página de Trocas e no texto de Produtos Personalizados. */
+
+    /* ⚠️ ETAPA 40 (22:23, vídeo + 2 prints do modelo): "na página da sacola é pra deixar só a
+       sacola" — a PRIMEIRA tela tem que caber inteira no telefone (título, produtos, Subtotal e o
+       botão lá embaixo), e só ROLANDO aparece o "Continue comprando". E o site de baixo não pode
+       rolar junto ("parece que está rodando a segunda tela"). Então a sacola vira UMA página que rola
+       sozinha: a `.tela-sacola` ocupa exatamente a altura visível (100dvh) e o `.rodape-extra` mora
+       depois dela, fora da primeira tela. Monta aqui, movendo os pedaços do molde. */
+    (function () {
+      var g = document.getElementById('gaveta-carrinho');
+      if (!g) return;
+      var rod = g.querySelector('[data-rodape-gaveta]');
+      var tela = document.createElement('div');
+      tela.className = 'tela-sacola';
+      var principal = document.createElement('div');
+      principal.className = 'rodape-principal';
+      var extra = document.createElement('div');
+      extra.className = 'rodape-extra';
+      Array.prototype.slice.call(rod.children).forEach(function (el) {
+        (el.matches('.total-carrinho, [data-fechar-pedido]') ? principal : extra).appendChild(el);
+      });
+      tela.appendChild(g.querySelector('header'));
+      tela.appendChild(g.querySelector('[data-corpo]'));
+      tela.appendChild(principal);
+      g.insertBefore(tela, rod);
+      g.insertBefore(extra, rod);
+      g.removeChild(rod);
+    })();
 
     molde('conta', 'Sua conta ālea',
       '<p class="vazio">Carregando…</p>', '');
@@ -269,8 +325,27 @@
     });
   }
 
+  /* ------------------------------------------- "voltar para o feed" (ETAPA 17)
+     Parte 3, item 2 (22/09/2026): o botão levava pra `index.html` — a PRIMEIRA página. Tem que
+     voltar pra categoria e pra tela exata de onde a pessoa saiu. O feed.js guardou essa tela em
+     `alea_feed_exato` quando ela saiu; aqui o botão aponta pra `index.html#<categoria>` (que abre
+     direto no feed, sem abertura) e deixa a marca `alea_voltar_exato` pedindo a restauração.
+     Sem tela guardada (chegou no produto por link de fora), segue pra primeira página. */
+  function ligarVoltarProFeed() {
+    Array.prototype.forEach.call(document.querySelectorAll('a.voltar'), function (a) {
+      var e = null;
+      try { e = JSON.parse(sessionStorage.getItem('alea_feed_exato') || 'null'); } catch (err) { /* nada */ }
+      if (!e || !e.cat) return;
+      a.setAttribute('href', 'index.html#' + e.cat);
+      a.addEventListener('click', function () {
+        try { sessionStorage.setItem('alea_voltar_exato', e.cat); } catch (err) { /* aba anônima */ }
+      });
+    });
+  }
+
   /* -------------------------------------------------------------------- início */
   function iniciar() {
+    ligarVoltarProFeed();
     preencherContato();
     montarMenuCategorias();
     montarRedes();

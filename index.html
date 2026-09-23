@@ -18,15 +18,16 @@
 <meta property="og:title" content="ālea — o comedouro com o nome do seu cão">
 <meta property="og:description" content="Impresso em 3D, sob encomenda, com a estampa que você escolher. Jataí-GO.">
 <meta property="og:url" content="https://www.aleaco.art.br/">
-<meta property="og:image" content="https://www.aleaco.art.br/img/produtos/hero_a.jpg">
+<meta property="og:image" content="img/marca/og_compartilhar.jpg">
 <meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="img/marca/og_compartilhar.jpg">
 
-<link rel="icon" href="img/marca/favicon_capivara_32.png" type="image/png" sizes="32x32">
-<link rel="icon" href="img/marca/favicon_capivara.svg" type="image/svg+xml">
-<link rel="apple-touch-icon" href="img/marca/favicon_capivara_180.png">
+<link rel="icon" href="img/marca/favicon_circular_32.png" type="image/png" sizes="32x32">
+<link rel="icon" href="img/marca/favicon_circular_48.png" type="image/png" sizes="48x48">
+<link rel="apple-touch-icon" href="img/marca/favicon_circular_180.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@300;400;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@300;400;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/estilo.css">
 
 <script type="application/ld+json">
@@ -58,9 +59,12 @@
        marca ele tem lugar próprio e não disputa pixel com nada.
        Quem liga e desliga é o feed.js. -->
   <span class="canto-marca">
+    <!-- REBRAND 22/09/2026: o topo esquerdo perdeu o logotipo inteiro da ālea e ficou SÓ a
+         capivara em miniatura (pedido do Cassiano em áudio). Peça gerada por
+         _montar_marca_e_co_v1_rebrand_2026-09-22.py. -->
     <a class="marca" href="index.html" aria-label="ālea — início">
-      <img class="colorida" src="img/marca/alea_logo.svg" alt="ālea" width="129" height="28">
-      <img class="clara" src="img/marca/alea_logo_claro.svg" alt="ālea" width="129" height="28">
+      <img class="colorida" src="img/marca/e_co/capivara_mini.svg" alt="ālea" width="46" height="28">
+      <img class="clara" src="img/marca/e_co/capivara_mini_claro.svg" alt="ālea" width="46" height="28">
     </a>
     <button class="voltar-categorias" type="button" data-fechar-feed hidden>&larr; categorias</button>
   </span>
@@ -82,7 +86,7 @@
       <span class="rotulo">Conta</span>
     </button>
     <button class="botao-icone" type="button" data-abrir="carrinho" aria-haspopup="dialog">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><path d="M3 6h18"></path><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 8.5h14V21H5z"></path><path d="M9 8.5V7a3 3 0 0 1 6 0v1.5"></path></svg>
       <span class="rotulo">Carrinho</span>
       <span class="quantos" data-quantos>0</span>
     </button>
@@ -102,12 +106,22 @@
          sobrepostas e sem transformação nenhuma, elas remontam o logotipo exato. É isso
          que deixa cada letra "sair de dentro da capivara" com uma linha de CSS — basta
          escalá-la em torno do centro da capivara. Nenhuma medida de letra no meio. -->
+    <!-- REBRAND 22/09/2026: as SETE peças (não mais cinco) têm o MESMO viewBox NOVO
+         (0 0 3462.47 970.75, gerado por _montar_marca_e_co_v1_rebrand_2026-09-22.py) — a caixa
+         do kit cresceu pra baixo pra caber o "& Co.". Sobrepostas e sem transformação, remontam
+         a marca nova exata. A ordem dos áudios dele (15:05): a capivara entra COM o "& Co." do
+         lado (`.eco-capivara`); quando ela assenta, o "& Co." mergulha nela; então o ālea sai
+         letra por letra; e no fim o "& Co." aparece embaixo (`.eco-final`). -->
     <div class="marca-anim" aria-hidden="true">
-      <img class="capivara" src="img/marca/alea_capivara.svg" alt="">
-      <img class="letra l1" src="img/marca/alea_letra1.svg" alt="">
-      <img class="letra l2" src="img/marca/alea_letra2.svg" alt="">
-      <img class="letra l3" src="img/marca/alea_letra3.svg" alt="">
-      <img class="letra l4" src="img/marca/alea_letra4.svg" alt="">
+      <img class="eco-capivara" src="img/marca/e_co/eco_capivara.svg" alt="">
+      <img class="capivara" src="img/marca/e_co/capivara.svg" alt="">
+      <!-- o "& Co." final vem ANTES das letras de propósito: ele desce de TRÁS do ālea, então
+           tem que ficar atrás delas na pilha (ajuste do Cassiano, 15:41). -->
+      <img class="eco-final" src="img/marca/e_co/eco_final.svg" alt="">
+      <img class="letra l1" src="img/marca/e_co/letra1.svg" alt="">
+      <img class="letra l2" src="img/marca/e_co/letra2.svg" alt="">
+      <img class="letra l3" src="img/marca/e_co/letra3.svg" alt="">
+      <img class="letra l4" src="img/marca/e_co/letra4.svg" alt="">
     </div>
 
     <!-- a frase vai INTEIRA no HTML (Google e leitor de tela leem mesmo sem JS); o JS
@@ -128,20 +142,20 @@
 
 <!-- ALEA:RODAPE -->
 <footer class="rodape">
-  <img class="marca-rodape" src="img/marca/alea_logo_claro.svg" alt="ālea">
+  <img class="marca-rodape" src="img/marca/e_co/logo_claro.svg" alt="ālea">
   <p class="frase" data-assinatura>Onde cada impressão começa com um sonho!</p>
   <a class="orcamento zap" data-assunto="orçamento de uma peça personalizada">Orçamentos e personalizados, clique aqui!</a>
   <nav class="menu-categorias" data-menu-categorias aria-label="Categorias"></nav>
   <div class="redes" data-redes></div>
   <p class="lei">
-    © <img src="img/marca/alea_logo_claro.svg" alt="ālea"> <span id="ano">2026</span> — Todos os direitos reservados.
+    © <img src="img/marca/e_co/logo_claro.svg" alt="ālea"> <span id="ano">2026</span> — Todos os direitos reservados.
     <span class="creditos">
       <span data-campo="responsavel">Cassiano Rosado</span>, <span data-campo="cidade">Jataí</span>/<span data-campo="uf">GO</span> ·
       CNPJ <span data-campo="cnpj">61.338.171/0001-10</span> ·
       identidade visual por <a href="https://www.instagram.com/mirellagaetti/" target="_blank" rel="noopener">Mirella Gaetti</a> ·
       
-      <a href="a-alea.html">Quem é a ālea</a> ·
-      <a href="trocas-e-entrega.html">Trocas, devolução e entrega</a> ·
+      <a href="a-alea.html">Quem somos nós</a> ·
+      <a href="trocas-e-entrega.html">Trocas, devoluções e entregas</a> ·
       <a href="privacidade.html">Política de privacidade</a>
     </span>
   </p>

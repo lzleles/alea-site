@@ -1,3 +1,12 @@
+/* CATALOGO:
+   nome: carrinho
+   categoria: UTIL
+   objetivo: Mantém carrinho, dados locais e histórico de pedidos e prepara o fechamento da compra pelo WhatsApp.
+   entrada: DOM, configuração global e dados do localStorage
+   saida: Gavetas, contador, histórico local e mensagem de pedido no WhatsApp
+   status: ativo (cabecalho proposto pelo Codex em 2026-09-20, confianca ALTA; conferir na proxima vez que o script rodar)
+   validado_em: TBD
+*/
 /* =============================================================================
    carrinho.js — o carrinho e a conta, os dois botões que ele pediu no canto
    =============================================================================
@@ -56,9 +65,13 @@
     document.dispatchEvent(new CustomEvent('alea:carrinho'));
   }
 
+  /* ETAPA 33: cada linha ganhou QUANTIDADE (o "− 1 +" do modelo dele). Item antigo, gravado
+     antes disto no aparelho de alguém, não tem o campo: vale 1. */
+  function qtd(i) { return Math.max(1, parseInt(i.qtd, 10) || 1); }
   function total() {
-    return itens.reduce(function (s, i) { return s + (i.preco || 0); }, 0);
+    return itens.reduce(function (s, i) { return s + (i.preco || 0) * qtd(i); }, 0);
   }
+  function pecas() { return itens.reduce(function (s, i) { return s + qtd(i); }, 0); }
   function temSobConsulta() {
     return itens.some(function (i) { return !i.preco; });
   }
@@ -69,7 +82,7 @@
        e aí quem chamou abre a gaveta, que explica o que falta. */
     fecharPedido: function () { return fecharPedido(); },
     itens: function () { return itens.slice(); },
-    quantos: function () { return itens.length; },
+    quantos: function () { return pecas(); },
     total: total,
     adicionar: function (item) {
       item.quando = new Date().toISOString();
@@ -77,13 +90,37 @@
       salvar();
     },
     remover: function (i) { itens.splice(i, 1); salvar(); },
+    /* ETAPA 45: o "editar" troca a linha no MESMO lugar, com a mesma quantidade e o mesmo id */
+    substituir: function (id, novo) {
+      for (var k = 0; k < itens.length; k++) {
+        if (itens[k].quando === id) {
+          novo.quando = id; novo.qtd = qtd(itens[k]); itens[k] = novo; salvar(); return true;
+        }
+      }
+      return false;
+    },
+    /* ⚠️ ETAPA 36 (22:06, "pensando melhor"): o − NUNCA tira da sacola — com 1 unidade ele não
+       faz nada. "A pessoa pode clicar sem querer e tirar o produto que demorou pra personalizar."
+       Quem tira é SÓ o × no canto da linha, como no modelo dele. (Era: − com 1 removia.) */
+    mudarQuantidade: function (i, passo) {
+      if (!itens[i]) return;
+      var n = qtd(itens[i]) + passo;
+      if (n < 1) return;
+      itens[i].qtd = n;
+      soALinha = i;          // ETAPA 39: repinta SÓ esta linha (ver `atualizarLinha`)
+      salvar();
+      soALinha = null;
+    },
     limpar: function () { itens = []; salvar(); }
   };
 
   /* ------------------------------------------------------------- o contador */
   function pintarContador() {
+    /* ETAPA 38 (22:10): a sacola ao lado do "Comprar agora" também fica cor de kraft quando há item
+       — SEM número (o número só lá em cima). Uma classe no <html> serve as duas sacolas. */
+    document.documentElement.classList.toggle('sacola-cheia', pecas() > 0);
     Array.prototype.forEach.call(document.querySelectorAll('[data-abrir="carrinho"]'), function (b) {
-      var n = itens.length;
+      var n = pecas();
       b.classList.toggle('tem-item', n > 0);
       var bolinha = b.querySelector('[data-quantos]');
       if (bolinha) bolinha.textContent = String(n);
@@ -92,10 +129,10 @@
   }
 
   /* -------------------------------------------------------- a gaveta do carrinho */
-  function descreverItem(i) {
+  function descreverItem(i, comMaterial) {
     var p = i.personalizacao || {};
     var partes = [];
-    if (p.nome_pet) partes.push('nome: ' + p.nome_pet);
+    if (p.nome_pet) partes.push('Nome: ' + p.nome_pet);    // ETAPA 44 (22:38): N maiúsculo
     if (p.cor) partes.push('cores da peça: ' + p.cor);      // formato antigo, ainda no aparelho de quem já comprou
     /* as cores viraram escolha (Tricolor, Bicolor, Monocromático, Degradê) em
        15/09/2026. O Degradê não traz cor nenhuma: traz a combinação a fazer depois. */
@@ -109,8 +146,31 @@
     (i.extras || []).forEach(function (x) {
       partes.push(x.rotulo + ' (+' + window.aleaDinheiro(x.preco) + ')');
     });
-    if (i.material) partes.push(i.material);
+    /* ETAPA 44: o material (PLA) SAI da sacola — "não faz sentido estar ali". Continua indo na
+       mensagem do WhatsApp (é informação de produção pra quem faz a peça). */
+    if (i.material && comMaterial) partes.push(i.material);
     return partes.join(' · ');
+  }
+
+  /* ⚠️ ETAPA 39 (22:16, com vídeo): "quando eu aumento um produto, treme os DOIS produtos". Causa:
+     cada + ou − redesenhava a sacola INTEIRA (innerHTML), e as fotos de todas as linhas recarregavam
+     — o pisca que ele viu como tremor. Agora a quantidade atualiza só o número, o preço da linha e
+     o subtotal, no lugar; e a linha mexida ganha um brilho suave (`.mexeu`) pra mostrar que é ela. */
+  var soALinha = null;
+  function atualizarLinha(n) {
+    var g = document.getElementById('gaveta-carrinho');
+    var linha = g && g.querySelectorAll('.linha-carrinho')[n];
+    var i = itens[n];
+    if (!linha || !i) { pintarGaveta(); return; }
+    linha.querySelector('.passos .n').textContent = qtd(i);
+    linha.querySelector('.valor-linha').textContent = i.preco ? window.aleaDinheiro(i.preco * qtd(i)) : 'Sob consulta';
+    var alvoTotal = g.querySelector('[data-total]');
+    if (alvoTotal) {
+      alvoTotal.textContent = window.aleaDinheiro(total()) + (temSobConsulta() ? ' + itens sob consulta' : '');
+    }
+    linha.classList.remove('mexeu');
+    void linha.offsetWidth;
+    linha.classList.add('mexeu');
   }
 
   function pintarGaveta() {
@@ -121,24 +181,37 @@
     var botao = g.querySelector('[data-fechar-pedido]');
 
     if (!itens.length) {
-      corpo.innerHTML = '<p class="vazio">Seu carrinho está vazio.</p>';
+      corpo.innerHTML = '<p class="vazio">Sua sacola está vazia.</p>';
       if (alvoTotal) alvoTotal.textContent = '—';
       if (botao) botao.disabled = true;
       return;
     }
 
     corpo.innerHTML = itens.map(function (i, n) {
-      var valor = i.preco ? window.aleaDinheiro(i.preco) : 'Sob consulta';
+      var valor = i.preco ? window.aleaDinheiro(i.preco * qtd(i)) : 'Sob consulta';
+      /* ETAPA 33: o layout do modelo — foto à esquerda; à direita o nome, o que foi escolhido,
+         a linha "Quantidade  − 1 +" com o traço embaixo, e o preço por último. Saiu o "tirar":
+         quem tira é o − com 1 unidade. */
       return '<div class="linha-carrinho">' +
         /* miniatura: o recorte quando existe, a foto normal quando nao. Nem toda peca
            tem recorte (ver `recorte` no produtos.js), e imagem quebrada no carrinho e'
            a ultima coisa que alguem quer ver antes de fechar um pedido. */
         '<img src="img/produtos/' + i.capa + '_obj_m.webp" alt="" loading="lazy" ' +
         'onerror="this.onerror=null;this.src=&quot;img/produtos/' + i.capa + '_m.jpg&quot;">' +
-        '<div><div class="titulo">' + i.nome + '</div>' +
+        '<div class="lado"><div class="cabeca-linha"><div class="titulo">' + i.nome + '</div>' +
+        '<button class="tirar-x" type="button" data-tirar="' + n + '" aria-label="Tirar ' + i.nome +
+        ' da sacola" title="Tirar da sacola">&times;</button></div>' +
         '<div class="detalhe">' + (descreverItem(i) || 'sem personalização') + '</div>' +
-        '<button class="tirar" type="button" data-tirar="' + n + '">tirar</button></div>' +
-        '<div>' + valor + '</div></div>';
+        /* ETAPA 45: o "editar" embaixo da personalização volta pra página da peça com tudo preenchido */
+        (i.slug ? '<a class="editar-item" href="produto-' + i.slug + '.html?editar=' +
+          encodeURIComponent(i.quando || '') + '">editar</a>' : '') +
+        '<div class="quantidade"><span>Quantidade</span>' +
+          '<span class="passos">' +
+          '<button type="button" data-qtd="' + n + '" data-passo="-1" aria-label="Diminuir quantidade">−</button>' +
+          '<span class="n" aria-live="polite">' + qtd(i) + '</span>' +
+          '<button type="button" data-qtd="' + n + '" data-passo="1" aria-label="Aumentar quantidade">+</button>' +
+          '</span></div>' +
+        '<div class="valor-linha">' + valor + '</div></div></div>';
     }).join('');
 
     if (alvoTotal) {
@@ -151,12 +224,40 @@
     }
   }
 
+  function fecharConfirmacao() {
+    var c = document.querySelector('.aviso-sacola.confirmar');
+    if (c) c.parentNode.removeChild(c);
+  }
+  function confirmarRemocao(n) {
+    var i = itens[n];
+    if (!i) return;
+    fecharConfirmacao();
+    var g = document.getElementById('gaveta-carrinho');
+    var a = document.createElement('div');
+    a.className = 'aviso-sacola confirmar visivel';
+    a.setAttribute('role', 'alertdialog');
+    a.setAttribute('aria-label', 'Remover item da sacola');
+    a.innerHTML =
+      '<div class="miniatura"><img alt="" src="img/produtos/' + i.capa + '_obj_m.webp" ' +
+      'onerror="this.onerror=null;this.src=&quot;img/produtos/' + i.capa + '_m.jpg&quot;"></div>' +
+      '<div class="texto"><p>Tem certeza de que deseja remover este item da sua sacola?</p>' +
+      '<div class="escolha"><button type="button" class="botao" data-remover-sim="' + n + '">Sim</button>' +
+      '<button type="button" class="botao contorno" data-remover-nao>Não</button></div></div>';
+    var cab = g && g.querySelector('header');
+    a.style.top = ((cab ? Math.max(0, cab.getBoundingClientRect().bottom) : 0) + 8) + 'px';
+    document.body.appendChild(a);
+    var nao = a.querySelector('[data-remover-nao]');
+    if (nao) nao.focus();
+  }
+
   /* ---------------------------------------------------------- fechar o pedido */
   function textoDoPedido() {
     var linhas = ['Olá! Quero fechar este pedido pelo site da ālea:', ''];
     itens.forEach(function (i, n) {
-      linhas.push((n + 1) + ') ' + i.nome + (i.preco ? ' — ' + window.aleaDinheiro(i.preco) : ' — sob consulta'));
-      var d = descreverItem(i);
+      var q = qtd(i);
+      linhas.push((n + 1) + ') ' + (q > 1 ? q + 'x ' : '') + i.nome +
+        (i.preco ? ' — ' + window.aleaDinheiro(i.preco * q) : ' — sob consulta'));
+      var d = descreverItem(i, true);
       if (d) linhas.push('   ' + d);
     });
     linhas.push('');
@@ -242,14 +343,31 @@
     pintarGaveta();
 
     document.addEventListener('click', function (e) {
+      /* ⚠️ ETAPA 48 (22:55, "pensando em acidentes"): o × não tira mais direto — abre uma janelinha
+         no mesmo desenho da de "adicionou" (miniatura + frase), perguntando "Tem certeza de que deseja
+         remover este item da sua sacola?" com Sim e Não. Só o Sim remove. */
       var tirar = e.target.closest('[data-tirar]');
-      if (tirar) { window.aleaCarrinho.remover(parseInt(tirar.getAttribute('data-tirar'), 10)); return; }
+      if (tirar) { confirmarRemocao(parseInt(tirar.getAttribute('data-tirar'), 10)); return; }
+      var sim = e.target.closest('[data-remover-sim]');
+      if (sim) {
+        var n = parseInt(sim.getAttribute('data-remover-sim'), 10);
+        fecharConfirmacao();
+        window.aleaCarrinho.remover(n);
+        return;
+      }
+      if (e.target.closest('[data-remover-nao]')) { fecharConfirmacao(); return; }
+      var passo = e.target.closest('[data-qtd]');
+      if (passo) {
+        window.aleaCarrinho.mudarQuantidade(parseInt(passo.getAttribute('data-qtd'), 10),
+                                           parseInt(passo.getAttribute('data-passo'), 10));
+        return;
+      }
       if (e.target.closest('[data-fechar-pedido]')) fecharPedido();
     });
 
     document.addEventListener('alea:carrinho', function () {
       pintarContador();
-      pintarGaveta();
+      if (soALinha !== null) atualizarLinha(soALinha); else pintarGaveta();
     });
     document.addEventListener('alea:gaveta', function (e) {
       if (e.detail.id === 'conta') pintarConta();

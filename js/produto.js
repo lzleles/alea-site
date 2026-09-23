@@ -1,3 +1,12 @@
+/* CATALOGO:
+   nome: produto
+   categoria: UTIL
+   objetivo: Controla galeria, tela cheia, personalização, preço, aceite e inclusão de produtos no carrinho.
+   entrada: DOM da página, configuração comercial e dados do produto
+   saida: Galeria interativa, item personalizado e comandos para o carrinho
+   status: ativo (cabecalho proposto pelo Codex em 2026-09-20, confianca ALTA; conferir na proxima vez que o script rodar)
+   validado_em: TBD
+*/
 /* =============================================================================
    produto.js — o que só a página de produto faz
    =============================================================================
@@ -212,6 +221,23 @@
   var caixaCores = document.querySelector('[data-cores-peca]');
   var camposCores = document.querySelector('[data-cores-campos]');
 
+  /* ⚠️ ETAPA 28 (22/09/2026, 21:19): o SORTEIO saiu — "algumas não têm tantas opções por se tratar
+     de filamento". Agora é UMA cor por caixa, FIXA, na ordem que ele ditou, de cima pra baixo:
+     1ª caixa "Ex.: Azul Fosco…", 2ª "Ex.: Verde…", 3ª "Ex.: Branco Perolizado…" (a ordem das 21:23,
+     que substitui a das 21:19; o "Verde" sem acabamento é literal dele). No bicolor valem as duas
+     primeiras; no monocromático, a primeira. */
+  /* ETAPA 29 (21:25): no BICOLOR, "por se tratar de somente 2 janelas, iremos colocar mais de uma":
+     Cor principal "Ex.: Vermelho, Laranja Fosco…" e Cor da base "Ex.: Amarelo Perolizado, Prata…".
+     O tricolor segue a lista de cima; o monocromático, a primeira dela (até ele dizer outra). */
+  var EXEMPLO_POR_CAIXA = ['Ex.: Azul Fosco…', 'Ex.: Verde…', 'Ex.: Branco Perolizado…'];
+  var EXEMPLO_BICOLOR = ['Ex.: Vermelho, Laranja Fosco…', 'Ex.: Amarelo Perolizado, Prata…'];
+  /* ETAPA 30 (21:28): o MONOCROMÁTICO ganhou o dele — "Ex.: Roxo Perolizado, Rosa Fosco, Dourado…" */
+  var EXEMPLO_MONO = ['Ex.: Roxo Perolizado, Rosa Fosco, Dourado…'];
+  function exemploDeCor(k, quantos) {
+    var lista = quantos === 2 ? EXEMPLO_BICOLOR : quantos === 1 ? EXEMPLO_MONO : EXEMPLO_POR_CAIXA;
+    return lista[k - 1] || lista[0];
+  }
+
   function desenharCamposDeCor(radio) {
     if (!camposCores) return;
     camposCores.innerHTML = '';
@@ -224,12 +250,26 @@
       return;
     }
     var quantos = parseInt(radio.getAttribute('data-campos'), 10) || 0;
+    /* ⚠️ ETAPA 26 (22/09/2026, 21:04-21:08): "cor 1, cor 2, cor 3 fica muito feio pro cliente". O
+       quadradinho da esquerda deixa de ser número e diz ONDE vai a cor — tricolor: Topo, Principal,
+       Base; bicolor: Principal, Base (palavras dele); monocromático: Principal (a peça inteira é a
+       cor principal — dedução minha, avisada a ele). E cada caixa ganha um exemplo como o da cor
+       do nome, com cores SORTEADAS: "Ex.: <cor> Sólido, <cor> Fosco, <cor> Perolizado…". */
+    var PARTES = { 3: ['Topo', 'Principal', 'Base'], 2: ['Principal', 'Base'], 1: ['Principal'] };
+    var partes = PARTES[quantos] || [];
+    /* ETAPA 27 (21:09, "aliás, melhor"): o quadradinho da esquerda SAI de vez; a caixa branca fica
+       onde está (mesmo recuo), e o nome vai EM CIMA dela, como os outros rótulos do formulário:
+       "Cor do topo", "Cor principal", "Cor da base". É um <label> de verdade (clicar no nome põe o
+       cursor na caixa) e herda o estilo do `.personalizar label`. */
+    var NOME_DA_PARTE = { Topo: 'Cor do topo', Principal: 'Cor principal', Base: 'Cor da base' };
     for (var k = 1; k <= quantos; k++) {
-      var linha = document.createElement('div');
+      var parte = partes[k - 1] || ('Cor ' + k);
+      var titulo = NOME_DA_PARTE[parte] || parte;
+      var linha = document.createElement('label');
       linha.className = 'campo-cor';
-      linha.innerHTML = '<span class="numero">' + k + '</span>' +
-        '<input type="text" name="cor_' + k + '" maxlength="40" ' +
-        'placeholder="Cor ' + k + '" aria-label="Cor ' + k + ' da peça">';
+      linha.innerHTML = '<span class="nome-parte">' + titulo + '</span>' +
+        '<input type="text" name="cor_' + k + '" maxlength="40" data-parte="' + parte.toLowerCase() + '" ' +
+        'placeholder="' + exemploDeCor(k, quantos) + '">';
       camposCores.appendChild(linha);
     }
     var primeiro = camposCores.querySelector('input');
@@ -297,14 +337,222 @@
     };
   }
 
+  /* ⚠️ ETAPA 19 (22/09/2026, parte 3, áudios das 20:29-20:30): a trava não é mais só do aceite.
+     "Não pode ficar nunca sem colocar o nome do pet, sem a escolha das cores da peça e sem marcar a
+     declaração. Toda vez que clicar em comprar agora e tiver alguma dessas faltando, essa opção vai
+     mudar a cor e vai fazer aquela animação igual você fez com a declaração." E, no seguinte: se
+     escolheu tricolor/bicolor/monocromático e não digitou as cores, o mesmo.
+     Cada falta ganha a classe `faltou` (a cor), os botões tremem (a animação da declaração), o
+     recado diz O QUE falta, e a tela rola até a primeira falta — no celular ela pode estar acima
+     da dobra, e cor mudando fora da tela ninguém vê. Degradê não pede cor (a cor é combinada).
+     A cor do NOME só é cobrada quando o adicional "nome colorido" está marcado (o campo só abre
+     com ele) — mesmo raciocínio das cores da peça: escolheu a opção, tem que dizer a cor. */
+  function oQueFalta() {
+    var faltas = [];
+    var nome = document.querySelector('[data-personalizar] [name="nome_pet"]');
+    if (nome && !nome.value.trim()) faltas.push({ el: nome.closest('label') || nome, texto: 'Por favor, digite o nome do pet.' });
+    var corNome = document.querySelector('[data-personalizar] [name="cor_nome"]');
+    if (corNome && !corNome.disabled && !corNome.value.trim()) {
+      faltas.push({ el: corNome.closest('label') || corNome, texto: 'Por favor, digite a cor do nome.' });
+    }
+    if (caixaCores) {
+      var r = caixaCores.querySelector('input[name="cores_peca"]:checked');
+      if (!r) {
+        /* ETAPA 24: treme e muda de cor o rótulo E cada opção (tricolor, bicolor, monocromático,
+           degradê) — "e todos os nomes que tiverem ali" */
+        faltas.push({ el: caixaCores.querySelector('.rotulo-grupo') || caixaCores, texto: 'Por favor, selecione a cor da peça.' });
+        Array.prototype.forEach.call(caixaCores.querySelectorAll('.cores-opcoes label'), function (l) {
+          faltas.push({ el: l, texto: null });
+        });
+      } else {
+        var vazios = Array.prototype.filter.call(
+          camposCores ? camposCores.querySelectorAll('input') : [], function (i) { return !i.value.trim(); });
+        vazios.forEach(function (i) {
+          var parte = i.getAttribute('data-parte');
+          var qual = parte === 'topo' ? 'a cor do topo' : parte === 'base' ? 'a cor da base'
+                   : parte === 'principal' ? 'a cor principal'
+                   : 'a cor ' + (i.getAttribute('name') || '').replace('cor_', '') + ' da peça';
+          faltas.push({ el: i.closest('.campo-cor') || i, texto: 'Por favor, digite ' + qual + '.' });
+        });
+      }
+    }
+    if (!caixaAceite || !caixaAceite.checked) {
+      faltas.push({ el: document.querySelector('[data-aceite]'), texto: 'Por favor, aceite os termos da declaração.' });   // ETAPA 32 (21:38): frase dele
+    }
+    return faltas;
+  }
+
+  function reclamarDoQueFalta(faltas) {
+    Array.prototype.forEach.call(document.querySelectorAll('.faltou'), function (x) { x.classList.remove('faltou'); });
+    faltas.forEach(function (f) { if (f.el) f.el.classList.add('faltou'); });
+    /* ETAPA 23 (22/09/2026, 20:44): "quero que trema TUDO o que está faltando na tela", não só os
+       botões. Cada falta treme junto (mesma animação), reiniciada a cada clique. */
+    Array.prototype.forEach.call(document.querySelectorAll('.treme-falta'), function (x) { x.classList.remove('treme-falta'); });
+    faltas.forEach(function (f) { if (f.el) { void f.el.offsetWidth; f.el.classList.add('treme-falta'); } });
+    var recado = document.querySelector('[data-recado-aceite]');
+    if (recado) {
+      var itens = faltas.map(function (f) { return f.texto; }).filter(Boolean);
+      /* ETAPA 24 (22/09/2026, 20:45): a frase é SÓ a da PRIMEIRA falta, de cima pra baixo ("será
+         sempre o primeiro item que está faltando") — a lista `faltas` já nasce na ordem da página.
+         As outras faltas não somem: continuam com a cor e tremendo. Era "Complete antes de
+         continuar: nome do pet, cores da peça e declaração." */
+      recado.textContent = itens[0];
+      recado.hidden = false;
+    }
+    var botoes = document.querySelector('[data-botoes]');
+    if (botoes) {
+      botoes.classList.remove('tremendo');
+      void botoes.offsetWidth;        // reinicia a animação se ele clicar duas vezes
+      botoes.classList.add('tremendo');
+    }
+    var primeira = faltas.filter(function (f) { return f.el; })[0];
+    if (primeira && primeira.el.scrollIntoView) {
+      /* ETAPA 22 (22/09/2026, 20:43): "a tela subiu pro nome do pet, mas o cursor não foi pra
+         janela — coloque o cursor direto nela". O foco vai pro CAMPO da primeira falta (no
+         celular isso já abre o teclado). Tem que ser AQUI, dentro do clique: o iPhone só aceita
+         foco programático durante o gesto. `preventScroll` pra o foco não dar um pulo seco por
+         cima da rolagem suave, que é quem centraliza. */
+      var alvo = primeira.el.matches && primeira.el.matches('input') ? primeira.el
+               : primeira.el.querySelector ? primeira.el.querySelector('input') : null;
+      if (!alvo && caixaCores && primeira.el.classList.contains('rotulo-grupo')) {
+        alvo = caixaCores.querySelector('input[name="cores_peca"]');
+      }
+      if (alvo && alvo.focus) { try { alvo.focus({ preventScroll: true }); } catch (e) { alvo.focus(); } }
+      /* ⚠️ ETAPA 25 (22/09/2026, 20:53, com vídeo): centralizar NÃO basta no celular — o teclado
+         sobe, e a barrinha de "completar automaticamente" do iPhone fica POR CIMA do campo. Ele pediu
+         o alinhamento que ele mesmo fez no vídeo: a falta logo ABAIXO do cabeçalho, sobrando a tela
+         de baixo pro teclado e pra barrinha. E SEMPRE, a cada clique — não só quando está fora da
+         tela. O cabeçalho é medido na hora (a altura muda com a tarja e com o tamanho da tela). */
+      var topo = document.querySelector('.topo');
+      var folga = (topo ? Math.max(0, topo.getBoundingClientRect().bottom) : 0) + 18;
+      var y = window.scrollY + primeira.el.getBoundingClientRect().top - folga;
+      window.scrollTo({ top: Math.max(0, y), behavior: 'smooth' });
+    }
+  }
+
+  /* quem corrige a falta perde a cor na hora — não precisa clicar de novo pra ver sumir */
+  document.addEventListener('input', function (ev) {
+    var dono = ev.target.closest && ev.target.closest('.faltou');
+    if (dono && ev.target.value && ev.target.value.trim()) dono.classList.remove('faltou');
+  });
+  document.addEventListener('change', function (ev) {
+    if (ev.target.name === 'cores_peca' && caixaCores) {
+      Array.prototype.forEach.call(caixaCores.querySelectorAll('.rotulo-grupo, .cores-opcoes label'),
+        function (x) { x.classList.remove('faltou'); });
+    }
+  });
+
+  /* ⚠️ ETAPA 43 (22/09/2026, 22:34, print de referência): ao adicionar pela sacola, aparece uma
+     JANELINHA logo abaixo do cabeçalho — a miniatura da peça à esquerda e a frase "Você adicionou
+     esta criação à sua Sacola de Compras." ("fazer somente a primeira frase"), com × pra fechar. Some
+     sozinha em 5 s. Cores e fonte são as da ālea; só a posição e o desenho seguem o modelo. */
+  var avisoTimer = null;
+  function avisarQueEntrou(capa) {
+    var velho = document.querySelector('.aviso-sacola');
+    if (velho) velho.parentNode.removeChild(velho);
+    var a = document.createElement('div');
+    a.className = 'aviso-sacola';
+    a.setAttribute('role', 'status');
+    a.innerHTML =
+      '<div class="miniatura"><img alt="" src="img/produtos/' + capa + '_obj_m.webp" ' +
+      'onerror="this.onerror=null;this.src=&quot;img/produtos/' + capa + '_m.jpg&quot;"></div>' +
+      '<p>Você adicionou esta criação à sua sacola de compras.</p>' +   // 22:36 minúsculo; 22:38 sem negrito
+      '<button type="button" class="fechar-aviso" aria-label="Fechar aviso">&times;</button>';
+    var topo = document.querySelector('.topo');
+    a.style.top = ((topo ? Math.max(0, topo.getBoundingClientRect().bottom) : 0) + 8) + 'px';
+    document.body.appendChild(a);
+    requestAnimationFrame(function () { a.classList.add('visivel'); });
+    function tirar() {
+      a.classList.remove('visivel');
+      setTimeout(function () { if (a.parentNode) a.parentNode.removeChild(a); }, 300);
+    }
+    a.querySelector('.fechar-aviso').addEventListener('click', tirar);
+    clearTimeout(avisoTimer);
+    avisoTimer = setTimeout(tirar, 3000);   // ETAPA 48 (22:55): 3 s, pedido dele (era 5)
+  }
+
+  /* ⚠️ ETAPA 45 (22:38): o "editar" da sacola traz a pessoa de volta a esta página com TUDO que ela
+     tinha escolhido já preenchido ("pra não precisar fazer tudo novamente"). O endereço chega com
+     `?editar=<id da linha>`; aqui se preenche nome, adicional, cor do nome, cores da peça e cada cor.
+     Ao adicionar/comprar de novo, a linha antiga é SUBSTITUÍDA (mantém a quantidade), não duplicada.
+     ⚠ A DECLARAÇÃO volta DESMARCADA de propósito: ela diz "revisei nome, grafia e cores", e depois de
+     mexer na personalização o aceite antigo não cobre o que mudou. */
+  var editando = null;
+  (function prepararEdicao() {
+    var m = /[?&]editar=([^&]+)/.exec(location.search);
+    if (!m || !window.aleaCarrinho || !botaoComprar) return;
+    var id = decodeURIComponent(m[1]);
+    var item = window.aleaCarrinho.itens().filter(function (i) { return i.quando === id; })[0];
+    if (!item || item.slug !== botaoComprar.getAttribute('data-slug')) return;
+    editando = id;
+    var p = item.personalizacao || {};
+    var nome = document.querySelector('[data-personalizar] [name="nome_pet"]');
+    if (nome) nome.value = p.nome_pet || '';
+    (item.extras || []).forEach(function (x) {
+      var rot = document.querySelector('[data-extra][data-extra-id="' + x.id + '"]');
+      var cx = rot && rot.querySelector('[data-extra-caixa]');
+      if (cx && !cx.checked) { cx.checked = true; cx.dispatchEvent(new Event('change', { bubbles: true })); }
+    });
+    var corNome = document.querySelector('[data-personalizar] [name="cor_nome"]');
+    if (corNome && p.cor_nome) corNome.value = p.cor_nome;
+    if (caixaCores && p.cores && p.cores.modo) {
+      var r = Array.prototype.filter.call(caixaCores.querySelectorAll('input[name="cores_peca"]'),
+        function (x) { return x.parentNode.textContent.trim() === p.cores.modo; })[0];
+      if (r) {
+        r.checked = true;
+        desenharCamposDeCor(r);
+        Array.prototype.forEach.call(camposCores.querySelectorAll('input'), function (inp, k) {
+          inp.value = (p.cores.cores || [])[k] || '';
+        });
+      }
+    }
+    if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
+    repintarPreco();
+    /* ETAPA 47 (22:51): "o cliente não quer saber do topo, ele só quer editar — tem que cair direto no
+       NOME DO PET". A tela para com o rótulo "Nome do pet" logo abaixo do cabeçalho (a mesma régua da
+       trava de compra). Reaplica no `load`: as fotos da colmeia, carregando, empurram o formulário. */
+    function cairNoNome() {
+      var alvo = nome && (nome.closest('label') || nome);
+      if (!alvo) return;
+      var topo = document.querySelector('.topo');
+      var folga = (topo ? Math.max(0, topo.getBoundingClientRect().bottom) : 0) + 18;
+      window.scrollTo(0, Math.max(0, window.scrollY + alvo.getBoundingClientRect().top - folga));
+    }
+    if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+    requestAnimationFrame(cairNoNome);
+    if (document.readyState !== 'complete') window.addEventListener('load', cairNoNome, { once: true });
+    setTimeout(cairNoNome, 400);
+  })();
+
   function porNoCarrinho(eDepoisFechar) {
-    if (!caixaAceite || !caixaAceite.checked) { reclamarDoAceite(); return; }
+    var faltas = oQueFalta();
+    if (faltas.length) { reclamarDoQueFalta(faltas); return; }
     if (!window.aleaCarrinho) return;
     var recado = document.querySelector('[data-recado-aceite]');
     if (recado) recado.hidden = true;
+    if (editando && window.aleaCarrinho.substituir(editando, montarItem())) {
+      editando = null;
+      if (history.replaceState) history.replaceState(null, '', location.pathname);
+      if (window.aleaGaveta) window.aleaGaveta.abrir('carrinho');   // editou: mostra a sacola já corrigida
+      return;
+    }
     window.aleaCarrinho.adicionar(montarItem());
-    if (eDepoisFechar && window.aleaCarrinho.fecharPedido()) return;   // foi pro WhatsApp
-    if (window.aleaGaveta) window.aleaGaveta.abrir('carrinho');
+    /* ⚠️ ETAPA 37 (22/09/2026, 22:09): os dois botões passam a fazer coisas DIFERENTES.
+       · a SACOLA ao lado só adiciona — "não vai abrir a sacola, pra ele continuar no site e
+         continuar comprando". O aviso de que entrou é a sacola do topo, que já fica cor de kraft
+         e ganha o número, e agora dá um pulinho (ver `.sacola-pulou` no CSS);
+       · o COMPRAR AGORA adiciona e ABRE a sacola, em tela cheia (era: ia direto pro WhatsApp). O
+         WhatsApp continua sendo o botão de fechar pedido DENTRO da sacola. */
+    if (eDepoisFechar) {
+      if (window.aleaGaveta) window.aleaGaveta.abrir('carrinho');
+      return;
+    }
+    avisarQueEntrou(botaoComprar.getAttribute('data-capa'));
+    Array.prototype.forEach.call(document.querySelectorAll('.topo [data-abrir="carrinho"], [data-add-carrinho]'), function (b) {
+      b.classList.remove('sacola-pulou');
+      void b.offsetWidth;
+      b.classList.add('sacola-pulou');
+    });
   }
 
   if (caixaAceite) {

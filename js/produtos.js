@@ -1,3 +1,12 @@
+/* CATALOGO:
+   nome: produtos
+   categoria: UTIL
+   objetivo: Define categorias, itens do feed e fichas de produto e valida referências e materiais do catálogo.
+   entrada: Dados comerciais editados diretamente no arquivo
+   saida: Objetos globais de categorias, vitrine e produtos, além de alertas no console
+   status: ativo (cabecalho proposto pelo Codex em 2026-09-20, confianca ALTA; conferir na proxima vez que o script rodar)
+   validado_em: TBD
+*/
 /* =============================================================================
    produtos.js — O CATÁLOGO. É o único arquivo que muda no dia a dia.
    =============================================================================
@@ -51,7 +60,10 @@ window.CATEGORIAS = [
   { id: 'fan',    nome: 'FAN',    descricao: '' },   // sugestão minha: cultura pop, coleção
   { id: 'glow',   nome: 'GLOW',   descricao: '' },   // sugestão minha: filamento que brilha no escuro
   { id: 'home',   nome: 'HOME',   descricao: '' },   // sugestão minha: casa e decoração
-  { id: 'pet',    nome: 'PET',    descricao: 'Nossa linha PET é voltada para cachorros.' },   // dita por ele, 16/09/2026
+  /* ⚠️ TEXTO PROVISÓRIO (etapa 3, 22/09/2026): o Cassiano pediu um placeholder sobre golden
+     retriever "só pra ver o espaçamento do título e da descrição antes das fotos" — ele escreve
+     o texto de verdade depois. TROCAR quando ele mandar o definitivo. */
+  { id: 'pet',    nome: 'PET',    descricao: 'Dócil, brincalhão e leal, o golden retriever enche a casa de pelo e alegria — e merece peças feitas sob medida pro tamanho e pro apetite dele. Cada comedouro sai com o nome do seu cão impresso na peça, na estampa que você escolher: bonito de deixar à mostra e resistente pra bagunça boa do dia a dia.' },
   { id: 'play',   nome: 'PLAY',   descricao: '' },   // sugestão minha: brinquedo e jogo
   { id: 'sense',  nome: 'SENSE',  descricao: '' }    // sugestão minha: sensorial, fidget
 ];
