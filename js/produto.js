@@ -468,7 +468,7 @@
     }
     a.querySelector('.fechar-aviso').addEventListener('click', tirar);
     clearTimeout(avisoTimer);
-    avisoTimer = setTimeout(tirar, 5000);
+    avisoTimer = setTimeout(tirar, 3000);   // ETAPA 48 (22:55): 3 s, pedido dele (era 5)
   }
 
   /* ⚠️ ETAPA 45 (22:38): o "editar" da sacola traz a pessoa de volta a esta página com TUDO que ela

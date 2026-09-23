@@ -1365,3 +1365,10 @@ a.continuar-comprando { display: inline-block; text-align: center; }  /* ETAPA 4
       por baixo e por cima dele. `overscroll-behavior: none` desliga o quique; o cabeçalho fica parado. */
 html, body { overflow-x: hidden; overscroll-behavior: none; }
 body { position: relative; max-width: 100%; }
+
+/* ETAPA 48: a janelinha de CONFIRMAR a remoção — mesmo desenho da de "adicionou", por cima da sacola */
+.aviso-sacola.confirmar { z-index: 95; grid-template-columns: 92px 1fr; }
+.aviso-sacola.confirmar .texto { padding: 14px; display: grid; gap: 12px; align-content: center; }
+.aviso-sacola.confirmar .texto p { padding: 0; }
+.aviso-sacola.confirmar .escolha { display: flex; gap: 10px; }
+.aviso-sacola.confirmar .escolha .botao { padding: 9px 22px; font-size: 14.5px; }

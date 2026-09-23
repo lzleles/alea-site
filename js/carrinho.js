@@ -224,6 +224,32 @@
     }
   }
 
+  function fecharConfirmacao() {
+    var c = document.querySelector('.aviso-sacola.confirmar');
+    if (c) c.parentNode.removeChild(c);
+  }
+  function confirmarRemocao(n) {
+    var i = itens[n];
+    if (!i) return;
+    fecharConfirmacao();
+    var g = document.getElementById('gaveta-carrinho');
+    var a = document.createElement('div');
+    a.className = 'aviso-sacola confirmar visivel';
+    a.setAttribute('role', 'alertdialog');
+    a.setAttribute('aria-label', 'Remover item da sacola');
+    a.innerHTML =
+      '<div class="miniatura"><img alt="" src="img/produtos/' + i.capa + '_obj_m.webp" ' +
+      'onerror="this.onerror=null;this.src=&quot;img/produtos/' + i.capa + '_m.jpg&quot;"></div>' +
+      '<div class="texto"><p>Tem certeza de que deseja remover este item da sua sacola?</p>' +
+      '<div class="escolha"><button type="button" class="botao" data-remover-sim="' + n + '">Sim</button>' +
+      '<button type="button" class="botao contorno" data-remover-nao>Não</button></div></div>';
+    var cab = g && g.querySelector('header');
+    a.style.top = ((cab ? Math.max(0, cab.getBoundingClientRect().bottom) : 0) + 8) + 'px';
+    document.body.appendChild(a);
+    var nao = a.querySelector('[data-remover-nao]');
+    if (nao) nao.focus();
+  }
+
   /* ---------------------------------------------------------- fechar o pedido */
   function textoDoPedido() {
     var linhas = ['Olá! Quero fechar este pedido pelo site da ālea:', ''];
@@ -317,8 +343,19 @@
     pintarGaveta();
 
     document.addEventListener('click', function (e) {
+      /* ⚠️ ETAPA 48 (22:55, "pensando em acidentes"): o × não tira mais direto — abre uma janelinha
+         no mesmo desenho da de "adicionou" (miniatura + frase), perguntando "Tem certeza de que deseja
+         remover este item da sua sacola?" com Sim e Não. Só o Sim remove. */
       var tirar = e.target.closest('[data-tirar]');
-      if (tirar) { window.aleaCarrinho.remover(parseInt(tirar.getAttribute('data-tirar'), 10)); return; }
+      if (tirar) { confirmarRemocao(parseInt(tirar.getAttribute('data-tirar'), 10)); return; }
+      var sim = e.target.closest('[data-remover-sim]');
+      if (sim) {
+        var n = parseInt(sim.getAttribute('data-remover-sim'), 10);
+        fecharConfirmacao();
+        window.aleaCarrinho.remover(n);
+        return;
+      }
+      if (e.target.closest('[data-remover-nao]')) { fecharConfirmacao(); return; }
       var passo = e.target.closest('[data-qtd]');
       if (passo) {
         window.aleaCarrinho.mudarQuantidade(parseInt(passo.getAttribute('data-qtd'), 10),
