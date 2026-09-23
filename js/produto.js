@@ -442,12 +442,86 @@
     }
   });
 
+  /* ⚠️ ETAPA 43 (22/09/2026, 22:34, print de referência): ao adicionar pela sacola, aparece uma
+     JANELINHA logo abaixo do cabeçalho — a miniatura da peça à esquerda e a frase "Você adicionou
+     esta criação à sua Sacola de Compras." ("fazer somente a primeira frase"), com × pra fechar. Some
+     sozinha em 5 s. Cores e fonte são as da ālea; só a posição e o desenho seguem o modelo. */
+  var avisoTimer = null;
+  function avisarQueEntrou(capa) {
+    var velho = document.querySelector('.aviso-sacola');
+    if (velho) velho.parentNode.removeChild(velho);
+    var a = document.createElement('div');
+    a.className = 'aviso-sacola';
+    a.setAttribute('role', 'status');
+    a.innerHTML =
+      '<div class="miniatura"><img alt="" src="img/produtos/' + capa + '_obj_m.webp" ' +
+      'onerror="this.onerror=null;this.src=&quot;img/produtos/' + capa + '_m.jpg&quot;"></div>' +
+      '<p>Você adicionou esta criação à sua sacola de compras.</p>' +   // 22:36 minúsculo; 22:38 sem negrito
+      '<button type="button" class="fechar-aviso" aria-label="Fechar aviso">&times;</button>';
+    var topo = document.querySelector('.topo');
+    a.style.top = ((topo ? Math.max(0, topo.getBoundingClientRect().bottom) : 0) + 8) + 'px';
+    document.body.appendChild(a);
+    requestAnimationFrame(function () { a.classList.add('visivel'); });
+    function tirar() {
+      a.classList.remove('visivel');
+      setTimeout(function () { if (a.parentNode) a.parentNode.removeChild(a); }, 300);
+    }
+    a.querySelector('.fechar-aviso').addEventListener('click', tirar);
+    clearTimeout(avisoTimer);
+    avisoTimer = setTimeout(tirar, 5000);
+  }
+
+  /* ⚠️ ETAPA 45 (22:38): o "editar" da sacola traz a pessoa de volta a esta página com TUDO que ela
+     tinha escolhido já preenchido ("pra não precisar fazer tudo novamente"). O endereço chega com
+     `?editar=<id da linha>`; aqui se preenche nome, adicional, cor do nome, cores da peça e cada cor.
+     Ao adicionar/comprar de novo, a linha antiga é SUBSTITUÍDA (mantém a quantidade), não duplicada.
+     ⚠ A DECLARAÇÃO volta DESMARCADA de propósito: ela diz "revisei nome, grafia e cores", e depois de
+     mexer na personalização o aceite antigo não cobre o que mudou. */
+  var editando = null;
+  (function prepararEdicao() {
+    var m = /[?&]editar=([^&]+)/.exec(location.search);
+    if (!m || !window.aleaCarrinho || !botaoComprar) return;
+    var id = decodeURIComponent(m[1]);
+    var item = window.aleaCarrinho.itens().filter(function (i) { return i.quando === id; })[0];
+    if (!item || item.slug !== botaoComprar.getAttribute('data-slug')) return;
+    editando = id;
+    var p = item.personalizacao || {};
+    var nome = document.querySelector('[data-personalizar] [name="nome_pet"]');
+    if (nome) nome.value = p.nome_pet || '';
+    (item.extras || []).forEach(function (x) {
+      var rot = document.querySelector('[data-extra][data-extra-id="' + x.id + '"]');
+      var cx = rot && rot.querySelector('[data-extra-caixa]');
+      if (cx && !cx.checked) { cx.checked = true; cx.dispatchEvent(new Event('change', { bubbles: true })); }
+    });
+    var corNome = document.querySelector('[data-personalizar] [name="cor_nome"]');
+    if (corNome && p.cor_nome) corNome.value = p.cor_nome;
+    if (caixaCores && p.cores && p.cores.modo) {
+      var r = Array.prototype.filter.call(caixaCores.querySelectorAll('input[name="cores_peca"]'),
+        function (x) { return x.parentNode.textContent.trim() === p.cores.modo; })[0];
+      if (r) {
+        r.checked = true;
+        desenharCamposDeCor(r);
+        Array.prototype.forEach.call(camposCores.querySelectorAll('input'), function (inp, k) {
+          inp.value = (p.cores.cores || [])[k] || '';
+        });
+      }
+    }
+    if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
+    repintarPreco();
+  })();
+
   function porNoCarrinho(eDepoisFechar) {
     var faltas = oQueFalta();
     if (faltas.length) { reclamarDoQueFalta(faltas); return; }
     if (!window.aleaCarrinho) return;
     var recado = document.querySelector('[data-recado-aceite]');
     if (recado) recado.hidden = true;
+    if (editando && window.aleaCarrinho.substituir(editando, montarItem())) {
+      editando = null;
+      if (history.replaceState) history.replaceState(null, '', location.pathname);
+      if (window.aleaGaveta) window.aleaGaveta.abrir('carrinho');   // editou: mostra a sacola já corrigida
+      return;
+    }
     window.aleaCarrinho.adicionar(montarItem());
     /* ⚠️ ETAPA 37 (22/09/2026, 22:09): os dois botões passam a fazer coisas DIFERENTES.
        · a SACOLA ao lado só adiciona — "não vai abrir a sacola, pra ele continuar no site e
@@ -459,6 +533,7 @@
       if (window.aleaGaveta) window.aleaGaveta.abrir('carrinho');
       return;
     }
+    avisarQueEntrou(botaoComprar.getAttribute('data-capa'));
     Array.prototype.forEach.call(document.querySelectorAll('.topo [data-abrir="carrinho"], [data-add-carrinho]'), function (b) {
       b.classList.remove('sacola-pulou');
       void b.offsetWidth;

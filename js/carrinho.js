@@ -90,6 +90,15 @@
       salvar();
     },
     remover: function (i) { itens.splice(i, 1); salvar(); },
+    /* ETAPA 45: o "editar" troca a linha no MESMO lugar, com a mesma quantidade e o mesmo id */
+    substituir: function (id, novo) {
+      for (var k = 0; k < itens.length; k++) {
+        if (itens[k].quando === id) {
+          novo.quando = id; novo.qtd = qtd(itens[k]); itens[k] = novo; salvar(); return true;
+        }
+      }
+      return false;
+    },
     /* ⚠️ ETAPA 36 (22:06, "pensando melhor"): o − NUNCA tira da sacola — com 1 unidade ele não
        faz nada. "A pessoa pode clicar sem querer e tirar o produto que demorou pra personalizar."
        Quem tira é SÓ o × no canto da linha, como no modelo dele. (Era: − com 1 removia.) */
@@ -120,10 +129,10 @@
   }
 
   /* -------------------------------------------------------- a gaveta do carrinho */
-  function descreverItem(i) {
+  function descreverItem(i, comMaterial) {
     var p = i.personalizacao || {};
     var partes = [];
-    if (p.nome_pet) partes.push('nome: ' + p.nome_pet);
+    if (p.nome_pet) partes.push('Nome: ' + p.nome_pet);    // ETAPA 44 (22:38): N maiúsculo
     if (p.cor) partes.push('cores da peça: ' + p.cor);      // formato antigo, ainda no aparelho de quem já comprou
     /* as cores viraram escolha (Tricolor, Bicolor, Monocromático, Degradê) em
        15/09/2026. O Degradê não traz cor nenhuma: traz a combinação a fazer depois. */
@@ -137,7 +146,9 @@
     (i.extras || []).forEach(function (x) {
       partes.push(x.rotulo + ' (+' + window.aleaDinheiro(x.preco) + ')');
     });
-    if (i.material) partes.push(i.material);
+    /* ETAPA 44: o material (PLA) SAI da sacola — "não faz sentido estar ali". Continua indo na
+       mensagem do WhatsApp (é informação de produção pra quem faz a peça). */
+    if (i.material && comMaterial) partes.push(i.material);
     return partes.join(' · ');
   }
 
@@ -191,6 +202,9 @@
         '<button class="tirar-x" type="button" data-tirar="' + n + '" aria-label="Tirar ' + i.nome +
         ' da sacola" title="Tirar da sacola">&times;</button></div>' +
         '<div class="detalhe">' + (descreverItem(i) || 'sem personalização') + '</div>' +
+        /* ETAPA 45: o "editar" embaixo da personalização volta pra página da peça com tudo preenchido */
+        (i.slug ? '<a class="editar-item" href="produto-' + i.slug + '.html?editar=' +
+          encodeURIComponent(i.quando || '') + '">editar</a>' : '') +
         '<div class="quantidade"><span>Quantidade</span>' +
           '<span class="passos">' +
           '<button type="button" data-qtd="' + n + '" data-passo="-1" aria-label="Diminuir quantidade">−</button>' +
@@ -217,7 +231,7 @@
       var q = qtd(i);
       linhas.push((n + 1) + ') ' + (q > 1 ? q + 'x ' : '') + i.nome +
         (i.preco ? ' — ' + window.aleaDinheiro(i.preco * q) : ' — sob consulta'));
-      var d = descreverItem(i);
+      var d = descreverItem(i, true);
       if (d) linhas.push('   ' + d);
     });
     linhas.push('');
