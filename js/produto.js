@@ -63,20 +63,27 @@
       'three-mesh-bvh': 'https://cdn.jsdelivr.net/npm/three-mesh-bvh@0.8.3/build/index.module.js',
       'three-bvh-csg': 'https://cdn.jsdelivr.net/npm/three-bvh-csg@0.0.17/build/index.module.js' } });
     document.head.appendChild(im);
+    /* ETAPA 55 (15:12, "essa parte a gente não vai mais precisar (...) vai estar inteira no Personalize aqui"):
+       o formulário some da página e só aparece DENTRO da janela (o personalizar3d.js o move pra lá). O botão fica
+       FORA do formulário, no lugar onde o formulário estava. */
     var b = document.createElement('button');
     b.type = 'button';
     b.className = 'botao personalizar-3d';
     b.textContent = 'Personalize aqui';
-    form.insertBefore(b, form.firstChild);
+    form.parentNode.insertBefore(b, form);
+    form.classList.add('mora-na-janela');
     var aberto = false;
-    b.addEventListener('click', function () {
-      if (aberto) return; aberto = true;
+    function abrir(depoisDeMontar) {
+      if (aberto) { if (depoisDeMontar) depoisDeMontar(); return; }
+      aberto = true;
       b.classList.add('carregando');
       import('./personalizar3d.js').then(function (m) {
-        return m.abrirJanela3D(cfg3d, function () { aberto = false; });
+        return m.abrirJanela3D(cfg3d, function () { aberto = false; }, depoisDeMontar);
       }).catch(function (e) { aberto = false; console.warn('janela 3D', e); })
         .then(function () { b.classList.remove('carregando'); });
-    });
+    }
+    b.addEventListener('click', function () { abrir(); });
+    window.aleaAbrirPersonalizar = abrir;
   })();
   var botaoSacola = document.querySelector('[data-add-carrinho]');
   if (!colmeia && !botaoComprar) return;
@@ -676,7 +683,13 @@
 
   function porNoCarrinho(eDepoisFechar) {
     var faltas = oQueFalta();
-    if (faltas.length) { reclamarDoQueFalta(faltas); return; }
+    if (faltas.length) {
+      /* ETAPA 55: o formulário mora na janela — faltou algo, a janela abre e a falta treme lá dentro */
+      if (window.aleaAbrirPersonalizar) {
+        window.aleaAbrirPersonalizar(function () { setTimeout(function () { reclamarDoQueFalta(oQueFalta()); }, 60); });
+      } else { reclamarDoQueFalta(faltas); }
+      return;
+    }
     if (!window.aleaCarrinho) return;
     var recado = document.querySelector('[data-recado-aceite]');
     if (recado) recado.hidden = true;

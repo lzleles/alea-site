@@ -185,20 +185,24 @@ window.ALEA = {
      ⚠ TESTE: Azul, Amarelo e Verde nos 3 acabamentos, pra ele ver o desenho. Os ORIGINAIS abaixo
      são provisórios ("a confirmar") — a lista real vem dele e substitui esta. */
   filamentos: {
+    /* ETAPA 55: cada cor com o CÓDIGO OFICIAL da cor (hex) — é ele que pinta a peça na janela 3D.
+       Fosco = as 5 que ele escolheu (msg 546). Básico e Perolizado seguem de TESTE (Azul/Amarelo/Verde e Dourado). */
     basico: [
-      { site: 'Azul',     original: 'a confirmar · PLA · Basic · Azul' },
-      { site: 'Amarelo',  original: 'a confirmar · PLA · Basic · Amarelo' },
-      { site: 'Verde',    original: 'a confirmar · PLA · Basic · Verde' }
+      { site: 'Azul',        hex: '#0A2989', original: 'Bambu Lab · PLA · Basic · Blue (10601)' },
+      { site: 'Amarelo',     hex: '#F4EE2A', original: 'Bambu Lab · PLA · Basic · Yellow (10400)' },
+      { site: 'Verde',       hex: '#00AE42', original: 'Bambu Lab · PLA · Basic · Bambu Green (10501)' }
     ],
     fosco: [
-      { site: 'Azul',     original: 'a confirmar · PLA · Matte · Azul' },
-      { site: 'Amarelo',  original: 'a confirmar · PLA · Matte · Amarelo' },
-      { site: 'Verde',    original: 'a confirmar · PLA · Matte · Verde' }
+      { site: 'Amarelo',     hex: '#F7D959', original: 'Bambu Lab · PLA · Matte · Lemon Yellow (11400)' },
+      { site: 'Rosa',        hex: '#E8AFCF', original: 'Bambu Lab · PLA · Matte · Sakura Pink (11201)' },
+      { site: 'Azul Claro',  hex: '#A3D8E1', original: 'Bambu Lab · PLA · Matte · Ice Blue (11601)' },
+      { site: 'Azul Escuro', hex: '#042F56', original: 'Bambu Lab · PLA · Matte · Dark Blue (11602)' },
+      { site: 'Terracota',   hex: '#B15533', original: 'Bambu Lab · PLA · Matte · Terracotta (11203)' }
     ],
     perolizado: [
-      { site: 'Azul',     original: 'a confirmar · PLA · Silk · Azul' },
-      { site: 'Amarelo',  original: 'a confirmar · PLA · Silk · Amarelo' },
-      { site: 'Verde',    original: 'a confirmar · PLA · Silk · Verde' }
+      { site: 'Azul',        hex: '#147BD1', original: 'Bambu Lab · PLA · Silk · Blue (13601)' },
+      { site: 'Verde',       hex: '#4CE4A0', original: 'Bambu Lab · PLA · Silk · Green (13502)' },
+      { site: 'Dourado',     hex: '#E5B03D', original: 'Bambu Lab · PLA · Silk · Gold (13401)' }
     ]
   },
   /* como cada acabamento aparece (a ordem é a da tela) e o que ele acrescenta ao nome da cor:

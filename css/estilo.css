@@ -1481,3 +1481,19 @@ html.janela3d-aberta { overflow: hidden; }
   .janela3d { grid-template-columns: 1fr; }
   .janela3d-palco { min-height: 46dvh; border-radius: 18px 18px 0 0; }
 }
+
+/* ETAPA 55 (23/09/2026, executar das 15:23):
+   1. o formulário SÓ aparece dentro da janela "Personalize aqui";
+   2. fundo de ESTÚDIO (degradê bege-acinzentado, tom médio) no lugar do preto — as duas cores vêm do JS e mudam
+      conforme a peça fica clara ou escura, com transição suave. */
+.personalizar.mora-na-janela { display: none; }
+.janela3d-form .personalizar.mora-na-janela { display: grid; margin: 0; }
+.personalizar-3d { width: 100%; margin: 0 0 20px; }
+.janela3d-palco {
+  --estudio-centro: #E6DFD3; --estudio-borda: #BFB5A5;
+  background: radial-gradient(ellipse 75% 70% at 50% 45%, var(--estudio-centro), var(--estudio-borda));
+  transition: --estudio-centro .4s, --estudio-borda .4s;
+}
+.janela3d-dica, .janela3d-carregando { color: rgba(40,32,24,.55); }
+.janela3d-lado { max-height: calc(100dvh - 32px); overflow: auto; }
+@media (max-width: 760px) { .janela3d-lado { max-height: none; overflow: visible; } }
