@@ -1,0 +1,83 @@
+/* CATALOGO:
+   nome: conta.css
+   categoria: UTIL
+   objetivo: O visual da gaveta Conta ligada ao servidor (entrar, ficha, endereços, pets, pedidos) e do aviso "posso lembrar sua visita?". Só carrega com api_conta preenchido.
+   entrada: variáveis de cor e fonte do estilo.css (--terracota, --tinta, --borda, --fonte-titulo…)
+   saida: estilos .conta-* e .aviso-memoria
+   status: ativo
+   validado_em: 2026-09-22 (print em 390 px e 1280 px)
+*/
+/* Arquivo SEPARADO do estilo.css de propósito: o estilo.css muda a cada rodada do Cassiano
+   em outra sessão, e a conta liga/desliga por uma linha do config.js. Separado, nenhum dos
+   dois pisa no outro. Toda cor vem das variáveis dele — mudou a marca, muda aqui junto. */
+
+.conta-entrar { display: grid; gap: 12px; padding: 4px 0 18px; border-bottom: 1px solid var(--borda); margin-bottom: 18px; }
+.conta-entrar p { margin: 0; font-size: 14.5px; color: var(--tinta-fraca); }
+.conta-entrar p strong { color: var(--tinta); }
+.conta-google { min-height: 44px; }
+.conta-fb { width: 100%; }
+.conta-miudo, .conta-entrar .conta-miudo { font-size: 12.5px; }
+.conta-miudo a, .conta-marca a { color: var(--terracota); }
+
+.conta-erro { margin: 0 0 12px; padding: 10px 12px; border-radius: 10px; font-size: 14px;
+  background: rgba(146, 68, 41, .08); color: var(--terracota); }
+.conta-aviso { margin: 0 0 16px; padding: 10px 12px; border-radius: 10px; font-size: 14px;
+  background: rgba(170, 150, 97, .14); color: var(--tinta); }
+
+.conta-topo { display: flex; gap: 12px; align-items: center; margin: 0 0 16px; }
+.conta-topo img, .conta-inicial { width: 48px; height: 48px; border-radius: 50%; flex: none; object-fit: cover; }
+.conta-inicial { display: grid; place-items: center; background: var(--terracota); color: var(--off);
+  font-family: var(--fonte-titulo); font-size: 22px; text-transform: uppercase; }
+.conta-topo strong { display: block; font-family: var(--fonte-titulo); font-weight: 500; font-size: 1.1rem; }
+.conta-topo small { display: block; color: var(--tinta-fraca); font-size: 13px; word-break: break-word; }
+
+.conta-h3 { font-family: var(--fonte-titulo); font-weight: 500; font-size: 1.05rem; margin: 24px 0 10px; }
+
+/* a caixinha de marcar: o `.personalizar label` deixa tudo em maiúscula dourada; aqui é frase */
+.personalizar label.conta-marca { display: flex; gap: 10px; align-items: flex-start; text-transform: none;
+  letter-spacing: 0; font-weight: 400; font-size: 14px; color: var(--tinta); }
+.personalizar label.conta-marca input { width: 18px; height: 18px; margin: 1px 0 0; flex: none; accent-color: var(--terracota); }
+.personalizar label small { text-transform: none; letter-spacing: 0; font-weight: 400; color: var(--tinta-fraca); }
+.conta-dupla { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+.conta-lista { list-style: none; padding: 0; margin: 0 0 8px; display: grid; gap: 10px; }
+.conta-lista li { display: flex; gap: 10px; justify-content: space-between; align-items: flex-start;
+  border-top: 1px solid var(--borda); padding-top: 8px; font-size: 14px; color: var(--tinta-fraca); }
+.conta-lista li strong { display: block; color: var(--tinta); font-weight: 600; }
+.conta-lista li strong small { font-weight: 400; color: var(--dourado); margin-left: 4px; }
+
+.conta-mais { margin: 6px 0 4px; }
+.conta-mais summary { cursor: pointer; color: var(--terracota); font-size: 14.5px; font-weight: 600; padding: 6px 0; }
+.conta-mais[open] summary { margin-bottom: 10px; }
+
+.conta-lembrancas { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.conta-lembra { display: grid; gap: 4px; text-decoration: none; color: var(--tinta); font-size: 12.5px; text-align: center; }
+.conta-lembra img { width: 100%; aspect-ratio: 1; object-fit: contain; background: var(--off); border-radius: 10px; }
+.conta-lembra small { color: var(--dourado); }
+
+.conta-rodape { display: flex; flex-wrap: wrap; gap: 6px 18px; margin: 28px 0 8px; padding-top: 14px; border-top: 1px solid var(--borda); }
+.conta-link { background: none; border: 0; padding: 4px 0; font: inherit; font-size: 13.5px; color: var(--tinta-fraca);
+  text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+.conta-link.perigo { color: var(--terracota); }
+
+/* ---------------------------------------------------------- o aviso da memória */
+.aviso-memoria { position: fixed; z-index: 90; left: 12px; right: 12px; bottom: 12px; max-width: 440px; margin: 0 auto;
+  display: grid; gap: 10px; padding: 14px 16px; border-radius: var(--raio);
+  background: var(--papel); color: var(--tinta); box-shadow: 0 10px 40px rgba(0, 0, 0, .28);
+  transform: translateY(24px); opacity: 0; transition: transform .35s ease, opacity .35s ease; }
+.aviso-memoria.visivel { transform: none; opacity: 1; }
+.aviso-memoria p { margin: 0; font-size: 14.5px; line-height: 1.4; }
+.aviso-memoria a { color: var(--terracota); }
+.aviso-memoria div { display: flex; gap: 10px; }
+.aviso-memoria .botao { flex: 1; padding-top: 10px; padding-bottom: 10px; }
+@media (prefers-reduced-motion: reduce) { .aviso-memoria { transition: none; } }
+
+/* o "tirar" igual ao do carrinho (linha-carrinho .tirar do estilo.css): palavra sublinhada, não botão */
+.conta-lista .tirar { background: transparent; border: 0; color: var(--tinta-fraca); cursor: pointer;
+  font: inherit; font-size: 13px; text-decoration: underline; padding: 0; flex: none; }
+
+/* dois campos lado a lado (Número/Complemento, Cidade/UF): input tem largura mínima própria
+   (~20 letras) e estourava a gaveta de 420 px pro lado — barra de rolagem horizontal, vista no
+   print do login real de 22/09/2026. min-width 0 deixa a coluna do grid encolher. */
+.conta-dupla > label { min-width: 0; }
+.conta-dupla input, .conta-dupla select { width: 100%; min-width: 0; box-sizing: border-box; }
