@@ -1355,3 +1355,13 @@ a.continuar-comprando { display: inline-block; text-align: center; }  /* ETAPA 4
 .aviso-sacola .fechar-aviso { background: transparent; border: 0; cursor: pointer; font-size: 24px; font-weight: 300; line-height: 1; color: var(--tinta-fraca); padding: 10px 12px; align-self: start; }
 @media (prefers-reduced-motion: reduce) { .aviso-sacola { transition: none; } }
 .linha-carrinho .editar-item { justify-self: start; font-size: 13.5px; color: var(--tinta); text-decoration: underline; text-underline-offset: 3px; }  /* ETAPA 45 */
+
+/* ⚠️ ETAPA 46 (22/09/2026, 22:43, vídeo no iPhone): dois defeitos da página de produto.
+   1. "Não pode mexer pros lados" — a página arrastava na horizontal. As gavetas (sacola e conta)
+      moram FORA da tela, à direita (translateX 100%), e o Safari deixa arrastar até elas. Trava do
+      eixo X na página inteira; as gavetas continuam abrindo por cima.
+   2. "Trava o cabeçalho: quando vou pra baixo rápido e volto rápido, ele sobe tampando a logo" — é o
+      ELÁSTICO do iPhone (a página passa do topo e quica); o cabeçalho é fixo, mas o conteúdo quica
+      por baixo e por cima dele. `overscroll-behavior: none` desliga o quique; o cabeçalho fica parado. */
+html, body { overflow-x: hidden; overscroll-behavior: none; }
+body { position: relative; max-width: 100%; }
