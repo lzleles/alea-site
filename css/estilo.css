@@ -1553,3 +1553,13 @@ html, body { overflow-x: clip; }
 .janela3d-recado { margin: 0; color: var(--terracota); font-weight: 600; font-size: 14px; }
 .personalizar .extra.inativo { background: #EFEAE2; border-color: var(--borda); opacity: .7; cursor: not-allowed; }
 .personalizar .extra.inativo .titulo-extra { color: var(--tinta-fraca); }
+
+/* ETAPA 60: a película que pega o toque nas opções travadas (o iPhone não entrega toque em campo desativado) e o
+   quadradinho do detalhe APAGADO quando o cliente escolheu ficar sem nome (mesmo tom das bolinhas travadas) */
+.campo-cor-nome { position: relative; }
+.campo-cor-nome .trava-toque { position: absolute; inset: 0; z-index: 2; background: transparent; cursor: not-allowed; }
+.campo-cor-nome .trava-toque[hidden] { display: none; }
+.personalizar .extra.inativo input[type="checkbox"] {
+  -webkit-appearance: none; appearance: none; width: 20px; height: 20px; margin: 0; border-radius: 5px;
+  background: #EFEAE2; border: 1.5px solid var(--borda); cursor: not-allowed;
+}

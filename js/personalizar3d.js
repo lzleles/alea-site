@@ -5,7 +5,7 @@
              pet GRAVADO ao vivo e as cores da peça e do nome trocando na hora, conforme o formulário.
    entrada: ALEA.modelos3d[slug] e ALEA.filamentos (config.js); o formulário [data-personalizar] da página
    saida: a janela (modal); o formulário de verdade MORA dentro dela enquanto está aberta
-   status: protótipo v5 (23/09/2026, etapa 59)
+   status: protótipo v6 (23/09/2026, etapa 60)
    validado_em: 23/09/2026 (teste headless desktop e 390 px)
 */
 /* =============================================================================
@@ -41,6 +41,9 @@
    v5 (etapa 59, 16:38-16:43): no passo 2, SEM NOME o "Um detalhe que transforma" fica inativo (não cobra cor de um
       nome que não existe) e tentar mexer treme e avisa "Por favor, volte e coloque o nome do seu pet."; COM nome,
       tocar no acabamento antes de marcar o detalhe treme e avisa "Marque a opção acima para personalizar.".
+   v6 (etapa 60, 16:51-16:53): no iPhone o toque em opção DESATIVADA não chega em lugar nenhum (o Safari engole) —
+      o recado nunca aparecia. Agora uma PELÍCULA invisível cobre as bolinhas e a janela da cor do nome enquanto
+      estão travadas e é ela que pega o toque. E, sem nome, o quadradinho do detalhe fica apagado como as bolinhas.
    ============================================================================= */
 
 var ACABAMENTO_MATERIAL = {           // como cada acabamento reflete a luz
@@ -145,10 +148,32 @@ export async function abrirJanela3D(cfg, aoFechar, aoMontar, opcoes) {
     }
   }, true);
 
+  /* a PELÍCULA: por cima do bloco da cor do nome enquanto ele está travado (sem nome, ou detalhe desmarcado) */
+  var pelicula = null;
+  function atualizarPelicula() {
+    var bloco = form && form.querySelector('.campo-cor-nome');
+    if (!bloco) return;
+    if (!pelicula) {
+      pelicula = document.createElement('div');
+      pelicula.className = 'trava-toque';
+      pelicula.setAttribute('aria-hidden', 'true');
+      bloco.appendChild(pelicula);
+      pelicula.addEventListener('click', function (e) {
+        e.preventDefault(); e.stopPropagation();
+        var alvos = [form.querySelector('[data-extra]'), bloco.closest('label') || bloco];
+        if (semNomeConfirmado()) avisarNoPasso('Por favor, volte e coloque o nome do seu pet.', alvos);
+        else avisarNoPasso('Marque a opção acima para personalizar.', alvos);
+      });
+    }
+    var cx = form.querySelector('[data-extra-caixa]');
+    pelicula.hidden = !(semNomeConfirmado() || !(cx && cx.checked));
+  }
+
   function mostrarPasso(i) {
     passoAtual = Math.max(0, Math.min(passos.length - 1, i));
     recadoPasso.hidden = true;
     acertarDetalhe();
+    atualizarPelicula();
     passos.forEach(function (els, k) { els.forEach(function (el) { el.classList.toggle('passo-escondido', k !== passoAtual); }); });
     var ultimo = passoAtual === passos.length - 1;
     var html = '';
@@ -232,6 +257,7 @@ export async function abrirJanela3D(cfg, aoFechar, aoMontar, opcoes) {
     vivo = false;
     passos.forEach(function (els) { els.forEach(function (el) { el.classList.remove('passo-escondido'); }); });
     var extI = form && form.querySelector('[data-extra]'); if (extI) extI.classList.remove('inativo');
+    if (pelicula && pelicula.parentNode) pelicula.parentNode.removeChild(pelicula);
     document.body.style.position = ''; document.body.style.top = ''; document.body.style.left = ''; document.body.style.right = '';
     if (vv) { vv.removeEventListener('resize', acompanharTela); vv.removeEventListener('scroll', acompanharTela); }
     window.aleaIrParaFalta = null;
@@ -472,6 +498,7 @@ export async function abrirJanela3D(cfg, aoFechar, aoMontar, opcoes) {
     palco.style.setProperty('--estudio-borda', estudio[1]);
   }
   function aplicarForm() {
+    atualizarPelicula();
     var cxD = form && form.querySelector('[data-extra-caixa]'); if (cxD && cxD.checked) recadoPasso.hidden = true;
     if (!form) return;
     /* cores da peça: tricolor = topo/principal/base; bicolor = principal (+ topo) e base; mono = tudo igual */
