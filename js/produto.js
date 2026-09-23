@@ -508,6 +508,20 @@
     }
     if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
     repintarPreco();
+    /* ETAPA 47 (22:51): "o cliente não quer saber do topo, ele só quer editar — tem que cair direto no
+       NOME DO PET". A tela para com o rótulo "Nome do pet" logo abaixo do cabeçalho (a mesma régua da
+       trava de compra). Reaplica no `load`: as fotos da colmeia, carregando, empurram o formulário. */
+    function cairNoNome() {
+      var alvo = nome && (nome.closest('label') || nome);
+      if (!alvo) return;
+      var topo = document.querySelector('.topo');
+      var folga = (topo ? Math.max(0, topo.getBoundingClientRect().bottom) : 0) + 18;
+      window.scrollTo(0, Math.max(0, window.scrollY + alvo.getBoundingClientRect().top - folga));
+    }
+    if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+    requestAnimationFrame(cairNoNome);
+    if (document.readyState !== 'complete') window.addEventListener('load', cairNoNome, { once: true });
+    setTimeout(cairNoNome, 400);
   })();
 
   function porNoCarrinho(eDepoisFechar) {
