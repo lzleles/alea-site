@@ -197,16 +197,63 @@
     alvoValor.innerHTML = (t === null) ? '<small>Sob consulta</small>' : window.aleaDinheiro(t);
   }
 
+  /* ⚠️ ETAPA 52 (23/09/2026, 14:03, áudio dele): a COR DO NOME ganha a mesma janelinha das cores da
+     peça — Básico · Fosco · Perolizado e, depois, a lista de cores daquele acabamento. O campo de texto
+     que o gerador escreve é TROCADO aqui (o gerador segue igual; a troca vive no JS, num lugar só). */
+  var FIL_ = (window.ALEA || {}).filamentos || {};
+  var ACAB_ = (window.ALEA || {}).acabamentos || [];
+  var corNomeBox = null;
+  (function trocarCorDoNome() {
+    var velho = document.querySelector('[data-personalizar] input[name="cor_nome"]');
+    if (!velho) return;
+    var caixa = document.createElement('div');
+    caixa.className = 'campo-cor campo-cor-nome';
+    caixa.setAttribute('data-parte', 'nome');
+    caixa.innerHTML = '<div class="acabamentos">' + ACAB_.map(function (ac) {
+        return '<label class="acabamento"><input type="radio" name="acab_nome" value="' + ac.id + '" disabled> ' +
+          ac.rotulo + '</label>';
+      }).join('') + '</div>' +
+      '<select name="cor_nome" disabled aria-label="Cor do nome"><option value="">Marque o detalhe acima</option></select>';
+    velho.parentNode.replaceChild(caixa, velho);
+    corNomeBox = caixa;
+    caixa.addEventListener('change', function (ev) {
+      var rad = ev.target.closest && ev.target.closest('.acabamento input');
+      if (!rad) return;
+      var sel = caixa.querySelector('select');
+      sel.innerHTML = '<option value="">Escolha a cor</option>' + (FIL_[rad.value] || []).map(function (f) {
+        return '<option value="' + f.site + '">' + f.site + '</option>'; }).join('');
+      sel.disabled = false;
+      var rot = caixa.closest('label'); if (rot) rot.classList.remove('faltou');
+      try { sel.focus({ preventScroll: true }); } catch (e) { sel.focus(); }
+    });
+  })();
+
+  function travarCorDoNome(liberar) {
+    if (!corNomeBox) return;
+    var sel = corNomeBox.querySelector('select');
+    Array.prototype.forEach.call(corNomeBox.querySelectorAll('.acabamento input'), function (r) {
+      r.disabled = !liberar; if (!liberar) r.checked = false;
+    });
+    sel.disabled = true;
+    sel.innerHTML = '<option value="">' + (liberar ? 'Escolha o acabamento acima' : 'Marque o detalhe acima') + '</option>';
+  }
+
+  function corDoNomeEscolhida() {
+    if (!corNomeBox) return { texto: '', original: '', escolha: null };
+    var ac = corNomeBox.querySelector('.acabamento input:checked');
+    var sel = corNomeBox.querySelector('select');
+    if (!ac || !sel.value) return { texto: '', original: '', escolha: null };
+    var def = ACAB_.filter(function (x) { return x.id === ac.value; })[0] || { sufixo: '' };
+    var fil = (FIL_[ac.value] || []).filter(function (f) { return f.site === sel.value; })[0];
+    return { texto: sel.value + def.sufixo, original: fil ? fil.original : sel.value + def.sufixo,
+             escolha: { acabamento: ac.value, cor: sel.value } };
+  }
+
   Array.prototype.forEach.call(document.querySelectorAll('[data-extra]'), function (rot) {
     var caixa = rot.querySelector('[data-extra-caixa]');
-    var liberado = document.querySelector('[name="cor_nome"]');
     caixa.addEventListener('change', function () {
       rot.classList.toggle('marcado', caixa.checked);
-      if (liberado) {
-        liberado.disabled = !caixa.checked;
-        if (!caixa.checked) liberado.value = '';
-        else liberado.focus();
-      }
+      travarCorDoNome(caixa.checked);
       repintarPreco();
     });
   });
@@ -370,7 +417,9 @@
       material: botaoComprar.getAttribute('data-material'),
       personalizacao: {
         nome_pet: campo('nome_pet'),
-        cor_nome: campo('cor_nome'),
+        cor_nome: corDoNomeEscolhida().texto,
+        cor_nome_original: corDoNomeEscolhida().original,
+        cor_nome_escolha: corDoNomeEscolhida().escolha,
         cores: coresEscolhidas()
       },
       extras: extras,
@@ -395,9 +444,14 @@
     var faltas = [];
     var nome = document.querySelector('[data-personalizar] [name="nome_pet"]');
     if (nome && !nome.value.trim()) faltas.push({ el: nome.closest('label') || nome, texto: 'Por favor, digite o nome do pet.' });
-    var corNome = document.querySelector('[data-personalizar] [name="cor_nome"]');
-    if (corNome && !corNome.disabled && !corNome.value.trim()) {
-      faltas.push({ el: corNome.closest('label') || corNome, texto: 'Por favor, digite a cor do nome.' });
+    /* ETAPA 52: com o detalhe marcado, cobra o acabamento e depois a cor do nome */
+    if (corNomeBox && !corNomeBox.querySelector('.acabamento input').disabled) {
+      var rotNome = corNomeBox.closest('label') || corNomeBox;
+      if (!corNomeBox.querySelector('.acabamento input:checked')) {
+        faltas.push({ el: rotNome, texto: 'Por favor, escolha o acabamento da cor do nome.' });
+      } else if (!corNomeBox.querySelector('select').value) {
+        faltas.push({ el: rotNome, texto: 'Por favor, escolha a cor do nome.' });
+      }
     }
     if (caixaCores) {
       var r = caixaCores.querySelector('input[name="cores_peca"]:checked');
@@ -543,8 +597,14 @@
       var cx = rot && rot.querySelector('[data-extra-caixa]');
       if (cx && !cx.checked) { cx.checked = true; cx.dispatchEvent(new Event('change', { bubbles: true })); }
     });
-    var corNome = document.querySelector('[data-personalizar] [name="cor_nome"]');
-    if (corNome && p.cor_nome) corNome.value = p.cor_nome;
+    /* ETAPA 52: a cor do nome volta com acabamento e cor (os pedidos antigos, em texto, não voltam) */
+    if (corNomeBox && p.cor_nome_escolha) {
+      var rn = corNomeBox.querySelector('.acabamento input[value="' + p.cor_nome_escolha.acabamento + '"]');
+      if (rn) {
+        rn.checked = true; rn.dispatchEvent(new Event('change', { bubbles: true }));
+        corNomeBox.querySelector('select').value = p.cor_nome_escolha.cor;
+      }
+    }
     if (caixaCores && p.cores && p.cores.modo) {
       var r = Array.prototype.filter.call(caixaCores.querySelectorAll('input[name="cores_peca"]'),
         function (x) { return x.parentNode.textContent.trim() === p.cores.modo; })[0];

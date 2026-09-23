@@ -168,10 +168,10 @@ window.ALEA = {
     opcoes: [
       { id: 'tricolor',      rotulo: 'Tricolor',      campos: 3 },
       { id: 'bicolor',       rotulo: 'Bicolor',       campos: 2 },
-      { id: 'monocromatico', rotulo: 'Monocromático', campos: 1 },
-      { id: 'degrade',       rotulo: 'Degradê',       campos: 0,
-        aviso: 'Por se tratar de filamentos específicos e sazonais, após a confirmação ' +
-               'de pagamento entraremos em contato pra informar as cores disponíveis!' }
+      { id: 'monocromatico', rotulo: 'Monocromático', campos: 1 }
+      /* ETAPA 52 (23/09/2026, 14:03): Degradê DESCARTADO de todos os comedouros — "vai me dar muita dor de
+         cabeça (...) às vezes eu não vou ter o filamento, ele vai ficar chateado". Era:
+         { id: 'degrade', rotulo: 'Degradê', campos: 0, aviso: 'Por se tratar de filamentos específicos e sazonais...' } */
     ]
   },
 

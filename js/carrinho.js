@@ -147,7 +147,8 @@
     if (comMaterial && p.cores && p.cores.originais && p.cores.originais.length) {
       partes.push('filamentos: ' + p.cores.originais.join(' / '));
     }
-    if (p.cor_nome) partes.push('cor do nome: ' + p.cor_nome);
+    if (p.cor_nome) partes.push('cor do nome: ' + p.cor_nome +
+      (comMaterial && p.cor_nome_original ? ' (' + p.cor_nome_original + ')' : ''));
     (i.extras || []).forEach(function (x) {
       partes.push(x.rotulo + ' (+' + window.aleaDinheiro(x.preco) + ')');
     });

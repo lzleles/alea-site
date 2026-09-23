@@ -1399,3 +1399,28 @@ body { position: relative; max-width: 100%; }
 .cores-campos .campo-cor select:disabled { background: #EFEAE2; color: var(--tinta-fraca); cursor: not-allowed; }
 .cores-campos .campo-cor.faltou .acabamento { color: var(--terracota); }
 .cores-campos .campo-cor.faltou select { border-color: var(--terracota); box-shadow: 0 0 0 1px var(--terracota); }
+
+/* ETAPA 52 (23/09/2026, 14:03): Tricolor/Bicolor/Monocromático na COR do rótulo "Cores da peça" (dourado),
+   com a grafia de hoje (só a primeira maiúscula). Básico/Fosco/Perolizado em PRETO, com a mesma fonte e o
+   mesmo jeito de escrita do Tricolor (desfaz o dourado/maiúscula da etapa 51). Vale também na cor do nome. */
+/* ETAPA 52b (14:04, áudio seguinte): o Tricolor/Bicolor/Monocromático fica EXATAMENTE como o rótulo "Cores
+   da peça" — maiúscula, dourado, mesmo tamanho ("não quero maior do que o cores da peça"). E o Básico/Fosco/
+   Perolizado herda o formato que o Tricolor tinha (primeira maiúscula, preto, 15,5 px). */
+.cores-opcoes label { color: var(--dourado); font-size: 13px; letter-spacing: .06em; text-transform: uppercase; font-weight: 700; }
+.cores-campos .campo-cor .acabamento, .campo-cor-nome .acabamento {
+  font-size: 15.5px; letter-spacing: 0; text-transform: none; color: var(--tinta); font-weight: 400;
+  display: flex; align-items: center; gap: 8px; cursor: pointer;
+}
+.campo-cor-nome { display: grid; gap: 8px; }
+.campo-cor-nome .acabamentos { display: flex; flex-wrap: wrap; gap: 6px 18px; }
+.campo-cor-nome .acabamento input { width: 19px; height: 19px; accent-color: var(--terracota); cursor: pointer; margin: 0; }
+.campo-cor-nome .acabamento input:disabled { cursor: not-allowed; }
+.campo-cor-nome .acabamento:has(input:disabled) { color: var(--tinta-fraca); cursor: not-allowed; }
+.campo-cor-nome select {
+  font: inherit; font-size: 15.5px; text-transform: none; letter-spacing: 0; color: var(--tinta);
+  padding: 11px 13px; border: 1px solid var(--borda); border-radius: 10px; background: #fff; width: 100%;
+}
+.campo-cor-nome select:disabled { background: #EFEAE2; color: var(--tinta-fraca); cursor: not-allowed; }
+.cores-campos .campo-cor.faltou .acabamento, label.faltou .campo-cor-nome .acabamento { color: var(--terracota); }
+label.faltou .campo-cor-nome select { border-color: var(--terracota); box-shadow: 0 0 0 1px var(--terracota); }
+.campo-cor-nome select, .campo-cor-nome option { font-weight: 400; }
