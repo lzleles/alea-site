@@ -81,6 +81,10 @@
        já quer fechar. Devolve `false` quando não deu (sem WhatsApp, carrinho vazio) —
        e aí quem chamou abre a gaveta, que explica o que falta. */
     fecharPedido: function () { return fecharPedido(); },
+    /* ETAPA 61 (23/09/2026, conta e compra "iguais às da Tiffany"): a página Finalizar Compra usa a
+       MESMA descrição da sacola e o MESMO envio pelo WhatsApp, agora com dados, entrega e pagamento. */
+    descrever: function (i) { return descreverItem(i); },
+    abrirWhatsApp: function (extras) { return abrirWhatsApp(extras); },
     itens: function () { return itens.slice(); },
     quantos: function () { return pecas(); },
     total: total,
@@ -185,7 +189,7 @@
     if (!g) return;
     var corpo = g.querySelector('[data-corpo]');
     var alvoTotal = g.querySelector('[data-total]');
-    var botao = g.querySelector('[data-fechar-pedido]');
+    var botao = g.querySelector('[data-finalizar-compra]');
 
     if (!itens.length) {
       corpo.innerHTML = '<p class="vazio">Sua sacola está vazia.</p>';
@@ -226,8 +230,8 @@
         (temSobConsulta() ? ' + itens sob consulta' : '');
     }
     if (botao) {
-      botao.disabled = !window.aleaTemZap;
-      botao.textContent = window.aleaTemZap ? 'Fechar pedido pelo WhatsApp' : 'WhatsApp ainda não configurado';
+      botao.disabled = false;
+      botao.textContent = 'Finalizar Compra';       // ETAPA 61: o nome do botão da Tiffany
     }
   }
 
@@ -258,7 +262,7 @@
   }
 
   /* ---------------------------------------------------------- fechar o pedido */
-  function textoDoPedido() {
+  function textoDoPedido(extras) {
     var linhas = ['Olá! Quero fechar este pedido pelo site da ālea:', ''];
     itens.forEach(function (i, n) {
       var q = qtd(i);
@@ -271,16 +275,26 @@
     linhas.push('Total das peças: ' + window.aleaDinheiro(total()) +
       (temSobConsulta() ? ' (fora os itens sob consulta)' : ''));
     linhas.push('Frete: a combinar pelo CEP.');
+    (extras || []).forEach(function (l) { linhas.push(l); });
     linhas.push('');
     linhas.push('Declarei no site que revisei a personalização e que estou ciente das ' +
       'condições de produtos personalizados.');
     var cliente = ler(CHAVE_CLIENTE, null);
-    if (cliente && cliente.nome) linhas.push('Meu nome: ' + cliente.nome);
+    if (!extras && cliente && cliente.nome) linhas.push('Meu nome: ' + cliente.nome);
     return linhas.join('\n');
   }
 
+  /* ⚠️ ETAPA 61: "fechar pedido" não abre mais o WhatsApp direto — leva pra SACOLA DE COMPRAS
+     (finalizar-compra.html), como no vídeo da Tiffany que o Cassiano mandou. O WhatsApp virou o
+     último passo do Finalizar Compra, com o pedido completo (`abrirWhatsApp`). */
   function fecharPedido() {
-    if (!itens.length || !window.aleaTemZap) return false;
+    if (!itens.length) return false;
+    location.href = 'finalizar-compra.html';
+    return true;
+  }
+
+  function abrirWhatsApp(extras) {
+    if (!itens.length || !window.aleaTemZap) return null;
     /* O pedido vira histórico ANTES de abrir o WhatsApp: se a conversa não abrir (app
        fora do ar, janela bloqueada), o visitante não perde o que montou. */
     var pedidos = ler(CHAVE_PEDIDOS, []) || [];
@@ -288,12 +302,9 @@
     gravar(CHAVE_PEDIDOS, pedidos.slice(0, 20));
 
     var url = 'https://wa.me/' + (window.ALEA || {}).whatsapp +
-      '?text=' + encodeURIComponent(textoDoPedido());
+      '?text=' + encodeURIComponent(textoDoPedido(extras));
     window.open(url, '_blank', 'noopener');
-
-    window.aleaCarrinho.limpar();
-    if (window.aleaGaveta) window.aleaGaveta.fechar();
-    return true;
+    return url;
   }
 
   /* ------------------------------------------------------------ a gaveta da conta */
@@ -369,7 +380,7 @@
                                            parseInt(passo.getAttribute('data-passo'), 10));
         return;
       }
-      if (e.target.closest('[data-fechar-pedido]')) fecharPedido();
+      if (e.target.closest('[data-finalizar-compra]')) fecharPedido();
     });
 
     document.addEventListener('alea:carrinho', function () {

@@ -267,7 +267,7 @@
     molde('carrinho', 'Sua Sacola de Compras',          // 21:44: o título do modelo, pedido dele
       '<p class="vazio">Sua sacola está vazia.</p>',
       '<div class="total-carrinho"><span>Subtotal:</span> <strong data-total>—</strong></div>' +
-      '<button class="botao" type="button" data-fechar-pedido disabled>Fechar pedido</button>' +
+      '<button class="botao" type="button" data-finalizar-compra disabled>Finalizar Compra</button>' +
       /* ETAPA 42 (22:30): o × do topo FECHA e deixa a pessoa exatamente onde estava; o "Continue
          comprando" leva pra PÁGINA INICIAL. Por isso ele virou link de verdade, não mais fechar. */
       '<a class="continuar-comprando" href="index.html">Continue comprando</a>');
@@ -293,7 +293,7 @@
       var extra = document.createElement('div');
       extra.className = 'rodape-extra';
       Array.prototype.slice.call(rod.children).forEach(function (el) {
-        (el.matches('.total-carrinho, [data-fechar-pedido]') ? principal : extra).appendChild(el);
+        (el.matches('.total-carrinho, [data-finalizar-compra]') ? principal : extra).appendChild(el);
       });
       tela.appendChild(g.querySelector('header'));
       tela.appendChild(g.querySelector('[data-corpo]'));
@@ -331,6 +331,9 @@
     cortina.addEventListener('click', fechar);
     document.addEventListener('click', function (e) {
       var b = e.target.closest('[data-abrir]');
+      /* ETAPA 61 (23/09/2026): a CONTA virou PÁGINA (conta.html), como na Tiffany — "clicar lá em cima,
+         do lado da sacola, em meu perfil, para aparecer essa página". O carrinho continua gaveta. */
+      if (b && b.getAttribute('data-abrir') === 'conta') { e.preventDefault(); location.href = 'conta.html'; return; }
       if (b) { e.preventDefault(); abrir(b.getAttribute('data-abrir')); return; }
       if (e.target.closest('[data-fechar-gaveta]')) fechar();
     });
@@ -376,6 +379,18 @@
     });
   }
 
+  /* ETAPA 61 (23/09/2026): na página de PEÇA entra o coração da Lista de Desejos (loja-dados.js).
+     As páginas conta.html e finalizar-compra.html carregam os arquivos da loja por conta própria. */
+  function carregarCoracao() {
+    if (!document.querySelector('.produto-topo') || window.aleaLoja) return;
+    var css = document.createElement('link');
+    css.rel = 'stylesheet'; css.href = 'css/loja.css';
+    document.head.appendChild(css);
+    var s = document.createElement('script');
+    s.src = 'js/loja-dados.js';
+    document.body.appendChild(s);
+  }
+
   /* -------------------------------------------------------------------- início */
   function iniciar() {
     ligarVoltarProFeed();
@@ -385,6 +400,7 @@
     montarGavetas();
     window.aleaLigarBotoes();     // as páginas de produto já nascem prontas no HTML
     carregarConta();
+    carregarCoracao();
     document.dispatchEvent(new CustomEvent('alea:site-pronto'));
   }
 
