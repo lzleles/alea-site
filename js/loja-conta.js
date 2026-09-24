@@ -86,10 +86,10 @@
         '<label class="loja-campo loja-senha"><span>Senha</span><input name="senha" type="password" autocomplete="current-password" ' +
           'placeholder="Adicione sua senha"><button type="button" data-olho aria-label="Mostrar senha">' + OLHO + '</button></label>' +
         (erro ? '<p class="loja-erro" role="alert">' + esc(erro) + '</p>' : '') +
-        '<p style="margin:22px 0 10px"><button type="button" class="loja-link seta" data-modo="codigo" data-esqueci>Esqueci minha senha</button></p>' +
+        '<p style="margin:14px 0 8px"><button type="button" class="loja-link seta" data-modo="codigo" data-esqueci>Esqueci minha senha</button></p>' +
         '<button type="submit" class="loja-bt entrar">Entrar</button>' +
         /* ETAPA 63 (22:24, Cassiano): vindo do Finalizar Compra, na MESMA linha: "… Cadastre-se ou continuar sem cadastro" */
-        '<p style="margin:22px 0 0"><button type="button" class="loja-link" data-modo="codigo">Não tem uma conta? <span class="loja-link sublinha">Cadastre-se</span></button>' +
+        '<p style="margin:14px 0 0"><button type="button" class="loja-link" data-modo="codigo">Não tem uma conta? <span class="loja-link sublinha">Cadastre-se</span></button>' +
           (daCompra ? ' <span class="loja-sem-cadastro">ou <a href="' + esc(voltar) + '" class="loja-link sublinha">continuar sem cadastro</a></span>' : '') + '</p>' +
         '</form>';
       outra = '<button type="button" class="loja-bt opcao" data-modo="codigo">Receber código por e-mail</button>';
@@ -97,12 +97,12 @@
     return h + htmlGoogle(outra);
   }
   function htmlGoogle(outra) {
-    return '<p class="loja-miudo" style="text-align:center;margin:34px 0 12px">ou</p>' +
+    return '<p class="loja-miudo" style="text-align:center;margin:20px 0 8px">ou</p>' +
       '<div class="loja-opcoes">' + (outra || '') +
       '<div data-google-botao></div>' +
       '<button type="button" class="loja-bt opcao google" data-entrar-google' + (L.previa ? '' : ' hidden') + '>' + G +
         '<span>Continuar com o Google</span></button></div>' +
-      '<p class="loja-miudo" style="text-align:center;margin:18px 0 0">Ao entrar você concorda com a ' +
+      '<p class="loja-miudo" style="text-align:center;margin:12px 0 0">Ao entrar você concorda com a ' +
         '<a href="privacidade.html">Política de Privacidade</a> da ālea.</p>';
   }
 
@@ -339,7 +339,19 @@
     erro = ''; aviso = '';
   }
 
+  /* ETAPA 64: quanto do rodapé preto cabe na primeira tela — do topo dele até o fim da frase, com um respiro */
+  function medirRodape() {
+    var rod = document.querySelector('footer.rodape');
+    var frase = rod && rod.querySelector('[data-assinatura], .frase');
+    if (!rod || !frase) return;
+    var alt = frase.getBoundingClientRect().bottom - rod.getBoundingClientRect().top + 14;
+    document.documentElement.style.setProperty('--lj-rodape-cabeca', Math.round(alt) + 'px');
+  }
+  window.addEventListener('resize', medirRodape);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(medirRodape);
+
   function ligar() {
+    medirRodape();
     Array.prototype.forEach.call(raiz.querySelectorAll('form'), function (f) {
       f.addEventListener('submit', enviar);
       if (f.matches('[data-form="endereco"]')) ligarCep(f);

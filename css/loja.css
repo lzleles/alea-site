@@ -208,10 +208,18 @@
 
 /* ETAPA 63 (22:19, print montado pelo Cassiano): a tela de entrar ocupa a PRIMEIRA tela inteira, no bege — o título
    colado embaixo do topo e o rodapé preto só aparece rolando. */
-.loja-sub.primeiro { margin-top: 22px; }
-/* 22:30 (print dele no iPhone): com 100svh o preto ainda aparecia ATRÁS da barra flutuante do Safari — o svh desconta a
-   barra, mas a página continua desenhada embaixo dela. 100lvh = a tela inteira, com a barra: o preto fica fora dela. */
-.loja .topo ~ main[data-loja-conta] { min-height: 100vh; min-height: 100lvh; }
+.loja-sub.primeiro { margin-top: 12px; margin-bottom: 10px; }
+/* ETAPA 64: pra capivara + frase do rodapé caberem na primeira tela do iPhone, a tela de entrar fica mais justa */
+[data-loja-conta] .loja-campo { margin-bottom: 8px; }
+.loja .topo ~ main[data-loja-conta] { padding-bottom: 16px; }
+.loja .rodape { padding-top: 26px; }
+/* ETAPA 64 (22:32, prints e áudios do Cassiano — eu tinha entendido o item 7 ao contrário): o vão bege embaixo da
+   Política é PREENCHIDO pelo começo do rodapé preto — a capivara, o ālea & Co. e a frase "Onde cada impressão começa
+   com um sonho!", que tem que terminar LOGO ACIMA da barra do Safari. O resto do rodapé (categorias etc.) só rolando.
+   A altura desse começo do rodapé muda com a largura da tela, então o loja-conta.js mede e escreve em
+   --lj-rodape-cabeca; 100svh é a tela visível com a barra do navegador aparecendo. */
+.loja .topo ~ main[data-loja-conta] { min-height: calc(100vh - var(--lj-rodape-cabeca, 0px));
+  min-height: calc(100svh - var(--lj-rodape-cabeca, 0px)); }
 .loja-sem-cadastro { font-size: 11px; color: var(--lj-cinza); white-space: nowrap; }
 .loja-sem-cadastro a { font-size: 11px; color: var(--lj-cinza); }
 /* a linha inteira precisa caber em 342 px (390 - 2×24): o "Não tem uma conta? Cadastre-se" encolhe um pouco quando ganha o complemento */
