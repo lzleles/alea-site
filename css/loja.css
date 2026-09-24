@@ -205,3 +205,13 @@
 /* nas páginas com o topo do site (fixo, 64 px), o conteúdo começa embaixo dele — igual à .pagina do estilo.css */
 .loja .topo ~ main { padding-top: calc(var(--tarja, 0px) + 66px); }
 .loja-opcoes [data-google-botao]:empty { display: none; }
+
+/* ETAPA 63 (22:19, print montado pelo Cassiano): a tela de entrar ocupa a PRIMEIRA tela inteira, no bege — o título
+   colado embaixo do topo e o rodapé preto só aparece rolando. */
+.loja-sub.primeiro { margin-top: 22px; }
+.loja .topo ~ main[data-loja-conta] { min-height: 100vh; min-height: 100svh; }
+.loja-sem-cadastro { font-size: 11px; color: var(--lj-cinza); white-space: nowrap; }
+.loja-sem-cadastro a { font-size: 11px; color: var(--lj-cinza); }
+/* a linha inteira precisa caber em 342 px (390 - 2×24): o "Não tem uma conta? Cadastre-se" encolhe um pouco quando ganha o complemento */
+p:has(> .loja-sem-cadastro) > .loja-link { font-size: 13px; }
+.loja-link .loja-link { font-size: inherit; }

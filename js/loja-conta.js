@@ -39,6 +39,7 @@
   var params = new URLSearchParams(location.search);
   var voltar = params.get('voltar');
   if (voltar && !/^[a-z0-9\-]+\.html(#[\w\/\-]*)?$/i.test(voltar)) voltar = null;   // só página do próprio site
+  var daCompra = params.get('compra') === '1' && !!voltar;   // chegou pelo "Finalizar Compra" da Sacola
 
   function esc(s) {
     return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
@@ -56,10 +57,11 @@
   /* ETAPA 62 (23/09/2026 21:58, print do Cassiano): a OUTRA opção de entrar não fica mais no topo — ela mora
      "logo abaixo do ou, acima do Continuar com o Google". Em cima fica só o jeito aberto agora. */
   function htmlEntrar() {
-    var h = '<h1 class="loja-titulo">Escolha uma opção para entrar</h1>';
+    /* ETAPA 63 (22:14, Cassiano): sai a frase "Escolha uma opção para entrar" — o título da tela é o do jeito aberto */
+    var h = '';
     var outra;
     if (codigoPara) {
-      h += '<h2 class="loja-sub">Digite o código enviado para seu e-mail</h2>' +
+      h += '<h1 class="loja-sub primeiro">Digite o código enviado para seu e-mail</h1>' +
         (L.previa ? '<p class="loja-aviso">Prévia: o e-mail de verdade ainda não sai. O código aqui é <strong>' + L.codigoPrevia + '</strong>.</p>' : '') +
         '<form data-form="codigo-digitar" novalidate>' +
         '<label class="loja-campo loja-codigo"><input name="codigo" inputmode="numeric" autocomplete="one-time-code" maxlength="6" ' +
@@ -69,7 +71,7 @@
         '<button type="submit" class="loja-bt entrar">Entrar</button></div></form>';
       outra = '<button type="button" class="loja-bt opcao" data-modo="senha">Entrar com e-mail e senha</button>';
     } else if (modoEntrar === 'codigo') {
-      h += '<h2 class="loja-sub">Receber código de acesso por e-mail</h2>' +
+      h += '<h1 class="loja-sub primeiro">Receber código de acesso por e-mail</h1>' +
         '<form data-form="codigo-pedir" novalidate>' +
         '<label class="loja-campo"><span>E-mail</span><input name="email" type="email" autocomplete="email" inputmode="email" ' +
           'placeholder="Ex.: exemplo@mail.com"></label>' +
@@ -77,7 +79,7 @@
         '<button type="submit" class="loja-bt entrar">Entrar</button></form>';
       outra = '<button type="button" class="loja-bt opcao" data-modo="senha">Entrar com e-mail e senha</button>';
     } else {
-      h += '<h2 class="loja-sub">Entrar com e-mail e senha</h2>' +
+      h += '<h1 class="loja-sub primeiro">Entrar com e-mail e senha</h1>' +
         '<form data-form="senha" novalidate>' +
         '<label class="loja-campo"><span>E-mail</span><input name="email" type="email" autocomplete="email" inputmode="email" ' +
           'placeholder="Ex.: exemplo@mail.com"></label>' +
@@ -86,7 +88,9 @@
         (erro ? '<p class="loja-erro" role="alert">' + esc(erro) + '</p>' : '') +
         '<p style="margin:22px 0 10px"><button type="button" class="loja-link seta" data-modo="codigo" data-esqueci>Esqueci minha senha</button></p>' +
         '<button type="submit" class="loja-bt entrar">Entrar</button>' +
-        '<p style="margin:22px 0 0"><button type="button" class="loja-link" data-modo="codigo">Não tem uma conta? <span class="loja-link sublinha">Cadastre-se</span></button></p>' +
+        /* ETAPA 63 (22:24, Cassiano): vindo do Finalizar Compra, na MESMA linha: "… Cadastre-se ou continuar sem cadastro" */
+        '<p style="margin:22px 0 0"><button type="button" class="loja-link" data-modo="codigo">Não tem uma conta? <span class="loja-link sublinha">Cadastre-se</span></button>' +
+          (daCompra ? ' <span class="loja-sem-cadastro">ou <a href="' + esc(voltar) + '" class="loja-link sublinha">continuar sem cadastro</a></span>' : '') + '</p>' +
         '</form>';
       outra = '<button type="button" class="loja-bt opcao" data-modo="codigo">Receber código por e-mail</button>';
     }

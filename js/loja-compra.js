@@ -407,7 +407,13 @@
       var box = raiz.querySelector('[data-entrega-previa]'); box.hidden = false;
       ev.target.closest('[data-ver-entrega]').hidden = true; box.querySelector('input').focus(); return;
     }
-    if (ev.target.closest('[data-ir-compra]')) { location.hash = '#/compra'; return; }
+    /* ETAPA 63 (22:15, Cassiano): "clicou em finalizar compra, vai pra tela do login". Quem já entrou segue direto;
+       quem não entrou vê a tela de entrar, com "continuar sem cadastro" na linha do Cadastre-se. */
+    if (ev.target.closest('[data-ir-compra]')) {
+      if (eu.logado) { location.hash = '#/compra'; return; }
+      location.href = 'conta.html?compra=1&voltar=' + encodeURIComponent('finalizar-compra.html#/compra');
+      return;
+    }
     if ((t = ev.target.closest('[data-etapa]'))) { st.etapa = t.getAttribute('data-etapa'); guardar(); pintar(); return; }
     if (ev.target.closest('[data-alterar-endereco]')) {
       raiz.querySelector('[data-endereco-campos]').hidden = false; raiz.querySelector('[data-endereco-caixa]').hidden = true; return;
