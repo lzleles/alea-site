@@ -3,20 +3,31 @@
 CATALOGO:
   nome: codigo-de-acesso (modelo de e-mail)
   categoria: MODELO
-  objetivo: O e-mail que leva o CÓDIGO DE ACESSO de 6 números da conta da ālea, no desenho do e-mail da Tiffany que o Cassiano mandou (print de 23/09/2026 20:41) e na identidade da ālea.
-  entrada: {{NOME}} (o PRIMEIRO NOME quando a conta já tem; senão o começo do e-mail), {{CODIGO}} (6 números, no assunto)
-           e {{D1}}..{{D6}} (os mesmos 6 números, um por caixinha) — trocados pelo servidor da conta (ZELES/Conta_Cliente)
+  objetivo: O e-mail que leva o CÓDIGO DE ACESSO de 6 números da conta da ālea, no desenho, nos textos e nas posições do e-mail da Tiffany que o Cassiano mandou (prints de 23/09/2026 20:41 e 23:06), na identidade da ālea.
+  entrada: {{NOME}} (o PRIMEIRO NOME quando a conta já tem; senão o começo do e-mail) e {{CODIGO}} (6 números) — trocados pelo servidor da conta (ZELES/Conta_Cliente) na hora de enviar
   saida: corpo HTML do e-mail
   status: prévia (23/09/2026) — o envio ainda não existe; quem liga é a casa quando o Lázaro escolher o remetente
   validado_em: 2026-09-23 (visto no navegador em 390 px e 600 px)
 
-ASSUNTO PROPOSTO:  Seu código de acesso é {{CODIGO}}
-REMETENTE PROPOSTO: ālea & Co. <cassianorosado@aleaco.art.br>  (o e-mail do negócio já declarado na política v2)
+HISTÓRICO
+  v1 (23:10) — estrutura da Tiffany + 3 ideias: números em caixinhas, rodapé claro, faixa preta.
+  v2 (23:30, áudios do Cassiano 23:24-23:27):
+    · "layout, imagens, pode permanecer tudo, inclusive a parte preta; agora TEXTOS, POSIÇÕES e TAMANHO DE TEXTO igual
+      exatamente à Tiffany";
+    · o código LIMPO, sem as caixinhas;
+    · o FUNDO da página inicial (degradê + estampa) no e-mail inteiro, e a estampa SE ABRE ao chegar nos números — a
+      mesma clareira que ela faz em volta da capivara na abertura do site (fundo_email.jpg já vem com a clareira);
+    · sai o "Encontre uma Loja"; no lugar dos ícones Facebook/Instagram/YouTube da Tiffany, SÓ o Linktree;
+    · todo e-mail de contato vira sac@aleaco.art.br ("acabei de criar", 23:26). Sai o "vale 10 minutos".
+
+ASSUNTO PROPOSTO:   Seu código de acesso é {{CODIGO}}
+REMETENTE PROPOSTO: ālea & Co. <sac@aleaco.art.br>   (decisão do Lázaro ao ligar o envio)
 
 REGRAS DE E-MAIL (por que este arquivo é "feio" por dentro):
   · tudo em TABELA e CSS EM LINHA — Gmail e Outlook ignoram <style> e flex;
-  · imagem em PNG com endereço ABSOLUTO — o Gmail não mostra SVG;
-  · nada de fonte baixada: a Defante não chega no e-mail; o título cai em Arial.
+  · imagem em PNG/JPG com endereço ABSOLUTO — o Gmail não mostra SVG;
+  · o fundo vai como background da célula: Gmail, Apple Mail e iPhone mostram; o Outlook de Windows fica no bege de reserva;
+  · a Defante não chega no e-mail; o texto cai em Arial;
   · o <script> do fim só existe pra PRÉVIA no navegador (preenche um exemplo); cliente de e-mail apaga script.
 -->
 <html lang="pt-BR">
@@ -27,86 +38,76 @@ REGRAS DE E-MAIL (por que este arquivo é "feio" por dentro):
 <title>Seu código de acesso é {{CODIGO}}</title>
 </head>
 <body style="margin:0;padding:0;background:#EAE4DB;">
-<!-- a linha que aparece na lista de e-mails, ao lado do assunto -->
-<div style="display:none;max-height:0;overflow:hidden;opacity:0;">Use este código para entrar na sua conta da ālea. Ele vale por 10 minutos.</div>
+<div style="display:none;max-height:0;overflow:hidden;opacity:0;">Seu código de acesso ālea é {{CODIGO}}</div>
 
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#EAE4DB;">
   <tr>
     <td align="center" style="padding:24px 12px;">
-      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;background:#F6F3EE;">
-
-        <!-- a marca -->
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;">
+        <!-- o fundo da página inicial: degradê + estampa, com a clareira em volta do código -->
         <tr>
-          <td align="center" style="padding:36px 24px 26px;">
-            <img data-img src="https://www.aleaco.art.br/modelos-email/logo_email.png" width="180" alt="ālea &amp; Co."
-                 style="display:block;width:180px;max-width:60%;height:auto;border:0;">
-          </td>
-        </tr>
-        <tr><td style="padding:0 24px;"><div style="height:1px;background:#D9D1C4;line-height:1px;font-size:1px;">&nbsp;</div></td></tr>
-
-        <!-- quem -->
-        <tr>
-          <td align="center" style="padding:40px 24px 8px;font-family:Arial,Helvetica,sans-serif;font-size:26px;line-height:32px;color:#2B2118;">
-            {{NOME}},
-          </td>
-        </tr>
-        <tr>
-          <td align="center" style="padding:18px 24px 0;font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:22px;color:#2B2118;">
-            Seu código de acesso ālea é:
-          </td>
-        </tr>
-
-        <!-- o código: o turquesa da Tiffany vira o terracota da ālea. IDEIA 1 (23/09/2026): cada número numa
-             caixinha, como a tela onde ele vai digitar — {{D1}}..{{D6}} são os 6 números, um por caixa. -->
-        <tr>
-          <td align="center" style="padding:32px 16px 36px;">
-            <table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr><td align="center" width="44" style="width:44px;height:54px;border:1px solid #CFC5B6;background:#FFFFFF;font-family:Arial,Helvetica,sans-serif;font-size:28px;line-height:54px;color:#924429;">{{D1}}</td><td width="8" style="width:8px;font-size:1px;">&nbsp;</td><td align="center" width="44" style="width:44px;height:54px;border:1px solid #CFC5B6;background:#FFFFFF;font-family:Arial,Helvetica,sans-serif;font-size:28px;line-height:54px;color:#924429;">{{D2}}</td><td width="8" style="width:8px;font-size:1px;">&nbsp;</td><td align="center" width="44" style="width:44px;height:54px;border:1px solid #CFC5B6;background:#FFFFFF;font-family:Arial,Helvetica,sans-serif;font-size:28px;line-height:54px;color:#924429;">{{D3}}</td><td width="8" style="width:8px;font-size:1px;">&nbsp;</td><td align="center" width="44" style="width:44px;height:54px;border:1px solid #CFC5B6;background:#FFFFFF;font-family:Arial,Helvetica,sans-serif;font-size:28px;line-height:54px;color:#924429;">{{D4}}</td><td width="8" style="width:8px;font-size:1px;">&nbsp;</td><td align="center" width="44" style="width:44px;height:54px;border:1px solid #CFC5B6;background:#FFFFFF;font-family:Arial,Helvetica,sans-serif;font-size:28px;line-height:54px;color:#924429;">{{D5}}</td><td width="8" style="width:8px;font-size:1px;">&nbsp;</td><td align="center" width="44" style="width:44px;height:54px;border:1px solid #CFC5B6;background:#FFFFFF;font-family:Arial,Helvetica,sans-serif;font-size:28px;line-height:54px;color:#924429;">{{D6}}</td></tr></table>
-          </td>
-        </tr>
-
-        <tr>
-          <td align="center" style="padding:0 40px;font-family:Arial,Helvetica,sans-serif;font-size:14px;line-height:22px;color:#2B2118;">
-            Para acessar sua conta ālea, por gentileza, insira o código no campo que permanece aberto em seu navegador.
-            O código vale por <strong>10 minutos</strong>.
-          </td>
-        </tr>
-        <tr>
-          <td align="center" style="padding:22px 40px 44px;font-family:Arial,Helvetica,sans-serif;font-size:14px;line-height:22px;color:#2B2118;">
-            Se houver alguma dúvida, por gentileza, não hesite em falar com a gente pelo e-mail
-            <a href="mailto:cassianorosado@aleaco.art.br" style="color:#924429;text-decoration:underline;">cassianorosado@aleaco.art.br</a>.
-          </td>
-        </tr>
-        <tr>
-          <td align="center" style="padding:0 40px 36px;font-family:Arial,Helvetica,sans-serif;font-size:12px;line-height:18px;color:#6B5D50;">
-            Não pediu este código? Pode ignorar este e-mail: sem o código, ninguém entra na sua conta.
-          </td>
-        </tr>
-
-        <!-- IDEIA 2: o rodapé claro da Tiffany ("Encontre uma Loja", redes, e-mail, por que você recebeu) — a ālea é
-             loja online, então vira "Conheça a loja". -->
-        <tr>
-          <td style="padding:0 24px 28px;">
-            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#EFE9E0;">
-              <tr><td align="center" style="padding:28px 20px 6px;font-family:Arial,Helvetica,sans-serif;font-size:16px;line-height:22px;">
-                <a href="https://www.aleaco.art.br/" style="color:#2B2118;text-decoration:none;">Conheça a loja</a>
-              </td></tr>
-              <tr><td align="center" style="padding:10px 20px 4px;font-family:Arial,Helvetica,sans-serif;font-size:13px;line-height:20px;">
-                <a href="https://www.instagram.com/alea.co_/" style="color:#924429;text-decoration:underline;">Instagram @alea.co_</a>
-                &nbsp;·&nbsp;
-                <a href="https://wa.me/5564999569994" style="color:#924429;text-decoration:underline;">WhatsApp</a>
-              </td></tr>
-              <tr><td align="center" style="padding:14px 20px 0;font-family:Arial,Helvetica,sans-serif;font-size:13px;line-height:20px;color:#2B2118;">
-                cassianorosado@aleaco.art.br
-              </td></tr>
-              <tr><td align="center" style="padding:16px 28px 26px;font-family:Arial,Helvetica,sans-serif;font-size:11.5px;line-height:17px;color:#6B5D50;">
-                Você recebeu este e-mail porque pediu um código de acesso no site da ālea. Ele não é propaganda:
-                a gente só manda novidades para quem marcar que quer recebê-las.
-              </td></tr>
+          <td data-fundo background="https://www.aleaco.art.br/modelos-email/fundo_email.jpg" bgcolor="#EFE9E0" valign="top"
+              style="background-color:#EFE9E0;background-image:url(https://www.aleaco.art.br/modelos-email/fundo_email.jpg);background-position:center top;background-repeat:no-repeat;">
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+              <tr>
+                <td align="center" style="padding:36px 24px 26px;">
+                  <img data-img src="https://www.aleaco.art.br/modelos-email/logo_email.png" width="180" alt="ālea &amp; Co."
+                       style="display:block;width:180px;max-width:60%;height:auto;border:0;">
+                </td>
+              </tr>
+              <tr><td style="padding:0 24px;"><div style="height:1px;background:#CFC5B6;line-height:1px;font-size:1px;">&nbsp;</div></td></tr>
+              <tr>
+                <td align="center" style="padding:42px 24px 0;font-family:Arial,Helvetica,sans-serif;font-size:30px;line-height:36px;color:#2B2118;">
+                  {{NOME}},
+                </td>
+              </tr>
+              <tr>
+                <td align="center" style="padding:40px 24px 0;font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:22px;color:#2B2118;">
+                  Seu código de acesso ālea é:
+                </td>
+              </tr>
+              <!-- o código LIMPO, como o da Tiffany; o turquesa dela vira o terracota da ālea -->
+              <tr>
+                <td data-codigo align="center" style="padding:48px 24px 52px 40px;font-family:Arial,Helvetica,sans-serif;font-size:34px;line-height:40px;letter-spacing:16px;color:#924429;">
+                  {{CODIGO}}
+                </td>
+              </tr>
+              <tr>
+                <td align="center" style="padding:0 36px;font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:24px;color:#2B2118;">
+                  Para acessar sua conta ālea, por gentileza, insira o código no campo que permanece aberto em seu navegador.
+                </td>
+              </tr>
+              <tr>
+                <td align="center" style="padding:28px 36px 56px;font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:24px;color:#2B2118;">
+                  Se houver alguma dúvida, por gentileza, não hesite em entrar em contato com o nosso Atendimento ao Cliente pelo e-mail
+                  <a href="mailto:sac@aleaco.art.br" style="color:#2B2118;text-decoration:underline;">sac@aleaco.art.br</a>.
+                </td>
+              </tr>
+              <!-- o rodapé claro, na ordem do da Tiffany (sem o "Encontre uma Loja"; só o Linktree nos ícones) -->
+              <tr>
+                <td style="padding:0 24px 32px;">
+                  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#F6F3EE;">
+                    <tr><td align="center" style="padding:34px 20px 0;">
+                      <a href="https://linktr.ee/eaibora.3d"><img data-img src="https://www.aleaco.art.br/modelos-email/icone_linktree.png" width="28" height="28" alt="Linktree" style="border:0;display:inline-block;"></a>
+                    </td></tr>
+                    <tr><td align="center" style="padding:40px 20px 0;font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:22px;color:#2B2118;">
+                      sac@aleaco.art.br
+                    </td></tr>
+                    <tr><td align="center" style="padding:34px 30px 0;font-family:Arial,Helvetica,sans-serif;font-size:14px;line-height:22px;color:#2B2118;">
+                      Você está recebendo este e-mail porque pediu um código de acesso no site da ālea. Caso deseje que seu e-mail seja
+                      removido de nossa lista de contatos, por gentileza, entrar em contato com o Atendimento ao Cliente.
+                    </td></tr>
+                    <tr><td align="center" style="padding:26px 30px 34px;font-family:Arial,Helvetica,sans-serif;font-size:14px;line-height:22px;color:#2B2118;">
+                      Para obter mais informações, não hesite em entrar em contato com nosso Atendimento ao Cliente por e-mail através de
+                      <a href="mailto:sac@aleaco.art.br" style="color:#2B2118;text-decoration:underline;">sac@aleaco.art.br</a>.
+                    </td></tr>
+                  </table>
+                </td>
+              </tr>
             </table>
           </td>
         </tr>
-
-        <!-- IDEIA 3: fecha com a faixa preta do site — a mesma assinatura que a pessoa vê no rodapé da loja -->
+        <!-- a faixa preta do site fecha o e-mail -->
         <tr>
           <td align="center" style="background:#000000;padding:30px 24px 28px;">
             <a href="https://www.aleaco.art.br/" style="text-decoration:none;">
@@ -129,13 +130,12 @@ REGRAS DE E-MAIL (por que este arquivo é "feio" por dentro):
     var q = new URLSearchParams(location.search);
     var nome = q.get('nome') || 'cassianorosado', codigo = q.get('codigo') || '566753';
     document.title = document.title.replace('{{CODIGO}}', codigo);
-    var h = document.body.innerHTML.split('{{NOME}}').join(nome).split('{{CODIGO}}').join(codigo);
-    for (var i = 1; i <= 6; i++) h = h.split('{{D' + i + '}}').join(codigo.charAt(i - 1));
-    document.body.innerHTML = h;
+    document.body.innerHTML = document.body.innerHTML.split('{{NOME}}').join(nome).split('{{CODIGO}}').join(codigo);
     if (!/aleaco\.art\.br$/.test(location.hostname)) {
-      Array.prototype.forEach.call(document.querySelectorAll('img[data-img]'), function (i) {
-        i.src = i.src.replace('https://www.aleaco.art.br/modelos-email/', '');
-      });
+      var troca = function (u) { return u.replace('https://www.aleaco.art.br/modelos-email/', ''); };
+      Array.prototype.forEach.call(document.querySelectorAll('img[data-img]'), function (i) { i.src = troca(i.src); });
+      var f = document.querySelector('[data-fundo]');
+      f.style.backgroundImage = 'url(fundo_email.jpg)';
     }
   })();
 </script>
