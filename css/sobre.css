@@ -1,0 +1,45 @@
+/* CATALOGO:
+   nome: sobre.css
+   categoria: UTIL
+   objetivo: O visual da página "Quem é a ālea" (a-alea.html) reescrita com a história do nome, da capivara e do low poly: a abertura com o dado facetado e "alea iacta est", as seções da história e o bloco prático.
+   entrada: variáveis de cor e fonte do estilo.css
+   saida: estilos .sobre-*
+   status: prévia (24/09/2026)
+   validado_em: 2026-09-24 (print em 390 px e 1280 px)
+*/
+/* Pedido do Cassiano (24/09/2026, 00:08-00:10, áudios): a história do nome ālea (César, o Rubicão, "a sorte está
+   lançada"), a da capivara e a do low poly — "capricha e me surpreenda". A surpresa é o DADO: o "alea" do latim é o
+   dado, e ele aparece desenhado em facetas, como a capivara, rolando uma vez ao abrir a página. */
+
+.sobre-abertura { text-align: center; padding: 8px 0 30px; }
+.sobre-dado { width: 132px; height: 132px; margin: 6px auto 22px; display: block; }
+.sobre-dado .rola { transform-origin: 60px 64px; animation: sobre-rolar 1.6s cubic-bezier(.2, .8, .2, 1) .15s both; }
+@keyframes sobre-rolar {
+  0%   { transform: translate(-70px, -40px) rotate(-200deg) scale(.7); opacity: 0; }
+  60%  { transform: translate(6px, 2px) rotate(12deg) scale(1.02); opacity: 1; }
+  80%  { transform: translate(-2px, 0) rotate(-4deg); }
+  100% { transform: none; opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) { .sobre-dado .rola { animation: none; } }
+
+.sobre-latim { font-family: var(--fonte-titulo); font-weight: 500; font-size: clamp(2.3rem, 9vw, 3.6rem); line-height: 1.02;
+  color: var(--terracota); margin: 0; letter-spacing: .01em; }
+.sobre-traducao { margin: 10px 0 0; font-size: 15px; color: var(--tinta-fraca); letter-spacing: .12em; text-transform: uppercase; }
+.sobre-assinatura-topo { margin: 26px auto 0; max-width: 34ch; font-size: 16.5px; line-height: 1.55; color: var(--tinta); }
+
+.sobre-secao { margin: 46px 0 0; }
+.sobre-secao h2 { display: flex; align-items: center; gap: 12px; }
+.sobre-secao h2::before { content: ''; width: 14px; height: 14px; flex: none; background: var(--dourado);
+  clip-path: polygon(50% 0, 100% 100%, 0 100%); }
+.sobre-secao p { line-height: 1.7; }
+.sobre-destaque { font-family: var(--fonte-titulo); font-size: 1.35rem; line-height: 1.35; color: var(--terracota);
+  margin: 26px 0; padding: 4px 0 4px 16px; border-left: 3px solid var(--dourado); }
+
+.texto img.sobre-capivara { display: block; width: min(240px, 66%) !important; max-width: none; height: auto; margin: 14px auto 20px; }
+
+.sobre-pratico { margin: 56px 0 0; padding: 26px 0 0; border-top: 1px solid var(--borda); }
+.sobre-pratico h2:first-child { margin-top: 0; }
+
+.sobre-fecho { text-align: center; margin: 52px 0 0; }
+.sobre-fecho .sobre-latim { font-size: clamp(1.6rem, 6vw, 2.2rem); }
+.sobre-fecho p { margin: 10px 0 22px; color: var(--tinta-fraca); }

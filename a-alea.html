@@ -20,6 +20,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@300;400;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/estilo.css">
+<link rel="stylesheet" href="css/sobre.css">
 </head>
 <body>
 <a class="pular" href="#conteudo">Pular para o conteúdo</a>
@@ -66,49 +67,121 @@
 </header>
 <!-- /ALEA:TOPO -->
 <main id="conteudo" class="pagina">
+<!-- ETAPA 70 (24/09/2026, áudios do Cassiano 00:08-00:10: "capricha e me surpreenda"): a página ganhou a história do
+     nome (César, o Rubicão, "a sorte está lançada"), da capivara e do low poly. O bloco prático de antes (o que faz,
+     sob encomenda, quem faz, a marca) continua, embaixo. Estilo em css/sobre.css. -->
 <div class="embrulho texto">
   <a class="voltar" href="index.html">← voltar para o feed</a>
-  <h1>Quem é a ālea</h1>
-  <p class="atualizado">Jataí, Goiás · impressão 3D sob encomenda</p>
 
-  <p>
-    A ālea nasceu do <a href="https://www.instagram.com/eaibora.3d/" target="_blank" rel="noopener">eaí, bora?</a>,
-    o canal onde o Cassiano Rosado mostra impressão 3D há anos para milhares de pessoas.
-    Primeiro veio o gosto pela máquina; a marca veio depois, quando ficou claro que dava
-    para fazer uma peça que ninguém mais tem.
-  </p>
+  <header class="sobre-abertura">
+    <!-- o dado facetado: "alea" é o dado, em latim; desenhado em triângulos como a capivara, rola uma vez ao abrir -->
+    <svg class="sobre-dado" viewBox="0 0 120 128" role="img" aria-label="Um dado desenhado em facetas">
+      <g class="rola">
+        <polygon points="60,14 103,39 60,39" fill="#DCC395"/><polygon points="60,14 60,39 17,39" fill="#CDB07F"/>
+        <polygon points="17,39 60,39 60,64" fill="#C4A46F"/><polygon points="60,39 103,39 60,64" fill="#D3B886"/>
+        <polygon points="17,39 60,64 17,89" fill="#9A4A2D"/><polygon points="60,64 60,114 17,89" fill="#86391F"/>
+        <polygon points="60,64 103,39 103,89" fill="#C27D46"/><polygon points="60,64 103,89 60,114" fill="#AE6A36"/>
+        <ellipse cx="60" cy="39" rx="6" ry="3.5" fill="#F6F3EE"/>
+        <ellipse cx="29" cy="60" rx="3.2" ry="4.4" fill="#F6F3EE" transform="skewY(30 29 60)"/>
+        <ellipse cx="48" cy="93" rx="3.2" ry="4.4" fill="#F6F3EE" transform="skewY(30 48 93)"/>
+        <ellipse cx="70.8" cy="70.3" rx="3.2" ry="4.4" fill="#F6F3EE" transform="skewY(-30 70.8 70.3)"/>
+        <ellipse cx="81.5" cy="76.5" rx="3.2" ry="4.4" fill="#F6F3EE" transform="skewY(-30 81.5 76.5)"/>
+        <ellipse cx="92.3" cy="82.8" rx="3.2" ry="4.4" fill="#F6F3EE" transform="skewY(-30 92.3 82.8)"/>
+      </g>
+    </svg>
+    <h1 class="sobre-latim">alea iacta est</h1>
+    <p class="sobre-traducao">a sorte está lançada</p>
+    <p class="sobre-assinatura-topo">Toda marca tem um começo. O da ālea foi um dado jogado numa madrugada, e que nunca mais voltou pra mão.</p>
+  </header>
 
-  <h2>O que a ālea faz</h2>
-  <p>
-    Comedouros e acessórios para cães, impressos em 3D, com o nome do animal na própria
-    peça. O nome não é adesivo: sai em baixo relevo, na cor do objeto, impresso junto —
-    e por isso não descasca nem sai na lavagem. As cores são escolhidas por você, e o
-    porta-saquinho sai combinando com o comedouro.
-  </p>
+  <section class="sobre-secao">
+    <h2>O dado lançado</h2>
+    <p>
+      Em 49 a.C., Júlio César parou na margem do Rubicão, o rio que nenhum general podia atravessar com seu exército sem
+      declarar guerra a Roma. Ele atravessou. E, do outro lado, disse a frase que ficou: <em>alea iacta est</em>, "a sorte está
+      lançada". <em>Alea</em>, em latim, é o dado: o acaso, o jogo, aquilo que, depois de lançado, não volta mais pra mão.
+    </p>
+    <p>
+      A ālea nasceu de um lançamento assim. Eu estava passando por um dos momentos mais difíceis da minha vida. Estava perdido,
+      sem saber pra que lado ir. Numa dessas noites, sem procurar nada, vi um vídeo de impressão 3D. Foi um choque de realidade:
+      ali estava criar, inventar, fazer existir todo dia uma coisa que ontem não existia. Era aquilo.
+    </p>
+    <p>
+      Comprei minha primeira impressora naquela mesma madrugada, por impulso. No dia seguinte, pensando no nome, esbarrei na
+      história de César, no dado lançado, no rio que não se atravessa de volta. E percebi que eu já estava do outro lado.
+      A impressora estava comprada, a decisão estava tomada, e no fundo do coração eu sabia que não queria voltar. Acredito
+      que foi Deus colocando esse caminho na minha frente, do jeito mais aleatório possível.
+    </p>
+    <p class="sobre-destaque">Por isso ālea: um acaso que virou escolha.</p>
+  </section>
 
-  <h2>Por que sob encomenda</h2>
-  <p>
-    Porque cada peça é de um cão só. Nada fica pronto esperando comprador: Sob encomenda, 3 dias úteis após a confirmação de pagamento.
-    É esse tempo que separa um comedouro genérico de um que é do seu cachorro.
-  </p>
+  <section class="sobre-secao">
+    <h2>A capivara</h2>
+    <img class="sobre-capivara" src="img/marca/e_co/capivara_recortada.svg" alt="A capivara da ālea, desenhada em triângulos" width="240" height="146" decoding="async">
+    <p>
+      Antes mesmo de existir o nome ālea, eu já sabia que a minha marca teria uma capivara. Ela é brasileira como a gente,
+      é bicho do Cerrado, de Goiás, da minha terra. É dócil, é carinhosa, convive com todo mundo e não faz mal a ninguém.
+      Pra mim, ela representa amor. Representa quem eu sou.
+    </p>
+    <p>
+      E ela é feita de triângulos porque eu sempre fui apaixonado pelo <em>low poly</em>: formas desenhadas com poucas faces,
+      pedaços que, sozinhos, parecem soltos e aleatórios, mas que juntos formam alguma coisa. É a mesma geometria da estampa
+      que você vê no fundo deste site.
+    </p>
+    <p class="sobre-destaque">Acaso que vira forma. Tinha que ser ālea, e tinha que ser a capivara.</p>
+  </section>
 
-  <h2>Quem faz</h2>
-  <p>
-    Cassiano Rosado, em Jataí, Goiás. As impressoras são dele, a arte é feita por ele, e
-    quem responde no WhatsApp é ele. Se algo sair errado, você fala com a pessoa que fez
-    — não com um atendimento.
-  </p>
+  <section class="sobre-secao">
+    <h2>O jeito ālea</h2>
+    <p>
+      Esse jeito de desenhar virou regra da casa. Antes de criar qualquer peça, a primeira pergunta é: dá pra fazer em low poly?
+      O nosso comedouro principal nasceu assim, todo em facetas. Quando a forma pede, a gente respeita. Mas, se der pra ser
+      geométrico, vai ser.
+    </p>
+    <p>
+      E é por isso também que eu sou chato. Chato com detalhe, com acabamento, com entrega. Escolho o melhor filamento, refaço
+      a peça que saiu um milímetro fora do rumo e reviso cada nome antes de imprimir.
+    </p>
+    <p class="sobre-destaque">O dado foi lançado uma vez. O cuidado, eu escolho todo dia.</p>
+    <p style="text-align:right;color:var(--tinta-fraca)">— Cassiano Rosado</p>
+  </section>
 
-  <h2>A marca</h2>
-  <p>
-    A capivara geométrica e a paleta de barro, azul e dourado são de autoria da designer
-    Mirella Gaetti, de Jataí. O grafismo facetado que aparece na embalagem é o mesmo
-    desenho que se move nas fotos deste site.
-  </p>
+  <div class="sobre-pratico">
+    <h2>O que a ālea faz</h2>
+    <p>
+      Comedouros e acessórios para cães, impressos em 3D, com o nome do animal na própria
+      peça. O nome não é adesivo: sai em baixo relevo, na cor do objeto, impresso junto —
+      e por isso não descasca nem sai na lavagem. As cores são escolhidas por você, e o
+      porta-saquinho sai combinando com o comedouro.
+    </p>
 
-  <p style="margin-top:34px">
+    <h2>Por que sob encomenda</h2>
+    <p>
+      Porque cada peça é de um cão só. Nada fica pronto esperando comprador: Sob encomenda, 3 dias úteis após a confirmação de pagamento.
+      É esse tempo que separa um comedouro genérico de um que é do seu cachorro.
+    </p>
+
+    <h2>Quem faz</h2>
+    <p>
+      Cassiano Rosado, em Jataí, Goiás, também à frente do canal
+      <a href="https://www.instagram.com/eaibora.3d/" target="_blank" rel="noopener">eaí, bora?</a>, onde mostra impressão 3D
+      pra milhares de pessoas. As impressoras são dele, a arte é feita por ele, e quem responde no WhatsApp é ele. Se algo
+      sair errado, você fala com a pessoa que fez — não com um atendimento.
+    </p>
+
+    <h2>A marca</h2>
+    <p>
+      A capivara geométrica e a paleta de barro, azul e dourado são de autoria da designer
+      Mirella Gaetti, de Jataí. O grafismo facetado que aparece na embalagem é o mesmo
+      desenho que se move nas fotos deste site.
+    </p>
+  </div>
+
+  <div class="sobre-fecho">
+    <p class="sobre-latim">a sorte está lançada.</p>
+    <p>Agora é a sua peça.</p>
     <a class="botao zap" data-assunto="quero falar sobre uma peça da ālea">Falar com o Cassiano</a>
-  </p>
+  </div>
 </div>
 </main>
 <!-- ALEA:RODAPE -->
