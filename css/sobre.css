@@ -1,45 +1,65 @@
 /* CATALOGO:
    nome: sobre.css
    categoria: UTIL
-   objetivo: O visual da página "Quem é a ālea" (a-alea.html) reescrita com a história do nome, da capivara e do low poly: a abertura com o dado facetado e "alea iacta est", as seções da história e o bloco prático.
-   entrada: variáveis de cor e fonte do estilo.css
+   objetivo: O visual da página "Quem é a ālea" (a-alea.html) com o texto do Cassiano: fundo em degradê com a estampa geométrica da página inicial, o texto correndo por cima, frases de destaque e o fecho "No fim, tudo se conecta" aparecendo linha a linha.
+   entrada: variáveis de cor e fonte do estilo.css; img/marca/estampa_off_ladrilho.svg
    saida: estilos .sobre-*
    status: prévia (24/09/2026)
    validado_em: 2026-09-24 (print em 390 px e 1280 px)
 */
-/* Pedido do Cassiano (24/09/2026, 00:08-00:10, áudios): a história do nome ālea (César, o Rubicão, "a sorte está
-   lançada"), a da capivara e a do low poly — "capricha e me surpreenda". A surpresa é o DADO: o "alea" do latim é o
-   dado, e ele aparece desenhado em facetas, como a capivara, rolando uma vez ao abrir a página. */
+/* v2 (24/09/2026 00:58, Cassiano): "não quero essa abertura com dado" — ālea pra ele é SORTE ("já estava escrito"),
+   não jogo. O texto agora é DELE, palavra por palavra; a página ganhou "outro degradê com esse fundo geométrico, mais
+   bonito, mais interativo, e deixar o texto fluir". O dado da v1 saiu (a v1 está no histórico do git).
 
-.sobre-abertura { text-align: center; padding: 8px 0 30px; }
-.sobre-dado { width: 132px; height: 132px; margin: 6px auto 22px; display: block; }
-.sobre-dado .rola { transform-origin: 60px 64px; animation: sobre-rolar 1.6s cubic-bezier(.2, .8, .2, 1) .15s both; }
-@keyframes sobre-rolar {
-  0%   { transform: translate(-70px, -40px) rotate(-200deg) scale(.7); opacity: 0; }
-  60%  { transform: translate(6px, 2px) rotate(12deg) scale(1.02); opacity: 1; }
-  80%  { transform: translate(-2px, 0) rotate(-4deg); }
-  100% { transform: none; opacity: 1; }
-}
-@media (prefers-reduced-motion: reduce) { .sobre-dado .rola { animation: none; } }
+   O FUNDO: o mesmo desenho da abertura do site (três manchas de cor sobre o bege + a estampa em ladrilho), numa camada
+   FIXA atrás da página — o texto rola e o fundo fica, como uma parede. Camada própria (e não background-attachment:
+   fixed) porque o Safari do iPhone ignora o fixed.
+   O INTERATIVO: cada bloco sobe e aparece quando chega na tela, e o fecho "No fim, tudo se conecta" acende linha a
+   linha (o script mora no próprio a-alea.html, IntersectionObserver). Quem pediu menos movimento no aparelho vê tudo parado. */
 
-.sobre-latim { font-family: var(--fonte-titulo); font-weight: 500; font-size: clamp(2.3rem, 9vw, 3.6rem); line-height: 1.02;
-  color: var(--terracota); margin: 0; letter-spacing: .01em; }
-.sobre-traducao { margin: 10px 0 0; font-size: 15px; color: var(--tinta-fraca); letter-spacing: .12em; text-transform: uppercase; }
-.sobre-assinatura-topo { margin: 26px auto 0; max-width: 34ch; font-size: 16.5px; line-height: 1.55; color: var(--tinta); }
+body.sobre { background: #EAE4DB; }
+.sobre-fundo { position: fixed; inset: 0; z-index: -1; pointer-events: none;
+  background:
+    radial-gradient(900px 620px at 12% 8%, rgba(118, 149, 165, .55), transparent 62%),
+    radial-gradient(820px 600px at 92% 40%, rgba(170, 150, 97, .50), transparent 60%),
+    radial-gradient(1000px 720px at 40% 104%, rgba(146, 68, 41, .40), transparent 64%),
+    linear-gradient(170deg, #F8F5F0 0%, #EAE4DB 55%, #E2D6C6 100%); }
+.sobre-fundo::before { content: ''; position: absolute; inset: 0;
+  background: url(../img/marca/estampa_off_ladrilho.svg) left top / 900px auto repeat; opacity: .45; }
 
-.sobre-secao { margin: 46px 0 0; }
-.sobre-secao h2 { display: flex; align-items: center; gap: 12px; }
-.sobre-secao h2::before { content: ''; width: 14px; height: 14px; flex: none; background: var(--dourado);
-  clip-path: polygon(50% 0, 100% 100%, 0 100%); }
-.sobre-secao p { line-height: 1.7; }
-.sobre-destaque { font-family: var(--fonte-titulo); font-size: 1.35rem; line-height: 1.35; color: var(--terracota);
-  margin: 26px 0; padding: 4px 0 4px 16px; border-left: 3px solid var(--dourado); }
+.sobre .texto { max-width: 62ch; }
+.sobre-texto p { font-size: 17px; line-height: 1.75; margin: 0 0 18px; color: var(--tinta); }
+.sobre-abre { font-family: var(--fonte-titulo); font-weight: 500; font-size: clamp(1.7rem, 6.4vw, 2.5rem) !important;
+  line-height: 1.2 !important; color: var(--terracota) !important; margin: 18px 0 34px !important; }
+.sobre-momento { font-family: var(--fonte-titulo); font-size: 1.3rem !important; line-height: 1.4 !important;
+  color: var(--terracota) !important; padding-left: 16px; border-left: 3px solid var(--dourado); margin: 30px 0 !important; }
+.sobre-grande { font-family: var(--fonte-titulo); font-weight: 500; text-align: center; color: var(--terracota) !important;
+  font-size: clamp(1.9rem, 7vw, 2.6rem) !important; line-height: 1.15 !important; margin: 40px 0 6px !important; }
+.sobre-grande + .sobre-sub { text-align: center; font-size: 18px !important; letter-spacing: .04em; color: var(--tinta-fraca) !important;
+  margin-bottom: 40px !important; }
+.sobre-texto h2 { font-family: var(--fonte-titulo); font-weight: 500; font-size: clamp(1.5rem, 5.4vw, 2rem); line-height: 1.2;
+  color: var(--terracota); margin: 58px 0 18px; }
+.sobre-ponte { font-style: italic; color: var(--tinta-fraca) !important; }
+.sobre-pergunta { font-family: var(--fonte-titulo); text-align: center; font-size: 1.5rem !important; color: var(--terracota) !important;
+  margin: 30px 0 !important; }
+.texto img.sobre-capivara { display: block; width: min(240px, 66%) !important; max-width: none; height: auto; margin: 6px auto 26px; }
 
-.texto img.sobre-capivara { display: block; width: min(240px, 66%) !important; max-width: none; height: auto; margin: 14px auto 20px; }
+/* o fecho: as palavras da lista dele, uma por linha, acendendo em sequência */
+.sobre-conecta { list-style: none; padding: 0; margin: 10px 0 34px; text-align: center; }
+.sobre-conecta li { font-family: var(--fonte-titulo); font-size: clamp(1.25rem, 5vw, 1.6rem); line-height: 1.5; color: var(--terracota); }
+.sobre-conecta li:last-child { font-family: var(--fonte-corpo); font-size: 17px; line-height: 1.6; color: var(--tinta); margin-top: 12px; }
+.sobre-final { font-family: var(--fonte-titulo); font-weight: 500; text-align: center; font-size: clamp(2.1rem, 8vw, 3rem) !important;
+  line-height: 1.1 !important; color: var(--terracota) !important; margin: 26px 0 50px !important; }
 
-.sobre-pratico { margin: 56px 0 0; padding: 26px 0 0; border-top: 1px solid var(--borda); }
+/* o bloco prático (o que existia na página) fica embaixo, numa caixa clara pra não competir com a história */
+.sobre-pratico { background: rgba(246, 243, 238, .82); padding: 22px 20px 6px; border-radius: var(--raio); margin: 10px 0 40px; }
+.sobre-pratico h2 { font-size: 1.2rem; margin: 18px 0 8px; }
 .sobre-pratico h2:first-child { margin-top: 0; }
+.sobre-pratico p { font-size: 15.5px; line-height: 1.65; }
+.sobre-contato { text-align: center; margin: 0 0 20px; }
 
-.sobre-fecho { text-align: center; margin: 52px 0 0; }
-.sobre-fecho .sobre-latim { font-size: clamp(1.6rem, 6vw, 2.2rem); }
-.sobre-fecho p { margin: 10px 0 22px; color: var(--tinta-fraca); }
+/* aparecer ao chegar na tela */
+.sobre .revela { opacity: 0; transform: translateY(18px); transition: opacity .8s ease, transform .8s ease; }
+.sobre .revela.visto { opacity: 1; transform: none; }
+.sobre-conecta li.revela { transition-duration: .6s; }
+@media (prefers-reduced-motion: reduce) { .sobre .revela { opacity: 1; transform: none; transition: none; } }
