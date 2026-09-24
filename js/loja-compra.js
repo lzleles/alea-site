@@ -145,8 +145,8 @@
       (eu.logado ? '' : '<p class="loja-miudo" style="margin:-6px 0 14px">Já tem conta? <a href="conta.html?voltar=finalizar-compra.html%23%2Fcompra" style="color:var(--terracota)">Entrar</a></p>') +
       '<form data-form="dados" novalidate>' +
       '<label class="loja-campo"><span>E-mail</span><input name="email" type="email" autocomplete="email" inputmode="email" value="' + esc(d.email) + '"' + trava + '></label>' +
-      '<label class="loja-campo"><span>Primeiro nome</span><input name="nome" autocomplete="given-name" maxlength="60" value="' + esc(d.nome) + '"></label>' +
-      '<label class="loja-campo"><span>Último nome</span><input name="sobrenome" autocomplete="family-name" maxlength="80" value="' + esc(d.sobrenome) + '"></label>' +
+      '<label class="loja-campo"><span>Nome</span><input name="nome" autocomplete="given-name" maxlength="60" value="' + esc(d.nome) + '"></label>' +
+      '<label class="loja-campo"><span>Sobrenome</span><input name="sobrenome" autocomplete="family-name" maxlength="80" value="' + esc(d.sobrenome) + '"></label>' +
       '<div class="loja-dupla">' +
         '<label class="loja-campo"><span>CPF</span><input name="cpf" inputmode="numeric" maxlength="14" placeholder="999.999.999-99" value="' + esc(mascaraCpf(d.cpf)) + '"></label>' +
         '<label class="loja-campo"><span>Telefone</span><input name="telefone" type="tel" inputmode="tel" autocomplete="tel-national" maxlength="15" placeholder="(64) 99999-9999" value="' + esc(mascaraTelefone(d.telefone)) + '"></label>' +
@@ -297,6 +297,13 @@
     });
   }
 
+  /* ETAPA 66 (22:51, Cassiano): faltou algo obrigatório → a tela TREME (a tremida do site) e o cursor vai direto
+     pro primeiro campo que falta, já ativo. Antes só mudava a cor — discreto demais. */
+  function tremerEIr(el) {
+    raiz.classList.remove('loja-tremendo'); void raiz.offsetWidth; raiz.classList.add('loja-tremendo');
+    if (el) { try { el.focus({ preventScroll: true }); } catch (x) { el.focus(); } el.scrollIntoView({ block: 'center', behavior: 'smooth' }); }
+  }
+
   function marcaFalta(form, nome, ok, dica) {
     var el = form.querySelector('[name="' + nome + '"]');
     var lab = el && el.closest('.loja-campo, .loja-marca');
@@ -318,12 +325,12 @@
                 telefone: v('telefone').replace(/\D/g, ''), consent_marketing: v('consent_marketing'),
                 aceite_politica: f.querySelector('[name="aceite_politica"]') ? v('aceite_politica') : true };
       var ok = [marcaFalta(f, 'email', L.emailValido(d.email), 'Digite um e-mail válido'),
-                marcaFalta(f, 'nome', !!d.nome, 'Preencha o primeiro nome'),
-                marcaFalta(f, 'sobrenome', !!d.sobrenome, 'Preencha o último nome'),
+                marcaFalta(f, 'nome', !!d.nome, 'Preencha o nome'),
+                marcaFalta(f, 'sobrenome', !!d.sobrenome, 'Preencha o sobrenome'),
                 marcaFalta(f, 'cpf', cpfValido(d.cpf), d.cpf ? 'CPF inválido' : 'Preencha o CPF'),
                 marcaFalta(f, 'telefone', d.telefone.length >= 10, 'Telefone com DDD'),
                 marcaFalta(f, 'aceite_politica', !!d.aceite_politica)].every(Boolean);
-      if (!ok) { var p = f.querySelector('.faltou input'); if (p) p.focus(); return; }
+      if (!ok) { tremerEIr(f.querySelector('.faltou input')); return; }
       st.dados = d; st.etapa = 'entrega';
       if (!st.entrega.destinatario) st.entrega.destinatario = nomeCompleto();
       guardar();
@@ -350,6 +357,7 @@
       if (!ok2) {
         var campos = raiz.querySelector('[data-endereco-campos]');
         if (campos && campos.querySelector('.faltou')) { campos.hidden = false; raiz.querySelector('[data-endereco-caixa]').hidden = true; }
+        tremerEIr(f.querySelector('.faltou input'));
         return;
       }
       e.editando = false; st.etapa = 'pagamento'; guardar();

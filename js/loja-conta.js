@@ -143,7 +143,16 @@
     if (voltar) { location.href = voltar; return; }
     ir('');
   }
-  function falhou(e) { erro = e.message || 'Não deu certo agora. Tente de novo.'; pintar(); }
+  /* ETAPA 66 (22:51, Cassiano): "toda vez que tiver alguma coisa errada, o site vai tremer e o cursor vai direto
+     pra onde está faltando a informação" — a mesma tremida do site (@keyframes tremer, estilo.css). */
+  function tremerEIr(el) {
+    raiz.classList.remove('loja-tremendo'); void raiz.offsetWidth; raiz.classList.add('loja-tremendo');
+    if (el) { try { el.focus({ preventScroll: true }); } catch (x) { el.focus(); } el.scrollIntoView({ block: 'center', behavior: 'smooth' }); }
+  }
+  function falhou(e, campo) {
+    erro = e.message || 'Não deu certo agora. Tente de novo.'; pintar();
+    tremerEIr(campo ? raiz.querySelector('[name="' + campo + '"]') : null);
+  }
 
   /* ============================================================= MINHA CONTA */
   var MENU = [['dados', 'Dados pessoais'], ['enderecos', 'Endereços'], ['pedidos', 'Pedidos'],
@@ -195,8 +204,8 @@
     return cabecaSecao('Dados pessoais') +
       '<form data-form="dados" novalidate>' +
       '<label class="loja-campo"><span>E-mail</span><input value="' + esc(e.email) + '" readonly aria-readonly="true"></label>' +
-      '<label class="loja-campo"><span>Primeiro nome</span><input name="nome" autocomplete="given-name" maxlength="60" value="' + esc(e.nome) + '"></label>' +
-      '<label class="loja-campo"><span>Último nome</span><input name="sobrenome" autocomplete="family-name" maxlength="80" value="' + esc(e.sobrenome) + '"></label>' +
+      '<label class="loja-campo"><span>Nome</span><input name="nome" autocomplete="given-name" maxlength="60" value="' + esc(e.nome) + '"></label>' +
+      '<label class="loja-campo"><span>Sobrenome</span><input name="sobrenome" autocomplete="family-name" maxlength="80" value="' + esc(e.sobrenome) + '"></label>' +
       '<div class="loja-dupla">' +
         '<label class="loja-campo"><span>CPF</span><input name="cpf" inputmode="numeric" maxlength="14" placeholder="999.999.999-99" value="' + esc(mascaraCpf(e.cpf)) + '"></label>' +
         '<label class="loja-campo"><span>Telefone</span><input name="telefone" type="tel" inputmode="tel" autocomplete="tel-national" maxlength="15" placeholder="(64) 99999-9999" value="' + esc(mascaraTelefone(e.telefone)) + '"></label>' +
@@ -228,8 +237,8 @@
       if (!ok) { faltas.push(nome); if (dica && lab.classList.contains('loja-campo')) lab.insertAdjacentHTML('beforeend', '<small class="dica-erro">' + dica + '</small>'); }
     }
     var v = function (n) { var el = form.querySelector('[name="' + n + '"]'); return el ? (el.type === 'checkbox' ? el.checked : el.value.trim()) : ''; };
-    marca('nome', !!v('nome'), 'Preencha o primeiro nome');
-    marca('sobrenome', !!v('sobrenome'), 'Preencha o último nome');
+    marca('nome', !!v('nome'), 'Preencha o nome');
+    marca('sobrenome', !!v('sobrenome'), 'Preencha o sobrenome');
     marca('cpf', cpfValido(v('cpf')), v('cpf') ? 'CPF inválido' : 'Preencha o CPF');
     marca('telefone', v('telefone').replace(/\D/g, '').length >= 10, 'Telefone com DDD');
     if (form.querySelector('[name="aceite_politica"]')) marca('aceite_politica', v('aceite_politica'));
@@ -388,23 +397,23 @@
     var pronto = function (p) { ocupado(f, true); return p.catch(function (e) { ocupado(f, false); falhou(e); }); };
 
     if (tipo === 'senha') {
-      if (!L.emailValido(v('email'))) return falhou(new Error('Digite um e-mail válido.'));
-      if (!v('senha')) return falhou(new Error('Digite sua senha.'));
+      if (!L.emailValido(v('email'))) return falhou(new Error('Digite um e-mail válido.'), 'email');
+      if (!v('senha')) return falhou(new Error('Digite sua senha.'), 'senha');
       return pronto(L.entrarSenha(v('email').toLowerCase(), v('senha')).then(entrou));
     }
     if (tipo === 'codigo-pedir') {
       var email = v('email').toLowerCase();
-      if (!L.emailValido(email)) return falhou(new Error('Digite um e-mail válido.'));
+      if (!L.emailValido(email)) return falhou(new Error('Digite um e-mail válido.'), 'email');
       return pronto(L.enviarCodigo(email).then(function () { codigoPara = email; pintar(); }));
     }
     if (tipo === 'codigo-digitar') {
-      if (v('codigo').length !== 6) return falhou(new Error('O código tem 6 números.'));
+      if (v('codigo').length !== 6) return falhou(new Error('O código tem 6 números.'), 'codigo');
       return pronto(L.entrarCodigo(codigoPara, v('codigo')).then(entrou));
     }
     if (tipo === 'dados') {
       var faltas = validarDados(f);
       if (faltas.length) {
-        var primeiro = f.querySelector('.faltou input, .faltou'); if (primeiro && primeiro.focus) primeiro.focus();
+        tremerEIr(f.querySelector('.faltou input'));
         return;
       }
       return pronto(L.salvarFicha({ nome: v('nome'), sobrenome: v('sobrenome'), cpf: v('cpf').replace(/\D/g, ''),
@@ -419,14 +428,13 @@
     if (tipo === 'endereco') {
       var d = { cep: v('cep').replace(/\D/g, ''), logradouro: v('logradouro'), numero: v('numero'), complemento: v('complemento'),
                 bairro: v('bairro'), cidade: v('cidade'), uf: v('uf').toUpperCase(), apelido: 'casa' };
-      if (d.cep.length !== 8 || !d.logradouro || !d.numero || !d.cidade || d.uf.length !== 2) {
-        return falhou(new Error('Preencha CEP, rua, número, cidade e UF.'));
-      }
+      var falta = d.cep.length !== 8 ? 'cep' : !d.logradouro ? 'logradouro' : !d.numero ? 'numero' : !d.cidade ? 'cidade' : d.uf.length !== 2 ? 'uf' : '';
+      if (falta) { tremerEIr(f.querySelector('[name="' + falta + '"]')); return; }
       return pronto(L.guardarEndereco(d).then(function (j) { eu = j; pintar(); }));
     }
     if (tipo === 'senha-nova') {
-      if (v('senha').length < 8) return falhou(new Error('A senha precisa de pelo menos 8 caracteres.'));
-      if (v('senha') !== v('senha2')) return falhou(new Error('As duas senhas não são iguais.'));
+      if (v('senha').length < 8) return falhou(new Error('A senha precisa de pelo menos 8 caracteres.'), 'senha');
+      if (v('senha') !== v('senha2')) return falhou(new Error('As duas senhas não são iguais.'), 'senha2');
       return pronto(L.definirSenha(v('senha')).then(function (j) { eu = j; aviso = 'Senha salva.'; pintar(); }));
     }
   }
