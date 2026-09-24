@@ -225,3 +225,6 @@
 /* a linha inteira precisa caber em 342 px (390 - 2×24): o "Não tem uma conta? Cadastre-se" encolhe um pouco quando ganha o complemento */
 p:has(> .loja-sem-cadastro) > .loja-link { font-size: 13px; }
 .loja-link .loja-link { font-size: inherit; }
+/* ETAPA 65 (print das 22:40): no iPhone o "Orçamentos…" aparecia atrás da barra flutuante do Safari. Na página da conta,
+   a primeira tela termina na frase; o respiro embaixo dela empurra o resto pra depois da barra. */
+body.loja .rodape .frase { margin-bottom: 96px; }

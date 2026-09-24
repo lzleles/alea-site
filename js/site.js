@@ -264,47 +264,11 @@
        que ele mandou — "mantenha minha fonte, cor, tudo, só quero o layout, design e posições" —
        e fica no rodapé: Subtotal centralizado, o botão largo, e "Continue comprando" sublinhado
        embaixo (fecha a gaveta). O aviso do frete continua, pequeno, por último. */
-    molde('carrinho', 'Sua Sacola de Compras',          // 21:44: o título do modelo, pedido dele
-      '<p class="vazio">Sua sacola está vazia.</p>',
-      '<div class="total-carrinho"><span>Subtotal:</span> <strong data-total>—</strong></div>' +
-      '<button class="botao" type="button" data-finalizar-compra disabled>Finalizar Compra</button>' +
-      /* ETAPA 42 (22:30): o × do topo FECHA e deixa a pessoa exatamente onde estava; o "Continue
-         comprando" leva pra PÁGINA INICIAL. Por isso ele virou link de verdade, não mais fechar. */
-      '<a class="continuar-comprando" href="index.html">Continue comprando</a>');
-    /* ETAPA 41 (22:29): saiu da sacola, a pedido dele, o aviso "O frete é calculado no fechamento,
-       pelo CEP. Peça personalizada só entra em produção depois da confirmação do pagamento." — o
-       frete segue sendo dito na mensagem do WhatsApp ("Frete: a combinar pelo CEP") e a regra da
-       produção está na página de Trocas e no texto de Produtos Personalizados. */
-
-    /* ⚠️ ETAPA 40 (22:23, vídeo + 2 prints do modelo): "na página da sacola é pra deixar só a
-       sacola" — a PRIMEIRA tela tem que caber inteira no telefone (título, produtos, Subtotal e o
-       botão lá embaixo), e só ROLANDO aparece o "Continue comprando". E o site de baixo não pode
-       rolar junto ("parece que está rodando a segunda tela"). Então a sacola vira UMA página que rola
-       sozinha: a `.tela-sacola` ocupa exatamente a altura visível (100dvh) e o `.rodape-extra` mora
-       depois dela, fora da primeira tela. Monta aqui, movendo os pedaços do molde. */
-    (function () {
-      var g = document.getElementById('gaveta-carrinho');
-      if (!g) return;
-      var rod = g.querySelector('[data-rodape-gaveta]');
-      var tela = document.createElement('div');
-      tela.className = 'tela-sacola';
-      var principal = document.createElement('div');
-      principal.className = 'rodape-principal';
-      var extra = document.createElement('div');
-      extra.className = 'rodape-extra';
-      Array.prototype.slice.call(rod.children).forEach(function (el) {
-        (el.matches('.total-carrinho, [data-finalizar-compra]') ? principal : extra).appendChild(el);
-      });
-      tela.appendChild(g.querySelector('header'));
-      tela.appendChild(g.querySelector('[data-corpo]'));
-      tela.appendChild(principal);
-      g.insertBefore(tela, rod);
-      g.insertBefore(extra, rod);
-      g.removeChild(rod);
-    })();
-
-    molde('conta', 'Sua conta ālea',
-      '<p class="vazio">Carregando…</p>', '');
+    /* ⚠️ ETAPA 65 (23/09/2026 22:41, vídeo do Cassiano: "a tela tá mexendo de novo pros lados"): as gavetas de SACOLA
+       e de CONTA não são mais montadas. As duas viraram páginas (finalizar-compra.html e conta.html — etapas 61/62), mas
+       continuavam existindo escondidas à direita da tela (x 390..780), e o Safari deixava arrastar até elas mesmo com a
+       moldura da etapa 57. O molde() continua aqui pra quem precisar de gaveta nova. */
+    void molde;
 
     function fechar() {
       Array.prototype.forEach.call(document.querySelectorAll('.gaveta'), function (g) {
