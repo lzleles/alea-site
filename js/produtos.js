@@ -136,6 +136,9 @@ window.PRODUTOS = [
       'A base elevada deixa o cão comer com o pescoço em posição mais natural, sem ' +
       'ter que abaixar a cabeça até o chão.'
     ],
+    /* PESO E DIMENSÕES (24/09/2026, pedido do Cassiano): base do frete e da caixa padrão. Preencher com o que
+       ELE mandar, nunca estimado — e rodar 01_gerar_paginas_v14_peso_e_dimensoes. Sem número = linha escondida no ar.
+       medidas: { peso_g: 0, altura_cm: 0, largura_cm: 0, comprimento_cm: 0 }, */
     /* linhas EXTRA da ficha, além das quatro padrão */
     ficha_extra: [
       ['Acompanha', 'Tigela interna em inox, removível pra lavar']

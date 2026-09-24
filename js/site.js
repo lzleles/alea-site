@@ -361,7 +361,15 @@
   }
 
   /* -------------------------------------------------------------------- início */
+  /* ETAPA 72 (24/09/2026): linha da ficha ainda sem número (ex.: "Peso e dimensões — a informar") só aparece na
+     PRÉVIA; no site do ar ela some. Nunca mostrar "a informar" pro cliente de verdade. */
+  function esconderFaltas() {
+    if (/github\.io$|^localhost$|^127\.0\.0\.1$/.test(location.hostname)) return;
+    Array.prototype.forEach.call(document.querySelectorAll('[data-falta]'), function (el) { el.hidden = true; });
+  }
+
   function iniciar() {
+    esconderFaltas();
     ligarVoltarProFeed();
     preencherContato();
     montarMenuCategorias();
