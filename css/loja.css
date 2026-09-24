@@ -209,7 +209,9 @@
 /* ETAPA 63 (22:19, print montado pelo Cassiano): a tela de entrar ocupa a PRIMEIRA tela inteira, no bege — o título
    colado embaixo do topo e o rodapé preto só aparece rolando. */
 .loja-sub.primeiro { margin-top: 22px; }
-.loja .topo ~ main[data-loja-conta] { min-height: 100vh; min-height: 100svh; }
+/* 22:30 (print dele no iPhone): com 100svh o preto ainda aparecia ATRÁS da barra flutuante do Safari — o svh desconta a
+   barra, mas a página continua desenhada embaixo dela. 100lvh = a tela inteira, com a barra: o preto fica fora dela. */
+.loja .topo ~ main[data-loja-conta] { min-height: 100vh; min-height: 100lvh; }
 .loja-sem-cadastro { font-size: 11px; color: var(--lj-cinza); white-space: nowrap; }
 .loja-sem-cadastro a { font-size: 11px; color: var(--lj-cinza); }
 /* a linha inteira precisa caber em 342 px (390 - 2×24): o "Não tem uma conta? Cadastre-se" encolhe um pouco quando ganha o complemento */
