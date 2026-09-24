@@ -31,6 +31,7 @@
   var FAIXA = L.previa ? '<div class="loja-previa">Prévia: a conta e os dados ficam só neste aparelho. Nada vai pro servidor.</div>' : '';
 
   var eu = null;
+  var METODOS = ['google'];
   var modoEntrar = 'senha';        // 'senha' | 'codigo'  — o que está ABERTO embaixo do título
   var codigoPara = null;           // e-mail que recebeu o código (tela "Digite o código…")
   var erro = '';
@@ -59,6 +60,22 @@
   /* ETAPA 62 (23/09/2026 21:58, print do Cassiano): a OUTRA opção de entrar não fica mais no topo — ela mora
      "logo abaixo do ou, acima do Continuar com o Google". Em cima fica só o jeito aberto agora. */
   function htmlEntrar() {
+    /* ETAPA 69: servidor que ainda não faz código nem senha → a tela mostra só o que funciona (Google e, vindo da
+       compra, o "continuar sem cadastro"). Nada de botão que dá erro pro cliente de verdade. */
+    var temSenha = METODOS.indexOf('senha') >= 0, temCodigo = METODOS.indexOf('codigo') >= 0;
+    if (!temSenha && !temCodigo) {
+      return '<h1 class="loja-sub primeiro">Entrar na sua conta</h1>' +
+        (erro ? '<p class="loja-erro" role="alert">' + esc(erro) + '</p>' : '') +
+        '<div class="loja-opcoes" style="margin-top:22px"><div data-google-botao></div>' +
+        '<button type="button" class="loja-bt opcao google" data-entrar-google' + (L.previa ? '' : ' hidden') + '>' + G +
+          '<span>Continuar com o Google</span></button></div>' +
+        (semCadastro ? '<p style="margin:18px 0 0;text-align:center"><span class="loja-sem-cadastro">ou <a href="' + esc(semCadastro) +
+          '" class="loja-link sublinha">continuar sem cadastro</a></span></p>' : '') +
+        '<p class="loja-miudo" style="text-align:center;margin:12px 0 0">Ao entrar você concorda com a ' +
+          '<a href="privacidade.html">Política de Privacidade</a> da ālea.</p>';
+    }
+    if (!temSenha && modoEntrar === 'senha') modoEntrar = 'codigo';
+    if (!temCodigo && modoEntrar === 'codigo') modoEntrar = 'senha';
     /* ETAPA 63 (22:14, Cassiano): sai a frase "Escolha uma opção para entrar" — o título da tela é o do jeito aberto */
     var h = '';
     var outra;
@@ -96,6 +113,7 @@
         '</form>';
       outra = '<button type="button" class="loja-bt opcao" data-modo="codigo">Receber código por e-mail</button>';
     }
+    if (!temSenha || !temCodigo) outra = '';
     return h + htmlGoogle(outra);
   }
   function htmlGoogle(outra) {
@@ -201,7 +219,9 @@
       '<label class="loja-campo"><span>Nome</span><input name="nome" autocomplete="given-name" maxlength="60" value="' + esc(e.nome) + '"></label>' +
       '<label class="loja-campo"><span>Sobrenome</span><input name="sobrenome" autocomplete="family-name" maxlength="80" value="' + esc(e.sobrenome) + '"></label>' +
       '<div class="loja-dupla">' +
-        '<label class="loja-campo"><span>CPF</span><input name="cpf" inputmode="numeric" maxlength="14" placeholder="999.999.999-99" value="' + esc(mascaraCpf(e.cpf)) + '"></label>' +
+        /* ETAPA 69 (condição da casa): o CPF só aparece na ficha quando o servidor GUARDA o CPF (a ficha dele traz o
+           campo). Antes disso, mostrar "salvo" seria mentira — ele segue sendo pedido no Finalizar Compra. */
+        (('cpf' in e) ? '<label class="loja-campo"><span>CPF</span><input name="cpf" inputmode="numeric" maxlength="14" placeholder="999.999.999-99" value="' + esc(mascaraCpf(e.cpf)) + '"></label>' : '') +
         '<label class="loja-campo"><span>Telefone</span><input name="telefone" type="tel" inputmode="tel" autocomplete="tel-national" maxlength="15" placeholder="(64) 99999-9999" value="' + esc(mascaraTelefone(e.telefone)) + '"></label>' +
       '</div>' +
       '<label class="loja-marca"><input type="checkbox" name="consent_personalizar"' + (e.consent_personalizar ? ' checked' : '') + '>' +
@@ -233,7 +253,7 @@
     var v = function (n) { var el = form.querySelector('[name="' + n + '"]'); return el ? (el.type === 'checkbox' ? el.checked : el.value.trim()) : ''; };
     marca('nome', !!v('nome'), 'Preencha o nome');
     marca('sobrenome', !!v('sobrenome'), 'Preencha o sobrenome');
-    marca('cpf', cpfValido(v('cpf')), v('cpf') ? 'CPF inválido' : 'Preencha o CPF');
+    if (form.querySelector('[name="cpf"]')) marca('cpf', cpfValido(v('cpf')), v('cpf') ? 'CPF inválido' : 'Preencha o CPF');
     marca('telefone', v('telefone').replace(/\D/g, '').length >= 10, 'Telefone com DDD');
     if (form.querySelector('[name="aceite_politica"]')) marca('aceite_politica', v('aceite_politica'));
     return faltas;
@@ -477,6 +497,6 @@
 
   window.addEventListener('hashchange', function () { erro = ''; pintar(); window.scrollTo(0, 0); });
 
-  L.eu().then(function (j) { eu = j || { logado: false }; pintar(); })
+  Promise.all([L.eu(), L.metodos()]).then(function (r) { eu = r[0] || { logado: false }; METODOS = r[1]; pintar(); })
     .catch(function () { eu = { logado: false }; erro = 'O servidor da conta não respondeu. Tente de novo em instantes.'; pintar(); });
 })();

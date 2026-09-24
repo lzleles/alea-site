@@ -268,7 +268,14 @@
     entrarGoogle: motor.entrarGoogle, salvarFicha: motor.salvarFicha, definirSenha: motor.definirSenha,
     guardarEndereco: motor.guardarEndereco, tirarEndereco: motor.tirarEndereco, principalEndereco: motor.principalEndereco,
     registrarPedido: motor.registrarPedido, sair: motor.sair, exportar: motor.exportar, excluir: motor.excluir,
-    config: PREVIA ? function () { return Promise.resolve({}); } : servidor.config,
+    config: PREVIA ? function () { return Promise.resolve({ metodos: ['google', 'codigo', 'senha'] }); } : servidor.config,
+    /* ETAPA 69 (condição da casa, 23/09/2026): quais jeitos de entrar o servidor JÁ faz. Sem "metodos" no /api/config
+       = só Google. Código e senha aparecem sozinhos quando a casa ligar ("metodos": ["google","codigo","senha"]). */
+    metodos: function () {
+      return (PREVIA ? Promise.resolve({ metodos: ['google', 'codigo', 'senha'] }) : servidor.config())
+        .then(function (c) { return (c && c.metodos && c.metodos.length) ? c.metodos : ['google']; })
+        .catch(function () { return ['google']; });
+    },
     desejos: desejos, compra: compra, buscarCep: buscarCep
   };
 
