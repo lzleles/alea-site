@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<!--
+CATALOGO:
+  nome: codigo-de-acesso (modelo de e-mail)
+  categoria: MODELO
+  objetivo: O e-mail que leva o CÓDIGO DE ACESSO de 6 números da conta da ālea, no desenho do e-mail da Tiffany que o Cassiano mandou (print de 23/09/2026 20:41) e na identidade da ālea.
+  entrada: {{NOME}} (o começo do e-mail da pessoa ou o nome dela) e {{CODIGO}} (6 números) — trocados pelo servidor da conta (ZELES/Conta_Cliente) na hora de enviar
+  saida: corpo HTML do e-mail
+  status: prévia (23/09/2026) — o envio ainda não existe; quem liga é a casa quando o Lázaro escolher o remetente
+  validado_em: 2026-09-23 (visto no navegador em 390 px e 600 px)
+
+ASSUNTO PROPOSTO:  Seu código de acesso é {{CODIGO}}
+REMETENTE PROPOSTO: ālea & Co. <cassianorosado@aleaco.art.br>  (o e-mail do negócio já declarado na política v2)
+
+REGRAS DE E-MAIL (por que este arquivo é "feio" por dentro):
+  · tudo em TABELA e CSS EM LINHA — Gmail e Outlook ignoram <style> e flex;
+  · imagem em PNG com endereço ABSOLUTO — o Gmail não mostra SVG;
+  · nada de fonte baixada: a Defante não chega no e-mail; o título cai em Arial.
+  · o <script> do fim só existe pra PRÉVIA no navegador (preenche um exemplo); cliente de e-mail apaga script.
+-->
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Seu código de acesso é {{CODIGO}}</title>
+</head>
+<body style="margin:0;padding:0;background:#EAE4DB;">
+<!-- a linha que aparece na lista de e-mails, ao lado do assunto -->
+<div style="display:none;max-height:0;overflow:hidden;opacity:0;">Use este código para entrar na sua conta da ālea. Ele vale por 10 minutos.</div>
+
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#EAE4DB;">
+  <tr>
+    <td align="center" style="padding:24px 12px;">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;background:#F6F3EE;">
+
+        <!-- a marca -->
+        <tr>
+          <td align="center" style="padding:36px 24px 26px;">
+            <img data-img src="https://www.aleaco.art.br/modelos-email/logo_email.png" width="180" alt="ālea &amp; Co."
+                 style="display:block;width:180px;max-width:60%;height:auto;border:0;">
+          </td>
+        </tr>
+        <tr><td style="padding:0 24px;"><div style="height:1px;background:#D9D1C4;line-height:1px;font-size:1px;">&nbsp;</div></td></tr>
+
+        <!-- quem -->
+        <tr>
+          <td align="center" style="padding:40px 24px 8px;font-family:Arial,Helvetica,sans-serif;font-size:26px;line-height:32px;color:#2B2118;">
+            {{NOME}},
+          </td>
+        </tr>
+        <tr>
+          <td align="center" style="padding:18px 24px 0;font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:22px;color:#2B2118;">
+            Seu código de acesso ālea é:
+          </td>
+        </tr>
+
+        <!-- o código: o turquesa da Tiffany vira o terracota da ālea -->
+        <tr>
+          <td align="center" style="padding:34px 24px 38px 38px;font-family:Arial,Helvetica,sans-serif;font-size:36px;line-height:40px;letter-spacing:14px;color:#924429;font-weight:400;">
+            {{CODIGO}}
+          </td>
+        </tr>
+
+        <tr>
+          <td align="center" style="padding:0 40px;font-family:Arial,Helvetica,sans-serif;font-size:14px;line-height:22px;color:#2B2118;">
+            Para acessar sua conta ālea, por gentileza, insira o código no campo que permanece aberto em seu navegador.
+            O código vale por <strong>10 minutos</strong>.
+          </td>
+        </tr>
+        <tr>
+          <td align="center" style="padding:22px 40px 44px;font-family:Arial,Helvetica,sans-serif;font-size:14px;line-height:22px;color:#2B2118;">
+            Se houver alguma dúvida, por gentileza, não hesite em falar com a gente pelo e-mail
+            <a href="mailto:cassianorosado@aleaco.art.br" style="color:#924429;text-decoration:underline;">cassianorosado@aleaco.art.br</a>.
+          </td>
+        </tr>
+        <tr>
+          <td align="center" style="padding:0 40px 36px;font-family:Arial,Helvetica,sans-serif;font-size:12px;line-height:18px;color:#6B5D50;">
+            Não pediu este código? Pode ignorar este e-mail: sem o código, ninguém entra na sua conta.
+          </td>
+        </tr>
+
+        <!-- o rodapé preto do site -->
+        <tr>
+          <td align="center" style="background:#000000;padding:34px 24px 30px;">
+            <a href="https://www.aleaco.art.br/" style="text-decoration:none;">
+              <img data-img src="https://www.aleaco.art.br/modelos-email/logo_claro_email.png" width="160" alt="ālea &amp; Co."
+                   style="display:block;width:160px;height:auto;border:0;margin:0 auto;">
+            </a>
+            <div style="padding-top:14px;font-family:Arial,Helvetica,sans-serif;font-size:12px;line-height:18px;color:#AA9661;">
+              Onde cada impressão começa com um sonho!
+            </div>
+            <div style="padding-top:16px;font-family:Arial,Helvetica,sans-serif;font-size:11px;line-height:16px;color:#9A9086;">
+              <a href="https://www.aleaco.art.br/" style="color:#EAE4DB;text-decoration:underline;">aleaco.art.br</a>
+              &nbsp;·&nbsp; Jataí/GO
+            </div>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+
+<!-- SÓ PRA PRÉVIA NO NAVEGADOR: preenche um exemplo e usa as imagens da própria prévia. E-mail apaga isto. -->
+<script>
+  (function () {
+    var q = new URLSearchParams(location.search);
+    var nome = q.get('nome') || 'cassianorosado', codigo = q.get('codigo') || '566753';
+    document.title = document.title.replace('{{CODIGO}}', codigo);
+    document.body.innerHTML = document.body.innerHTML.split('{{NOME}}').join(nome).split('{{CODIGO}}').join(codigo);
+    if (!/aleaco\.art\.br$/.test(location.hostname)) {
+      Array.prototype.forEach.call(document.querySelectorAll('img[data-img]'), function (i) {
+        i.src = i.src.replace('https://www.aleaco.art.br/modelos-email/', '');
+      });
+    }
+  })();
+</script>
+</body>
+</html>
