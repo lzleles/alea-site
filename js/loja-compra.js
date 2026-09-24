@@ -89,9 +89,11 @@
   function subtotal() { return CAR() ? CAR().total() : 0; }
   function sobConsulta() { return itens().some(function (i) { return !i.preco; }); }
 
-  function htmlTotais() {
+  /* ETAPA 62 (22:08, Cassiano): "ninguém mais fica preocupado com quanto vai pagar de frete nessa página (...)
+     vamos deixar essa página mais clean" — na SACOLA sai o bloco Entrega e a linha do frete; ele volta no fim. */
+  function htmlTotais(semFrete) {
     return '<div class="loja-totais"><div><span>Subtotal</span><span>' + dinheiro(subtotal()) + '</span></div>' +
-      '<div><span>Frete</span><span>a calcular</span></div>' +
+      (semFrete ? '' : '<div><span>Frete</span><span>a calcular</span></div>') +
       '<div class="total"><span>Total</span><span>' + dinheiro(subtotal()) + (sobConsulta() ? ' + itens sob consulta' : '') + '</span></div></div>';
   }
 
@@ -120,14 +122,7 @@
         '<span class="loja-miudo">Adicione uma mensagem personalizada que será impressa e enviada com seu presente.</span></span></label>' +
       '<textarea data-presente-texto maxlength="240" placeholder="Sua mensagem"' + (st.presente ? '' : ' hidden') + '>' +
         esc(st.presente_texto || '') + '</textarea></div>' +
-      '<div class="loja-bloco-entrega"><h3>Entrega</h3><p>Veja as opções de entrega para seus itens, com todos os prazos e valores.</p>' +
-      '<button type="button" class="loja-bt contorno" data-ver-entrega>Ver Opções de Entrega</button>' +
-      '<div data-entrega-previa hidden style="margin-top:14px">' +
-        '<div class="loja-cep"><label class="loja-campo"><span>CEP</span><input data-cep-sacola inputmode="numeric" maxlength="9" placeholder="00000-000" value="' +
-          esc(st.entrega.cep ? st.entrega.cep.replace(/^(\d{5})(\d{3})$/, '$1-$2') : '') + '"></label>' +
-        '<a href="https://buscacepinter.correios.com.br/app/endereco/index.php" target="_blank" rel="noopener">Não sei meu CEP</a></div>' +
-        '<p class="loja-miudo" data-cep-resposta style="margin:10px 0 0"></p></div></div>' +
-      htmlTotais() +
+      htmlTotais(true) +
       '<button type="button" class="loja-bt largo" data-ir-compra>Finalizar Compra</button>' +
       '<a class="loja-mais-produtos" href="index.html">Escolher mais Produtos</a>';
     return h;

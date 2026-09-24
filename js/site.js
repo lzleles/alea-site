@@ -315,6 +315,10 @@
       document.body.classList.remove('travado');
     }
     function abrir(id) {
+      /* ETAPA 62 (23/09/2026 22:07, Cassiano: "temos duas sacolas (...) aquela primeira não vai existir mais"):
+         a SACOLA deixou de ser gaveta. Todo pedido de "abrir o carrinho" — o ícone do topo, o editar da peça,
+         o Comprar agora — vai direto pra página Sacola de Compras. */
+      if (id === 'carrinho') { location.href = 'finalizar-compra.html'; return; }
       var g = document.getElementById('gaveta-' + id);
       if (!g) return;
       fechar();
@@ -334,6 +338,7 @@
       /* ETAPA 61 (23/09/2026): a CONTA virou PÁGINA (conta.html), como na Tiffany — "clicar lá em cima,
          do lado da sacola, em meu perfil, para aparecer essa página". O carrinho continua gaveta. */
       if (b && b.getAttribute('data-abrir') === 'conta') { e.preventDefault(); location.href = 'conta.html'; return; }
+      if (b && b.getAttribute('data-abrir') === 'carrinho') { e.preventDefault(); location.href = 'finalizar-compra.html'; return; }
       if (b) { e.preventDefault(); abrir(b.getAttribute('data-abrir')); return; }
       if (e.target.closest('[data-fechar-gaveta]')) fechar();
     });

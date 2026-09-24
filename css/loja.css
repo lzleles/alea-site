@@ -204,3 +204,4 @@
 
 /* nas páginas com o topo do site (fixo, 64 px), o conteúdo começa embaixo dele — igual à .pagina do estilo.css */
 .loja .topo ~ main { padding-top: calc(var(--tarja, 0px) + 66px); }
+.loja-opcoes [data-google-botao]:empty { display: none; }
