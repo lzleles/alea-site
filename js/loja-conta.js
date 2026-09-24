@@ -39,15 +39,9 @@
   var params = new URLSearchParams(location.search);
   var voltar = params.get('voltar');
   if (voltar && !/^[a-z0-9\-]+\.html(#[\w\/\-]*)?$/i.test(voltar)) voltar = null;   // só página do próprio site
-  /* ETAPA 65 (22:42, Cassiano): o "continuar sem cadastro" aparece SEMPRE, também entrando pelo bonequinho do topo.
-     Vindo da compra, segue pro Finalizar Compra; vindo do topo, volta pra página de onde a pessoa veio (ou pro início). */
-  var semCadastro = voltar || (function () {
-    try {
-      var r = document.referrer && new URL(document.referrer);
-      if (r && r.origin === location.origin && !/conta\.html$/.test(r.pathname)) return r.pathname.split('/').pop() + r.search + r.hash;
-    } catch (e) { /* nada */ }
-    return 'index.html';
-  })();
+  /* ETAPA 67 (23:02, Cassiano: "eu te peço perdão, foi erro meu"): o "continuar sem cadastro" só existe vindo da
+     COMPRA. Pelo perfil ele não faz sentido — "como ia continuar sem o produto?". Desfaz a etapa 65, item 10. */
+  var semCadastro = params.get('compra') === '1' && voltar ? voltar : '';
 
   function esc(s) {
     return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
@@ -98,7 +92,7 @@
         '<button type="submit" class="loja-bt entrar">Entrar</button>' +
         /* ETAPA 63 (22:24, Cassiano): vindo do Finalizar Compra, na MESMA linha: "… Cadastre-se ou continuar sem cadastro" */
         '<p style="margin:14px 0 0"><button type="button" class="loja-link" data-modo="codigo">Não tem uma conta? <span class="loja-link sublinha">Cadastre-se</span></button>' +
-          ' <span class="loja-sem-cadastro">ou <a href="' + esc(semCadastro || 'index.html') + '" class="loja-link sublinha">continuar sem cadastro</a></span></p>' +
+          (semCadastro ? ' <span class="loja-sem-cadastro">ou <a href="' + esc(semCadastro) + '" class="loja-link sublinha">continuar sem cadastro</a></span>' : '') + '</p>' +
         '</form>';
       outra = '<button type="button" class="loja-bt opcao" data-modo="codigo">Receber código por e-mail</button>';
     }
