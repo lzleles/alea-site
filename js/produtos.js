@@ -119,7 +119,8 @@ window.PRODUTOS = [
 
   {
     slug: 'bowl-wave',
-    /* peso: 198 g com a tigela de inox (Cassiano, 24/09/2026 01:39). Medidas: caixa do objeto no arquivo 3D do Luke,
+    /* peso: 198 g com a tigela de inox (Cassiano, 24/09/2026 01:39) — guardado COMO ELE MANDOU; a ficha mostra +10%
+       (regra dele, 01:46: "todo peso que eu te passar, você coloca 10% a mais"), feita pelo gerador v14. Medidas: caixa do objeto no arquivo 3D do Luke,
        tamanho G (o do configurador 3D) — 211,9 × 212,9 × 83,7 mm. O tamanho M do mesmo arquivo: 186,4 × 187,3 × 73,6 mm. */
     medidas: { peso_g: 198, altura_cm: 8.4, largura_cm: 21.3, comprimento_cm: 21.2 },
     nome: 'ālea Bowl Wave',
