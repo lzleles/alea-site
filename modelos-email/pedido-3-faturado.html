@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<!-- GERADO por 03_site/02_gerar_emails_pedido_v1_2026-09-24.py — mexer lá, não aqui.
+     ASSUNTO: Nota fiscal emitida — pedido nº {{PEDIDO}}
+     REMETENTE PROPOSTO: ālea & Co. <sac@aleaco.art.br> -->
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Nota fiscal emitida — pedido nº {{PEDIDO}}</title>
+</head>
+<body style="margin:0;padding:0;background:#EAE4DB;">
+<div style="display:none;max-height:0;overflow:hidden;opacity:0;">Pedido faturado — pedido nº {{PEDIDO}}</div>
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#EAE4DB;">
+  <tr><td align="center" style="padding:24px 12px;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;">
+      <tr><td data-fundo background="https://www.aleaco.art.br/modelos-email/fundo_email_pedido.jpg" bgcolor="#EFE9E0" valign="top"
+          style="background-color:#EFE9E0;background-image:url(https://www.aleaco.art.br/modelos-email/fundo_email_pedido.jpg);background-position:center top;background-repeat:no-repeat;">
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+          <tr><td align="center" style="padding:36px 24px 26px;">
+            <img data-img src="https://www.aleaco.art.br/modelos-email/logo_email.png" width="180" alt="ālea &amp; Co." style="display:block;width:180px;max-width:60%;height:auto;border:0;">
+          </td></tr>
+          <tr><td style="padding:0 24px;"><div style="height:1px;background:#CFC5B6;line-height:1px;font-size:1px;">&nbsp;</div></td></tr>
+          <tr><td align="center" style="padding:40px 24px 0;font-family:Arial,Helvetica,sans-serif;font-size:30px;line-height:36px;color:#2B2118;">{{NOME}},</td></tr>
+          <tr><td align="center" style="padding:26px 24px 0;font-family:Arial,Helvetica,sans-serif;font-size:22px;line-height:28px;color:#924429;">Pedido faturado</td></tr>
+          <tr><td style="padding:28px 24px 0;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:0 auto;"><tr><td align="center" width="20%" style="font-family:Arial,Helvetica,sans-serif;font-size:11px;line-height:15px;color:#924429;font-weight:400;padding:0 2px;"><div style="font-size:12px;line-height:14px;">&#9650;</div>Recebido</td><td align="center" width="20%" style="font-family:Arial,Helvetica,sans-serif;font-size:11px;line-height:15px;color:#924429;font-weight:400;padding:0 2px;"><div style="font-size:12px;line-height:14px;">&#9650;</div>Pago</td><td align="center" width="20%" style="font-family:Arial,Helvetica,sans-serif;font-size:11px;line-height:15px;color:#924429;font-weight:700;padding:0 2px;"><div style="font-size:12px;line-height:14px;">&#9650;</div>Faturado</td><td align="center" width="20%" style="font-family:Arial,Helvetica,sans-serif;font-size:11px;line-height:15px;color:#B9AEA2;font-weight:400;padding:0 2px;"><div style="font-size:12px;line-height:14px;">&#9651;</div>Enviado</td><td align="center" width="20%" style="font-family:Arial,Helvetica,sans-serif;font-size:11px;line-height:15px;color:#B9AEA2;font-weight:400;padding:0 2px;"><div style="font-size:12px;line-height:14px;">&#9651;</div>Entregue</td></tr></table></td></tr>
+          <tr><td align="center" style="padding:30px 36px 0;font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:24px;color:#2B2118;">A nota fiscal do seu pedido foi emitida. A peça está sendo embalada com cuidado para seguir até você.</td></tr>
+          <tr><td align="center" style="padding:22px 36px 0;font-family:Arial,Helvetica,sans-serif;font-size:14px;line-height:22px;color:#2B2118;">Nota fiscal nº <strong>{{NF_NUMERO}}</strong> · <a href="{{NF_LINK}}" style="color:#924429;text-decoration:underline;">ver a nota fiscal</a></td></tr>
+          <tr><td style="padding:34px 24px 0;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#F6F3EE;"><tr><td style="padding:22px 22px 6px;font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:20px;color:#2B2118;">Resumo do pedido <span style="color:#8A7D70;font-size:12px;">nº {{PEDIDO}} · {{DATA}}</span></td></tr><tr><td style="padding:6px 22px 0;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><!--{{ITENS}}--></table></td></tr><tr><td style="padding:10px 22px 0;"><div style="height:1px;background:#D9D1C4;line-height:1px;font-size:1px;">&nbsp;</div></td></tr><tr><td style="padding:8px 22px 0;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="font-family:Arial,Helvetica,sans-serif;font-size:13px;line-height:20px;color:#2B2118;padding:4px 0;">Subtotal</td><td align="right" style="font-family:Arial,Helvetica,sans-serif;font-size:13px;line-height:20px;color:#2B2118;padding:4px 0;">{{SUBTOTAL}}</td></tr><tr><td style="font-family:Arial,Helvetica,sans-serif;font-size:13px;line-height:20px;color:#2B2118;padding:4px 0;">Frete</td><td align="right" style="font-family:Arial,Helvetica,sans-serif;font-size:13px;line-height:20px;color:#2B2118;padding:4px 0;">{{FRETE}}</td></tr><tr><td style="font-family:Arial,Helvetica,sans-serif;font-size:13px;line-height:20px;color:#2B2118;padding:4px 0;font-weight:700;">Total</td><td align="right" style="font-family:Arial,Helvetica,sans-serif;font-size:13px;line-height:20px;color:#2B2118;padding:4px 0;font-weight:700;">{{TOTAL}}</td></tr><tr><td style="font-family:Arial,Helvetica,sans-serif;font-size:13px;line-height:20px;color:#2B2118;padding:4px 0;">Pagamento</td><td align="right" style="font-family:Arial,Helvetica,sans-serif;font-size:13px;line-height:20px;color:#2B2118;padding:4px 0;">{{PAGAMENTO}}</td></tr></table></td></tr><tr><td style="padding:12px 22px 22px;font-family:Arial,Helvetica,sans-serif;font-size:12.5px;line-height:19px;color:#8A7D70;"><strong style="color:#2B2118;">Entrega</strong><br>{{ENDERECO}}</td></tr></table></td></tr>
+          <tr><td align="center" style="padding:28px 36px 0;font-family:Arial,Helvetica,sans-serif;font-size:14px;line-height:22px;color:#2B2118;">
+            Se houver alguma dúvida, por gentileza, não hesite em entrar em contato com o nosso Atendimento ao Cliente pelo e-mail
+            <a href="mailto:sac@aleaco.art.br" style="color:#2B2118;text-decoration:underline;">sac@aleaco.art.br</a>.
+          </td></tr>
+          <tr><td style="padding:34px 24px 32px;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#F6F3EE;"><tr><td align="center" style="padding:34px 20px 0;"><a href="https://linktr.ee/eaibora.3d"><img data-img src="https://www.aleaco.art.br/modelos-email/icone_linktree.png" width="28" height="28" alt="Linktree" style="border:0;display:inline-block;"></a></td></tr><tr><td align="center" style="padding:34px 20px 0;font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:22px;color:#2B2118;">sac@aleaco.art.br</td></tr><tr><td align="center" style="padding:28px 30px 34px;font-family:Arial,Helvetica,sans-serif;font-size:14px;line-height:22px;color:#2B2118;">Para obter mais informações, não hesite em entrar em contato com nosso Atendimento ao Cliente por e-mail através de <a href="mailto:sac@aleaco.art.br" style="color:#2B2118;text-decoration:underline;">sac@aleaco.art.br</a>.</td></tr></table></td></tr>
+        </table>
+      </td></tr>
+      <tr><td align="center" style="background:#000000;padding:30px 24px 28px;">
+        <a href="https://www.aleaco.art.br/" style="text-decoration:none;">
+          <img data-img src="https://www.aleaco.art.br/modelos-email/logo_claro_email.png" width="150" alt="ālea &amp; Co." style="display:block;width:150px;height:auto;border:0;margin:0 auto;">
+        </a>
+        <div style="padding-top:14px;font-family:Arial,Helvetica,sans-serif;font-size:12px;line-height:18px;color:#AA9661;">Onde cada impressão começa com um sonho!</div>
+      </td></tr>
+    </table>
+  </td></tr>
+</table>
+<!-- SÓ PRA PRÉVIA NO NAVEGADOR: preenche um pedido de exemplo e usa as imagens da própria prévia. E-mail apaga isto. -->
+<script>
+  (function () {
+    var ex = { NOME: 'Cassiano', PEDIDO: 'AL004941', DATA: '24/09/2026', SUBTOTAL: 'R$ 179,00', FRETE: 'R$ 24,90', TOTAL: 'R$ 203,90',
+      PAGAMENTO: 'Pix', ENDERECO: 'Rua Doutor Lauro Taveira, 1689 — Vila Fátima<br>Jataí - GO · 75803-125',
+      NF_NUMERO: '000123', NF_LINK: '#', TRANSPORTADORA: 'Correios (PAC)', RASTREIO: 'AA123456789BR', RASTREIO_LINK: '#',
+      PRAZO: '3 dias úteis após a confirmação de pagamento',
+      ITENS: '<tr><td width="56" style="padding:6px 0;"><img src="../img/produtos/luke_1_obj_m.webp" width="48" height="48" style="display:block;background:#EAE4DB;"></td>' +
+             '<td style="font-family:Arial,sans-serif;font-size:13px;line-height:18px;color:#2B2118;padding:6px 8px;">ālea Bowl Wave<br>' +
+             '<span style="color:#8A7D70;font-size:12px;">Nome: Luke · Bicolor: Laranja, Cáqui</span></td>' +
+             '<td align="right" style="font-family:Arial,sans-serif;font-size:13px;color:#2B2118;padding:6px 0;">R$ 179,00</td></tr>' };
+    var h = document.body.innerHTML;
+    h = h.split('<!--{{ITENS}}-->').join(ex.ITENS);
+    Object.keys(ex).forEach(function (k) { h = h.split('{{' + k + '}}').join(ex[k]); });
+    document.body.innerHTML = h;
+    document.title = document.title.split('{{PEDIDO}}').join(ex.PEDIDO);
+    if (!/aleaco\.art\.br$/.test(location.hostname)) {
+      var troca = function (u) { return u.replace('https://www.aleaco.art.br/modelos-email/', ''); };
+      Array.prototype.forEach.call(document.querySelectorAll('img[data-img]'), function (i) { i.src = troca(i.src); });
+      document.querySelector('[data-fundo]').style.backgroundImage = 'url(fundo_email_pedido.jpg)';
+    }
+  })();
+</script>
+</body>
+</html>
