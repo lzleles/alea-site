@@ -42,6 +42,11 @@ window.aleaCorDoTopo = (function () {
     var cor = pilha.length ? pilha[pilha.length - 1].cor : PADRAO;
     meta.content = cor;
     document.documentElement.style.backgroundColor = pilha.length ? cor : '';
+    /* ETAPA 113 (áudios 1704-1708 + prints 1705/1707): no iPhone a meta sozinha não pintou o topo — o Safari novo copia
+       a cor do CABEÇALHO FIXO e do fundo da página. Então, com tela cheia aberta, eles todos vestem a mesma cor (CSS
+       `html.topo-emendado`), e o topo, a foto e a barra de baixo viram uma tela só. */
+    document.documentElement.classList.toggle('topo-emendado', pilha.length > 0);
+    document.documentElement.style.setProperty('--cor-do-topo', cor);
   }
   /* uso: aleaCorDoTopo('album', '#6E6862') ao abrir; aleaCorDoTopo('album', null) ao fechar */
   return function (quem, cor) {
@@ -299,8 +304,11 @@ window.aleaCorDoTopo = (function () {
         g.classList.remove('aberta');
         g.setAttribute('aria-hidden', 'true');
       });
+      /* v23 (25/09/2026): só destrava a página se uma gaveta estava aberta de verdade — o Esc chamava isto sempre e
+         destravava a página por baixo de um álbum aberto */
+      var tinhaGaveta = cortina.classList.contains('aberta');
       cortina.classList.remove('aberta');
-      document.body.classList.remove('travado');
+      if (tinhaGaveta) document.body.classList.remove('travado');
     }
     function abrir(id) {
       /* ETAPA 62 (23/09/2026 22:07, Cassiano: "temos duas sacolas (...) aquela primeira não vai existir mais"):

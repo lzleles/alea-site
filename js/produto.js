@@ -214,6 +214,11 @@
     function comecarEm(n) {
       gOrdem = [n];
       for (var k = 0; k < aberto.fotos.length; k++) if (k !== n) gOrdem.push(k);
+      if (window.aleaAbrirTelaCheia) {
+        var lista = aberto.fotos.map(function (f) { return 'img/produtos/' + f + '.jpg'; });
+        window.aleaAbrirTelaCheia(n, lista, gOrdem);
+        return;
+      }
       mostrarGrande(0);
     }
     function preparar(f) {
@@ -348,6 +353,8 @@
     });
     document.addEventListener('keydown', function (ev) {
       if (!tela.classList.contains('aberta')) return;
+      var tc = document.querySelector('[data-telacheia]');
+      if (tc && tc.classList.contains('aberta')) return;
       if (!grande.hidden && (ev.key === 'ArrowRight' || ev.key === 'ArrowLeft')) { ev.preventDefault(); andarGrande(ev.key === 'ArrowRight' ? 1 : -1); return; }
       if (ev.key !== 'Escape') return;
       ev.preventDefault();
@@ -395,7 +402,7 @@
   var fotosGrandes = [];
   try { fotosGrandes = JSON.parse(colmeia && colmeia.getAttribute('data-grandes') || '[]'); }
   catch (e) { fotosGrandes = []; }
-  var tcAtual = -1, tcOrdem = [];
+  var tcAtual = -1, tcOrdem = [], tcLista = fotosGrandes;
   /* v19 (áudios 1632-1634): a foto tocada é a nº 1; depois vem a ordem de leitura da colmeia (a ordem dos favos na
      página — esquerda pra direita, de cima pra baixo), pulando a que já foi. */
   function ordemDaColmeia(n) {
@@ -408,9 +415,13 @@
     return seq;
   }
 
-  function abrirTelaCheia(n) {
-    if (!telacheia || !fotosGrandes.length) return;
-    tcOrdem = ordemDaColmeia(n);
+  /* v23 (vídeo 1714 + áudio 1713): as fotos do ÁLBUM abrem NESTA tela cheia (a da colmeia, a que emendou o topo e o
+     rodapé no iPhone dele) — com a lista e a ordem do álbum. `lista`/`ordem` vazios = a colmeia, como antes. */
+  function abrirTelaCheia(n, lista, ordem) {
+    tcLista = lista || fotosGrandes;
+    telacheia && telacheia.classList.toggle('sobre-album', !!lista);
+    if (!telacheia || !tcLista.length) return;
+    tcOrdem = ordem || ordemDaColmeia(n);
     tcAtual = 0;
     pintarTelaCheia();
     telacheia.classList.add('aberta');
@@ -424,19 +435,21 @@
     telacheia.classList.remove('aberta');
     telacheia.setAttribute('aria-hidden', 'true');
     topo('telacheia', null);
-    document.body.classList.remove('travado');
+    /* v23: se veio de um álbum, o álbum continua aberto — a página de trás continua travada */
+    var alb = document.querySelector('[data-album-tela]');
+    if (!(alb && alb.classList.contains('aberta'))) document.body.classList.remove('travado');
   }
 
   function pintarTelaCheia() {
     var palco = telacheia.querySelector('[data-palco-tc]');
     var pontos = telacheia.querySelector('[data-pontos-tc]');
     var conta = telacheia.querySelector('[data-conta-tc]');
-    palco.innerHTML = '<img src="' + fotosGrandes[tcOrdem[tcAtual]] + '" alt="Foto ' +
-      (tcAtual + 1) + ' de ' + fotosGrandes.length + '">';
-    pontos.innerHTML = fotosGrandes.map(function (_, k) {
+    palco.innerHTML = '<img src="' + tcLista[tcOrdem[tcAtual]] + '" alt="Foto ' +
+      (tcAtual + 1) + ' de ' + tcLista.length + '">';
+    pontos.innerHTML = tcLista.map(function (_, k) {
       return '<i class="' + (k === tcAtual ? 'on' : '') + '"></i>';
     }).join('');
-    conta.textContent = (tcAtual + 1) + ' / ' + fotosGrandes.length;
+    conta.textContent = (tcAtual + 1) + ' / ' + tcLista.length;
   }
 
   /* ⚠️ SEM VOLTA: passar do fim (ou do começo) FECHA em vez de dar a volta. É o pedido
@@ -444,11 +457,12 @@
      que já viu tudo, e ele fica rodando achando que falta foto. */
   function andarTelaCheia(dir) {
     var n = tcAtual + dir;
-    if (n < 0 || n >= fotosGrandes.length) { fecharTelaCheia(); return; }
+    if (n < 0 || n >= tcLista.length) { fecharTelaCheia(); return; }
     tcAtual = n;
     pintarTelaCheia();
   }
 
+  window.aleaAbrirTelaCheia = abrirTelaCheia;
   if (telacheia) {
     telacheia.addEventListener('click', function (ev) {
       if (ev.target.closest('[data-fechar-tc]')) { fecharTelaCheia(); return; }

@@ -1749,3 +1749,18 @@ body.no-feed .topo::before {
 .album-tela .album-grade .favo:nth-child(1) { transform-origin: left top; }
 .album-tela .album-grade .favo:nth-child(2) { transform-origin: center top; }
 .album-tela .album-grade .favo:nth-child(3) { transform-origin: right top; }
+
+/* =============================================================================
+   ⚠️ TOPO E RODAPÉ EMENDADOS NA TELA CHEIA — ETAPA 113 (Cassiano, 25/09/2026 15:55-15:57, prints 1705/1707 + áudios 1704-1708)
+   "em todo site, se for tela cheia, adequa o fundo da foto com o cabeçalho de cima e o rodapé de baixo". A meta
+   theme-color trocada na hora não bastou no iPhone: o Safari pinta as barras copiando o que está fixo no topo (o nosso
+   cabeçalho, bege) e o fundo da página. Com uma tela cheia aberta, tudo isso veste a cor da tela cheia. */
+html.topo-emendado, html.topo-emendado body { background: var(--cor-do-topo) !important; }
+html.topo-emendado .topo, html.topo-emendado .topo::before,
+html.topo-emendado body.no-feed .topo::before, html.topo-emendado body.escuro .topo::before {
+  background: var(--cor-do-topo) !important; -webkit-backdrop-filter: none !important; backdrop-filter: none !important;
+}
+html.topo-emendado .album-tela { background: var(--cor-do-topo) !important; -webkit-backdrop-filter: none !important; backdrop-filter: none !important; }
+
+/* v23: a tela cheia aberta a partir de um ÁLBUM mora por cima dele (o álbum é z 90) */
+.telacheia.sobre-album { z-index: 96; }
