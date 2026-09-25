@@ -209,7 +209,7 @@ window.ALEA = {
      25/09/2026: a LISTA REAL dele substituiu as de teste (ver o bloco `filamentos` abaixo). */
   filamentos: {
     /* LISTA REAL do Cassiano (25/09/2026, audios 1786-1815, tudo PLA; nomes do site trocados por ele na
-       msg 1827; sem 4a aba - audio 1830). Gerado por 03_site/07_gerar_filamentos_config_v2_sem_4a_aba_2026-09-25.py
+       msg 1827; sem 4a aba - audio 1830; + Rosa Silk msg 1835). Gerado por 03_site/07_gerar_filamentos_config_v3_rosa_silk_2026-09-25.py
        a partir de 03_site/_LISTA_FILAMENTOS_DELE_2026-09-25.json - nao editar a mao. Antes: cores de TESTE
        (Azul/Amarelo/Verde) no Basico e Perolizado e as 5 foscas Bambu da msg 546.
        hex = cor OFICIAL do fabricante; eSUN Silk Lime = aproximado (medido na foto oficial da eSUN). */
@@ -249,6 +249,7 @@ window.ALEA = {
       { site: 'Dourado', hex: '#D09531', original: 'Multfila · PLA · Mult Silk · Ouro Envelhecido (4226-PCI-PLS-048)' },
       { site: 'Laranja', hex: '#F15505', original: 'Voolt3D · PLA · V-Silk · Laranja (PL-LJ-SK-1)' },
       { site: 'Vermelho', hex: '#DA342E', original: 'Multfila · PLA · Mult Silk · Vermelho Metalizado (4226-PCI-PLS-026)' },
+      { site: 'Rosa', hex: '#FF7F6F', original: 'eSUN · PLA · PLA-Silk · Pink' },
       { site: 'Azul Aqua', hex: '#6BBFE3', original: 'eSUN · PLA · Silk · Aqua' },
       { site: 'Azul', hex: '#358AE8', original: 'Multfila · PLA · Mult Silk · Azul Safira Metalizado (4226-PCI-PLS-025)' },
       { site: 'Azul Céu', hex: '#035EB7', original: 'Voolt3D · PLA · V-Silk · Azul Sky (PL-AZ-SY-SK-1)' },
