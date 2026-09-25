@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- GERADO por 03_site/02_gerar_emails_pedido_v25_capivara_da_vez_maior_2026-09-24.py — mexer lá, não aqui.
+<!-- GERADO por 03_site/02_gerar_emails_pedido_v26_lote8_textos_nome_degrade_2026-09-24.py — mexer lá, não aqui.
      ASSUNTO: Seu código de acesso é {{CODIGO}}
      REMETENTE PROPOSTO: ālea & Co. <sac@aleaco.art.br> -->
 <html lang="pt-BR">
@@ -9,19 +9,19 @@
 <meta name="robots" content="noindex">
 <title>Seu código de acesso é {{CODIGO}}</title>
 </head>
-<body style="margin:0;padding:0;background:#EFE9E0;">
+<body style="margin:0;padding:0;background:#000000;">
 <div style="display:none;max-height:0;overflow:hidden;opacity:0;">Seu código de acesso no ālea &amp; Co. é {{CODIGO}}</div>
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#EFE9E0;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#000000" style="background:#000000;">
   <tr><td align="center" style="padding:0;">
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;">
       <tr><td data-fundo background="https://www.aleaco.art.br/modelos-email/fundo_email_inteiro.jpg" bgcolor="#EFE9E0" valign="top"
           style="background-color:#EFE9E0;background-image:url(https://www.aleaco.art.br/modelos-email/fundo_email_inteiro.jpg);background-position:center top;background-repeat:repeat-y;">
         <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
           <tr><td align="center" style="padding:36px 24px 26px;">
-            <img data-img src="https://www.aleaco.art.br/modelos-email/logo_email.png" width="180" alt="ālea &amp; Co." style="display:block;width:180px;max-width:60%;height:auto;border:0;">
+            <a href="https://www.aleaco.art.br/" style="text-decoration:none;"><img data-img src="https://www.aleaco.art.br/modelos-email/logo_email.png" width="180" alt="ālea &amp; Co." style="display:block;width:180px;max-width:60%;height:auto;border:0;"></a>
           </td></tr>
           <tr><td style="padding:0 24px;"><div style="height:1px;background:#CFC5B6;line-height:1px;font-size:1px;">&nbsp;</div></td></tr>
-          <tr><td align="center" style="padding:40px 24px 0;font-family:Arial,Helvetica,sans-serif;font-size:30px;line-height:36px;color:#2B2118;">{{NOME}},</td></tr>
+          <tr><td align="center" style="padding:40px 24px 0;font-family:Arial,Helvetica,sans-serif;font-size:30px;line-height:36px;color:#2B2118;"><span data-nome>{{NOME}}</span><span style="color:#AF9559;">,</span></td></tr>
 <tr><td align="center" style="padding:36px 16px 0px;font-family:Arial,Helvetica,sans-serif;font-size:16px;line-height:22px;color:#2B2118;text-wrap:balance;">Seu código de acesso no ālea &amp; Co. é:</td></tr><tr><td data-codigo align="center" style="padding:40px 24px 44px 40px;font-family:Arial,Helvetica,sans-serif;font-size:34px;line-height:40px;letter-spacing:16px;color:#924429;">{{CODIGO}}</td></tr><tr><td align="center" style="padding:0px 16px 0px;font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:23px;color:#2B2118;text-wrap:balance;">Para acessar sua conta, insira o código no campo que ficou aberto no seu navegador.</td></tr><tr><td style="height:40px;line-height:40px;font-size:1px;">&nbsp;</td></tr><tr><td style="padding:0 12px 24px;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#F6F3EE;"><tr><td align="center" style="padding:28px 14px 0;"><a href="https://linktr.ee/eaibora.3d"><img data-img src="https://www.aleaco.art.br/modelos-email/icone_linktree.png" width="28" height="28" alt="Linktree" style="border:0;display:inline-block;"></a></td></tr><tr><td align="center" style="padding:22px 14px 0;font-family:Arial,Helvetica,sans-serif;font-size:14px;line-height:21px;color:#2B2118;">Você está recebendo este e-mail porque solicitou um código de acesso no site da ālea &amp; Co.</td></tr><tr><td align="center" style="padding:18px 14px 0;font-family:Arial,Helvetica,sans-serif;font-size:14px;line-height:21px;color:#2B2118;">Para mais informações, mande um e-mail para:</td></tr><tr><td align="center" style="padding:8px 14px 28px;font-family:Arial,Helvetica,sans-serif;font-size:18px;line-height:24px;"><a href="mailto:sac@aleaco.art.br" style="color:#924429;text-decoration:none;font-weight:700;">sac@aleaco.art.br</a></td></tr></table></td></tr>
         </table>
       </td></tr>
@@ -41,6 +41,13 @@
     var nome = q.get('nome') || 'cassianorosado', codigo = q.get('codigo') || '566753';
     document.title = document.title.replace('{{CODIGO}}', codigo);
     document.body.innerHTML = document.body.innerHTML.split('{{NOME}}').join(nome).split('{{CODIGO}}').join(codigo);
+    /* v26: o nome em degradê letra a letra (mesma conta de nome_em_degrade do servidor) */
+    document.querySelectorAll('[data-nome]').forEach(function (el) { var s = el.textContent, cs = [[108,150,167],[189,106,44],[157,62,32],[175,149,89]];
+      var ls = s.replace(/\s/g, '').length, n = Math.max(1, ls - 1), k = 0, out = '';
+      for (var q = 0; q < s.length; q++) { var ch = s[q]; if (/\s/.test(ch)) { out += ch; continue; }
+        var t = k / n * 3, i = Math.min(Math.floor(t), 2), f = t - i, c = [0,1,2].map(function (m) { return Math.round(cs[i][m] + (cs[i+1][m] - cs[i][m]) * f); });
+        out += '<span style="color:rgb(' + c.join(',') + ');">' + ch + '</span>'; k++; }
+      el.innerHTML = out; });
     if (!/aleaco\.art\.br$/.test(location.hostname)) {
       var troca = function (u) { return u.replace('https://www.aleaco.art.br/modelos-email/', ''); };
       Array.prototype.forEach.call(document.querySelectorAll('img[data-img]'), function (i) { i.src = troca(i.src); });
