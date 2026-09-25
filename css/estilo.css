@@ -1029,34 +1029,48 @@ body.sem-transicao-feed .feed { transition: none !important; }
    cima "na mesma nomenclatura e cor do PET, talvez um pouquinho menor" (o rótulo .linha: dourado, maiúscula, 12,5px
    → aqui 11px). Clicou, abre uma tela QUASE cheia com as miniaturas do álbum; a foto expande dentro dela; clicar em
    qualquer lugar fora da foto volta pras miniaturas; clicar no escuro ou no × fecha o álbum. */
+/* ÁLBUNS EM FLOR — v17 (Cassiano 25/09/2026 14:14, áudio 1612, sobre a v16): "não quero esse efeito tudo pra um
+   lado só. Quero a foto um pouquinho menor e as fotos de trás toda embaralhada, parecendo uma flor em volta dele, pra
+   ver que tem mais fotos." A capa fica no centro em 84% do favo; atrás, 3 PÉTALAS do mesmo tamanho com outras fotos
+   do álbum, giradas pra lados diferentes (as pontas aparecem em volta, não só à direita). O nome vai embaixo, dourado.
+   (a v16 — "ÁLBUNS EM PILHA", 2 favos lisos subindo pra direita — está no histórico do git, commit a7a4961) */
 .albuns {
-  --favo: clamp(78px, 11vw, 112px);
-  display: flex; justify-content: center; gap: calc(var(--favo) * .16);
-  margin: -6px 0 18px;
+  --favo: min(clamp(96px, 15vw, 150px), 25vw);
+  display: flex; justify-content: center; align-items: flex-start;
+  gap: calc(var(--favo) * .12);
+  margin: calc(var(--favo) * -.3) 0 22px;           /* encosta na colmeia (o respiro de baixo dela é pro favo aberto) */
 }
-.albuns .favo {
-  position: relative; width: var(--favo); height: calc(var(--favo) * 1.1547); margin: 0;
-  padding: 0; border: 0; background: var(--papel); cursor: pointer;
+.albuns .album {
+  position: relative; display: flex; flex-direction: column; align-items: center; gap: 8px;
+  padding: 0; margin: 0; border: 0; background: none; cursor: pointer; font: inherit; color: inherit;
+  transition: transform .35s cubic-bezier(.3, .86, .28, 1);
+}
+.albuns .album-pilha {
+  position: relative; display: block; width: var(--favo); height: calc(var(--favo) * 1.1547);
+  filter: drop-shadow(0 5px 9px rgba(43, 33, 24, .18));
+}
+.albuns .petala, .albuns .album-capa {
+  position: absolute; left: 8%; top: 8%; width: 84%; height: 84%; display: block; overflow: hidden;
   clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
-  transition: transform .35s cubic-bezier(.3, .86, .28, 1), filter .35s ease;
+  background: #DCCFBE;
 }
-.albuns .favo img { width: 100%; height: 100%; object-fit: cover; display: block; }
-.albuns .favo:hover { transform: scale(1.06); filter: brightness(1.06); }
-.albuns .favo:focus-visible { outline: 2px solid var(--terracota); outline-offset: 2px; }
-.albuns .favo .rotulo-album {
-  position: absolute; left: 4%; right: 4%; top: 50%; transform: translateY(-50%);
-  font-size: clamp(9.5px, 2.6vw, 11px); line-height: 1.15; letter-spacing: .08em; text-transform: uppercase; font-weight: 700; color: var(--dourado);
-  hyphens: manual; overflow-wrap: normal;
-  text-align: center; pointer-events: none;
-  text-shadow: 0 0 6px var(--papel), 0 0 2px var(--papel), 0 1px 1px var(--papel);
+.albuns .petala img, .albuns .album-capa img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.albuns .petala img { filter: brightness(.82) saturate(.8); }
+.albuns .petala.p1 { transform: translate(-7%, -3%) rotate(-19deg); }
+.albuns .petala.p2 { transform: translate(7%, -4%) rotate(17deg); }
+.albuns .petala.p3 { transform: translate(0, 6%) rotate(34deg); }
+.albuns .album-capa { background: var(--papel); padding: 4%; box-sizing: border-box; }   /* a moldura clara separa a capa das pétalas */
+.albuns .album-capa img { clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%); }
+.albuns .album:hover { transform: translateY(-3px); }
+.albuns .album:hover .album-capa img { filter: brightness(1.06); }
+.albuns .album:focus-visible { outline: 2px solid var(--terracota); outline-offset: 4px; border-radius: 6px; }
+.albuns .rotulo-album {
+  font-size: clamp(10px, 2.7vw, 12.5px); line-height: 1.15; letter-spacing: .08em; text-transform: uppercase;
+  font-weight: 700; color: var(--dourado); white-space: nowrap; text-align: center;
 }
-.albuns .favo::before {
-  content: ''; position: absolute; inset: 0; background: rgba(246, 243, 238, .55); pointer-events: none;
-}
-.albuns .favo.vazio { cursor: default; background: var(--borda, #E3DBCF); }
-.albuns .favo.vazio::before { display: none; }
-.albuns .favo.vazio .rotulo-album { top: 42%; }
-.albuns .favo.vazio .rotulo-breve { position: absolute; left: 4%; right: 4%; top: 58%; font-size: 9.5px; letter-spacing: .08em; color: var(--tinta-fraca); text-align: center; }
+.albuns .album.vazio { cursor: default; }
+.albuns .album.vazio .album-capa { background: var(--borda, #E3DBCF); }
+.albuns .album.vazio .rotulo-breve { font-size: 9.5px; letter-spacing: .08em; color: var(--tinta-fraca); margin-top: -4px; }
 
 .album-tela {
   position: fixed; inset: 0; z-index: 90; display: grid; place-items: center;
@@ -1079,15 +1093,34 @@ body.sem-transicao-feed .feed { transition: none !important; }
 .album-tela .album-conta { font-size: 12px; color: var(--tinta-fraca); margin-left: 8px; }
 .album-tela .album-grade { --favo: clamp(96px, 16vw, 168px); padding-block: clamp(20px, 4vw, 40px); }
 .album-tela .album-grade .favo { margin: calc(var(--favo) * -.14) 0; }
-/* a foto grande mora POR CIMA da grade, dentro da caixa: "expande num tamanho legal" */
-.album-tela .album-grande {
-  position: absolute; inset: 0; z-index: 2; display: grid; place-items: center; padding: clamp(18px, 4vw, 40px);
-  background: rgba(246, 243, 238, .92); border-radius: 18px; cursor: zoom-out;
+/* v18 — A FOTO AMPLIADA DO ÁLBUM É TELA CHEIA (Cassiano 25/09/2026 14:23, áudios 1623-1624 + vídeo 1622): "a tela de
+   trás mexe, tem que ficar estática"; "vários formatos (...) fica dando essa transição feia quando é horizontal,
+   vertical"; "tela cheia, cheiona, arrancar tudo que tem de escrita, não deixar X, não deixar nada; embaixo bem suave
+   que foto que está até que foto que vai; pra sair, arrasta pra baixo ou pra cima, igual o iPhone". A camada mora no
+   <body> (o JS a muda de lugar), fixa, fundo liso da página; a foto ocupa a tela inteira NA PROPORÇÃO DELA
+   (contain), então foto em pé e deitada trocam sem a caixa crescer ou encolher. (a v17 — foto dentro da caixa, com
+   sombra — está no histórico do git, commit 40d5f65) */
+.album-grande {
+  position: fixed; inset: 0; z-index: 95; display: grid; place-items: center;
+  /* v19 (áudio 1628): o MESMO fundo e o MESMO esmaecer da tela cheia da colmeia — "mais suave, mais elegante" */
+  background: rgba(246, 243, 238, .82); -webkit-backdrop-filter: blur(22px) saturate(120%); backdrop-filter: blur(22px) saturate(120%);
+  touch-action: none; overscroll-behavior: contain;
+  animation: albumGrandeEntra .28s ease;
 }
-.album-tela .album-grande[hidden] { display: none; }   /* o `display: grid` acima vencia o atributo hidden e a camada invisível engolia o clique */
-.album-tela .album-grande img { max-width: 100%; max-height: 100%; object-fit: contain; border-radius: 12px; box-shadow: 0 18px 50px rgba(0, 0, 0, .25); cursor: default; }
+.album-grande.saindo { opacity: 0; transition: opacity .28s ease; }
+@keyframes albumGrandeEntra { from { opacity: 0; } to { opacity: 1; } }
+.album-grande[hidden] { display: none; }   /* o `display: grid` acima venceria o atributo hidden */
+.album-grande img {
+  display: block; width: 100vw; height: 100vh; height: 100dvh; object-fit: contain;
+  transition: transform .25s ease; will-change: transform; -webkit-user-select: none; user-select: none;
+}
+@media (hover: hover) and (pointer: fine) { .album-grande { cursor: zoom-out; } }
+.album-grande .album-conta-grande {
+  position: fixed; left: 0; right: 0; bottom: calc(env(safe-area-inset-bottom, 0px) + 16px); text-align: center;
+  font-size: 12.5px; letter-spacing: .08em; color: var(--tinta-fraca); opacity: .75; pointer-events: none;
+}
 .album-tela.com-grande .album-caixa { overflow: hidden; }
-@media (prefers-reduced-motion: reduce) { .album-tela, .albuns .favo { transition: none; } }
+@media (prefers-reduced-motion: reduce) { .album-tela, .albuns .album { transition: none; } }
 .colmeia-dica { text-align: center; font-size: 13px; color: var(--tinta-fraca); margin: 0 0 2px; }
 .colmeia-dica2 { text-align: center; font-size: 11.5px; color: var(--tinta-fraca); opacity: .75; margin: 0 0 4px; }
 
@@ -1628,3 +1661,91 @@ html, body { overflow-x: clip; }
   -webkit-appearance: none; appearance: none; width: 20px; height: 20px; margin: 0; border-radius: 5px;
   background: #EFEAE2; border: 1.5px solid var(--borda); cursor: not-allowed;
 }
+
+/* =============================================================================
+   ⚠️ FEED CLARO — ETAPA 108 (Cassiano, 25/09/2026 14:41, print 1636 + áudio 1637)
+   "a nossa tela preta: faz a prévia, no lugar desse preto, com o papel de parede que você fez pra nossa página
+   inicial, em degradê com textura. Toda foto que você tiver recortado, esquece, deixa só as fotos profissionais,
+   que eu acho que vai ficar mais bonito o site, mais elegante."
+   · o fundo do feed é o MESMO da abertura (os 3 radiais + o linear) com a estampa off a 50% por cima, PARADO
+     (fixo na tela enquanto os produtos rolam);
+   · o que era branco-sobre-preto vira tinta-sobre-papel; as bolinhas continuam brancas porque moram DENTRO da foto;
+   · o cabeçalho deixa de ficar preto no feed: o feed.js liga `no-feed` (e não mais `escuro`), e a faixa que cobre o
+     "g" do "← categorias" ganha a versão clara.
+   As regras escuras de antes continuam no arquivo, acima — é daqui pra baixo que vale. */
+.feed {
+  color: var(--tinta);
+  background:
+    radial-gradient(1100px 720px at 16% 14%, rgba(118, 149, 165, .60), transparent 62%),
+    radial-gradient(940px 660px at 86% 24%, rgba(170, 150, 97, .58), transparent 60%),
+    radial-gradient(1080px 780px at 52% 98%, rgba(146, 68, 41, .46), transparent 64%),
+    linear-gradient(162deg, #F8F5F0 0%, #EAE4DB 54%, #E2D6C6 100%);
+}
+.feed::before {
+  content: ''; position: fixed; inset: 0; z-index: -1; pointer-events: none;
+  background: url(../img/marca/estampa_off_ladrilho.svg) left top / 900px auto repeat;
+  opacity: .5;
+}
+@media (min-aspect-ratio: 3/5) {
+  .feed::before { background-size: clamp(1000px, 90vw, 1400px) auto; background-position: center top; }
+}
+.feed .objeto.com-cenario { background: #EAE4DB; box-shadow: 0 34px 70px -40px rgba(43, 33, 24, .55); }
+.feed .categoria { color: var(--terracota); }
+.feed .ver { color: var(--terracota); opacity: .9; }   /* o dourado some sobre o degradê (medido no print) */
+.feed .produto-mini, .feed .valor { color: var(--tinta); }
+.feed .contador { color: rgba(43, 33, 24, .55); }
+.feed .descricao-categoria { color: var(--tinta); }
+.feed .descricao-categoria .titulo-categoria { color: var(--terracota); }
+.feed .fechar-feed { color: var(--tinta); }
+.feed .fechar-feed:hover { color: var(--terracota); }
+.feed .fim p { color: var(--tinta); }
+.feed .fim .ou-veja { color: rgba(43, 33, 24, .5); }
+.feed .fim .menu-categorias a, .feed .fim .menu-categorias span { color: var(--tinta); }
+.feed .fim .botao, .feed .fim .botao[aria-disabled='true'], .feed .fim .botao:disabled { background: var(--terracota); color: var(--off); box-shadow: none; }
+.feed .fim .botao:hover { background: var(--tinta); color: var(--off); box-shadow: none; }
+.voltar-categorias:hover, .voltar-categorias:focus-visible { background: rgba(43, 33, 24, .08); }
+.dica-arrasto { background: rgba(43, 33, 24, .72); text-shadow: none; }
+/* o cabeçalho no feed claro: a mesma receita da etapa 9 (barra + prolongamento como UM pseudo, opaco a 92%),
+   só que no tom do papel em vez do preto */
+body.no-feed .topo { background: transparent; -webkit-backdrop-filter: none; backdrop-filter: none; }
+body.no-feed .topo::before {
+  content: ''; position: absolute; left: 0; right: 0; top: 0; bottom: -7px;
+  background: color-mix(in srgb, var(--off) 92%, transparent);
+  -webkit-backdrop-filter: saturate(140%) blur(10px); backdrop-filter: saturate(140%) blur(10px);
+  z-index: -1; pointer-events: none;
+}
+
+/* =============================================================================
+   ⚠️ X DISCRETO — ETAPA 109 (Cassiano, 25/09/2026 15:13-15:14, áudios 1671 e 1673 + print 1672)
+   "vamos colocar um X bem discreto, só que sem o círculo, só o X mesmo, mais branquinho, bem pra passar despercebido,
+   mas que se olhar ele está lá (...) em todos que tiver X com uma bola preta, pode tirar". Vale pro X do álbum
+   (era a bola preta), pro da tela cheia da colmeia (era a bola translúcida) e pro novo X da foto do álbum. Branco a
+   ~90% com uma sombra leve: é o que o deixa visível num fundo claro sem virar botão. */
+.album-tela .album-fechar, .telacheia .fechar-x, .x-discreto {
+  width: 44px; height: 44px; border: 0; border-radius: 0; padding: 0; background: transparent !important;
+  color: rgba(255, 255, 255, .92); font-size: 32px; font-weight: 300; line-height: 1; cursor: pointer;
+  text-shadow: 0 0 5px rgba(0, 0, 0, .45), 0 1px 2px rgba(0, 0, 0, .3);
+  opacity: .8; transition: opacity .2s ease;
+  display: grid; place-items: center;
+}
+.album-tela .album-fechar:hover, .telacheia .fechar-x:hover, .x-discreto:hover { opacity: 1; }
+.album-grande .album-grande-x {
+  position: fixed; top: calc(env(safe-area-inset-top, 0px) + 10px); right: 12px; z-index: 2;
+}
+
+/* =============================================================================
+   ⚠️ TELA CHEIA EMENDADA NO TOPO — ETAPA 111 (Cassiano, 25/09/2026 15:28-15:37, prints 1680/1686 + áudios 1681-1691)
+   "só quando for tela cheia a gente emenda: mesma cor de cabeçalho com fundo de foto, pra ficar a sensação de tela
+   infinita". Medido no print dele: o fundo translúcido+embaçado saía mais cinza que a barra do iPhone (o borrão escurece).
+   Então, na TELA CHEIA, o fundo é SÓLIDO e na mesma cor que o JS põe no topo (#F4F0EB). Janela (álbum) mantém o véu. */
+.telacheia, .album-grande {
+  background: #F4F0EB; -webkit-backdrop-filter: none; backdrop-filter: none;
+}
+/* a 1ª ampliação dentro do álbum: as colunas das pontas crescem pra dentro, pra não cortar na borda da caixa */
+.album-tela .album-grade .favo:nth-child(3n+1) { transform-origin: left center; }
+.album-tela .album-grade .favo:nth-child(3n) { transform-origin: right center; }
+.album-tela .album-grade { overflow: visible; }
+/* a 1ª fileira cresce pra BAIXO (pra cima cobria o título do álbum) */
+.album-tela .album-grade .favo:nth-child(1) { transform-origin: left top; }
+.album-tela .album-grade .favo:nth-child(2) { transform-origin: center top; }
+.album-tela .album-grade .favo:nth-child(3) { transform-origin: right top; }

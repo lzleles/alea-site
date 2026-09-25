@@ -27,6 +27,30 @@
    no site da Negocie em 10/09/2026, e ele só aparece conferindo o href NO AR.
    ========================================================================== */
 
+/* ⚠️ ETAPA 110 (Cassiano, 25/09/2026 15:27, vídeo 1678 + áudio 1679): "no site da Globo.com o cabeçalho fica da
+   mesma cor que a tela, dá a impressão de que a tela é infinita; no nosso, o cabeçalho tá da cor diferente do fundo
+   das fotos, dá pra ver que tá cortado". O que o iPhone pinta lá em cima é a COR DE TEMA: o Safari lê a meta
+   `theme-color` e, nas versões novas, a cor de fundo do <html>. O site não declarava nenhuma. Agora declara (a cor
+   do cabeçalho) e cada janela de foto troca pela cor do SEU fundo enquanto está aberta. */
+window.aleaCorDoTopo = (function () {
+  var PADRAO = '#EAE4DB';
+  var meta = document.querySelector('meta[name="theme-color"]');
+  if (!meta) { meta = document.createElement('meta'); meta.name = 'theme-color'; document.head.appendChild(meta); }
+  meta.content = PADRAO;
+  var pilha = [];
+  function aplicar() {
+    var cor = pilha.length ? pilha[pilha.length - 1].cor : PADRAO;
+    meta.content = cor;
+    document.documentElement.style.backgroundColor = pilha.length ? cor : '';
+  }
+  /* uso: aleaCorDoTopo('album', '#6E6862') ao abrir; aleaCorDoTopo('album', null) ao fechar */
+  return function (quem, cor) {
+    pilha = pilha.filter(function (p) { return p.quem !== quem; });
+    if (cor) pilha.push({ quem: quem, cor: cor });
+    aplicar();
+  };
+})();
+
 (function () {
   'use strict';
 

@@ -155,6 +155,7 @@
      álbum. Se ele clicar na foto, ela expande num tamanho legal, mas com ele podendo clicar em qualquer lugar da
      tela ali fora pra voltar pras miniaturas." Não usa a tela cheia de carrossel. Os conjuntos vêm do
      `data-albuns` que o gerador v15 escreve a partir do produtos.js. */
+  function topo(q, c) { if (window.aleaCorDoTopo) window.aleaCorDoTopo(q, c); }
   (function albuns() {
     var caixaAlbuns = document.querySelector('[data-albuns]');
     var tela = document.querySelector('[data-album-tela]');
@@ -167,7 +168,23 @@
     var conta = tela.querySelector('[data-album-conta]');
     var h1 = document.querySelector('.produto-topo h1');
     var peca = h1 ? h1.textContent.trim() : 'a peça';
-    var aberto = null;
+    var aberto = null, gAtual = -1, gOrdem = [], carregadas = {};
+    /* v17: o contador "2 / 6" da foto ampliada (criado aqui pra não mexer no HTML gerado) */
+    var contaG = document.createElement('span');
+    contaG.className = 'album-conta-grande';
+    grande.appendChild(contaG);
+    /* v18 (áudios 1623-1624 do Cassiano, vídeo 1622): a foto ampliada vira TELA CHEIA DE VERDADE — sai de dentro da caixa
+       do álbum e mora direto no <body>, fixa na tela, com fundo liso que não mexe. Sem X e sem texto: só o "3 / 6"
+       suave embaixo. Sai ARRASTANDO pra baixo ou pra cima, "igual o iPhone, o Android"; passa DESLIZANDO pro lado. */
+    document.body.appendChild(grande);
+    var gImg = grande.querySelector('img');
+    /* v20 (áudios 1671/1673): um X bem discreto, só o traço, branco fraco — o arrastar pra cima/baixo continua fechando */
+    var gX = document.createElement('button');
+    gX.type = 'button'; gX.className = 'x-discreto album-grande-x'; gX.setAttribute('aria-label', 'Fechar a foto');
+    gX.textContent = '\u00d7';
+    gX.addEventListener('click', function (e) { e.stopPropagation(); fecharGrande(); });
+    grande.appendChild(gX);
+    var mouse = !!(window.matchMedia && window.matchMedia('(hover: hover) and (pointer: fine)').matches);
 
     function abrirAlbum(id) {
       var a = albuns[id];
@@ -175,6 +192,7 @@
       aberto = a;
       nome.textContent = a.nome;
       conta.textContent = a.fotos.length + (a.fotos.length === 1 ? ' foto' : ' fotos');
+      grade.classList.remove('tem-aberto');
       grade.innerHTML = a.fotos.map(function (f, n) {
         return '<button class="favo" type="button" data-album-foto="' + n + '" aria-label="Ampliar foto ' + (n + 1) + ' do álbum ' + a.nome + '">' +
           '<img src="img/produtos/' + f + '_m.jpg" width="700" height="700" loading="lazy" decoding="async" alt="' + peca + ' ' + a.nome + ' — foto ' + (n + 1) + '"></button>';
@@ -183,6 +201,7 @@
       tela.classList.add('aberta');
       tela.setAttribute('aria-hidden', 'false');
       document.body.classList.add('travado');
+      /* v21 (áudios 1685/1689/1691): janela NÃO troca a cor do topo — "prevalece esse sombreamento bonito"; só a tela cheia emenda */
     }
     function fecharAlbum() {
       tela.classList.remove('aberta');
@@ -190,32 +209,147 @@
       document.body.classList.remove('travado');
       aberto = null;
     }
-    function abrirGrande(n) {
+    /* v19 (áudios 1632-1634): "qualquer foto que ele clicar vai ser a número 1; depois segue a ordem normal, da
+       esquerda pra direita, de cima pra baixo" — pra quem toca na 7ª não chegar no fim logo e achar que fechou. */
+    function comecarEm(n) {
+      gOrdem = [n];
+      for (var k = 0; k < aberto.fotos.length; k++) if (k !== n) gOrdem.push(k);
+      mostrarGrande(0);
+    }
+    function preparar(f) {
+      if (carregadas[f]) return;
+      var i = new Image();
+      i.onload = function () { carregadas[f] = true; };
+      i.src = 'img/produtos/' + f + '.jpg';
+    }
+    function mostrarGrande(pos) {
       if (!aberto) return;
-      grande.querySelector('img').src = 'img/produtos/' + aberto.fotos[n] + '.jpg';
-      grande.hidden = false;
-      tela.classList.add('com-grande');
+      gAtual = pos;
+      var n = gOrdem[pos];
+      contaG.textContent = aberto.fotos.length > 1 ? (pos + 1) + ' / ' + aberto.fotos.length : '';
+      /* v19: foto já baixada entra direto (sem piscar a miniatura); as vizinhas ficam baixando por trás */
+      if (gOrdem[pos + 1] !== undefined) preparar(aberto.fotos[gOrdem[pos + 1]]);
+      if (gOrdem[pos - 1] !== undefined) preparar(aberto.fotos[gOrdem[pos - 1]]);
+      if (carregadas[aberto.fotos[n]]) { gImg.setAttribute('data-foto', aberto.fotos[n]); gImg.src = 'img/produtos/' + aberto.fotos[n] + '.jpg'; mostrarCamada(); return; }
+      /* v16: a miniatura (_m, já carregada) aparece NA HORA e a foto inteira entra por cima quando chegar —
+         no 4G a tela ficava só esmaecida por um instante e parecia que o clique não pegou */
+      var img = gImg, f = aberto.fotos[n], cheia = new Image();
+      img.setAttribute('data-foto', f);
+      img.src = 'img/produtos/' + f + '_m.jpg';
+      cheia.onload = function () { carregadas[f] = true; if (img.getAttribute('data-foto') === f) img.src = cheia.src; };
+      cheia.src = 'img/produtos/' + f + '.jpg';
+      mostrarCamada();
+    }
+    /* v19 (áudio 1628, "gostei mais dessa primeira transição, mais suave, mais elegante"): a camada entra e sai
+       esmaecendo em .28s, igual à tela cheia da colmeia */
+    var saida = null;
+    function mostrarCamada() {
+      clearTimeout(saida);
+      grande.classList.remove('saindo');
+      if (grande.hidden) { grande.hidden = false; tela.classList.add('com-grande'); topo('foto', '#F4F0EB'); }
     }
     function fecharGrande() {
-      grande.hidden = true;
-      tela.classList.remove('com-grande');
+      if (grande.hidden) return;
+      gAtual = -1;
+      topo('foto', null);
+      grande.classList.add('saindo');
+      clearTimeout(saida);
+      saida = setTimeout(function () { grande.hidden = true; grande.classList.remove('saindo'); tela.classList.remove('com-grande'); }, 280);
     }
+    /* v17 (áudios 1613-1614 do Cassiano): a foto ampliada do álbum PASSA pro lado, e "chegou na última foto, o cliente
+       apertou de novo pra rolar ou clicou pra passar, aí fecha" — SEM VOLTA, o mesmo esquema da tela cheia da colmeia.
+       Fechar aqui é voltar pras miniaturas do álbum, não sair do álbum. */
+    function andarGrande(dir) {
+      if (!aberto || gAtual < 0) return;
+      var pos = gAtual + dir;
+      if (pos < 0 || pos >= gOrdem.length) { fecharGrande(); return; }
+      mostrarGrande(pos);
+    }
+    var toque = null;
+    function soltar() {
+      gImg.style.transition = ''; gImg.style.transform = ''; grande.style.backgroundColor = '';
+    }
+    grande.addEventListener('touchstart', function (e) {
+      if (e.touches.length !== 1) { toque = null; return; }
+      toque = { x: e.touches[0].clientX, y: e.touches[0].clientY, dx: 0, dy: 0, eixo: null };
+      gImg.style.transition = 'none';
+    }, { passive: true });
+    /* passive:false + preventDefault: é isto que segura a página de trás parada enquanto o dedo mexe na foto */
+    grande.addEventListener('touchmove', function (e) {
+      e.preventDefault();
+      if (!toque) return;
+      var t = e.touches[0];
+      toque.dx = t.clientX - toque.x; toque.dy = t.clientY - toque.y;
+      if (!toque.eixo && (Math.abs(toque.dx) > 8 || Math.abs(toque.dy) > 8)) toque.eixo = Math.abs(toque.dx) > Math.abs(toque.dy) ? 'x' : 'y';
+      if (toque.eixo === 'y') {
+        var k = Math.min(Math.abs(toque.dy) / 400, 1);
+        gImg.style.transform = 'translateY(' + toque.dy + 'px) scale(' + (1 - k * .15) + ')';
+        grande.style.backgroundColor = 'rgba(246, 243, 238, ' + (1 - k * .6) + ')';
+      } else if (toque.eixo === 'x' && Math.abs(toque.dx) >= 40) {
+        var dir = toque.dx < 0 ? 1 : -1;
+        toque = null; soltar();
+        andarGrande(dir);
+      }
+    }, { passive: false });
+    grande.addEventListener('touchend', function () {
+      if (!toque) return;
+      var t = toque; toque = null;
+      soltar();
+      if (t.eixo === 'y' && Math.abs(t.dy) > 90) fecharGrande();
+    }, { passive: true });
+    grande.addEventListener('touchcancel', function () { toque = null; soltar(); }, { passive: true });
+    /* no computador não há arrastar: clique na foto ou Esc volta pras miniaturas; rodinha e setas passam */
+    grande.addEventListener('click', function () { if (mouse) fecharGrande(); });
+    grande.addEventListener('wheel', function (e) {
+      if (grande.hidden) return;
+      var d = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
+      if (Math.abs(d) < 8) return;
+      e.preventDefault();
+      andarGrande(d > 0 ? 1 : -1);
+    }, { passive: false });
+
+    /* v20 (áudios 1668-1669): "a tela de trás nunca pode rolar"; "toda janela que só envolva foto, se eu arrastar pra
+       cima ou pra baixo, fecha". Nas MINIATURAS do álbum: se a caixa não precisa rolar, o dedo não rola nada e o
+       arrasto vertical fecha o álbum; se precisa (álbum grande), ela rola por dentro e só o excesso é segurado. */
+    var tt = null;
+    var caixa = tela.querySelector('.album-caixa');
+    tela.addEventListener('touchstart', function (e) {
+      tt = e.touches.length === 1 ? { x: e.touches[0].clientX, y: e.touches[0].clientY } : null;
+    }, { passive: true });
+    tela.addEventListener('touchmove', function (e) {
+      var rola = caixa && caixa.scrollHeight > caixa.clientHeight + 1 && caixa.contains(e.target);
+      if (!rola) e.preventDefault();
+      /* v21 (áudio 1687): "em janela que não seja tela cheia, não vai poder fechar rolando; vai prevalecer o X" — o
+         álbum vai ter muitas fotos e a pessoa vai rolar pra ver. O arrasto só rola a caixa; a página de trás nunca. */
+    }, { passive: false });
+    tela.addEventListener('touchend', function () { tt = null; }, { passive: true });
 
     caixaAlbuns.addEventListener('click', function (ev) {
       var b = ev.target.closest('[data-album]');
       if (b) abrirAlbum(b.getAttribute('data-album'));
     });
     tela.addEventListener('click', function (ev) {
-      if (ev.target.closest('[data-fechar-album]')) { fecharAlbum(); return; }
-      /* foto grande aberta: clicar em QUALQUER lugar (fora da própria foto) volta pras miniaturas */
-      if (!grande.hidden) { if (!ev.target.closest('[data-album-grande] img')) fecharGrande(); return; }
+      if (ev.target.closest('[data-fechar-album]')) { if (!grande.hidden) fecharGrande(); else fecharAlbum(); return; }
+      /* v21 (áudios 1683-1684): "clicar uma vez amplia a foto um pouco, do mesmo tamanho das colmeias da outra página;
+         clicar de novo vai pra tela cheia". E com uma ampliada, o próximo toque só devolve ela pro lugar. */
+      var ampliada = grade.querySelector('.favo.aberto');
       var f = ev.target.closest('[data-album-foto]');
-      if (f) { abrirGrande(parseInt(f.getAttribute('data-album-foto'), 10)); return; }
+      if (ampliada) {
+        if (f === ampliada) { comecarEm(parseInt(f.getAttribute('data-album-foto'), 10)); return; }
+        ampliada.classList.remove('aberto');
+        /* v22 (áudio 1699): outra foto do álbum = a ampliação troca direto pra ela; fora das fotos = só devolve */
+        if (f) { f.classList.add('aberto'); return; }
+        grade.classList.remove('tem-aberto');
+        return;
+      }
+      if (f) { f.classList.add('aberto'); grade.classList.add('tem-aberto'); return; }
       /* clicar fora da caixa (no escuro) fecha o álbum */
       if (!ev.target.closest('.album-caixa')) fecharAlbum();
     });
     document.addEventListener('keydown', function (ev) {
-      if (ev.key !== 'Escape' || !tela.classList.contains('aberta')) return;
+      if (!tela.classList.contains('aberta')) return;
+      if (!grande.hidden && (ev.key === 'ArrowRight' || ev.key === 'ArrowLeft')) { ev.preventDefault(); andarGrande(ev.key === 'ArrowRight' ? 1 : -1); return; }
+      if (ev.key !== 'Escape') return;
       ev.preventDefault();
       if (!grande.hidden) fecharGrande(); else fecharAlbum();
     });
@@ -240,32 +374,56 @@
      ampliada só voltava ao tamanho se clicasse nela de novo — e ninguém adivinha isso.
      O ouvinte é no documento, e sai de cena quando o clique foi DENTRO da colmeia (lá
      o primeiro clique expande e o segundo abre a tela cheia) ou na tela cheia. */
+  /* v19 (vídeo 1630 + áudio 1631, 25/09/2026): "sempre que tiver uma imagem na ampliação 1, você só vai conseguir
+     acessar outras coisas depois que ela voltar pro lugar dela". Ouvinte em CAPTURA: o toque fora do favo aberto
+     (inclusive no espaço vazio da colmeia, no canto de baixo, num álbum ou num botão) é ENGOLIDO e só fecha a
+     ampliação; o próximo toque é que faz a coisa. Tocar no próprio favo aberto continua abrindo a tela cheia. */
   document.addEventListener('click', function (ev) {
     if (!colmeia || !colmeia.classList.contains('tem-aberto')) return;
-    if (ev.target.closest('[data-colmeia]')) return;
     if (ev.target.closest('[data-telacheia]')) return;
+    var ab = colmeia.querySelector('.favo.aberto');
+    if (ab && ab.contains(ev.target)) return;
+    /* v22 (áudio 1699): tocar em OUTRA foto da colmeia troca a ampliação direto pra ela (o clique segue pro ouvinte
+       da colmeia, que fecha a antiga e amplia a nova); só o toque FORA das fotos é engolido e apenas devolve. */
+    if (ev.target.closest('[data-colmeia] [data-favo]')) return;
+    ev.preventDefault();
+    ev.stopPropagation();
     fecharFavos();
-  });
+  }, true);
 
   /* =================================================================== tela cheia */
   var fotosGrandes = [];
   try { fotosGrandes = JSON.parse(colmeia && colmeia.getAttribute('data-grandes') || '[]'); }
   catch (e) { fotosGrandes = []; }
-  var tcAtual = -1;
+  var tcAtual = -1, tcOrdem = [];
+  /* v19 (áudios 1632-1634): a foto tocada é a nº 1; depois vem a ordem de leitura da colmeia (a ordem dos favos na
+     página — esquerda pra direita, de cima pra baixo), pulando a que já foi. */
+  function ordemDaColmeia(n) {
+    var seq = [n];
+    favos().forEach(function (f) {
+      var k = parseInt(f.getAttribute('data-favo'), 10);
+      if (!isNaN(k) && k !== n && k < fotosGrandes.length) seq.push(k);
+    });
+    for (var k = 0; k < fotosGrandes.length; k++) if (seq.indexOf(k) < 0) seq.push(k);
+    return seq;
+  }
 
   function abrirTelaCheia(n) {
     if (!telacheia || !fotosGrandes.length) return;
-    tcAtual = n;
+    tcOrdem = ordemDaColmeia(n);
+    tcAtual = 0;
     pintarTelaCheia();
     telacheia.classList.add('aberta');
     telacheia.setAttribute('aria-hidden', 'false');
     document.body.classList.add('travado');
+    topo('telacheia', '#F4F0EB');        /* papel a 82% sobre o bege: a cor que o fundo embaçado mostra */
   }
 
   function fecharTelaCheia() {
     if (!telacheia) return;
     telacheia.classList.remove('aberta');
     telacheia.setAttribute('aria-hidden', 'true');
+    topo('telacheia', null);
     document.body.classList.remove('travado');
   }
 
@@ -273,7 +431,7 @@
     var palco = telacheia.querySelector('[data-palco-tc]');
     var pontos = telacheia.querySelector('[data-pontos-tc]');
     var conta = telacheia.querySelector('[data-conta-tc]');
-    palco.innerHTML = '<img src="' + fotosGrandes[tcAtual] + '" alt="Foto ' +
+    palco.innerHTML = '<img src="' + fotosGrandes[tcOrdem[tcAtual]] + '" alt="Foto ' +
       (tcAtual + 1) + ' de ' + fotosGrandes.length + '">';
     pontos.innerHTML = fotosGrandes.map(function (_, k) {
       return '<i class="' + (k === tcAtual ? 'on' : '') + '"></i>';
@@ -299,15 +457,19 @@
       if (!ev.target.closest('img')) fecharTelaCheia();
     });
 
-    var tx = null;
-    telacheia.addEventListener('touchstart', function (e) { tx = e.touches[0].clientX; }, { passive: true });
+    /* v20 (áudios 1668-1669): passive:false + preventDefault = a página de trás NUNCA rola com a tela cheia aberta;
+       arrastar pro lado passa (como antes); arrastar pra cima ou pra baixo FECHA. */
+    var tx = null, ty = null;
+    telacheia.addEventListener('touchstart', function (e) { tx = e.touches[0].clientX; ty = e.touches[0].clientY; }, { passive: true });
     telacheia.addEventListener('touchmove', function (e) {
+      e.preventDefault();
       if (tx === null) return;
-      var dx = tx - e.touches[0].clientX;
+      var dx = tx - e.touches[0].clientX, dy = e.touches[0].clientY - ty;
+      if (Math.abs(dy) > 70 && Math.abs(dy) > Math.abs(dx)) { tx = null; fecharTelaCheia(); return; }
       if (Math.abs(dx) < 40) return;
       tx = null;
       andarTelaCheia(dx > 0 ? 1 : -1);
-    }, { passive: true });
+    }, { passive: false });
     telacheia.addEventListener('touchend', function () { tx = null; }, { passive: true });
 
     telacheia.addEventListener('wheel', function (e) {
