@@ -168,7 +168,7 @@
     var conta = tela.querySelector('[data-album-conta]');
     var h1 = document.querySelector('.produto-topo h1');
     var peca = h1 ? h1.textContent.trim() : 'a peça';
-    var aberto = null, gAtual = -1, gOrdem = [], carregadas = {};
+    var aberto = null, abertoId = null, gAtual = -1, gOrdem = [], carregadas = {};
     /* v17: o contador "2 / 6" da foto ampliada (criado aqui pra não mexer no HTML gerado) */
     var contaG = document.createElement('span');
     contaG.className = 'album-conta-grande';
@@ -189,7 +189,7 @@
     function abrirAlbum(id) {
       var a = albuns[id];
       if (!a || !a.fotos || !a.fotos.length) return;
-      aberto = a;
+      aberto = a; abertoId = id;
       nome.textContent = a.nome;
       conta.textContent = a.fotos.length + (a.fotos.length === 1 ? ' foto' : ' fotos');
       grade.classList.remove('tem-aberto');
@@ -216,7 +216,18 @@
       for (var k = 0; k < aberto.fotos.length; k++) if (k !== n) gOrdem.push(k);
       if (window.aleaAbrirTelaCheia) {
         var lista = aberto.fotos.map(function (f) { return 'img/produtos/' + f + '.jpg'; });
-        window.aleaAbrirTelaCheia(n, lista, gOrdem);
+        /* v24 (áudios 1725/1727, ar 16:18): com a janela do álbum por baixo, o iPhone não emendava o topo — na colmeia
+           (sem janela por baixo) emendava. Então a janela do álbum SAI enquanto a tela cheia está aberta e VOLTA ao fechar:
+           a página fica exatamente como na colmeia. */
+        var volta = abertoId, ordem = gOrdem.slice();
+        /* v25 (vídeo 1731, cores medidas no Safari: topo #E5DCD3 = o bege do cabeçalho): o álbum saía ESMAECENDO em .3s
+           enquanto a tela cheia entrava — o Safari lia a cor nesse meio-tempo. Agora ele some NA HORA (sem transição),
+           e só então a tela cheia abre: a mesma sequência da colmeia. */
+        tela.style.transition = 'none';
+        fecharAlbum();
+        void tela.offsetHeight;
+        tela.style.transition = '';
+        window.aleaAbrirTelaCheia(n, lista, ordem, function () { abrirAlbum(volta); });
         return;
       }
       mostrarGrande(0);
@@ -417,7 +428,9 @@
 
   /* v23 (vídeo 1714 + áudio 1713): as fotos do ÁLBUM abrem NESTA tela cheia (a da colmeia, a que emendou o topo e o
      rodapé no iPhone dele) — com a lista e a ordem do álbum. `lista`/`ordem` vazios = a colmeia, como antes. */
-  function abrirTelaCheia(n, lista, ordem) {
+  var tcAoFechar = null;
+  function abrirTelaCheia(n, lista, ordem, aoFechar) {
+    tcAoFechar = aoFechar || null;
     tcLista = lista || fotosGrandes;
     telacheia && telacheia.classList.toggle('sobre-album', !!lista);
     if (!telacheia || !tcLista.length) return;
@@ -438,6 +451,7 @@
     /* v23: se veio de um álbum, o álbum continua aberto — a página de trás continua travada */
     var alb = document.querySelector('[data-album-tela]');
     if (!(alb && alb.classList.contains('aberta'))) document.body.classList.remove('travado');
+    if (tcAoFechar) { var f = tcAoFechar; tcAoFechar = null; f(); }
   }
 
   function pintarTelaCheia() {
