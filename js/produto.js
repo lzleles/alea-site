@@ -177,6 +177,12 @@
        suave embaixo. Sai ARRASTANDO pra baixo ou pra cima, "igual o iPhone, o Android"; passa DESLIZANDO pro lado. */
     document.body.appendChild(grande);
     var gImg = grande.querySelector('img');
+    /* v20 (áudios 1671/1673): um X bem discreto, só o traço, branco fraco — o arrastar pra cima/baixo continua fechando */
+    var gX = document.createElement('button');
+    gX.type = 'button'; gX.className = 'x-discreto album-grande-x'; gX.setAttribute('aria-label', 'Fechar a foto');
+    gX.textContent = '\u00d7';
+    gX.addEventListener('click', function (e) { e.stopPropagation(); fecharGrande(); });
+    grande.appendChild(gX);
     var mouse = !!(window.matchMedia && window.matchMedia('(hover: hover) and (pointer: fine)').matches);
 
     function abrirAlbum(id) {
@@ -298,6 +304,23 @@
       andarGrande(d > 0 ? 1 : -1);
     }, { passive: false });
 
+    /* v20 (áudios 1668-1669): "a tela de trás nunca pode rolar"; "toda janela que só envolva foto, se eu arrastar pra
+       cima ou pra baixo, fecha". Nas MINIATURAS do álbum: se a caixa não precisa rolar, o dedo não rola nada e o
+       arrasto vertical fecha o álbum; se precisa (álbum grande), ela rola por dentro e só o excesso é segurado. */
+    var tt = null;
+    var caixa = tela.querySelector('.album-caixa');
+    tela.addEventListener('touchstart', function (e) {
+      tt = e.touches.length === 1 ? { x: e.touches[0].clientX, y: e.touches[0].clientY } : null;
+    }, { passive: true });
+    tela.addEventListener('touchmove', function (e) {
+      var rola = caixa && caixa.scrollHeight > caixa.clientHeight + 1 && caixa.contains(e.target);
+      if (!rola) e.preventDefault();
+      if (!tt || rola) return;
+      var dx = e.touches[0].clientX - tt.x, dy = e.touches[0].clientY - tt.y;
+      if (Math.abs(dy) > 70 && Math.abs(dy) > Math.abs(dx)) { tt = null; fecharAlbum(); }
+    }, { passive: false });
+    tela.addEventListener('touchend', function () { tt = null; }, { passive: true });
+
     caixaAlbuns.addEventListener('click', function (ev) {
       var b = ev.target.closest('[data-album]');
       if (b) abrirAlbum(b.getAttribute('data-album'));
@@ -415,15 +438,19 @@
       if (!ev.target.closest('img')) fecharTelaCheia();
     });
 
-    var tx = null;
-    telacheia.addEventListener('touchstart', function (e) { tx = e.touches[0].clientX; }, { passive: true });
+    /* v20 (áudios 1668-1669): passive:false + preventDefault = a página de trás NUNCA rola com a tela cheia aberta;
+       arrastar pro lado passa (como antes); arrastar pra cima ou pra baixo FECHA. */
+    var tx = null, ty = null;
+    telacheia.addEventListener('touchstart', function (e) { tx = e.touches[0].clientX; ty = e.touches[0].clientY; }, { passive: true });
     telacheia.addEventListener('touchmove', function (e) {
+      e.preventDefault();
       if (tx === null) return;
-      var dx = tx - e.touches[0].clientX;
+      var dx = tx - e.touches[0].clientX, dy = e.touches[0].clientY - ty;
+      if (Math.abs(dy) > 70 && Math.abs(dy) > Math.abs(dx)) { tx = null; fecharTelaCheia(); return; }
       if (Math.abs(dx) < 40) return;
       tx = null;
       andarTelaCheia(dx > 0 ? 1 : -1);
-    }, { passive: true });
+    }, { passive: false });
     telacheia.addEventListener('touchend', function () { tx = null; }, { passive: true });
 
     telacheia.addEventListener('wheel', function (e) {

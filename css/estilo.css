@@ -1714,3 +1714,21 @@ body.no-feed .topo::before {
   -webkit-backdrop-filter: saturate(140%) blur(10px); backdrop-filter: saturate(140%) blur(10px);
   z-index: -1; pointer-events: none;
 }
+
+/* =============================================================================
+   ⚠️ X DISCRETO — ETAPA 109 (Cassiano, 25/09/2026 15:13-15:14, áudios 1671 e 1673 + print 1672)
+   "vamos colocar um X bem discreto, só que sem o círculo, só o X mesmo, mais branquinho, bem pra passar despercebido,
+   mas que se olhar ele está lá (...) em todos que tiver X com uma bola preta, pode tirar". Vale pro X do álbum
+   (era a bola preta), pro da tela cheia da colmeia (era a bola translúcida) e pro novo X da foto do álbum. Branco a
+   ~90% com uma sombra leve: é o que o deixa visível num fundo claro sem virar botão. */
+.album-tela .album-fechar, .telacheia .fechar-x, .x-discreto {
+  width: 44px; height: 44px; border: 0; border-radius: 0; padding: 0; background: transparent !important;
+  color: rgba(255, 255, 255, .92); font-size: 32px; font-weight: 300; line-height: 1; cursor: pointer;
+  text-shadow: 0 0 5px rgba(0, 0, 0, .45), 0 1px 2px rgba(0, 0, 0, .3);
+  opacity: .8; transition: opacity .2s ease;
+  display: grid; place-items: center;
+}
+.album-tela .album-fechar:hover, .telacheia .fechar-x:hover, .x-discreto:hover { opacity: 1; }
+.album-grande .album-grande-x {
+  position: fixed; top: calc(env(safe-area-inset-top, 0px) + 10px); right: 12px; z-index: 2;
+}
