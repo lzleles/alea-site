@@ -63,7 +63,8 @@ window.CATEGORIAS = [
   /* ⚠️ TEXTO PROVISÓRIO (etapa 3, 22/09/2026): o Cassiano pediu um placeholder sobre golden
      retriever "só pra ver o espaçamento do título e da descrição antes das fotos" — ele escreve
      o texto de verdade depois. TROCAR quando ele mandar o definitivo. */
-  { id: 'pet',    nome: 'PET',    descricao: 'Dócil, brincalhão e leal, o golden retriever enche a casa de pelo e alegria — e merece peças feitas sob medida pro tamanho e pro apetite dele. Cada comedouro sai com o nome do seu cão impresso na peça, na estampa que você escolher: bonito de deixar à mostra e resistente pra bagunça boa do dia a dia.' },
+  /* 25/09/2026 10:26 (msg 1473, texto DELE, palavra por palavra) — antes era o texto do golden retriever. */
+  { id: 'pet',    nome: 'PET',    descricao: 'Nossa linha PET foi criada para trazer mais alegria e personalidade à sua casa, criando um cantinho especial para quem, mesmo sem dizer uma palavra, transborda amor, alegria e companheirismo.' },
   { id: 'play',   nome: 'PLAY',   descricao: '' },   // sugestão minha: brinquedo e jogo
   { id: 'sense',  nome: 'SENSE',  descricao: '' }    // sugestão minha: sensorial, fidget
 ];
