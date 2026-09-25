@@ -155,6 +155,7 @@
      álbum. Se ele clicar na foto, ela expande num tamanho legal, mas com ele podendo clicar em qualquer lugar da
      tela ali fora pra voltar pras miniaturas." Não usa a tela cheia de carrossel. Os conjuntos vêm do
      `data-albuns` que o gerador v15 escreve a partir do produtos.js. */
+  function topo(q, c) { if (window.aleaCorDoTopo) window.aleaCorDoTopo(q, c); }
   (function albuns() {
     var caixaAlbuns = document.querySelector('[data-albuns]');
     var tela = document.querySelector('[data-album-tela]');
@@ -199,11 +200,13 @@
       tela.classList.add('aberta');
       tela.setAttribute('aria-hidden', 'false');
       document.body.classList.add('travado');
+      topo('album', '#6E6862');          /* o véu escuro do álbum sobre o bege da página (medido: rgba(20,14,10,.58) sobre #EAE4DB) */
     }
     function fecharAlbum() {
       tela.classList.remove('aberta');
       tela.setAttribute('aria-hidden', 'true');
       document.body.classList.remove('travado');
+      topo('album', null);
       aberto = null;
     }
     /* v19 (áudios 1632-1634): "qualquer foto que ele clicar vai ser a número 1; depois segue a ordem normal, da
@@ -243,11 +246,12 @@
     function mostrarCamada() {
       clearTimeout(saida);
       grande.classList.remove('saindo');
-      if (grande.hidden) { grande.hidden = false; tela.classList.add('com-grande'); }
+      if (grande.hidden) { grande.hidden = false; tela.classList.add('com-grande'); topo('foto', '#F4F0EB'); }
     }
     function fecharGrande() {
       if (grande.hidden) return;
       gAtual = -1;
+      topo('foto', null);
       grande.classList.add('saindo');
       clearTimeout(saida);
       saida = setTimeout(function () { grande.hidden = true; grande.classList.remove('saindo'); tela.classList.remove('com-grande'); }, 280);
@@ -399,12 +403,14 @@
     telacheia.classList.add('aberta');
     telacheia.setAttribute('aria-hidden', 'false');
     document.body.classList.add('travado');
+    topo('telacheia', '#F4F0EB');        /* papel a 82% sobre o bege: a cor que o fundo embaçado mostra */
   }
 
   function fecharTelaCheia() {
     if (!telacheia) return;
     telacheia.classList.remove('aberta');
     telacheia.setAttribute('aria-hidden', 'true');
+    topo('telacheia', null);
     document.body.classList.remove('travado');
   }
 
