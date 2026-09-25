@@ -192,6 +192,7 @@
       aberto = a;
       nome.textContent = a.nome;
       conta.textContent = a.fotos.length + (a.fotos.length === 1 ? ' foto' : ' fotos');
+      grade.classList.remove('tem-aberto');
       grade.innerHTML = a.fotos.map(function (f, n) {
         return '<button class="favo" type="button" data-album-foto="' + n + '" aria-label="Ampliar foto ' + (n + 1) + ' do álbum ' + a.nome + '">' +
           '<img src="img/produtos/' + f + '_m.jpg" width="700" height="700" loading="lazy" decoding="async" alt="' + peca + ' ' + a.nome + ' — foto ' + (n + 1) + '"></button>';
@@ -200,13 +201,12 @@
       tela.classList.add('aberta');
       tela.setAttribute('aria-hidden', 'false');
       document.body.classList.add('travado');
-      topo('album', '#6E6862');          /* o véu escuro do álbum sobre o bege da página (medido: rgba(20,14,10,.58) sobre #EAE4DB) */
+      /* v21 (áudios 1685/1689/1691): janela NÃO troca a cor do topo — "prevalece esse sombreamento bonito"; só a tela cheia emenda */
     }
     function fecharAlbum() {
       tela.classList.remove('aberta');
       tela.setAttribute('aria-hidden', 'true');
       document.body.classList.remove('travado');
-      topo('album', null);
       aberto = null;
     }
     /* v19 (áudios 1632-1634): "qualquer foto que ele clicar vai ser a número 1; depois segue a ordem normal, da
@@ -319,9 +319,8 @@
     tela.addEventListener('touchmove', function (e) {
       var rola = caixa && caixa.scrollHeight > caixa.clientHeight + 1 && caixa.contains(e.target);
       if (!rola) e.preventDefault();
-      if (!tt || rola) return;
-      var dx = e.touches[0].clientX - tt.x, dy = e.touches[0].clientY - tt.y;
-      if (Math.abs(dy) > 70 && Math.abs(dy) > Math.abs(dx)) { tt = null; fecharAlbum(); }
+      /* v21 (áudio 1687): "em janela que não seja tela cheia, não vai poder fechar rolando; vai prevalecer o X" — o
+         álbum vai ter muitas fotos e a pessoa vai rolar pra ver. O arrasto só rola a caixa; a página de trás nunca. */
     }, { passive: false });
     tela.addEventListener('touchend', function () { tt = null; }, { passive: true });
 
@@ -331,8 +330,16 @@
     });
     tela.addEventListener('click', function (ev) {
       if (ev.target.closest('[data-fechar-album]')) { if (!grande.hidden) fecharGrande(); else fecharAlbum(); return; }
+      /* v21 (áudios 1683-1684): "clicar uma vez amplia a foto um pouco, do mesmo tamanho das colmeias da outra página;
+         clicar de novo vai pra tela cheia". E com uma ampliada, o próximo toque só devolve ela pro lugar. */
+      var ampliada = grade.querySelector('.favo.aberto');
       var f = ev.target.closest('[data-album-foto]');
-      if (f) { comecarEm(parseInt(f.getAttribute('data-album-foto'), 10)); return; }
+      if (ampliada) {
+        if (f === ampliada) { comecarEm(parseInt(f.getAttribute('data-album-foto'), 10)); return; }
+        ampliada.classList.remove('aberto'); grade.classList.remove('tem-aberto');
+        return;
+      }
+      if (f) { f.classList.add('aberto'); grade.classList.add('tem-aberto'); return; }
       /* clicar fora da caixa (no escuro) fecha o álbum */
       if (!ev.target.closest('.album-caixa')) fecharAlbum();
     });

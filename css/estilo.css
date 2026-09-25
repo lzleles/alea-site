@@ -1732,3 +1732,20 @@ body.no-feed .topo::before {
 .album-grande .album-grande-x {
   position: fixed; top: calc(env(safe-area-inset-top, 0px) + 10px); right: 12px; z-index: 2;
 }
+
+/* =============================================================================
+   ⚠️ TELA CHEIA EMENDADA NO TOPO — ETAPA 111 (Cassiano, 25/09/2026 15:28-15:37, prints 1680/1686 + áudios 1681-1691)
+   "só quando for tela cheia a gente emenda: mesma cor de cabeçalho com fundo de foto, pra ficar a sensação de tela
+   infinita". Medido no print dele: o fundo translúcido+embaçado saía mais cinza que a barra do iPhone (o borrão escurece).
+   Então, na TELA CHEIA, o fundo é SÓLIDO e na mesma cor que o JS põe no topo (#F4F0EB). Janela (álbum) mantém o véu. */
+.telacheia, .album-grande {
+  background: #F4F0EB; -webkit-backdrop-filter: none; backdrop-filter: none;
+}
+/* a 1ª ampliação dentro do álbum: as colunas das pontas crescem pra dentro, pra não cortar na borda da caixa */
+.album-tela .album-grade .favo:nth-child(3n+1) { transform-origin: left center; }
+.album-tela .album-grade .favo:nth-child(3n) { transform-origin: right center; }
+.album-tela .album-grade { overflow: visible; }
+/* a 1ª fileira cresce pra BAIXO (pra cima cobria o título do álbum) */
+.album-tela .album-grade .favo:nth-child(1) { transform-origin: left top; }
+.album-tela .album-grade .favo:nth-child(2) { transform-origin: center top; }
+.album-tela .album-grade .favo:nth-child(3) { transform-origin: right top; }
