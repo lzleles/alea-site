@@ -297,7 +297,7 @@
         '<p>Obrigado, ' + esc(concluido.nome) + '! Recebemos o seu pedido e o pagamento' +
         (concluido.forma === 'pix' ? ' pelo Pix' : (concluido.parcelas > 1 ? ' em ' + concluido.parcelas + 'x no cartão' : ' no cartão')) + '. ' +
         'A produção começa agora e você recebe as novidades por e-mail.</p>' +
-        (concluido.descritor ? '<p class="loja-miudo">Na fatura do cartão, a compra aparece com o nome <strong>' + esc(concluido.descritor) + '</strong>.</p>' : '') +
+        (concluido.descritor ? '<p class="loja-miudo">Na fatura do cartão, procure pelo nome <strong>' + esc(concluido.descritor) + '</strong>.</p>' : '') +
         '<p><a class="loja-bt" href="index.html">Continuar comprando</a></p></div>';
     }
     return '<div class="loja-concluido"><h1>Pedido recebido</h1><p class="numero">' + esc(concluido.numero) + '</p>' +
