@@ -263,7 +263,7 @@
 
   /* ---------------------------------------------------------- fechar o pedido */
   function textoDoPedido(extras) {
-    var linhas = ['Olá! Quero fechar este pedido pelo site da ālea:', ''];
+    var linhas = ['Olá! Quero fechar este pedido pelo site da ālea & Co.:', ''];
     itens.forEach(function (i, n) {
       var q = qtd(i);
       linhas.push((n + 1) + ') ' + (q > 1 ? q + 'x ' : '') + i.nome +

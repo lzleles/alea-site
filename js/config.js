@@ -32,7 +32,7 @@ window.ALEA = {
   whatsapp: '5564999569994',
 
   /* Texto que já vai escrito na conversa. O {produto} é trocado pelo item clicado. */
-  mensagem: 'Oi! Vim pelo site da ālea. Queria saber sobre: {produto}',
+  mensagem: 'Oi! Vim pelo site da ālea & Co. Queria saber sobre: {produto}',
 
   /* ⚠️ Sem "conversao_whatsapp" preenchido o Google Ads NÃO sabe quais cliques viraram
      conversa — e o lance inteligente fica sem nada pra aprender. A campanha vira
