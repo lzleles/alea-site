@@ -336,7 +336,10 @@
       var f = ev.target.closest('[data-album-foto]');
       if (ampliada) {
         if (f === ampliada) { comecarEm(parseInt(f.getAttribute('data-album-foto'), 10)); return; }
-        ampliada.classList.remove('aberto'); grade.classList.remove('tem-aberto');
+        ampliada.classList.remove('aberto');
+        /* v22 (áudio 1699): outra foto do álbum = a ampliação troca direto pra ela; fora das fotos = só devolve */
+        if (f) { f.classList.add('aberto'); return; }
+        grade.classList.remove('tem-aberto');
         return;
       }
       if (f) { f.classList.add('aberto'); grade.classList.add('tem-aberto'); return; }
@@ -380,6 +383,9 @@
     if (ev.target.closest('[data-telacheia]')) return;
     var ab = colmeia.querySelector('.favo.aberto');
     if (ab && ab.contains(ev.target)) return;
+    /* v22 (áudio 1699): tocar em OUTRA foto da colmeia troca a ampliação direto pra ela (o clique segue pro ouvinte
+       da colmeia, que fecha a antiga e amplia a nova); só o toque FORA das fotos é engolido e apenas devolve. */
+    if (ev.target.closest('[data-colmeia] [data-favo]')) return;
     ev.preventDefault();
     ev.stopPropagation();
     fecharFavos();
