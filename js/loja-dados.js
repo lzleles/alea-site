@@ -271,10 +271,14 @@
     config: PREVIA ? function () { return Promise.resolve({ metodos: ['google', 'codigo', 'senha'] }); } : servidor.config,
     /* ETAPA 69 (condição da casa, 23/09/2026): quais jeitos de entrar o servidor JÁ faz. Sem "metodos" no /api/config
        = só Google. Código e senha aparecem sozinhos quando a casa ligar ("metodos": ["google","codigo","senha"]). */
+    /* 25/09/2026 09:48 (áudio do Cassiano, msg 1460, depois do parecer contrário): "já deixa tudo pronto, deixa o layout
+       pronto, se o cliente clicar e der erro não tem problema (…) já coloque isso aí no ar". `conta_metodos_forcados` no
+       config.js manda por cima do servidor; quando a casa ligar as rotas, é só esvaziar a chave que volta a valer o /api/config. */
     metodos: function () {
+      var forcados = (C.conta_metodos_forcados && C.conta_metodos_forcados.length) ? C.conta_metodos_forcados : null;
       return (PREVIA ? Promise.resolve({ metodos: ['google', 'codigo', 'senha'] }) : servidor.config())
-        .then(function (c) { return (c && c.metodos && c.metodos.length) ? c.metodos : ['google']; })
-        .catch(function () { return ['google']; });
+        .then(function (c) { return forcados || ((c && c.metodos && c.metodos.length) ? c.metodos : ['google']); })
+        .catch(function () { return forcados || ['google']; });
     },
     desejos: desejos, compra: compra, buscarCep: buscarCep
   };

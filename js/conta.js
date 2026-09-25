@@ -257,7 +257,7 @@
         '<label class="conta-marca"><input type="checkbox" name="consent_personalizar"' + (e.consent_personalizar ? ' checked' : '') + '>' +
           '<span>Lembrar as peças que eu vi, pra me mostrar de novo quando eu voltar</span></label>' +
         '<label class="conta-marca"><input type="checkbox" name="consent_marketing"' + (e.consent_marketing ? ' checked' : '') + '>' +
-          '<span>Quero receber novidades e ofertas da ālea</span></label>' +
+          '<span>Quero receber novidades e ofertas da ālea & Co.</span></label>' +
         (cfg && cfg.politica_versao && !e.politica_em_dia
           ? '<label class="conta-marca"><input type="checkbox" name="aceite_politica"><span>Li e aceito a ' +
             '<a href="privacidade.html" target="_blank" rel="noopener">política de privacidade</a></span></label>' : '') +
@@ -475,7 +475,7 @@
       return;
     }
     if (e.target.closest('[data-conta-excluir]')) {
-      if (!confirm('Excluir sua conta da ālea? Seus dados de cadastro e a memória da sua visita serão apagados. ' +
+      if (!confirm('Excluir sua conta da ālea & Co.? Seus dados de cadastro e a memória da sua visita serão apagados. ' +
                    'Pedidos já feitos ficam só pelo tempo que a lei fiscal exige.')) return;
       api('POST', '/api/eu/excluir').then(function (j) {
         eu = { logado: false }; erro = j.mensagem || '';

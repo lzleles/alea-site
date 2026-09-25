@@ -58,7 +58,7 @@
     t.id = 'tarja-config';
     t.className = 'tarja-config';
     t.innerHTML = '<strong>Site em configuração.</strong> Falta o WhatsApp comercial da ' +
-      'ālea em <code>js/config.js</code> — por isso ' +
+      'ālea & Co. em <code>js/config.js</code> — por isso ' +
       (quantos === 1 ? 'o botão de compra está desligado' : 'os ' + quantos + ' botões de compra estão desligados') +
       ' de propósito, em vez de virarem link morto.';
     document.body.insertBefore(t, document.body.firstChild);
@@ -79,7 +79,7 @@
     var botoes = (raiz || document).querySelectorAll('.zap:not([data-ligado])');
     Array.prototype.forEach.call(botoes, function (b) {
       b.setAttribute('data-ligado', '1');
-      var assunto = b.getAttribute('data-assunto') || 'os produtos da ālea';
+      var assunto = b.getAttribute('data-assunto') || 'os produtos da ālea & Co.';
       if (temZap) {
         b.setAttribute('href', linkZap(assunto));
         b.setAttribute('target', '_blank');

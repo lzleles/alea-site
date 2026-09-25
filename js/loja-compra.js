@@ -155,10 +155,10 @@
         '<a href="trocas-e-entrega.html" target="_blank" rel="noopener" style="color:var(--terracota)">Trocas, Devoluções e Entregas</a>.</p>' +
       (eu.logado && eu.politica_aceita ? '' :
         '<label class="loja-marca" data-politica><input type="checkbox" name="aceite_politica"' + (d.aceite_politica ? ' checked' : '') + '><span>Li e aceito a ' +
-        '<a href="privacidade.html" target="_blank" rel="noopener">Política de Privacidade</a> da ālea.</span></label>') +
+        '<a href="privacidade.html" target="_blank" rel="noopener">Política de Privacidade</a> da ālea & Co.</span></label>') +
       '<label class="loja-marca"><input type="checkbox" name="consent_marketing"' + (d.consent_marketing ? ' checked' : '') + '>' +
-        '<span>Desejo receber as comunicações digitais da ālea.<br><span class="loja-miudo">Ao se inscrever, você concorda em receber por e-mail ' +
-        'e WhatsApp informações sobre produtos, serviços e novidades da ālea, seguindo nossa Política de Privacidade.</span></span></label>' +
+        '<span>Desejo receber as comunicações digitais da ālea & Co.<br><span class="loja-miudo">Ao se inscrever, você concorda em receber por e-mail ' +
+        'e WhatsApp informações sobre produtos, serviços e novidades da ālea & Co., seguindo nossa Política de Privacidade.</span></span></label>' +
       (erro ? '<p class="loja-erro" role="alert">' + esc(erro) + '</p>' : '') +
       '<button type="submit" class="loja-bt largo" style="margin-top:14px">Ir para a Entrega</button></form></section>';
   }
@@ -220,7 +220,7 @@
     } else if (p === 'cartao') {
       caixa = '<div class="loja-pagar-caixa"><span class="loja-seguro">Ambiente Seguro</span>' +
         '<p>Você digita os dados do cartão na página segura do pagamento, logo depois de finalizar a compra. ' +
-        'A ālea não recebe nem guarda o número do seu cartão.</p></div>';
+        'A ālea & Co. não recebe nem guarda o número do seu cartão.</p></div>';
     }
     return '<section class="loja-etapa"><header>' + ICONE.cartao + '<h2>Pagamento</h2></header>' +
       '<label class="loja-radio' + (p === 'cartao' ? ' escolhido' : '') + '"><input type="radio" name="pagamento" value="cartao"' + (p === 'cartao' ? ' checked' : '') + '>' +
@@ -244,12 +244,12 @@
     return '<h1 class="loja-titulo grande">Finalizar Compra</h1>' + etapaDados() + etapaEntrega() + etapaPagamento() +
       htmlResumo() +
       (st.etapa === 'pagamento' ? '<button type="button" class="loja-bt largo" data-concluir' + (st.pagamento ? '' : ' disabled') + '>Finalizar Compra</button>' +
-        '<p class="loja-miudo" style="text-align:center;margin-top:10px">Enquanto o pagamento pelo site não liga, o pedido completo segue pelo WhatsApp da ālea.</p>' : '');
+        '<p class="loja-miudo" style="text-align:center;margin-top:10px">Enquanto o pagamento pelo site não liga, o pedido completo segue pelo WhatsApp da ālea & Co.</p>' : '');
   }
 
   function htmlConcluido() {
     return '<div class="loja-concluido"><h1>Pedido recebido</h1><p class="numero">' + esc(concluido.numero) + '</p>' +
-      '<p>Obrigado, ' + esc(concluido.nome) + '! Abrimos o WhatsApp da ālea com o seu pedido completo: é por lá que você recebe ' +
+      '<p>Obrigado, ' + esc(concluido.nome) + '! Abrimos o WhatsApp da ālea & Co. com o seu pedido completo: é por lá que você recebe ' +
         'o valor do frete e o ' + (concluido.pagamento === 'pix' ? 'Pix' : 'link seguro do cartão') + ' para pagar.</p>' +
       '<p><a class="loja-bt" href="index.html">Continuar comprando</a></p>' +
       (concluido.zap ? '<p class="loja-miudo">O WhatsApp não abriu? <a href="' + esc(concluido.zap) + '" target="_blank" rel="noopener" style="color:var(--terracota)">Toque aqui</a>.</p>' : '') +
