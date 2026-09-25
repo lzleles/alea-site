@@ -234,7 +234,8 @@
       /* ETAPA P1: o Brick do Mercado Pago (Pix + cartão) com o tema aprovado; o botão "Pagar" é dele */
       return '<section class="loja-etapa loja-etapa-pagar"><header>' + ICONE.cartao + '<h2>Pagamento</h2></header>' +
         (erro ? '<p class="loja-erro" role="alert">' + esc(erro) + '</p>' : '') +
-        '<div class="loja-brick" id="alea-brick"><p class="loja-miudo" style="text-align:center;padding:30px 0">Carregando o pagamento seguro…</p></div>' +
+        '<p class="loja-miudo loja-brick-carregando" data-brick-carregando>Carregando o pagamento seguro…</p>' +
+        '<div class="loja-brick" id="alea-brick"></div>' +
         '<p class="loja-miudo loja-brick-nota">Frete: a calcular — prazo e valor confirmados com o pedido.</p></section>';
     }
     var p = st.pagamento;
@@ -325,9 +326,11 @@
       alvoId: 'alea-brick', valor: subtotal(),
       pagador: { email: d.email, nome: d.nome, sobrenome: d.sobrenome, cpf: d.cpf },
       aoEnviar: pagarAgora,
+      aoPronto: function () { var c = raiz.querySelector('[data-brick-carregando]'); if (c) c.remove(); },
       aoErro: function () { /* o Brick mostra o próprio aviso de campo */ }
     }).catch(function () {
       var alvo = raiz.querySelector('#alea-brick');
+      var c = raiz.querySelector('[data-brick-carregando]'); if (c) c.remove();
       if (alvo) alvo.innerHTML = '<p class="loja-erro">O pagamento pelo site não carregou. Recarregue a página — ou finalize pelo WhatsApp.</p>';
     });
   }
