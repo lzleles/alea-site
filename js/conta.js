@@ -505,13 +505,9 @@
         .catch(function () {});
     } catch (x) { /* o pedido do WhatsApp continua; só não fica no histórico */ }
   }
-  document.addEventListener('click', function (e) {
-    if (e.target.closest('[data-fechar-pedido]')) registrarPedido();
-  }, true);
-  if (window.aleaCarrinho && window.aleaCarrinho.fecharPedido) {
-    var fecharOriginal = window.aleaCarrinho.fecharPedido;
-    window.aleaCarrinho.fecharPedido = function () { registrarPedido(); return fecharOriginal.apply(this, arguments); };
-  }
+  /* ETAPA 61 (23/09/2026): o pedido não sai mais da gaveta — ele é registrado no fim do
+     Finalizar Compra (loja-compra.js → aleaLoja.registrarPedido). `registrarPedido` fica aqui
+     sem ouvinte, só pra quem ainda chamar por fora. */
 
   /* -------------------------------------------------------------- início */
   document.addEventListener('alea:gaveta', function (e) {

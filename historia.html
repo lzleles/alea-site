@@ -3,16 +3,17 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Quem é a ālea — impressão 3D em Jataí-GO</title>
-<meta name="description" content="A ālea faz comedouros e acessórios pet personalizados, impressos em 3D sob encomenda em Jataí, Goiás.">
-<link rel="canonical" href="https://www.aleaco.art.br/a-alea.html">
-<meta property="og:type" content="website">
-<meta property="og:title" content="Quem é a ālea — impressão 3D em Jataí-GO">
-<meta property="og:description" content="A ālea faz comedouros e acessórios pet personalizados, impressos em 3D sob encomenda em Jataí, Goiás.">
-<meta property="og:url" content="https://www.aleaco.art.br/a-alea.html">
+<!-- ETAPA 71.3 (24/09/2026 01:09, Cassiano): "uma prévia somente com essa página, pra eu poder compartilhar com as
+     pessoas sem elas verem o site". Cópia AVULSA da história (a-alea.html): sem topo, sem rodapé, sem sacola, sem
+     links pro resto do site. Fora do Google (noindex). Se o texto mudar em a-alea.html, mudar aqui também. -->
+<meta name="robots" content="noindex, nofollow">
+<title>A história da ālea</title>
+<meta name="description" content="Um acaso que virou escolha — a história da ālea, por Cassiano Rosado.">
+<meta property="og:type" content="article">
+<meta property="og:title" content="A história da ālea">
+<meta property="og:description" content="Um acaso que virou escolha.">
 <meta property="og:image" content="img/marca/og_compartilhar.jpg">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="img/marca/og_compartilhar.jpg">
 <link rel="icon" href="img/marca/favicon_circular_32.png" type="image/png" sizes="32x32">
 <link rel="icon" href="img/marca/favicon_circular_48.png" type="image/png" sizes="48x48">
 <link rel="apple-touch-icon" href="img/marca/favicon_circular_180.png">
@@ -22,57 +23,14 @@
 <link rel="stylesheet" href="css/estilo.css">
 <link rel="stylesheet" href="css/sobre.css">
 </head>
-<body>
-<a class="pular" href="#conteudo">Pular para o conteúdo</a>
-<!-- ALEA:TOPO -->
-<header class="topo">
-  <!-- ⚠️ O BOTÃO DE VOLTAR PRAS CATEGORIAS MORA AQUI, EMBAIXO DO LOGO.
-       Dentro do feed ele caía POR CIMA da foto no celular; ao LADO do logo ele ficou
-       apertado (as duas coisas vistas pelo Cassiano em 15/09/2026). Empilhado abaixo da
-       marca ele tem lugar próprio e não disputa pixel com nada.
-       Quem liga e desliga é o feed.js. -->
-  <span class="canto-marca">
-    <!-- REBRAND 22/09/2026: o topo esquerdo perdeu o logotipo inteiro da ālea e ficou SÓ a
-         capivara em miniatura (pedido do Cassiano em áudio). Peça gerada por
-         _montar_marca_e_co_v1_rebrand_2026-09-22.py. -->
-    <a class="marca" href="index.html" aria-label="ālea — início">
-      <img class="colorida" src="img/marca/e_co/capivara_mini.svg" alt="ālea" width="46" height="28">
-      <img class="clara" src="img/marca/e_co/capivara_mini_claro.svg" alt="ālea" width="46" height="28">
-    </a>
-    <button class="voltar-categorias" type="button" data-fechar-feed hidden>&larr; categorias</button>
-  </span>
-  <!-- ⚠️ A LOGO DO CANAL @eaibora.3d (Cassiano, 4a rodada, 17/09/2026, item 3).
-       Ela mora AQUI, colada a direita da marca, e nao sai do lugar nunca: a animacao da abertura
-       so a faz crescer e voltar em torno do canto superior esquerdo DELA MESMA (transform-origin:
-       top left), com o mesmo tempo, o mesmo atraso e a mesma curva da capivara - 3x menor.
-       Quem mede "3x menor" e' o abertura.js, porque o tamanho da capivara gigante muda com a janela.
-       A imagem e' a que o Cassiano mandou em 17/09/2026 as 17:02 (o logo que ele usa no Instagram e no
-       Linktree), com o fundo recortado por _preparar_logo_3d_v2_foto_do_cassiano.py. -->
-  <a class="marca-3d" href="https://www.instagram.com/eaibora.3d?stkn=MzVtaHNja3ppa2k4" target="_blank" rel="noopener"
-     aria-label="Instagram do canal eai, bora? (@eaibora.3d)" title="@eaibora.3d">
-    <img src="img/marca/eaibora3d_logo.webp" alt="eai, bora? — o canal do Cassiano no Instagram"
-         width="41" height="28" decoding="async">
-  </a>
-  <nav aria-label="Principal">
-    <button class="botao-icone" type="button" data-abrir="conta" aria-haspopup="dialog">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-      <span class="rotulo">Conta</span>
-    </button>
-    <button class="botao-icone" type="button" data-abrir="carrinho" aria-haspopup="dialog">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 8.5h14V21H5z"></path><path d="M9 8.5V7a3 3 0 0 1 6 0v1.5"></path></svg>
-      <span class="rotulo">Carrinho</span>
-      <span class="quantos" data-quantos>0</span>
-    </button>
-  </nav>
-</header>
-<!-- /ALEA:TOPO -->
-<main id="conteudo" class="pagina">
+<body class="sobre">
+<main id="conteudo" class="pagina" style="padding-top:28px">
 <!-- ETAPA 71 (24/09/2026 00:58): o TEXTO desta página é do Cassiano, palavra por palavra (mensagem de Telegram 978).
      A porta só fez o layout: fundo em degradê com a estampa (css/sobre.css) e os blocos aparecendo ao rolar.
      Mexer no texto = pedir a ele. O bloco prático do fim é o que a página já tinha. -->
 <div class="sobre-fundo" aria-hidden="true"></div>
 <div class="embrulho texto">
-  <a class="voltar" href="index.html">← voltar para o feed</a>
+  <p style="text-align:center;margin:0 0 10px"><img src="img/marca/e_co/logo.svg" alt="ālea &amp; Co." width="170" style="display:block;margin:0 auto;width:170px;height:auto"></p>
   <h1 class="sr-so" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Quem é a ālea</h1>
 
   <div class="sobre-texto">
@@ -148,8 +106,7 @@
     <p class="sobre-final revela">Tinha que ser ālea. ❤️</p>
   </div>
 
-  <!-- 01:08 (Cassiano): a caixa clara com o bloco prático (o que faz, sob encomenda, quem faz, a marca) SAIU inteira. -->
-  <!-- 01:59 (Cassiano): o botão "Falar com o Cassiano" SAIU desta página ("não quero ninguém falando comigo"). -->
+  <p class="sobre-contato" style="color:var(--tinta-fraca);font-size:14px">— Cassiano Rosado · ālea &amp; Co. · Jataí, Goiás</p>
 </div>
 <script>
   /* cada bloco aparece quando chega na tela; a lista do fecho acende uma linha de cada vez */
@@ -170,31 +127,5 @@
   })();
 </script>
 </main>
-<!-- ALEA:RODAPE -->
-<footer class="rodape">
-  <img class="marca-rodape" src="img/marca/e_co/logo_claro.svg" alt="ālea">
-  <p class="frase" data-assinatura>Onde cada impressão começa com um sonho!</p>
-  <a class="orcamento zap" data-assunto="orçamento de uma peça personalizada">Orçamentos e personalizados, clique aqui!</a>
-  <nav class="menu-categorias" data-menu-categorias aria-label="Categorias"></nav>
-  <div class="redes" data-redes></div>
-  <p class="lei">
-    © <img src="img/marca/e_co/logo_claro.svg" alt="ālea"> <span id="ano">2026</span> — Todos os direitos reservados.
-    <span class="creditos">
-      <span data-campo="responsavel">Cassiano Rosado</span>, <span data-campo="cidade">Jataí</span>/<span data-campo="uf">GO</span> ·
-      CNPJ <span data-campo="cnpj">61.338.171/0001-10</span> ·
-      identidade visual por <a href="https://www.instagram.com/mirellagaetti/" target="_blank" rel="noopener">Mirella Gaetti</a> ·
-      
-      <a href="a-alea.html">Quem somos nós</a> ·
-      <a href="trocas-e-entrega.html">Trocas, devoluções e entregas</a> ·
-      <a href="privacidade.html">Política de privacidade</a>
-    </span>
-  </p>
-</footer>
-<!-- /ALEA:RODAPE -->
-<script src="js/config.js"></script>
-<script src="js/produtos.js"></script>
-<script src="js/site.js"></script>
-<script src="js/carrinho.js"></script>
-<script src="js/produto.js"></script>
 </body>
 </html>

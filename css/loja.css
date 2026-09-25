@@ -1,0 +1,233 @@
+/* CATALOGO:
+   nome: loja.css
+   categoria: UTIL
+   objetivo: O visual das páginas de CONTA (entrar, código por e-mail, Minha Conta e seções) e de COMPRA (Sacola de Compras e Finalizar Compra em 3 etapas), no desenho da Tiffany e na identidade da ālea.
+   entrada: variáveis de cor e fonte do estilo.css (--terracota, --tinta, --papel, --fonte-titulo…)
+   saida: estilos .loja-*
+   status: prévia (23/09/2026)
+   validado_em: 2026-09-23 (print em 390 px contra os vídeos do Cassiano)
+*/
+/* =============================================================================
+   loja.css — a conta e a compra "iguais às da Tiffany" (pedido do Cassiano, 23/09/2026 20:36-20:47)
+   =============================================================================
+   Palavras dele: "questão de nomes, nomenclatura, posição (…) você vai copiar tudo", "cuidado de
+   tamanho de janela, espaçamento", mas "dentro da minha identidade visual: a dele é branca, a minha
+   é virada pro lado do bege; a fonte dele é uma, a minha é outra".
+
+   AS MEDIDAS SAEM DA TIFFANY, MEDIDAS NO NAVEGADOR (390 px, 23/09/2026 21:40):
+     título de seção ........ serifada 20 px, cor #333, centralizado      -> Defante 20 px, --tinta
+     botão de opção ......... 327 × 50 px, borda 1 px, texto 14 px         -> igual, borda --tinta
+     campo .................. 35 px de altura, só a linha de baixo, 14 px -> igual
+     botão Entrar ........... 122 × 40 px, preto, texto 14 px peso 500    -> igual, terracota
+     margem lateral ......... 24 px
+   A TROCA DE COR, UMA SÓ REGRA: o PRETO da Tiffany vira TERRACOTA (é o botão de ação do site
+   inteiro), o TURQUESA dela vira DOURADO/TERRACOTA, e o BRANCO vira o PAPEL bege.
+   ========================================================================== */
+
+.loja { --lj-lado: 24px; --lj-cinza: #8A7D70; --lj-linha: rgba(43, 33, 24, .14); --lj-caixa: rgba(43, 33, 24, .035);
+  background: var(--papel); color: var(--tinta); font-family: var(--fonte-corpo); font-size: 14px; }
+.loja *, .loja *::before, .loja *::after { box-sizing: border-box; }
+.loja main { max-width: 480px; margin: 0 auto; padding: 0 var(--lj-lado) 40px; min-height: 60vh; }
+.loja a { color: inherit; }
+.loja [hidden] { display: none !important; }
+
+/* ------------------------------------------------------------- o topo só com a marca (checkout) */
+.loja-topo-compra { display: flex; justify-content: center; align-items: center; padding: 22px var(--lj-lado) 18px; }
+.loja-topo-compra img { height: 34px; width: auto; }
+
+/* ------------------------------------------------------------------ textos */
+.loja-migalha { font-size: 10px; color: var(--lj-cinza); margin: 18px 0 30px; letter-spacing: .02em; }
+.loja-migalha a { text-decoration: none; }
+.loja-titulo { font-family: var(--fonte-titulo); font-weight: 400; font-size: 20px; line-height: 24px; color: var(--tinta);
+  text-align: center; margin: 56px 0 28px; }
+.loja-titulo.grande { font-size: 24px; line-height: 30px; text-align: left; margin: 26px 0 16px; padding-bottom: 14px;
+  border-bottom: 1px solid var(--lj-linha); }
+.loja-sub { font-family: var(--fonte-titulo); font-weight: 400; font-size: 20px; line-height: 24px; text-align: center;
+  margin: 58px 0 14px; }
+.loja-miudo { font-size: 11px; line-height: 1.5; color: var(--lj-cinza); }
+.loja-aviso { margin: 14px 0; padding: 10px 12px; font-size: 13px; line-height: 1.45; background: rgba(170, 150, 97, .16);
+  border-left: 3px solid var(--dourado); }
+.loja-erro { margin: 12px 0; padding: 10px 12px; font-size: 13px; background: rgba(146, 68, 41, .09); color: var(--terracota); }
+
+/* ------------------------------------------------------------------ botões */
+.loja-bt { display: inline-flex; align-items: center; justify-content: center; min-height: 40px; padding: 0 22px; border: 0;
+  border-radius: 0; background: var(--terracota); color: var(--off); font: inherit; font-size: 14px; font-weight: 500;
+  letter-spacing: .02em; cursor: pointer; text-decoration: none; }
+.loja-bt:hover { background: var(--laranja); }
+.loja-bt:disabled { background: var(--dourado); cursor: not-allowed; opacity: .75; }
+.loja-bt.entrar { min-width: 122px; }
+.loja-bt.largo { display: flex; width: 100%; min-height: 50px; }
+.loja-bt.contorno { background: transparent; color: var(--tinta); box-shadow: inset 0 0 0 1px var(--tinta); }
+.loja-bt.contorno:hover { background: rgba(43, 33, 24, .05); }
+.loja-bt.opcao { display: flex; width: 100%; min-height: 50px; font-weight: 400; background: transparent; color: var(--tinta);
+  box-shadow: inset 0 0 0 1px var(--tinta); }
+.loja-bt.opcao.cheia { background: var(--terracota); color: var(--off); box-shadow: none; }
+.loja-bt.pequeno { min-height: 30px; min-width: 85px; padding: 0 16px; font-size: 12px; }
+.loja-bt.google { gap: 10px; }
+.loja-bt.google svg { width: 18px; height: 18px; flex: none; }
+.loja-link { background: none; border: 0; padding: 0; font: inherit; font-size: 14px; color: var(--tinta); cursor: pointer;
+  text-decoration: none; }
+.loja-link.seta::after { content: '›'; margin-left: 8px; color: var(--lj-cinza); }
+.loja-link.sublinha { text-decoration: underline; text-underline-offset: 3px; }
+.loja-link.dourado { color: var(--terracota); font-size: 11px; }
+.loja-opcoes { display: grid; gap: 10px; }
+
+/* ------------------------------------------------------------------ campos */
+.loja-campo { display: block; margin: 0 0 14px; }
+.loja-campo > span { display: block; font-size: 10px; color: var(--lj-cinza); margin: 0 0 2px; letter-spacing: .02em; }
+.loja-campo > span small { font-size: 10px; color: var(--lj-cinza); }
+.loja-campo input, .loja-campo select { width: 100%; height: 35px; padding: 0 22px 0 0; border: 0; border-bottom: 1px solid var(--tinta);
+  border-radius: 0; background: transparent; color: var(--tinta); font: inherit; font-size: 14px; -webkit-appearance: none; appearance: none; }
+.loja-campo select { background-image: linear-gradient(45deg, transparent 50%, var(--tinta) 50%), linear-gradient(-45deg, transparent 50%, var(--tinta) 50%);
+  background-position: calc(100% - 9px) 16px, calc(100% - 4px) 16px; background-size: 5px 5px; background-repeat: no-repeat; }
+.loja-campo input::placeholder { color: var(--lj-cinza); opacity: 1; }
+.loja-campo input:focus, .loja-campo select:focus { outline: 0; border-bottom-width: 2px; border-bottom-color: var(--terracota); }
+.loja-campo { position: relative; }
+.loja-campo.ok::after { content: '✓'; position: absolute; right: 2px; bottom: 9px; font-size: 12px; color: var(--dourado); }
+.loja-campo.faltou > span { color: var(--terracota); }
+.loja-campo.faltou input, .loja-campo.faltou select { border-bottom-color: var(--terracota); }
+.loja-campo .dica-erro { display: block; font-size: 11px; color: var(--terracota); margin-top: 4px; }
+.loja-dupla { display: grid; grid-template-columns: 1fr 1fr; gap: 0 18px; }
+.loja-dupla > * { min-width: 0; }
+.loja-senha { position: relative; }
+.loja-senha button { position: absolute; right: 0; bottom: 6px; background: none; border: 0; padding: 2px; color: var(--lj-cinza); cursor: pointer; }
+.loja-senha button svg { width: 20px; height: 20px; }
+
+.loja-marca { display: flex; gap: 10px; align-items: flex-start; margin: 10px 0; font-size: 12.5px; line-height: 1.45; cursor: pointer; }
+.loja-marca input { width: 16px; height: 16px; margin: 1px 0 0; flex: none; accent-color: var(--terracota); }
+.loja-marca a { color: var(--terracota); }
+.loja-marca.faltou { color: var(--terracota); }
+
+/* o código de 6 dígitos (o turquesa da Tiffany vira terracota) */
+.loja-codigo input { text-align: center; font-family: var(--fonte-titulo); font-size: 22px; letter-spacing: .5em; color: var(--terracota);
+  padding: 0 0 0 .5em; height: 44px; }
+.loja-codigo input::placeholder { font-family: var(--fonte-corpo); font-size: 11px; letter-spacing: .12em; color: var(--lj-cinza); }
+.loja-par { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-top: 18px; }
+
+/* ------------------------------------------------------------ Minha Conta */
+.loja-ola { font-family: var(--fonte-titulo); font-size: 16px; margin: 0 0 30px; }
+.loja-menu { list-style: none; margin: 0; padding: 0; display: grid; gap: 14px; }
+.loja-menu a, .loja-menu button { background: none; border: 0; padding: 0; font: inherit; font-size: 13px; color: var(--tinta);
+  text-decoration: none; cursor: pointer; }
+.loja-menu a[aria-current="page"] { color: var(--terracota); }
+.loja-voltar-menu { display: inline-block; margin: 0 0 18px; font-size: 12px; color: var(--lj-cinza); text-decoration: none; }
+.loja-secao-titulo { font-family: var(--fonte-titulo); font-weight: 400; font-size: 18px; margin: 0 0 18px; }
+.loja-lista { list-style: none; margin: 0 0 16px; padding: 0; }
+.loja-lista li { display: flex; justify-content: space-between; gap: 12px; padding: 14px 0; border-top: 1px solid var(--lj-linha); font-size: 13px; line-height: 1.5; }
+.loja-lista li:last-child { border-bottom: 1px solid var(--lj-linha); }
+.loja-lista strong { font-weight: 600; }
+.loja-lista .acoes { display: grid; gap: 6px; justify-items: end; align-content: start; }
+.loja-lista .acoes button { background: none; border: 0; padding: 0; font: inherit; font-size: 12px; color: var(--lj-cinza); text-decoration: underline; cursor: pointer; }
+.loja-vazio { color: var(--lj-cinza); font-size: 13px; }
+.loja-desejos { display: grid; grid-template-columns: 1fr 1fr; gap: 18px 14px; }
+.loja-desejos a { text-decoration: none; font-size: 12.5px; line-height: 1.35; }
+.loja-desejos img { width: 100%; aspect-ratio: 1; object-fit: contain; background: var(--off); display: block; margin-bottom: 8px; }
+.loja-desejos .tirar { background: none; border: 0; padding: 0; font: inherit; font-size: 11px; color: var(--lj-cinza); text-decoration: underline; cursor: pointer; }
+
+/* o rodapé "Início" + a faixa (a faixa turquesa da Tiffany vira terracota) */
+.loja-inicio { max-width: 480px; margin: 0 auto; padding: 14px var(--lj-lado); border-top: 1px solid var(--lj-linha); }
+.loja-inicio a { font-size: 13px; text-decoration: none; }
+.loja-faixa { height: 6px; background: var(--terracota); opacity: .85; }
+
+/* ------------------------------------------------------ Sacola de Compras */
+.loja-item { display: grid; grid-template-columns: 64px 1fr auto; gap: 4px 14px; padding: 16px 0; border-bottom: 1px solid var(--lj-linha); }
+.loja-item img { width: 64px; height: 64px; object-fit: contain; background: var(--off); grid-row: span 2; }
+.loja-item .nome { font-size: 11.5px; letter-spacing: .06em; line-height: 1.55; color: var(--tinta); }
+.loja-item .nome small { display: block; letter-spacing: 0; color: var(--lj-cinza); font-size: 11px; margin-top: 2px; }
+.loja-item .tirar { background: none; border: 0; padding: 0 2px; font-size: 16px; line-height: 1; color: var(--lj-cinza); cursor: pointer; align-self: start; }
+.loja-item .linha-qtd { grid-column: 2 / 4; display: flex; justify-content: space-between; align-items: center; margin-top: 6px; }
+.loja-passos { display: inline-flex; align-items: center; gap: 14px; }
+.loja-passos button { width: 22px; height: 22px; background: none; border: 0; font-size: 16px; color: var(--lj-cinza); cursor: pointer; padding: 0; }
+.loja-passos span { min-width: 12px; text-align: center; font-size: 12px; }
+.loja-item .valor { font-size: 12.5px; letter-spacing: .04em; }
+.loja-presente { margin: 22px 0 6px; }
+.loja-presente textarea { width: 100%; min-height: 72px; margin-top: 8px; padding: 8px; border: 1px solid var(--lj-linha); background: transparent;
+  font: inherit; font-size: 13px; color: var(--tinta); resize: vertical; }
+.loja-bloco-entrega { margin: 24px 0; }
+.loja-bloco-entrega h3 { font-family: var(--fonte-titulo); font-weight: 400; font-size: 15px; margin: 0 0 4px; }
+.loja-bloco-entrega p { margin: 0 0 12px; font-size: 11px; color: var(--lj-cinza); line-height: 1.5; }
+.loja-totais { background: var(--lj-caixa); padding: 4px 16px; margin: 18px 0; }
+.loja-totais div { display: flex; justify-content: space-between; padding: 12px 0; font-size: 12.5px; }
+.loja-totais div + div { border-top: 1px solid var(--lj-linha); }
+.loja-totais .total { font-family: var(--fonte-titulo); font-size: 17px; }
+.loja-mais-produtos { display: block; text-align: center; margin: 22px 0 0; font-size: 11px; letter-spacing: .14em; text-transform: uppercase; text-decoration: none; }
+
+/* ------------------------------------------------------- Finalizar Compra */
+.loja-etapa { border: 1px solid var(--lj-linha); padding: 16px; margin: 0 0 16px; background: rgba(255, 255, 255, .28); }
+.loja-etapa > header { display: flex; align-items: center; gap: 10px; margin: 0 0 14px; }
+.loja-etapa > header h2 { flex: 1; margin: 0; font-family: var(--fonte-titulo); font-weight: 400; font-size: 15px; }
+.loja-etapa > header svg { width: 18px; height: 18px; flex: none; }
+.loja-etapa > header .editar { background: none; border: 0; padding: 2px; cursor: pointer; color: var(--lj-cinza); }
+.loja-etapa.apagada > header { color: var(--lj-cinza); margin: 0; }
+.loja-etapa.apagada .espera { margin: 14px 0 0; font-size: 11.5px; color: var(--lj-cinza); }
+.loja-etapa .intro { margin: 0 0 16px; font-size: 12.5px; line-height: 1.55; color: var(--tinta); }
+.loja-etapa .feito { font-size: 11.5px; color: var(--lj-cinza); line-height: 1.6; }
+.loja-etapa .feito a, .loja-etapa .feito button { color: var(--tinta); }
+.loja-cep { display: flex; align-items: flex-end; gap: 16px; }
+.loja-cep .loja-campo { flex: 0 0 150px; margin: 0; }
+.loja-cep a { font-size: 11px; color: var(--terracota); padding-bottom: 10px; }
+.loja-rotulo { font-family: var(--fonte-titulo); font-size: 13px; margin: 22px 0 10px; }
+.loja-radio { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border: 1px solid var(--lj-linha); cursor: pointer; font-size: 12.5px; }
+.loja-radio + .loja-radio { border-top: 0; }
+.loja-radio input { width: 16px; height: 16px; margin: 0; accent-color: var(--terracota); flex: none; }
+.loja-radio .txt { flex: 1; }
+.loja-radio .txt small { display: block; font-size: 10.5px; color: var(--lj-cinza); margin-top: 2px; }
+.loja-radio .preco { font-size: 12px; }
+.loja-radio.escolhido { background: var(--lj-caixa); }
+.loja-endereco { display: flex; gap: 12px; align-items: flex-start; padding: 12px 14px; border: 1px solid var(--lj-linha); font-size: 12px; line-height: 1.5; margin: 0 0 16px; }
+.loja-endereco svg { width: 18px; height: 18px; flex: none; margin-top: 2px; }
+.loja-endereco button { background: none; border: 0; padding: 0; font: inherit; color: var(--tinta); text-decoration: underline; cursor: pointer; }
+.loja-pagar-caixa { border: 1px solid var(--lj-linha); padding: 26px 16px; text-align: center; margin: 14px 0 0; }
+.loja-pagar-caixa .logo-pix { font-family: var(--fonte-titulo); font-size: 30px; color: var(--terracota); letter-spacing: .02em; }
+.loja-pagar-caixa p { margin: 10px 0 0; font-size: 12.5px; line-height: 1.5; }
+.loja-seguro { display: inline-block; margin: 0 0 8px; padding: 4px 10px; font-size: 11px; box-shadow: 0 1px 4px rgba(0, 0, 0, .12); background: var(--papel); }
+.loja-resumo h2 { font-family: var(--fonte-titulo); font-weight: 400; font-size: 15px; margin: 26px 0 10px; padding-bottom: 10px; border-bottom: 1px solid var(--lj-linha); }
+.loja-resumo .linha { display: grid; grid-template-columns: 40px 1fr auto; gap: 4px 12px; font-size: 11.5px; letter-spacing: .04em; line-height: 1.5; padding: 8px 0; }
+.loja-resumo .linha img { width: 40px; height: 40px; object-fit: contain; background: var(--off); }
+.loja-resumo .linha small { display: block; color: var(--lj-cinza); letter-spacing: 0; }
+.loja-resumo .voltar-sacola { display: block; text-align: right; font-size: 11px; color: var(--terracota); margin: 12px 0; text-decoration: none; }
+.loja-concluido { text-align: center; padding: 30px 0; }
+.loja-concluido h1 { font-family: var(--fonte-titulo); font-weight: 400; font-size: 24px; margin: 0 0 10px; }
+.loja-concluido p { font-size: 13.5px; line-height: 1.55; }
+.loja-concluido .numero { font-family: var(--fonte-titulo); font-size: 20px; color: var(--terracota); }
+
+/* o coração da lista de desejos na página do produto */
+.loja-coracao { display: inline-flex; align-items: center; gap: 6px; background: none; border: 0; padding: 4px 0; font: inherit; font-size: 12.5px;
+  color: var(--tinta-fraca); cursor: pointer; }
+.loja-coracao svg { width: 20px; height: 20px; }
+.loja-coracao[aria-pressed="true"] svg { fill: var(--terracota); stroke: var(--terracota); }
+.loja-coracao[aria-pressed="true"] { color: var(--terracota); }
+
+/* a faixa que diz "isto é prévia" — some no ar. Mora dentro do <main>, então sangra até a borda. */
+.loja-previa { background: var(--dourado); color: var(--tinta); font-size: 11.5px; line-height: 1.4; text-align: center; padding: 6px 12px;
+  margin: 0 calc(var(--lj-lado) * -1); }
+
+/* nas páginas com o topo do site (fixo, 64 px), o conteúdo começa embaixo dele — igual à .pagina do estilo.css */
+.loja .topo ~ main { padding-top: calc(var(--tarja, 0px) + 66px); }
+.loja-opcoes [data-google-botao]:empty { display: none; }
+
+/* ETAPA 63 (22:19, print montado pelo Cassiano): a tela de entrar ocupa a PRIMEIRA tela inteira, no bege — o título
+   colado embaixo do topo e o rodapé preto só aparece rolando. */
+.loja-sub.primeiro { margin-top: 12px; margin-bottom: 10px; }
+/* ETAPA 64: pra capivara + frase do rodapé caberem na primeira tela do iPhone, a tela de entrar fica mais justa */
+[data-loja-conta] .loja-campo { margin-bottom: 8px; }
+.loja .topo ~ main[data-loja-conta] { padding-bottom: 16px; }
+.loja .rodape { padding-top: 26px; }
+/* ETAPA 64 (22:32, prints e áudios do Cassiano — eu tinha entendido o item 7 ao contrário): o vão bege embaixo da
+   Política é PREENCHIDO pelo começo do rodapé preto — a capivara, o ālea & Co. e a frase "Onde cada impressão começa
+   com um sonho!", que tem que terminar LOGO ACIMA da barra do Safari. O resto do rodapé (categorias etc.) só rolando.
+   A altura desse começo do rodapé muda com a largura da tela, então o loja-conta.js mede e escreve em
+   --lj-rodape-cabeca; 100svh é a tela visível com a barra do navegador aparecendo. */
+.loja .topo ~ main[data-loja-conta] { min-height: calc(100vh - var(--lj-rodape-cabeca, 0px));
+  min-height: calc(100svh - var(--lj-rodape-cabeca, 0px)); }
+.loja-sem-cadastro { font-size: 11px; color: var(--lj-cinza); white-space: nowrap; }
+.loja-sem-cadastro a { font-size: 11px; color: var(--lj-cinza); }
+/* a linha inteira precisa caber em 342 px (390 - 2×24): o "Não tem uma conta? Cadastre-se" encolhe um pouco quando ganha o complemento */
+p:has(> .loja-sem-cadastro) > .loja-link { font-size: 13px; }
+.loja-link .loja-link { font-size: inherit; }
+/* ETAPA 65 (print das 22:40): no iPhone o "Orçamentos…" aparecia atrás da barra flutuante do Safari. Na página da conta,
+   a primeira tela termina na frase; o respiro embaixo dela empurra o resto pra depois da barra. */
+body.loja .rodape .frase { margin-bottom: 96px; }
+/* ETAPA 66: a tela treme quando falta algo (a mesma @keyframes tremer do estilo.css) */
+.loja-tremendo { animation: tremer .45s ease-in-out 1; }
+@media (prefers-reduced-motion: reduce) { .loja-tremendo { animation: none; } }

@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<!-- ETAPA 66 (22:54, Cassiano): "nunca ampliar" ao tocar num campo, mantendo a letra em 14. maximum-scale=1 faz o
+     iPhone parar o zoom automático do campo; a pinça com dois dedos continua funcionando no iOS (acessibilidade). -->
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>Minha Conta | ālea</title>
+<meta name="description" content="Entre na sua conta da ālea: dados pessoais, endereços, pedidos e lista de desejos.">
+<meta name="robots" content="noindex">
+<link rel="canonical" href="https://www.aleaco.art.br/conta.html">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Minha Conta | ālea">
+<meta property="og:description" content="Entre na sua conta da ālea: dados, endereços, pedidos e lista de desejos.">
+<meta property="og:image" content="img/marca/og_compartilhar.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="img/marca/og_compartilhar.jpg">
+<link rel="icon" href="img/marca/favicon_circular_32.png" type="image/png" sizes="32x32">
+<link rel="icon" href="img/marca/favicon_circular_48.png" type="image/png" sizes="48x48">
+<link rel="apple-touch-icon" href="img/marca/favicon_circular_180.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@300;400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/estilo.css">
+<link rel="stylesheet" href="css/loja.css">
+</head>
+<body class="loja">
+<!-- ALEA:TOPO -->
+<header class="topo">
+  <!-- ⚠️ O BOTÃO DE VOLTAR PRAS CATEGORIAS MORA AQUI, EMBAIXO DO LOGO.
+       Dentro do feed ele caía POR CIMA da foto no celular; ao LADO do logo ele ficou
+       apertado (as duas coisas vistas pelo Cassiano em 15/09/2026). Empilhado abaixo da
+       marca ele tem lugar próprio e não disputa pixel com nada.
+       Quem liga e desliga é o feed.js. -->
+  <span class="canto-marca">
+    <!-- REBRAND 22/09/2026: o topo esquerdo perdeu o logotipo inteiro da ālea e ficou SÓ a
+         capivara em miniatura (pedido do Cassiano em áudio). Peça gerada por
+         _montar_marca_e_co_v1_rebrand_2026-09-22.py. -->
+    <a class="marca" href="index.html" aria-label="ālea — início">
+      <img class="colorida" src="img/marca/e_co/capivara_mini.svg" alt="ālea" width="46" height="28">
+      <img class="clara" src="img/marca/e_co/capivara_mini_claro.svg" alt="ālea" width="46" height="28">
+    </a>
+    <button class="voltar-categorias" type="button" data-fechar-feed hidden>&larr; categorias</button>
+  </span>
+  <!-- ⚠️ A LOGO DO CANAL @eaibora.3d (Cassiano, 4a rodada, 17/09/2026, item 3).
+       Ela mora AQUI, colada a direita da marca, e nao sai do lugar nunca: a animacao da abertura
+       so a faz crescer e voltar em torno do canto superior esquerdo DELA MESMA (transform-origin:
+       top left), com o mesmo tempo, o mesmo atraso e a mesma curva da capivara - 3x menor.
+       Quem mede "3x menor" e' o abertura.js, porque o tamanho da capivara gigante muda com a janela.
+       A imagem e' a que o Cassiano mandou em 17/09/2026 as 17:02 (o logo que ele usa no Instagram e no
+       Linktree), com o fundo recortado por _preparar_logo_3d_v2_foto_do_cassiano.py. -->
+  <a class="marca-3d" href="https://www.instagram.com/eaibora.3d?stkn=MzVtaHNja3ppa2k4" target="_blank" rel="noopener"
+     aria-label="Instagram do canal eai, bora? (@eaibora.3d)" title="@eaibora.3d">
+    <img src="img/marca/eaibora3d_logo.webp" alt="eai, bora? — o canal do Cassiano no Instagram"
+         width="41" height="28" decoding="async">
+  </a>
+  <nav aria-label="Principal">
+    <button class="botao-icone" type="button" data-abrir="conta" aria-haspopup="dialog">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+      <span class="rotulo">Conta</span>
+    </button>
+    <button class="botao-icone" type="button" data-abrir="carrinho" aria-haspopup="dialog">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 8.5h14V21H5z"></path><path d="M9 8.5V7a3 3 0 0 1 6 0v1.5"></path></svg>
+      <span class="rotulo">Carrinho</span>
+      <span class="quantos" data-quantos>0</span>
+    </button>
+  </nav>
+</header>
+<!-- /ALEA:TOPO -->
+<!-- A CONTA "IGUAL À DA TIFFANY" (pedido do Cassiano, 23/09/2026). Quem desenha é o js/loja-conta.js:
+     sem conta = "Escolha uma opção para entrar"; com conta = "Minha Conta" (#/dados, #/enderecos, #/pedidos,
+     #/autenticacao, #/desejos). -->
+<main data-loja-conta aria-live="polite"><p class="loja-vazio" style="padding:60px 0;text-align:center">Carregando…</p></main>
+
+<!-- ALEA:RODAPE -->
+<footer class="rodape">
+  <img class="marca-rodape" src="img/marca/e_co/logo_claro.svg" alt="ālea">
+  <p class="frase" data-assinatura>Onde cada impressão começa com um sonho!</p>
+  <a class="orcamento zap" data-assunto="orçamento de uma peça personalizada">Orçamentos e personalizados, clique aqui!</a>
+  <nav class="menu-categorias" data-menu-categorias aria-label="Categorias"></nav>
+  <div class="redes" data-redes></div>
+  <p class="lei">
+    © <img src="img/marca/e_co/logo_claro.svg" alt="ālea"> <span id="ano">2026</span> — Todos os direitos reservados.
+    <span class="creditos">
+      <span data-campo="responsavel">Cassiano Rosado</span>, <span data-campo="cidade">Jataí</span>/<span data-campo="uf">GO</span> ·
+      CNPJ <span data-campo="cnpj">61.338.171/0001-10</span> ·
+      identidade visual por <a href="https://www.instagram.com/mirellagaetti/" target="_blank" rel="noopener">Mirella Gaetti</a> ·
+      
+      <a href="a-alea.html">Quem somos nós</a> ·
+      <a href="trocas-e-entrega.html">Trocas, devoluções e entregas</a> ·
+      <a href="privacidade.html">Política de privacidade</a>
+    </span>
+  </p>
+</footer>
+<!-- /ALEA:RODAPE -->
+<script src="js/config.js"></script>
+<script src="js/produtos.js"></script>
+<script src="js/site.js"></script>
+<script src="js/carrinho.js"></script>
+<script src="js/loja-dados.js"></script>
+<script src="js/loja-conta.js"></script>
+</body>
+</html>

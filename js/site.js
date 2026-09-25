@@ -264,47 +264,11 @@
        que ele mandou — "mantenha minha fonte, cor, tudo, só quero o layout, design e posições" —
        e fica no rodapé: Subtotal centralizado, o botão largo, e "Continue comprando" sublinhado
        embaixo (fecha a gaveta). O aviso do frete continua, pequeno, por último. */
-    molde('carrinho', 'Sua Sacola de Compras',          // 21:44: o título do modelo, pedido dele
-      '<p class="vazio">Sua sacola está vazia.</p>',
-      '<div class="total-carrinho"><span>Subtotal:</span> <strong data-total>—</strong></div>' +
-      '<button class="botao" type="button" data-fechar-pedido disabled>Fechar pedido</button>' +
-      /* ETAPA 42 (22:30): o × do topo FECHA e deixa a pessoa exatamente onde estava; o "Continue
-         comprando" leva pra PÁGINA INICIAL. Por isso ele virou link de verdade, não mais fechar. */
-      '<a class="continuar-comprando" href="index.html">Continue comprando</a>');
-    /* ETAPA 41 (22:29): saiu da sacola, a pedido dele, o aviso "O frete é calculado no fechamento,
-       pelo CEP. Peça personalizada só entra em produção depois da confirmação do pagamento." — o
-       frete segue sendo dito na mensagem do WhatsApp ("Frete: a combinar pelo CEP") e a regra da
-       produção está na página de Trocas e no texto de Produtos Personalizados. */
-
-    /* ⚠️ ETAPA 40 (22:23, vídeo + 2 prints do modelo): "na página da sacola é pra deixar só a
-       sacola" — a PRIMEIRA tela tem que caber inteira no telefone (título, produtos, Subtotal e o
-       botão lá embaixo), e só ROLANDO aparece o "Continue comprando". E o site de baixo não pode
-       rolar junto ("parece que está rodando a segunda tela"). Então a sacola vira UMA página que rola
-       sozinha: a `.tela-sacola` ocupa exatamente a altura visível (100dvh) e o `.rodape-extra` mora
-       depois dela, fora da primeira tela. Monta aqui, movendo os pedaços do molde. */
-    (function () {
-      var g = document.getElementById('gaveta-carrinho');
-      if (!g) return;
-      var rod = g.querySelector('[data-rodape-gaveta]');
-      var tela = document.createElement('div');
-      tela.className = 'tela-sacola';
-      var principal = document.createElement('div');
-      principal.className = 'rodape-principal';
-      var extra = document.createElement('div');
-      extra.className = 'rodape-extra';
-      Array.prototype.slice.call(rod.children).forEach(function (el) {
-        (el.matches('.total-carrinho, [data-fechar-pedido]') ? principal : extra).appendChild(el);
-      });
-      tela.appendChild(g.querySelector('header'));
-      tela.appendChild(g.querySelector('[data-corpo]'));
-      tela.appendChild(principal);
-      g.insertBefore(tela, rod);
-      g.insertBefore(extra, rod);
-      g.removeChild(rod);
-    })();
-
-    molde('conta', 'Sua conta ālea',
-      '<p class="vazio">Carregando…</p>', '');
+    /* ⚠️ ETAPA 65 (23/09/2026 22:41, vídeo do Cassiano: "a tela tá mexendo de novo pros lados"): as gavetas de SACOLA
+       e de CONTA não são mais montadas. As duas viraram páginas (finalizar-compra.html e conta.html — etapas 61/62), mas
+       continuavam existindo escondidas à direita da tela (x 390..780), e o Safari deixava arrastar até elas mesmo com a
+       moldura da etapa 57. O molde() continua aqui pra quem precisar de gaveta nova. */
+    void molde;
 
     function fechar() {
       Array.prototype.forEach.call(document.querySelectorAll('.gaveta'), function (g) {
@@ -315,6 +279,10 @@
       document.body.classList.remove('travado');
     }
     function abrir(id) {
+      /* ETAPA 62 (23/09/2026 22:07, Cassiano: "temos duas sacolas (...) aquela primeira não vai existir mais"):
+         a SACOLA deixou de ser gaveta. Todo pedido de "abrir o carrinho" — o ícone do topo, o editar da peça,
+         o Comprar agora — vai direto pra página Sacola de Compras. */
+      if (id === 'carrinho') { location.href = 'finalizar-compra.html'; return; }
       var g = document.getElementById('gaveta-' + id);
       if (!g) return;
       fechar();
@@ -331,6 +299,10 @@
     cortina.addEventListener('click', fechar);
     document.addEventListener('click', function (e) {
       var b = e.target.closest('[data-abrir]');
+      /* ETAPA 61 (23/09/2026): a CONTA virou PÁGINA (conta.html), como na Tiffany — "clicar lá em cima,
+         do lado da sacola, em meu perfil, para aparecer essa página". O carrinho continua gaveta. */
+      if (b && b.getAttribute('data-abrir') === 'conta') { e.preventDefault(); location.href = 'conta.html'; return; }
+      if (b && b.getAttribute('data-abrir') === 'carrinho') { e.preventDefault(); location.href = 'finalizar-compra.html'; return; }
       if (b) { e.preventDefault(); abrir(b.getAttribute('data-abrir')); return; }
       if (e.target.closest('[data-fechar-gaveta]')) fechar();
     });
@@ -376,8 +348,28 @@
     });
   }
 
+  /* ETAPA 61 (23/09/2026): na página de PEÇA entra o coração da Lista de Desejos (loja-dados.js).
+     As páginas conta.html e finalizar-compra.html carregam os arquivos da loja por conta própria. */
+  function carregarCoracao() {
+    if (!document.querySelector('.produto-topo') || window.aleaLoja) return;
+    var css = document.createElement('link');
+    css.rel = 'stylesheet'; css.href = 'css/loja.css';
+    document.head.appendChild(css);
+    var s = document.createElement('script');
+    s.src = 'js/loja-dados.js';
+    document.body.appendChild(s);
+  }
+
   /* -------------------------------------------------------------------- início */
+  /* ETAPA 72 (24/09/2026): linha da ficha ainda sem número (ex.: "Peso e dimensões — a informar") só aparece na
+     PRÉVIA; no site do ar ela some. Nunca mostrar "a informar" pro cliente de verdade. */
+  function esconderFaltas() {
+    if (/github\.io$|^localhost$|^127\.0\.0\.1$/.test(location.hostname)) return;
+    Array.prototype.forEach.call(document.querySelectorAll('[data-falta]'), function (el) { el.hidden = true; });
+  }
+
   function iniciar() {
+    esconderFaltas();
     ligarVoltarProFeed();
     preencherContato();
     montarMenuCategorias();
@@ -385,6 +377,7 @@
     montarGavetas();
     window.aleaLigarBotoes();     // as páginas de produto já nascem prontas no HTML
     carregarConta();
+    carregarCoracao();
     document.dispatchEvent(new CustomEvent('alea:site-pronto'));
   }
 

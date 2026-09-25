@@ -119,6 +119,10 @@ window.PRODUTOS = [
 
   {
     slug: 'bowl-wave',
+    /* peso: 198 g com a tigela de inox (Cassiano, 24/09/2026 01:39) — guardado COMO ELE MANDOU; a ficha mostra +10%
+       (regra dele, 01:46: "todo peso que eu te passar, você coloca 10% a mais"), feita pelo gerador v14. Medidas: caixa do objeto no arquivo 3D do Luke,
+       tamanho G (o do configurador 3D) — 211,9 × 212,9 × 83,7 mm. O tamanho M do mesmo arquivo: 186,4 × 187,3 × 73,6 mm. */
+    medidas: { peso_g: 198, altura_cm: 8.4, largura_cm: 21.3, comprimento_cm: 21.2 },
     nome: 'ālea Bowl Wave',
     linha: 'Comedouro',
     categoria: 'pet',
@@ -136,6 +140,9 @@ window.PRODUTOS = [
       'A base elevada deixa o cão comer com o pescoço em posição mais natural, sem ' +
       'ter que abaixar a cabeça até o chão.'
     ],
+    /* PESO E DIMENSÕES (24/09/2026, pedido do Cassiano): base do frete e da caixa padrão. Preencher com o que
+       ELE mandar, nunca estimado — e rodar 01_gerar_paginas_v14_peso_e_dimensoes. Sem número = linha escondida no ar.
+       medidas: { peso_g: 0, altura_cm: 0, largura_cm: 0, comprimento_cm: 0 }, */
     /* linhas EXTRA da ficha, além das quatro padrão */
     ficha_extra: [
       ['Acompanha', 'Tigela interna em inox, removível pra lavar']
@@ -145,6 +152,8 @@ window.PRODUTOS = [
 
   {
     slug: 'poop-bag-holder',
+    /* ⚠ EXEMPLO pra ver o layout (pedido dele, 01:39: "inventa desses dois por enquanto") — NÃO É MEDIDA. Some no ar. */
+    medidas_exemplo: { peso_g: 45, altura_cm: 10, largura_cm: 6, comprimento_cm: 7 },
     nome: 'ālea Poop Bag Holder',
     linha: 'Passeio',
     categoria: 'pet',
@@ -166,6 +175,8 @@ window.PRODUTOS = [
 
   {
     slug: 'kit',
+    /* ⚠ EXEMPLO pra ver o layout (pedido dele, 01:39: "inventa desses dois por enquanto") — NÃO É MEDIDA. Some no ar. */
+    medidas_exemplo: { peso_g: 250, altura_cm: 10, largura_cm: 23, comprimento_cm: 23 },
     nome: 'Kit ālea',
     linha: 'Kit',
     categoria: 'pet',
