@@ -192,7 +192,13 @@
     }
     function abrirGrande(n) {
       if (!aberto) return;
-      grande.querySelector('img').src = 'img/produtos/' + aberto.fotos[n] + '.jpg';
+      /* v16: a miniatura (_m, já carregada) aparece NA HORA e a foto inteira entra por cima quando chegar —
+         no 4G a tela ficava só esmaecida por um instante e parecia que o clique não pegou */
+      var img = grande.querySelector('img'), f = aberto.fotos[n], cheia = new Image();
+      img.setAttribute('data-foto', f);
+      img.src = 'img/produtos/' + f + '_m.jpg';
+      cheia.onload = function () { if (img.getAttribute('data-foto') === f) img.src = cheia.src; };
+      cheia.src = 'img/produtos/' + f + '.jpg';
       grande.hidden = false;
       tela.classList.add('com-grande');
     }
