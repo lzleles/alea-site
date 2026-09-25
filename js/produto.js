@@ -71,7 +71,8 @@
      leva o próprio data-favo, então a tela cheia continua abrindo a foto certa. */
   function capaNoMeio() {
     if (!colmeia) return;
-    var favos = Array.prototype.slice.call(colmeia.querySelectorAll('.favo'));
+    /* 25/09/2026: os favos-BOTÃO das configurações (.config) não entram na troca — eles são a linha de cima */
+    var favos = Array.prototype.slice.call(colmeia.querySelectorAll('.favo:not(.config):not(.voltar)'));
     var capa = colmeia.querySelector('.favo[data-favo="0"]');
     if (!capa || favos.length < 3) return;
     var cx = colmeia.getBoundingClientRect(), mx = cx.left + cx.width / 2, my = cx.top + cx.height / 2;
@@ -147,6 +148,79 @@
   }
 
   /* ===================================================================== colmeia */
+  /* ⚠️ OS ÁLBUNS (Cassiano, áudios 25/09/2026 11:19, 11:30 e 11:31 — msgs 1493, 1517, 1518). A colmeia das 7 fica
+     como está ("tá muito lindo, não quero que mexa nelas"). Embaixo dela, 3 favos menores são os álbuns —
+     tricolor, bicolor e monocromático — com o nome escrito em cima. "Se ele clicar em qualquer um dos álbuns, a
+     gente abre outra tela pra ele, não tela cheia, mas quase cheia, só pra ele ver que tem muitas fotos e ali é um
+     álbum. Se ele clicar na foto, ela expande num tamanho legal, mas com ele podendo clicar em qualquer lugar da
+     tela ali fora pra voltar pras miniaturas." Não usa a tela cheia de carrossel. Os conjuntos vêm do
+     `data-albuns` que o gerador v15 escreve a partir do produtos.js. */
+  (function albuns() {
+    var caixaAlbuns = document.querySelector('[data-albuns]');
+    var tela = document.querySelector('[data-album-tela]');
+    if (!caixaAlbuns || !tela) return;
+    var albuns = {};
+    try { albuns = JSON.parse(caixaAlbuns.getAttribute('data-albuns') || '{}'); } catch (e) { albuns = {}; }
+    var grade = tela.querySelector('[data-album-grade]');
+    var grande = tela.querySelector('[data-album-grande]');
+    var nome = tela.querySelector('[data-album-nome]');
+    var conta = tela.querySelector('[data-album-conta]');
+    var h1 = document.querySelector('.produto-topo h1');
+    var peca = h1 ? h1.textContent.trim() : 'a peça';
+    var aberto = null;
+
+    function abrirAlbum(id) {
+      var a = albuns[id];
+      if (!a || !a.fotos || !a.fotos.length) return;
+      aberto = a;
+      nome.textContent = a.nome;
+      conta.textContent = a.fotos.length + (a.fotos.length === 1 ? ' foto' : ' fotos');
+      grade.innerHTML = a.fotos.map(function (f, n) {
+        return '<button class="favo" type="button" data-album-foto="' + n + '" aria-label="Ampliar foto ' + (n + 1) + ' do álbum ' + a.nome + '">' +
+          '<img src="img/produtos/' + f + '_m.jpg" width="700" height="700" loading="lazy" decoding="async" alt="' + peca + ' ' + a.nome + ' — foto ' + (n + 1) + '"></button>';
+      }).join('');
+      fecharGrande();
+      tela.classList.add('aberta');
+      tela.setAttribute('aria-hidden', 'false');
+      document.body.classList.add('travado');
+    }
+    function fecharAlbum() {
+      tela.classList.remove('aberta');
+      tela.setAttribute('aria-hidden', 'true');
+      document.body.classList.remove('travado');
+      aberto = null;
+    }
+    function abrirGrande(n) {
+      if (!aberto) return;
+      grande.querySelector('img').src = 'img/produtos/' + aberto.fotos[n] + '.jpg';
+      grande.hidden = false;
+      tela.classList.add('com-grande');
+    }
+    function fecharGrande() {
+      grande.hidden = true;
+      tela.classList.remove('com-grande');
+    }
+
+    caixaAlbuns.addEventListener('click', function (ev) {
+      var b = ev.target.closest('[data-album]');
+      if (b) abrirAlbum(b.getAttribute('data-album'));
+    });
+    tela.addEventListener('click', function (ev) {
+      if (ev.target.closest('[data-fechar-album]')) { fecharAlbum(); return; }
+      /* foto grande aberta: clicar em QUALQUER lugar (fora da própria foto) volta pras miniaturas */
+      if (!grande.hidden) { if (!ev.target.closest('[data-album-grande] img')) fecharGrande(); return; }
+      var f = ev.target.closest('[data-album-foto]');
+      if (f) { abrirGrande(parseInt(f.getAttribute('data-album-foto'), 10)); return; }
+      /* clicar fora da caixa (no escuro) fecha o álbum */
+      if (!ev.target.closest('.album-caixa')) fecharAlbum();
+    });
+    document.addEventListener('keydown', function (ev) {
+      if (ev.key !== 'Escape' || !tela.classList.contains('aberta')) return;
+      ev.preventDefault();
+      if (!grande.hidden) fecharGrande(); else fecharAlbum();
+    });
+  })();
+
   if (colmeia) {
     colmeia.addEventListener('click', function (ev) {
       var favo = ev.target.closest('[data-favo]');

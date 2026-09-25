@@ -63,7 +63,8 @@ window.CATEGORIAS = [
   /* ⚠️ TEXTO PROVISÓRIO (etapa 3, 22/09/2026): o Cassiano pediu um placeholder sobre golden
      retriever "só pra ver o espaçamento do título e da descrição antes das fotos" — ele escreve
      o texto de verdade depois. TROCAR quando ele mandar o definitivo. */
-  { id: 'pet',    nome: 'PET',    descricao: 'Dócil, brincalhão e leal, o golden retriever enche a casa de pelo e alegria — e merece peças feitas sob medida pro tamanho e pro apetite dele. Cada comedouro sai com o nome do seu cão impresso na peça, na estampa que você escolher: bonito de deixar à mostra e resistente pra bagunça boa do dia a dia.' },
+  /* 25/09/2026 10:26 (msg 1473, texto DELE, palavra por palavra) — antes era o texto do golden retriever. */
+  { id: 'pet',    nome: 'PET',    descricao: 'Nossa linha PET foi criada para trazer mais alegria e personalidade à sua casa, criando um cantinho especial para quem, mesmo sem dizer uma palavra, transborda amor, alegria e companheirismo.' },
   { id: 'play',   nome: 'PLAY',   descricao: '' },   // sugestão minha: brinquedo e jogo
   { id: 'sense',  nome: 'SENSE',  descricao: '' }    // sugestão minha: sensorial, fidget
 ];
@@ -128,6 +129,18 @@ window.PRODUTOS = [
     categoria: 'pet',
     preco: 179,
     capa: 'luke_1',
+    /* OS ÁLBUNS POR CONFIGURAÇÃO (Cassiano, áudios 25/09/2026 11:19-11:30, msgs 1493, 1517, 1518): a colmeia das 7
+       fotos de cima NÃO muda ("são as sete capas, padrão pra todos os produtos"). Embaixo dela entram 3 favos menores,
+       os ÁLBUNS, com o nome escrito em cima no estilo do rótulo "PET": tricolor, bicolor e monocromático. Clicou, abre
+       uma tela quase cheia com as miniaturas daquele álbum; a foto expande dentro dela e clicar fora volta pras
+       miniaturas. O Bowl Wave sai em 3 combinações de cor — monocromático (Matteo, verde), bicolor (Catrina, azul e
+       branco) e tricolor (Luke: branco/laranja/cinza; Cacau: bege/dourado/marrom). Ele alimenta: "coloca essa daqui
+       no álbum monocromático". Quem monta a página é o 01_gerar_paginas_v15_colmeia_configuracoes; a tela é do produto.js. */
+    configuracoes: [
+      { id: 'tricolor',      nome: 'Tricolor',      capa: 'pro_luke_1',    fotos: ['pro_luke_1', 'pro_cacau_1', 'luke_1', 'luke_2', 'luke_3', 'luke_4'] },
+      { id: 'bicolor',       nome: 'Bicolor',       capa: 'pro_catrina_1', fotos: ['pro_catrina_1'] },
+      { id: 'monocromatico', nome: 'Monocromático', capa: 'pro_matteo_1',  fotos: ['pro_matteo_1', 'matteo_1', 'matteo_2', 'matteo_3'] }
+    ],
     material: 'PLA',          /* ⚠️ era o que o texto de 14/09 dizia. Se esta peça hoje
                                  sai em PETG, trocar aqui e regerar as páginas. */
     resumo: 'Comedouro elevado com o nome do seu cão impresso no corpo da peça.',

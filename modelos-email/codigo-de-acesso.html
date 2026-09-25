@@ -1,16 +1,16 @@
 <!DOCTYPE html>
-<!-- GERADO por 03_site/02_gerar_emails_pedido_v27_lote9_recebido_uma_frase_2026-09-24.py — mexer lá, não aqui.
-     ASSUNTO: Seu código de acesso é {{CODIGO}}
+<!-- GERADO por 03_site/02_gerar_emails_pedido_v31_ola_cor_por_letra_2026-09-25.py — mexer lá, não aqui.
+     ASSUNTO: Seu código de acesso
      REMETENTE PROPOSTO: ālea & Co. <sac@aleaco.art.br> -->
 <html lang="pt-BR">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex">
-<title>Seu código de acesso é {{CODIGO}}</title>
+<title>Seu código de acesso</title>
 </head>
 <body style="margin:0;padding:0;background:#000000;">
-<div style="display:none;max-height:0;overflow:hidden;opacity:0;">Seu código de acesso no ālea &amp; Co. é {{CODIGO}}</div>
+<div style="display:none;max-height:0;overflow:hidden;opacity:0;">Seu código de acesso no ālea &amp; Co.</div>
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#000000" style="background:#000000;">
   <tr><td align="center" style="padding:0;">
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;">
@@ -38,14 +38,14 @@
 <script>
   (function () {
     var q = new URLSearchParams(location.search);
-    var nome = q.get('nome') || 'cassianorosado', codigo = q.get('codigo') || '566753';
+    var nome = q.get('nome') || '', codigo = q.get('codigo') || '566753';
     document.title = document.title.replace('{{CODIGO}}', codigo);
     document.body.innerHTML = document.body.innerHTML.split('{{NOME}}').join(nome).split('{{CODIGO}}').join(codigo);
     /* v26: o nome em degradê letra a letra (mesma conta de nome_em_degrade do servidor) */
-    document.querySelectorAll('[data-nome]').forEach(function (el) { var s = el.textContent, cs = [[108,150,167],[189,106,44],[157,62,32],[175,149,89]];
+    document.querySelectorAll('[data-nome]').forEach(function (el) { var s = el.textContent, cs = [[108,150,167],[189,106,44],[157,62,32],[175,149,89]]; s = s.trim() ? 'Olá ' + s.trim() : 'Olá';
       var ls = s.replace(/\s/g, '').length, n = Math.max(1, ls - 1), k = 0, out = '';
       for (var q = 0; q < s.length; q++) { var ch = s[q]; if (/\s/.test(ch)) { out += ch; continue; }
-        var t = k / n * 3, i = Math.min(Math.floor(t), 2), f = t - i, c = [0,1,2].map(function (m) { return Math.round(cs[i][m] + (cs[i+1][m] - cs[i][m]) * f); });
+        var t = k / n * 3, i = Math.min(Math.floor(t), 2), f = t - i, c = [0,1,2].map(function (m) { return Math.round(cs[i][m] + (cs[i+1][m] - cs[i][m]) * f); }); if (ls <= 3) c = cs[k];
         out += '<span style="color:rgb(' + c.join(',') + ');">' + ch + '</span>'; k++; }
       el.innerHTML = out; });
     if (!/aleaco\.art\.br$/.test(location.hostname)) {

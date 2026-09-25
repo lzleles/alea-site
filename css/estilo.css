@@ -1023,6 +1023,71 @@ body.sem-transicao-feed .feed { transition: none !important; }
 .colmeia.tem-aberto .favo:nth-child(even).aberto { transform: translateY(calc(var(--favo) * .29)) scale(2.05); }
 /* espaço em volta pra foto aberta não sair da página */
 .colmeia-caixa { padding: calc(var(--favo, 120px) * .55) 0; overflow: hidden; }
+
+/* ⚠️ OS ÁLBUNS (Cassiano, áudios 25/09/2026 11:30-11:31, print msg 1516): a colmeia das 7 fica como está; embaixo
+   dela, 3 favos MENORES são os álbuns por configuração — tricolor, bicolor e monocromático — com o nome escrito em
+   cima "na mesma nomenclatura e cor do PET, talvez um pouquinho menor" (o rótulo .linha: dourado, maiúscula, 12,5px
+   → aqui 11px). Clicou, abre uma tela QUASE cheia com as miniaturas do álbum; a foto expande dentro dela; clicar em
+   qualquer lugar fora da foto volta pras miniaturas; clicar no escuro ou no × fecha o álbum. */
+.albuns {
+  --favo: clamp(78px, 11vw, 112px);
+  display: flex; justify-content: center; gap: calc(var(--favo) * .16);
+  margin: -6px 0 18px;
+}
+.albuns .favo {
+  position: relative; width: var(--favo); height: calc(var(--favo) * 1.1547); margin: 0;
+  padding: 0; border: 0; background: var(--papel); cursor: pointer;
+  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+  transition: transform .35s cubic-bezier(.3, .86, .28, 1), filter .35s ease;
+}
+.albuns .favo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.albuns .favo:hover { transform: scale(1.06); filter: brightness(1.06); }
+.albuns .favo:focus-visible { outline: 2px solid var(--terracota); outline-offset: 2px; }
+.albuns .favo .rotulo-album {
+  position: absolute; left: 4%; right: 4%; top: 50%; transform: translateY(-50%);
+  font-size: clamp(9.5px, 2.6vw, 11px); line-height: 1.15; letter-spacing: .08em; text-transform: uppercase; font-weight: 700; color: var(--dourado);
+  hyphens: manual; overflow-wrap: normal;
+  text-align: center; pointer-events: none;
+  text-shadow: 0 0 6px var(--papel), 0 0 2px var(--papel), 0 1px 1px var(--papel);
+}
+.albuns .favo::before {
+  content: ''; position: absolute; inset: 0; background: rgba(246, 243, 238, .55); pointer-events: none;
+}
+.albuns .favo.vazio { cursor: default; background: var(--borda, #E3DBCF); }
+.albuns .favo.vazio::before { display: none; }
+.albuns .favo.vazio .rotulo-album { top: 42%; }
+.albuns .favo.vazio .rotulo-breve { position: absolute; left: 4%; right: 4%; top: 58%; font-size: 9.5px; letter-spacing: .08em; color: var(--tinta-fraca); text-align: center; }
+
+.album-tela {
+  position: fixed; inset: 0; z-index: 90; display: grid; place-items: center;
+  background: rgba(20, 14, 10, .58); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
+  opacity: 0; visibility: hidden; transition: opacity .3s ease, visibility .3s;
+}
+.album-tela.aberta { opacity: 1; visibility: visible; }
+.album-tela .album-caixa {
+  position: relative; width: min(94vw, 980px); height: min(90svh, 900px);
+  background: var(--papel); border-radius: 18px; padding: clamp(14px, 3vw, 28px);
+  overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; overscroll-behavior: contain;
+  box-shadow: 0 30px 80px rgba(0, 0, 0, .35);
+}
+.album-tela .album-fechar {
+  position: absolute; top: 10px; right: 12px; z-index: 3; width: 38px; height: 38px; border-radius: 50%;
+  border: 0; background: var(--tinta); color: var(--papel); font-size: 24px; line-height: 1; cursor: pointer;
+}
+.album-tela .album-nome { margin: 4px 0 6px; text-align: center; }
+.album-tela .album-nome .linha { font-size: 12.5px; letter-spacing: .1em; text-transform: uppercase; color: var(--dourado); font-weight: 700; }
+.album-tela .album-conta { font-size: 12px; color: var(--tinta-fraca); margin-left: 8px; }
+.album-tela .album-grade { --favo: clamp(96px, 16vw, 168px); padding-block: clamp(20px, 4vw, 40px); }
+.album-tela .album-grade .favo { margin: calc(var(--favo) * -.14) 0; }
+/* a foto grande mora POR CIMA da grade, dentro da caixa: "expande num tamanho legal" */
+.album-tela .album-grande {
+  position: absolute; inset: 0; z-index: 2; display: grid; place-items: center; padding: clamp(18px, 4vw, 40px);
+  background: rgba(246, 243, 238, .92); border-radius: 18px; cursor: zoom-out;
+}
+.album-tela .album-grande[hidden] { display: none; }   /* o `display: grid` acima vencia o atributo hidden e a camada invisível engolia o clique */
+.album-tela .album-grande img { max-width: 100%; max-height: 100%; object-fit: contain; border-radius: 12px; box-shadow: 0 18px 50px rgba(0, 0, 0, .25); cursor: default; }
+.album-tela.com-grande .album-caixa { overflow: hidden; }
+@media (prefers-reduced-motion: reduce) { .album-tela, .albuns .favo { transition: none; } }
 .colmeia-dica { text-align: center; font-size: 13px; color: var(--tinta-fraca); margin: 0 0 2px; }
 .colmeia-dica2 { text-align: center; font-size: 11.5px; color: var(--tinta-fraca); opacity: .75; margin: 0 0 4px; }
 
