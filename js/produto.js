@@ -220,7 +220,13 @@
            (sem janela por baixo) emendava. Então a janela do álbum SAI enquanto a tela cheia está aberta e VOLTA ao fechar:
            a página fica exatamente como na colmeia. */
         var volta = abertoId, ordem = gOrdem.slice();
+        /* v25 (vídeo 1731, cores medidas no Safari: topo #E5DCD3 = o bege do cabeçalho): o álbum saía ESMAECENDO em .3s
+           enquanto a tela cheia entrava — o Safari lia a cor nesse meio-tempo. Agora ele some NA HORA (sem transição),
+           e só então a tela cheia abre: a mesma sequência da colmeia. */
+        tela.style.transition = 'none';
         fecharAlbum();
+        void tela.offsetHeight;
+        tela.style.transition = '';
         window.aleaAbrirTelaCheia(n, lista, ordem, function () { abrirAlbum(volta); });
         return;
       }
