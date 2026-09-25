@@ -1762,3 +1762,5 @@ html.topo-emendado body.no-feed .topo::before, html.topo-emendado body.escuro .t
 }
 html.topo-emendado .album-tela { background: var(--cor-do-topo) !important; -webkit-backdrop-filter: none !important; backdrop-filter: none !important; }
 
+/* v23: a tela cheia aberta a partir de um ÁLBUM mora por cima dele (o álbum é z 90) */
+.telacheia.sobre-album { z-index: 96; }

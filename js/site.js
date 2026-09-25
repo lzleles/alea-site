@@ -304,8 +304,11 @@ window.aleaCorDoTopo = (function () {
         g.classList.remove('aberta');
         g.setAttribute('aria-hidden', 'true');
       });
+      /* v23 (25/09/2026): só destrava a página se uma gaveta estava aberta de verdade — o Esc chamava isto sempre e
+         destravava a página por baixo de um álbum aberto */
+      var tinhaGaveta = cortina.classList.contains('aberta');
       cortina.classList.remove('aberta');
-      document.body.classList.remove('travado');
+      if (tinhaGaveta) document.body.classList.remove('travado');
     }
     function abrir(id) {
       /* ETAPA 62 (23/09/2026 22:07, Cassiano: "temos duas sacolas (...) aquela primeira não vai existir mais"):
