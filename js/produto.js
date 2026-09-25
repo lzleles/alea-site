@@ -167,7 +167,11 @@
     var conta = tela.querySelector('[data-album-conta]');
     var h1 = document.querySelector('.produto-topo h1');
     var peca = h1 ? h1.textContent.trim() : 'a peça';
-    var aberto = null;
+    var aberto = null, gAtual = -1;
+    /* v17: o contador "2 / 6" da foto ampliada (criado aqui pra não mexer no HTML gerado) */
+    var contaG = document.createElement('span');
+    contaG.className = 'album-conta-grande';
+    grande.appendChild(contaG);
 
     function abrirAlbum(id) {
       var a = albuns[id];
@@ -192,6 +196,8 @@
     }
     function abrirGrande(n) {
       if (!aberto) return;
+      gAtual = n;
+      contaG.textContent = aberto.fotos.length > 1 ? (n + 1) + ' / ' + aberto.fotos.length : '';
       /* v16: a miniatura (_m, já carregada) aparece NA HORA e a foto inteira entra por cima quando chegar —
          no 4G a tela ficava só esmaecida por um instante e parecia que o clique não pegou */
       var img = grande.querySelector('img'), f = aberto.fotos[n], cheia = new Image();
@@ -205,14 +211,41 @@
     function fecharGrande() {
       grande.hidden = true;
       tela.classList.remove('com-grande');
+      gAtual = -1;
     }
+    /* v17 (áudios 1613-1614 do Cassiano): a foto ampliada do álbum PASSA pro lado, e "chegou na última foto, o cliente
+       apertou de novo pra rolar ou clicou pra passar, aí fecha" — SEM VOLTA, o mesmo esquema da tela cheia da colmeia.
+       Fechar aqui é voltar pras miniaturas do álbum, não sair do álbum. */
+    function andarGrande(dir) {
+      if (!aberto || gAtual < 0) return;
+      var n = gAtual + dir;
+      if (n < 0 || n >= aberto.fotos.length) { fecharGrande(); return; }
+      abrirGrande(n);
+    }
+    var gx = null;
+    grande.addEventListener('touchstart', function (e) { gx = e.touches[0].clientX; }, { passive: true });
+    grande.addEventListener('touchmove', function (e) {
+      if (gx === null) return;
+      var dx = gx - e.touches[0].clientX;
+      if (Math.abs(dx) < 40) return;
+      gx = null;
+      andarGrande(dx > 0 ? 1 : -1);
+    }, { passive: true });
+    grande.addEventListener('touchend', function () { gx = null; }, { passive: true });
+    grande.addEventListener('wheel', function (e) {
+      if (grande.hidden) return;
+      var d = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
+      if (Math.abs(d) < 8) return;
+      e.preventDefault();
+      andarGrande(d > 0 ? 1 : -1);
+    }, { passive: false });
 
     caixaAlbuns.addEventListener('click', function (ev) {
       var b = ev.target.closest('[data-album]');
       if (b) abrirAlbum(b.getAttribute('data-album'));
     });
     tela.addEventListener('click', function (ev) {
-      if (ev.target.closest('[data-fechar-album]')) { fecharAlbum(); return; }
+      if (ev.target.closest('[data-fechar-album]')) { if (!grande.hidden) fecharGrande(); else fecharAlbum(); return; }
       /* foto grande aberta: clicar em QUALQUER lugar (fora da própria foto) volta pras miniaturas */
       if (!grande.hidden) { if (!ev.target.closest('[data-album-grande] img')) fecharGrande(); return; }
       var f = ev.target.closest('[data-album-foto]');
@@ -221,7 +254,9 @@
       if (!ev.target.closest('.album-caixa')) fecharAlbum();
     });
     document.addEventListener('keydown', function (ev) {
-      if (ev.key !== 'Escape' || !tela.classList.contains('aberta')) return;
+      if (!tela.classList.contains('aberta')) return;
+      if (!grande.hidden && (ev.key === 'ArrowRight' || ev.key === 'ArrowLeft')) { ev.preventDefault(); andarGrande(ev.key === 'ArrowRight' ? 1 : -1); return; }
+      if (ev.key !== 'Escape') return;
       ev.preventDefault();
       if (!grande.hidden) fecharGrande(); else fecharAlbum();
     });
