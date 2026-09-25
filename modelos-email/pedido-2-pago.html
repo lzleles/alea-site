@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- GERADO por 03_site/02_gerar_emails_pedido_v28_assuntos_dele_2026-09-25.py — mexer lá, não aqui.
+<!-- GERADO por 03_site/02_gerar_emails_pedido_v29_ola_no_degrade_2026-09-25.py — mexer lá, não aqui.
      ASSUNTO: Pagamento aprovado
      REMETENTE PROPOSTO: ālea & Co. <sac@aleaco.art.br> -->
 <html lang="pt-BR">
@@ -47,7 +47,7 @@
     Object.keys(ex).forEach(function (k) { h = h.split('{{' + k + '}}').join(ex[k]); });
     document.body.innerHTML = h;
     /* v26: o nome em degradê letra a letra (mesma conta de nome_em_degrade do servidor) */
-    document.querySelectorAll('[data-nome]').forEach(function (el) { var s = el.textContent, cs = [[108,150,167],[189,106,44],[157,62,32],[175,149,89]];
+    document.querySelectorAll('[data-nome]').forEach(function (el) { var s = el.textContent, cs = [[108,150,167],[189,106,44],[157,62,32],[175,149,89]]; s = s.trim() ? 'Olá, ' + s.trim() : 'Olá';
       var ls = s.replace(/\s/g, '').length, n = Math.max(1, ls - 1), k = 0, out = '';
       for (var q = 0; q < s.length; q++) { var ch = s[q]; if (/\s/.test(ch)) { out += ch; continue; }
         var t = k / n * 3, i = Math.min(Math.floor(t), 2), f = t - i, c = [0,1,2].map(function (m) { return Math.round(cs[i][m] + (cs[i+1][m] - cs[i][m]) * f); });
