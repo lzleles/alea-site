@@ -72,7 +72,7 @@
         (semCadastro ? '<p style="margin:18px 0 0;text-align:center"><span class="loja-sem-cadastro">ou <a href="' + esc(semCadastro) +
           '" class="loja-link sublinha">continuar sem cadastro</a></span></p>' : '') +
         '<p class="loja-miudo" style="text-align:center;margin:12px 0 0">Ao entrar você concorda com a ' +
-          '<a href="privacidade.html">Política de Privacidade</a> da ālea.</p>';
+          '<a href="privacidade.html">Política de Privacidade</a> da ālea & Co.</p>';
     }
     if (!temSenha && modoEntrar === 'senha') modoEntrar = 'codigo';
     if (!temCodigo && modoEntrar === 'codigo') modoEntrar = 'senha';
@@ -123,7 +123,7 @@
       '<button type="button" class="loja-bt opcao google" data-entrar-google' + (L.previa ? '' : ' hidden') + '>' + G +
         '<span>Continuar com o Google</span></button></div>' +
       '<p class="loja-miudo" style="text-align:center;margin:12px 0 0">Ao entrar você concorda com a ' +
-        '<a href="privacidade.html">Política de Privacidade</a> da ālea.</p>';
+        '<a href="privacidade.html">Política de Privacidade</a> da ālea & Co.</p>';
   }
 
   /* O botão OFICIAL do Google só funciona no endereço cadastrado no Google (o site do ar). Na prévia
@@ -227,7 +227,7 @@
       '<label class="loja-marca"><input type="checkbox" name="consent_personalizar"' + (e.consent_personalizar ? ' checked' : '') + '>' +
         '<span>Lembrar as peças que eu vi, pra me mostrar de novo quando eu voltar</span></label>' +
       '<label class="loja-marca"><input type="checkbox" name="consent_marketing"' + (e.consent_marketing ? ' checked' : '') + '>' +
-        '<span>Quero receber novidades e ofertas da ālea</span></label>' +
+        '<span>Quero receber novidades e ofertas da ālea & Co.</span></label>' +
       (e.politica_aceita ? '' :
         '<label class="loja-marca" data-politica><input type="checkbox" name="aceite_politica"><span>Li e aceito a ' +
         '<a href="privacidade.html" target="_blank" rel="noopener">Política de Privacidade</a></span></label>') +
@@ -485,7 +485,7 @@
       return;
     }
     if (e.target.closest('[data-excluir]')) {
-      if (!confirm('Excluir sua conta da ālea? Seus dados de cadastro e a memória da sua visita serão apagados. ' +
+      if (!confirm('Excluir sua conta da ālea & Co.? Seus dados de cadastro e a memória da sua visita serão apagados. ' +
                    'Pedidos já feitos ficam só pelo tempo que a lei fiscal exige.')) return;
       L.excluir().then(function (j) {
         eu = { logado: false }; erro = (j && j.mensagem) || '';

@@ -58,6 +58,14 @@ window.ALEA = {
   api_conta: 'https://api.aleaco.art.br',   // ligado em 23/09/2026 (ordem do Lázaro): servidor da ZELES + app Google 'ālea' + política v2
   login_automatico: true,
 
+  /* 25/09/2026 09:48 — ORDEM DO CASSIANO (áudio, msg 1460), contra o parecer da porta: a tela de conta mostra
+     e-mail+senha, código por e-mail e "Cadastre-se" no ar MESMO antes do servidor fazer isso ("se der erro é normal,
+     porque o site ainda não está pronto"). Enquanto o servidor não tiver as rotas, quem tentar recebe
+     "Isso ainda não está ligado no servidor." Facebook fica de fora (ordem dele, mesmo áudio).
+     ⚠️ Quando a casa ligar código/senha no /api/config ("metodos"), deixar esta lista VAZIA ([]) pra voltar a
+     obedecer o servidor. */
+  conta_metodos_forcados: ['google', 'codigo', 'senha'],
+
   /* A FRASE DA MARCA. Ela abre o site (escrita letra por letra) e fecha o rodapé.
      Um lugar só: mudou aqui, mudou nos dois. */
   assinatura: 'Onde cada impressão começa com um sonho!',
