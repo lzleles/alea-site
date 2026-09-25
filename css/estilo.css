@@ -1764,3 +1764,13 @@ html.topo-emendado .album-tela { background: var(--cor-do-topo) !important; -web
 
 /* v23: a tela cheia aberta a partir de um ÁLBUM mora por cima dele (o álbum é z 90) */
 .telacheia.sobre-album { z-index: 96; }
+
+/* v24 — A FOTO NA TELA CHEIA OCUPA A TELA (Cassiano, 25/09/2026 16:19, áudios 1727-1728): "essa foto que tava grandona,
+   ocupando a tela inteira, ficou menor; se a foto couber na tela inteirinha, pode colocar, desde que não estique".
+   A foto usa toda a largura e toda a altura livre entre o X e as bolinhas, sempre na proporção dela (contain). */
+.telacheia .palco-foto { padding: 0; }
+.telacheia img {
+  max-width: 100vw; max-height: calc(100svh - 124px); width: auto; height: auto; object-fit: contain;
+  border-radius: 0; box-shadow: none;
+}
+
