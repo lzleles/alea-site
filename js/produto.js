@@ -172,6 +172,12 @@
     var contaG = document.createElement('span');
     contaG.className = 'album-conta-grande';
     grande.appendChild(contaG);
+    /* v18 (áudios 1623-1624 do Cassiano, vídeo 1622): a foto ampliada vira TELA CHEIA DE VERDADE — sai de dentro da caixa
+       do álbum e mora direto no <body>, fixa na tela, com fundo liso que não mexe. Sem X e sem texto: só o "3 / 6"
+       suave embaixo. Sai ARRASTANDO pra baixo ou pra cima, "igual o iPhone, o Android"; passa DESLIZANDO pro lado. */
+    document.body.appendChild(grande);
+    var gImg = grande.querySelector('img');
+    var mouse = !!(window.matchMedia && window.matchMedia('(hover: hover) and (pointer: fine)').matches);
 
     function abrirAlbum(id) {
       var a = albuns[id];
@@ -200,7 +206,7 @@
       contaG.textContent = aberto.fotos.length > 1 ? (n + 1) + ' / ' + aberto.fotos.length : '';
       /* v16: a miniatura (_m, já carregada) aparece NA HORA e a foto inteira entra por cima quando chegar —
          no 4G a tela ficava só esmaecida por um instante e parecia que o clique não pegou */
-      var img = grande.querySelector('img'), f = aberto.fotos[n], cheia = new Image();
+      var img = gImg, f = aberto.fotos[n], cheia = new Image();
       img.setAttribute('data-foto', f);
       img.src = 'img/produtos/' + f + '_m.jpg';
       cheia.onload = function () { if (img.getAttribute('data-foto') === f) img.src = cheia.src; };
@@ -222,16 +228,40 @@
       if (n < 0 || n >= aberto.fotos.length) { fecharGrande(); return; }
       abrirGrande(n);
     }
-    var gx = null;
-    grande.addEventListener('touchstart', function (e) { gx = e.touches[0].clientX; }, { passive: true });
-    grande.addEventListener('touchmove', function (e) {
-      if (gx === null) return;
-      var dx = gx - e.touches[0].clientX;
-      if (Math.abs(dx) < 40) return;
-      gx = null;
-      andarGrande(dx > 0 ? 1 : -1);
+    var toque = null;
+    function soltar() {
+      gImg.style.transition = ''; gImg.style.transform = ''; grande.style.backgroundColor = '';
+    }
+    grande.addEventListener('touchstart', function (e) {
+      if (e.touches.length !== 1) { toque = null; return; }
+      toque = { x: e.touches[0].clientX, y: e.touches[0].clientY, dx: 0, dy: 0, eixo: null };
+      gImg.style.transition = 'none';
     }, { passive: true });
-    grande.addEventListener('touchend', function () { gx = null; }, { passive: true });
+    /* passive:false + preventDefault: é isto que segura a página de trás parada enquanto o dedo mexe na foto */
+    grande.addEventListener('touchmove', function (e) {
+      e.preventDefault();
+      if (!toque) return;
+      var t = e.touches[0];
+      toque.dx = t.clientX - toque.x; toque.dy = t.clientY - toque.y;
+      if (!toque.eixo && (Math.abs(toque.dx) > 8 || Math.abs(toque.dy) > 8)) toque.eixo = Math.abs(toque.dx) > Math.abs(toque.dy) ? 'x' : 'y';
+      if (toque.eixo === 'y') {
+        var k = Math.min(Math.abs(toque.dy) / 400, 1);
+        gImg.style.transform = 'translateY(' + toque.dy + 'px) scale(' + (1 - k * .15) + ')';
+        grande.style.backgroundColor = 'rgba(246, 243, 238, ' + (1 - k * .6) + ')';
+      } else if (toque.eixo === 'x') {
+        gImg.style.transform = 'translateX(' + toque.dx + 'px)';
+      }
+    }, { passive: false });
+    grande.addEventListener('touchend', function () {
+      if (!toque) return;
+      var t = toque; toque = null;
+      soltar();
+      if (t.eixo === 'y' && Math.abs(t.dy) > 90) { fecharGrande(); return; }
+      if (t.eixo === 'x' && Math.abs(t.dx) > 50) andarGrande(t.dx < 0 ? 1 : -1);
+    }, { passive: true });
+    grande.addEventListener('touchcancel', function () { toque = null; soltar(); }, { passive: true });
+    /* no computador não há arrastar: clique na foto ou Esc volta pras miniaturas; rodinha e setas passam */
+    grande.addEventListener('click', function () { if (mouse) fecharGrande(); });
     grande.addEventListener('wheel', function (e) {
       if (grande.hidden) return;
       var d = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
@@ -246,8 +276,6 @@
     });
     tela.addEventListener('click', function (ev) {
       if (ev.target.closest('[data-fechar-album]')) { if (!grande.hidden) fecharGrande(); else fecharAlbum(); return; }
-      /* foto grande aberta: clicar em QUALQUER lugar (fora da própria foto) volta pras miniaturas */
-      if (!grande.hidden) { if (!ev.target.closest('[data-album-grande] img')) fecharGrande(); return; }
       var f = ev.target.closest('[data-album-foto]');
       if (f) { abrirGrande(parseInt(f.getAttribute('data-album-foto'), 10)); return; }
       /* clicar fora da caixa (no escuro) fecha o álbum */
