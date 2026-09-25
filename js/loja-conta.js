@@ -81,7 +81,10 @@
     var outra;
     if (codigoPara) {
       h += '<h1 class="loja-sub primeiro">Digite o código enviado para seu e-mail</h1>' +
-        (L.previa ? '<p class="loja-aviso">Prévia: o e-mail de verdade ainda não sai. O código aqui é <strong>' + L.codigoPrevia + '</strong>.</p>' : '') +
+        (L.previa ? '<p class="loja-aviso">Prévia: o e-mail de verdade ainda não sai. O código aqui é <strong>' + L.codigoPrevia + '</strong>.</p>'
+                  /* 25/09/2026 11:07 (servidor da conta no ar): o e-mail do código cai no Spam do Gmail nos primeiros
+                     dias (domínio novo; SPF/DKIM/DMARC passam). Aviso pedido pela janela zeles-alea-servidor-conta. */
+                  : '<p class="loja-miudo" style="text-align:center;margin:-6px 0 14px">Não chegou? Confira também a caixa de spam.</p>') +
         '<form data-form="codigo-digitar" novalidate>' +
         '<label class="loja-campo loja-codigo"><input name="codigo" inputmode="numeric" autocomplete="one-time-code" maxlength="6" ' +
           'placeholder="Adicione seu código de acesso" aria-label="Código de acesso"></label>' +

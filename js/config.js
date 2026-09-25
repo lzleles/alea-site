@@ -63,8 +63,10 @@ window.ALEA = {
      porque o site ainda não está pronto"). Enquanto o servidor não tiver as rotas, quem tentar recebe
      "Isso ainda não está ligado no servidor." Facebook fica de fora (ordem dele, mesmo áudio).
      ⚠️ Quando a casa ligar código/senha no /api/config ("metodos"), deixar esta lista VAZIA ([]) pra voltar a
-     obedecer o servidor. */
-  conta_metodos_forcados: ['google', 'codigo', 'senha'],
+     obedecer o servidor.
+     25/09/2026 11:07 — a casa LIGOU (janela zeles-alea-servidor-conta): /api/config devolve
+     "metodos":["google","codigo","senha"], medido. Lista esvaziada: o site volta a obedecer o servidor. */
+  conta_metodos_forcados: [],
 
   /* A FRASE DA MARCA. Ela abre o site (escrita letra por letra) e fecha o rodapé.
      Um lugar só: mudou aqui, mudou nos dois. */
