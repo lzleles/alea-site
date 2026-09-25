@@ -228,7 +228,7 @@
       '<div class="fim">' +
         /* ETAPA 4 (22/09/2026): o logo do fim virou a marca NOVA (Capivara Página Inicial),
            e o "ou veja outra categoria" saiu (pedido dele). */
-        '<img src="img/marca/e_co/logo_claro.svg" alt="ālea & Co.">' +
+        '<img src="img/marca/e_co/logo.svg" alt="ālea & Co.">' +
         '<p data-assinatura>Onde cada impressão começa com um sonho!</p>' +
         '<a class="botao zap" data-assunto="orçamento de uma peça personalizada">Orçamentos e personalizados</a>' +
         '<nav class="menu-categorias" data-menu-categorias aria-label="Categorias"></nav>' +
@@ -598,7 +598,8 @@
        nada e o primeiro item entraria sem efeito e sem contador. */
     feed.classList.add('aberto');
     feed.setAttribute('aria-hidden', 'false');
-    document.body.classList.add('escuro', 'travado');
+    /* etapa 108 (25/09/2026, áudio 1637): o feed deixou de ser preto — 'no-feed' no lugar de 'escuro' */
+    document.body.classList.add('no-feed', 'travado');
     document.body.classList.remove('na-abertura');
     aberto = true;
 
@@ -635,7 +636,7 @@
     feed.classList.remove('aberto');
     feed.setAttribute('aria-hidden', 'true');
     mostrarVoltar(false);
-    document.body.classList.remove('escuro', 'travado');
+    document.body.classList.remove('no-feed', 'travado');
     document.body.classList.add('na-abertura');
     aberto = false;
   }

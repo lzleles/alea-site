@@ -1102,8 +1102,13 @@ body.sem-transicao-feed .feed { transition: none !important; }
    sombra — está no histórico do git, commit 40d5f65) */
 .album-grande {
   position: fixed; inset: 0; z-index: 95; display: grid; place-items: center;
-  background: var(--papel); touch-action: none; overscroll-behavior: contain;
+  /* v19 (áudio 1628): o MESMO fundo e o MESMO esmaecer da tela cheia da colmeia — "mais suave, mais elegante" */
+  background: rgba(246, 243, 238, .82); -webkit-backdrop-filter: blur(22px) saturate(120%); backdrop-filter: blur(22px) saturate(120%);
+  touch-action: none; overscroll-behavior: contain;
+  animation: albumGrandeEntra .28s ease;
 }
+.album-grande.saindo { opacity: 0; transition: opacity .28s ease; }
+@keyframes albumGrandeEntra { from { opacity: 0; } to { opacity: 1; } }
 .album-grande[hidden] { display: none; }   /* o `display: grid` acima venceria o atributo hidden */
 .album-grande img {
   display: block; width: 100vw; height: 100vh; height: 100dvh; object-fit: contain;
@@ -1655,4 +1660,57 @@ html, body { overflow-x: clip; }
 .personalizar .extra.inativo input[type="checkbox"] {
   -webkit-appearance: none; appearance: none; width: 20px; height: 20px; margin: 0; border-radius: 5px;
   background: #EFEAE2; border: 1.5px solid var(--borda); cursor: not-allowed;
+}
+
+/* =============================================================================
+   ⚠️ FEED CLARO — ETAPA 108 (Cassiano, 25/09/2026 14:41, print 1636 + áudio 1637)
+   "a nossa tela preta: faz a prévia, no lugar desse preto, com o papel de parede que você fez pra nossa página
+   inicial, em degradê com textura. Toda foto que você tiver recortado, esquece, deixa só as fotos profissionais,
+   que eu acho que vai ficar mais bonito o site, mais elegante."
+   · o fundo do feed é o MESMO da abertura (os 3 radiais + o linear) com a estampa off a 50% por cima, PARADO
+     (fixo na tela enquanto os produtos rolam);
+   · o que era branco-sobre-preto vira tinta-sobre-papel; as bolinhas continuam brancas porque moram DENTRO da foto;
+   · o cabeçalho deixa de ficar preto no feed: o feed.js liga `no-feed` (e não mais `escuro`), e a faixa que cobre o
+     "g" do "← categorias" ganha a versão clara.
+   As regras escuras de antes continuam no arquivo, acima — é daqui pra baixo que vale. */
+.feed {
+  color: var(--tinta);
+  background:
+    radial-gradient(1100px 720px at 16% 14%, rgba(118, 149, 165, .60), transparent 62%),
+    radial-gradient(940px 660px at 86% 24%, rgba(170, 150, 97, .58), transparent 60%),
+    radial-gradient(1080px 780px at 52% 98%, rgba(146, 68, 41, .46), transparent 64%),
+    linear-gradient(162deg, #F8F5F0 0%, #EAE4DB 54%, #E2D6C6 100%);
+}
+.feed::before {
+  content: ''; position: fixed; inset: 0; z-index: -1; pointer-events: none;
+  background: url(../img/marca/estampa_off_ladrilho.svg) left top / 900px auto repeat;
+  opacity: .5;
+}
+@media (min-aspect-ratio: 3/5) {
+  .feed::before { background-size: clamp(1000px, 90vw, 1400px) auto; background-position: center top; }
+}
+.feed .objeto.com-cenario { background: #EAE4DB; box-shadow: 0 34px 70px -40px rgba(43, 33, 24, .55); }
+.feed .categoria { color: var(--terracota); }
+.feed .ver { color: var(--terracota); opacity: .9; }   /* o dourado some sobre o degradê (medido no print) */
+.feed .produto-mini, .feed .valor { color: var(--tinta); }
+.feed .contador { color: rgba(43, 33, 24, .55); }
+.feed .descricao-categoria { color: var(--tinta); }
+.feed .descricao-categoria .titulo-categoria { color: var(--terracota); }
+.feed .fechar-feed { color: var(--tinta); }
+.feed .fechar-feed:hover { color: var(--terracota); }
+.feed .fim p { color: var(--tinta); }
+.feed .fim .ou-veja { color: rgba(43, 33, 24, .5); }
+.feed .fim .menu-categorias a, .feed .fim .menu-categorias span { color: var(--tinta); }
+.feed .fim .botao, .feed .fim .botao[aria-disabled='true'], .feed .fim .botao:disabled { background: var(--terracota); color: var(--off); box-shadow: none; }
+.feed .fim .botao:hover { background: var(--tinta); color: var(--off); box-shadow: none; }
+.voltar-categorias:hover, .voltar-categorias:focus-visible { background: rgba(43, 33, 24, .08); }
+.dica-arrasto { background: rgba(43, 33, 24, .72); text-shadow: none; }
+/* o cabeçalho no feed claro: a mesma receita da etapa 9 (barra + prolongamento como UM pseudo, opaco a 92%),
+   só que no tom do papel em vez do preto */
+body.no-feed .topo { background: transparent; -webkit-backdrop-filter: none; backdrop-filter: none; }
+body.no-feed .topo::before {
+  content: ''; position: absolute; left: 0; right: 0; top: 0; bottom: -7px;
+  background: color-mix(in srgb, var(--off) 92%, transparent);
+  -webkit-backdrop-filter: saturate(140%) blur(10px); backdrop-filter: saturate(140%) blur(10px);
+  z-index: -1; pointer-events: none;
 }

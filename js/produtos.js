@@ -81,7 +81,10 @@ window.CATEGORIAS = [
    "tirar as fotos sempre sem fundo, somente o objeto […] deixando as fotos completas
    somente se arrastar pro lado".
 
-   `recorte: true` quer dizer que existe o arquivo `<primeira foto>_obj.webp`, o objeto
+   ⚠️ ETAPA 108 (25/09/2026, áudio 1637 do Cassiano): "toda foto que você tiver recortado, esquece, deixa só as fotos
+  profissionais" — TODOS os itens passaram a `recorte: false` (os `_obj.webp` continuam no repositório, só não
+  entram mais no feed) e a foto profissional, onde existe, é a primeira (pro_luke_1, pro_matteo_1).
+  `recorte: true` quer dizer que existe o arquivo `<primeira foto>_obj.webp`, o objeto
    sem fundo, gerado pelo `_recortar_fundo_v1.py`. `recorte: false` quer dizer que aquela
    peca ainda NAO tem foto com o objeto inteiro dentro do quadro -- ela aparece no feed
    com moldura, como antes, e e' honesto: melhor uma foto normal do que meia tigela
@@ -91,13 +94,13 @@ window.CATEGORIAS = [
    aparece em feed nenhum — e a conferência do fim deste arquivo reclama no console
    em vez de deixar você descobrir pelo cliente. */
 window.VITRINE = [
-  { produto: 'ālea Bowl Wave', nome: 'Luke',       categoria: 'pet', preco: 179,  pagina: 'bowl-wave',       recorte: true,  fotos: ['luke_1','luke_2','luke_3','luke_4'] },
+  { produto: 'ālea Bowl Wave', nome: 'Luke',       categoria: 'pet', preco: 179,  pagina: 'bowl-wave',       recorte: false,  fotos: ['pro_luke_1','luke_1','luke_2','luke_3','luke_4'] },
   { produto: 'ālea Bowl Wave', nome: 'Ayla',       categoria: 'pet', preco: 179,  pagina: 'bowl-wave',       recorte: false, fotos: ['ayla_1','ayla_2','ayla_3','ayla_4'] },
-  { produto: 'ālea Bowl Wave', nome: 'Tina Preta', categoria: 'pet', preco: 179,  pagina: 'bowl-wave',       recorte: true,  fotos: ['tina_1','tina_2','tina_3','tina_4'] },
-  { produto: 'ālea Bowl Wave', nome: 'Chica',      categoria: 'pet', preco: 179,  pagina: 'bowl-wave',       recorte: true,  fotos: ['chica_1','chica_2','chica_3'] },
-  { produto: 'ālea Bowl Wave', nome: 'Matteo',     categoria: 'pet', preco: 179,  pagina: 'bowl-wave',       recorte: true,  fotos: ['matteo_1','matteo_2','matteo_3'] },
-  { produto: 'ālea Bowl Wave', nome: 'Cláudia',    categoria: 'pet', preco: 179,  pagina: 'bowl-wave',       recorte: true,  fotos: ['claudia_1','claudia_2','claudia_3','claudia_4'] },
-  { produto: 'ālea Poop Bag',  nome: 'Chica',      categoria: 'pet', preco: 59,   pagina: 'poop-bag-holder', recorte: true,  fotos: ['saquinho_1','saquinho_2','saquinho_3'] },
+  { produto: 'ālea Bowl Wave', nome: 'Tina Preta', categoria: 'pet', preco: 179,  pagina: 'bowl-wave',       recorte: false,  fotos: ['tina_1','tina_2','tina_3','tina_4'] },
+  { produto: 'ālea Bowl Wave', nome: 'Chica',      categoria: 'pet', preco: 179,  pagina: 'bowl-wave',       recorte: false,  fotos: ['chica_1','chica_2','chica_3'] },
+  { produto: 'ālea Bowl Wave', nome: 'Matteo',     categoria: 'pet', preco: 179,  pagina: 'bowl-wave',       recorte: false,  fotos: ['pro_matteo_1','matteo_1','matteo_2','matteo_3'] },
+  { produto: 'ālea Bowl Wave', nome: 'Cláudia',    categoria: 'pet', preco: 179,  pagina: 'bowl-wave',       recorte: false,  fotos: ['claudia_1','claudia_2','claudia_3','claudia_4'] },
+  { produto: 'ālea Poop Bag',  nome: 'Chica',      categoria: 'pet', preco: 59,   pagina: 'poop-bag-holder', recorte: false,  fotos: ['saquinho_1','saquinho_2','saquinho_3'] },
   { produto: 'Kit ālea',       nome: 'Tina Preta', categoria: 'pet', preco: null, pagina: 'kit',             recorte: false,  fotos: ['kit_1','kit_2','kit_3'] }
 ];
 
