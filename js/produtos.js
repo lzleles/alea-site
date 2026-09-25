@@ -98,7 +98,7 @@ window.VITRINE = [
   { produto: 'ālea Bowl Wave', nome: 'Ayla',       categoria: 'pet', preco: 179,  pagina: 'bowl-wave',       recorte: false, fotos: ['ayla_1','ayla_2','ayla_3','ayla_4'] },
   { produto: 'ālea Bowl Wave', nome: 'Tina Preta', categoria: 'pet', preco: 179,  pagina: 'bowl-wave',       recorte: false,  fotos: ['tina_1','tina_2','tina_3','tina_4'] },
   { produto: 'ālea Bowl Wave', nome: 'Chica',      categoria: 'pet', preco: 179,  pagina: 'bowl-wave',       recorte: false,  fotos: ['chica_1','chica_2','chica_3'] },
-  { produto: 'ālea Bowl Wave', nome: 'Matteo',     categoria: 'pet', preco: 179,  pagina: 'bowl-wave',       recorte: false,  fotos: ['pro_matteo_1q','matteo_1','matteo_2','matteo_3'] },
+  { produto: 'ālea Bowl Wave', nome: 'Matteo',     categoria: 'pet', preco: 179,  pagina: 'bowl-wave',       recorte: false,  fotos: ['matteo_1','matteo_2','matteo_3'] },
   { produto: 'ālea Bowl Wave', nome: 'Cláudia',    categoria: 'pet', preco: 179,  pagina: 'bowl-wave',       recorte: false,  fotos: ['claudia_1','claudia_2','claudia_3','claudia_4'] },
   { produto: 'ālea Poop Bag',  nome: 'Chica',      categoria: 'pet', preco: 59,   pagina: 'poop-bag-holder', recorte: false,  fotos: ['saquinho_1','saquinho_2','saquinho_3'] },
   { produto: 'Kit ālea',       nome: 'Tina Preta', categoria: 'pet', preco: null, pagina: 'kit',             recorte: false,  fotos: ['kit_1','kit_2','kit_3'] }
