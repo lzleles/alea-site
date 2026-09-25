@@ -4,8 +4,8 @@
    objetivo: A página finalizar-compra.html no desenho da Tiffany — Sacola de Compras (itens, mensagem para presente, entrega, subtotal) e Finalizar Compra em 3 etapas (Dados Pessoais, Entrega com CEP que preenche, Pagamento) com o Resumo do Pedido.
    entrada: window.aleaCarrinho (carrinho.js); window.aleaLoja (loja-dados.js); window.aleaLojaUtil (loja-conta.js não é carregado aqui: as máscaras vivem em loja-util abaixo)
    saida: pedido registrado; até o pagamento do site existir, o pedido completo segue pelo WhatsApp da ālea
-   status: prévia (23/09/2026)
-   validado_em: 2026-09-23 (Playwright 390 px, motor prévia)
+   status: prévia (23/09/2026) · etapa P1 do pagamento (25/09/2026): Pix + cartão dentro do site (js/loja-pagamento.js)
+   validado_em: 2026-09-25 (Playwright 390 px na prévia /pagamento/, MP em modo TESTE)
 */
 /* =============================================================================
    loja-compra.js — "some o fechar pedido pelo WhatsApp, aparece concluir compra" (Cassiano, 23/09/2026 20:44)
@@ -21,6 +21,14 @@
    dados, endereço e a forma de pagamento escolhida — pelo WhatsApp da ālea, que é como o Cassiano
    recebe hoje. Quando o gateway existir, muda SÓ a função `concluir()`.
    ⚠️ FRETE: não há tabela de frete ainda. A tela diz "a calcular" — nunca um valor inventado.
+
+   ETAPA P1 (25/09/2026) — O PAGAMENTO ENTRA NO SITE. O Cassiano escolheu (23/09 23h51) Mercado Pago com Pix +
+   cartão DENTRO do site (Payment Brick), e aprovou o visual em 24/09 22h37. A regra "o site nunca terá campo de
+   cartão" continua de pé no que importa: os campos do cartão do Brick são do MERCADO PAGO (campo seguro, o número
+   vira token no navegador) — a ālea & Co. não recebe nem guarda o número. Quando o servidor liga o pagamento
+   (GET /api/config -> "pagamento"), a etapa 3 mostra o Brick e o botão dele ("Pagar") conclui; sem isso — ou com
+   peça "sob consulta" na sacola — tudo segue como antes, pelo WhatsApp. O valor cobrado é o do SERVIDOR (recalcula
+   pela tabela de preço); frete ainda não entra na cobrança (a calcular, decisão pendente).
    ========================================================================== */
 (function () {
   'use strict';
@@ -29,7 +37,15 @@
   var raiz = document.querySelector('[data-loja-compra]');
   if (!L || !raiz) return;
   /* a faixa "isto é prévia" mora DENTRO da página (o topo do site é fixo e cobriria o que vem antes) */
-  var FAIXA = L.previa ? '<div class="loja-previa">Prévia: a conta e os dados ficam só neste aparelho. Nada vai pro servidor.</div>' : '';
+  var PG = window.aleaPagamento;
+  var pgCfg = null;                 // o "pagamento" do /api/config; null = pagamento pelo site desligado
+  var pix = null;                   // o Pix gerado, esperando a transferência
+  var espiaPix = null;
+  function faixa() {
+    if (!L.previa) return '';
+    if (pgCfg && pgCfg.teste) return '<div class="loja-previa">Prévia: pagamento de TESTE do Mercado Pago — nada é cobrado de verdade. A conta fica só neste aparelho.</div>';
+    return '<div class="loja-previa">Prévia: a conta e os dados ficam só neste aparelho. Nada vai pro servidor.</div>';
+  }
   var CAR = function () { return window.aleaCarrinho; };
 
   function esc(s) {
@@ -88,6 +104,7 @@
   function descrever(i) { return CAR() && CAR().descrever ? CAR().descrever(i) : ''; }
   function subtotal() { return CAR() ? CAR().total() : 0; }
   function sobConsulta() { return itens().some(function (i) { return !i.preco; }); }
+  function online() { return !!(pgCfg && PG && !sobConsulta() && subtotal() > 0); }
 
   /* ETAPA 62 (22:08, Cassiano): "ninguém mais fica preocupado com quanto vai pagar de frete nessa página (...)
      vamos deixar essa página mais clean" — na SACOLA sai o bloco Entrega e a linha do frete; ele volta no fim. */
@@ -213,6 +230,13 @@
       return '<section class="loja-etapa apagada"><header>' + ICONE.cartao + '<h2>Pagamento</h2></header>' +
         '<p class="espera">Aguardando o preenchimento dos dados</p></section>';
     }
+    if (online()) {
+      /* ETAPA P1: o Brick do Mercado Pago (Pix + cartão) com o tema aprovado; o botão "Pagar" é dele */
+      return '<section class="loja-etapa loja-etapa-pagar"><header>' + ICONE.cartao + '<h2>Pagamento</h2></header>' +
+        (erro ? '<p class="loja-erro" role="alert">' + esc(erro) + '</p>' : '') +
+        '<div class="loja-brick" id="alea-brick"><p class="loja-miudo" style="text-align:center;padding:30px 0">Carregando o pagamento seguro…</p></div>' +
+        '<p class="loja-miudo loja-brick-nota">Frete: a calcular — prazo e valor confirmados com o pedido.</p></section>';
+    }
     var p = st.pagamento;
     var caixa = '';
     if (p === 'pix') {
@@ -243,11 +267,38 @@
     if (!itens().length) return htmlSacola();
     return '<h1 class="loja-titulo grande">Finalizar Compra</h1>' + etapaDados() + etapaEntrega() + etapaPagamento() +
       htmlResumo() +
-      (st.etapa === 'pagamento' ? '<button type="button" class="loja-bt largo" data-concluir' + (st.pagamento ? '' : ' disabled') + '>Finalizar Compra</button>' +
+      (st.etapa === 'pagamento' && !online() ? '<button type="button" class="loja-bt largo" data-concluir' + (st.pagamento ? '' : ' disabled') + '>Finalizar Compra</button>' +
         '<p class="loja-miudo" style="text-align:center;margin-top:10px">Enquanto o pagamento pelo site não liga, o pedido completo segue pelo WhatsApp da ālea & Co.</p>' : '');
   }
 
+  /* ETAPA P1: o Pix gerado — QR, copia e cola, e a tela confere sozinha quando o banco confirmar */
+  function htmlPix() {
+    var validade = '';
+    if (pix.expira_em) {
+      var d = new Date(pix.expira_em);
+      if (!isNaN(d)) validade = d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+    }
+    return '<div class="loja-concluido loja-pix"><h1>Pague com Pix</h1><p class="numero">' + esc(pix.numero) + '</p>' +
+      '<p>Abra o app do seu banco, escolha <strong>Pix &gt; Ler QR code</strong> ou <strong>Pix Copia e Cola</strong>.</p>' +
+      (pix.qr_base64 ? '<img class="loja-pix-qr" alt="QR code do Pix" src="data:image/png;base64,' + esc(pix.qr_base64) + '">' : '') +
+      '<p class="loja-rotulo" style="margin-top:14px">Pix Copia e Cola</p>' +
+      '<textarea class="loja-pix-codigo" readonly rows="3" data-pix-codigo>' + esc(pix.copia_e_cola) + '</textarea>' +
+      '<p><button type="button" class="loja-bt largo" data-copiar-pix>Copiar código</button></p>' +
+      '<p class="loja-miudo">Valor: ' + dinheiro(pix.total) + (validade ? ' · pague até as ' + esc(validade) : '') + '</p>' +
+      '<p class="loja-pix-status" data-pix-status aria-live="polite">Aguardando o pagamento… esta tela confirma sozinha.</p>' +
+      (pgCfg && pgCfg.teste ? '<p class="loja-miudo" style="color:var(--terracota)">Pix de TESTE: este código não é pago de verdade.</p>' : '') +
+      '</div>';
+  }
+
   function htmlConcluido() {
+    if (concluido.pago) {
+      return '<div class="loja-concluido"><h1>Pagamento aprovado</h1><p class="numero">' + esc(concluido.numero) + '</p>' +
+        '<p>Obrigado, ' + esc(concluido.nome) + '! Recebemos o seu pedido e o pagamento' +
+        (concluido.forma === 'pix' ? ' pelo Pix' : (concluido.parcelas > 1 ? ' em ' + concluido.parcelas + 'x no cartão' : ' no cartão')) + '. ' +
+        'A produção começa agora e você recebe as novidades por e-mail.</p>' +
+        (concluido.descritor ? '<p class="loja-miudo">Na fatura do cartão, a compra aparece com o nome <strong>' + esc(concluido.descritor) + '</strong>.</p>' : '') +
+        '<p><a class="loja-bt" href="index.html">Continuar comprando</a></p></div>';
+    }
     return '<div class="loja-concluido"><h1>Pedido recebido</h1><p class="numero">' + esc(concluido.numero) + '</p>' +
       '<p>Obrigado, ' + esc(concluido.nome) + '! Abrimos o WhatsApp da ālea & Co. com o seu pedido completo: é por lá que você recebe ' +
         'o valor do frete e o ' + (concluido.pagamento === 'pix' ? 'Pix' : 'link seguro do cartão') + ' para pagar.</p>' +
@@ -258,9 +309,87 @@
 
   /* ================================================================ desenhar */
   function pintar() {
-    raiz.innerHTML = FAIXA + (concluido ? htmlConcluido() : (tela() === 'compra' ? htmlCompra() : htmlSacola()));
+    if (PG) PG.desmontar();
+    raiz.innerHTML = faixa() + (concluido ? htmlConcluido() : pix ? htmlPix() : (tela() === 'compra' ? htmlCompra() : htmlSacola()));
     ligar();
     erro = '';
+    if (!concluido && !pix && tela() === 'compra' && st.etapa === 'pagamento' && online()) montarBrick();
+  }
+
+  /* ------------------------------------------------------ ETAPA P1: o Brick
+     O valor que o Brick mostra é o subtotal da sacola; o que vale é o que o servidor recalcula. Se os dois não
+     baterem (preço mudou no site com a sacola aberta), o servidor recusa e a tela pede pra conferir. */
+  function montarBrick() {
+    var d = st.dados;
+    PG.montar({
+      alvoId: 'alea-brick', valor: subtotal(),
+      pagador: { email: d.email, nome: d.nome, sobrenome: d.sobrenome, cpf: d.cpf },
+      aoEnviar: pagarAgora,
+      aoErro: function () { /* o Brick mostra o próprio aviso de campo */ }
+    }).catch(function () {
+      var alvo = raiz.querySelector('#alea-brick');
+      if (alvo) alvo.innerHTML = '<p class="loja-erro">O pagamento pelo site não carregou. Recarregue a página — ou finalize pelo WhatsApp.</p>';
+    });
+  }
+
+  function pagarAgora(selecionado, fd) {
+    var d = st.dados, e = st.entrega;
+    var forma = selecionado === 'bank_transfer' || fd.payment_method_id === 'pix' ? 'pix' : 'cartao';
+    var corpo = {
+      forma: forma, total: subtotal(),
+      itens: itens().map(function (i) { var c = JSON.parse(JSON.stringify(i)); delete c.miniatura; return c; }),
+      comprador: { nome: d.nome, sobrenome: d.sobrenome, email: d.email, cpf: d.cpf, telefone: d.telefone },
+      entrega: { cep: e.cep, logradouro: e.logradouro, numero: e.numero, complemento: e.complemento, bairro: e.bairro,
+                 cidade: e.cidade, uf: e.uf, destinatario: e.destinatario },
+      presente: st.presente ? (st.presente_texto || '') : null,
+      consent_marketing: !!d.consent_marketing,
+      visitante: window.aleaRastro ? window.aleaRastro.visitante() : null
+    };
+    if (forma === 'cartao') {
+      corpo.cartao = { token: fd.token, payment_method_id: fd.payment_method_id, installments: +fd.installments || 1,
+                       issuer_id: fd.issuer_id ? String(fd.issuer_id) : null };
+    }
+    return PG.pagar(corpo).then(function (r) {
+      if (r.estado === 'aprovado') { fechar(r, forma); return; }
+      if (r.estado === 'aguardando_pix' && r.pix) {
+        pix = { numero: r.numero, chave: r.chave, total: r.total, nome: d.nome, copia_e_cola: r.pix.copia_e_cola,
+                qr_base64: r.pix.qr_base64, expira_em: r.pix.expira_em };
+        CAR().limpar(); L.compra.limpar();
+        pintar(); window.scrollTo(0, 0); espiarPix();
+        return;
+      }
+      erro = r.estado === 'recusado' ? PG.motivo(r.detalhe) :
+        'O pagamento ficou em análise (pedido ' + r.numero + '). Você recebe a confirmação por e-mail.';
+      pintar(); rolarPara('.loja-etapa-pagar');
+    }).catch(function (x) {
+      erro = x.message || 'Não foi possível concluir o pagamento. Nada foi cobrado.';
+      pintar(); rolarPara('.loja-etapa-pagar');
+    });
+  }
+
+  function fechar(r, forma) {
+    if (espiaPix) { clearInterval(espiaPix); espiaPix = null; }
+    concluido = { pago: true, numero: r.numero, nome: r.nome || st.dados.nome || '', forma: forma,
+                  parcelas: r.parcelas, descritor: r.descritor };
+    pix = null;
+    if (CAR()) CAR().limpar(); L.compra.limpar();
+    st = { etapa: 'dados', dados: {}, entrega: {}, pagamento: '' };
+    pintar(); window.scrollTo(0, 0);
+  }
+
+  function espiarPix() {
+    if (espiaPix) clearInterval(espiaPix);
+    espiaPix = setInterval(function () {
+      if (!pix) { clearInterval(espiaPix); espiaPix = null; return; }
+      PG.consultar(pix.numero, pix.chave).then(function (s) {
+        if (s.estado === 'aprovado') { fechar({ numero: pix.numero, nome: pix.nome }, 'pix'); }
+        else if (s.estado === 'expirado' || s.estado === 'cancelado') {
+          var el = raiz.querySelector('[data-pix-status]');
+          if (el) el.textContent = 'Este Pix expirou. Faça o pedido de novo para gerar outro código.';
+          clearInterval(espiaPix); espiaPix = null;
+        }
+      }).catch(function () { /* sem rede agora: tenta de novo no próximo giro */ });
+    }, 5000);
   }
 
   function ligar() {
@@ -428,6 +557,13 @@
     }
     if (ev.target.closest('[data-sair]')) { L.sair().then(function () { eu = { logado: false }; st.dados = {}; st.etapa = 'dados'; guardar(); pintar(); }); return; }
     if (ev.target.closest('[data-concluir]')) { concluir(); }
+    if (ev.target.closest('[data-copiar-pix]')) {
+      var cx = raiz.querySelector('[data-pix-codigo]');
+      var bt = ev.target.closest('[data-copiar-pix]');
+      var ok = function () { bt.textContent = 'Código copiado'; };
+      if (navigator.clipboard) navigator.clipboard.writeText(cx.value).then(ok, function () { cx.select(); document.execCommand('copy'); ok(); });
+      else { cx.select(); document.execCommand('copy'); ok(); }
+    }
   });
   raiz.addEventListener('change', function (ev) {
     var t = ev.target;
@@ -460,7 +596,10 @@
         }
         guardar();
       }
-    }).catch(function () { eu = { logado: false }; }).then(pintar);
+    }).catch(function () { eu = { logado: false }; }).then(function () {
+      /* ETAPA P1: pergunta ao servidor se o pagamento pelo site está ligado (desligado = tudo como antes) */
+      return PG ? PG.disponivel().then(function (c) { pgCfg = c; }) : null;
+    }).then(pintar);
   }
   if (window.aleaCarrinho) comecar(); else document.addEventListener('DOMContentLoaded', comecar);
 })();

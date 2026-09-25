@@ -231,3 +231,14 @@ body.loja .rodape .frase { margin-bottom: 96px; }
 /* ETAPA 66: a tela treme quando falta algo (a mesma @keyframes tremer do estilo.css) */
 .loja-tremendo { animation: tremer .45s ease-in-out 1; }
 @media (prefers-reduced-motion: reduce) { .loja-tremendo { animation: none; } }
+
+/* ETAPA P1 (25/09/2026): o PAGAMENTO no site — o Brick do Mercado Pago no tema "alea_fundo" aprovado pelo Cassiano
+   (24/09 22h37): formulário transparente sobre o fundo dos e-mails da ālea. */
+.loja-etapa-pagar { padding-bottom: 12px; }
+.loja-brick { margin: 6px -16px 0; padding: 4px 4px 8px; min-height: 120px;
+  background: #EFE9E0 url(../modelos-email/fundo_email_inteiro.jpg) center top / 100% auto repeat-y; }
+.loja-brick-nota { margin: 10px 0 0; text-align: center; }
+.loja-pix-qr { display: block; width: 220px; height: 220px; margin: 14px auto 0; image-rendering: pixelated; }
+.loja-pix-codigo { width: 100%; box-sizing: border-box; font: 11px/1.4 ui-monospace, Menlo, Consolas, monospace; padding: 8px;
+  border: 1px solid var(--lj-linha); background: rgba(255, 255, 255, .6); resize: none; word-break: break-all; }
+.loja-pix-status { margin-top: 12px; font-size: 13px; color: var(--terracota); }

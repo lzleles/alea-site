@@ -66,6 +66,12 @@ window.ALEA = {
      obedecer o servidor. */
   conta_metodos_forcados: ['google', 'codigo', 'senha'],
 
+  /* O PAGAMENTO NA PRÉVIA (25/09/2026). Só é lido quando o site roda na PRÉVIA (github.io): lá o pagamento fala com a
+     INSTÂNCIA DE TESTE do servidor (chaves de TESTE do Mercado Pago — nada é cobrado). No ar este valor é ignorado:
+     o pagamento usa o api_conta e só aparece quando o servidor do ar ligar o pagamento (hoje não liga).
+     Ver js/loja-pagamento.js e ZELES\Conta_Cliente\03_implantar\instalar_pagamento_teste_v1.sh. */
+  api_pagamento_previa: 'https://api.aleaco.art.br/teste',
+
   /* A FRASE DA MARCA. Ela abre o site (escrita letra por letra) e fecha o rodapé.
      Um lugar só: mudou aqui, mudou nos dois. */
   assinatura: 'Onde cada impressão começa com um sonho!',
