@@ -1908,7 +1908,7 @@ html.topo-emendado .aviso-memoria { display: none !important; }
   margin: 6px 0 0; font-size: 13px; font-weight: 600; color: var(--terracota);
   opacity: 0; transition: opacity .25s ease;
 }
-.recado-trava.visivel { opacity: 1; }
+.recado-trava.visivel, .produto-topo p.recado-trava.visivel { opacity: 1; }
 .recado-trava[hidden] { display: none; }
 
 /* (I) [CELULAR TAMBÉM] a logo do rodapé virou link pro Instagram da ālea (site.js v29) */
