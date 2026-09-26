@@ -75,6 +75,13 @@
   function temSobConsulta() {
     return itens.some(function (i) { return !i.preco; });
   }
+  /* 25/09/2026 (lote das 20:01, msg 1885): os 4 produtos novos são "sob consulta" (preço null). Com a sacola SÓ de
+     peças sob consulta o total virava "R$ 0,00 + itens sob consulta" — parece que a peça é de graça. Agora: nada com
+     preço -> "Sob consulta"; mistura -> "R$ x + itens sob consulta" (como antes). O pedido pelo WhatsApp não muda. */
+  function textoTotal() {
+    if (temSobConsulta() && !total()) return 'Sob consulta';
+    return window.aleaDinheiro(total()) + (temSobConsulta() ? ' + itens sob consulta' : '');
+  }
 
   window.aleaCarrinho = {
     /* o "Comprar agora" da página de produto chama isto de fora: ele põe no carrinho e
@@ -88,6 +95,7 @@
     itens: function () { return itens.slice(); },
     quantos: function () { return pecas(); },
     total: total,
+    textoTotal: textoTotal,     // 25/09/2026: o mesmo texto do total, pra quem precisar (o loja-compra.js tem a regra igual)
     adicionar: function (item) {
       item.quando = new Date().toISOString();
       itens.push(item);
@@ -177,7 +185,7 @@
     linha.querySelector('.valor-linha').textContent = i.preco ? window.aleaDinheiro(i.preco * qtd(i)) : 'Sob consulta';
     var alvoTotal = g.querySelector('[data-total]');
     if (alvoTotal) {
-      alvoTotal.textContent = window.aleaDinheiro(total()) + (temSobConsulta() ? ' + itens sob consulta' : '');
+      alvoTotal.textContent = textoTotal();
     }
     linha.classList.remove('mexeu');
     void linha.offsetWidth;
@@ -226,8 +234,7 @@
     }).join('');
 
     if (alvoTotal) {
-      alvoTotal.textContent = window.aleaDinheiro(total()) +
-        (temSobConsulta() ? ' + itens sob consulta' : '');
+      alvoTotal.textContent = textoTotal();
     }
     if (botao) {
       botao.disabled = false;
@@ -272,8 +279,8 @@
       if (d) linhas.push('   ' + d);
     });
     linhas.push('');
-    linhas.push('Total das peças: ' + window.aleaDinheiro(total()) +
-      (temSobConsulta() ? ' (fora os itens sob consulta)' : ''));
+    linhas.push('Total das peças: ' + ((temSobConsulta() && !total()) ? 'sob consulta' :   // 25/09/2026: sem "R$ 0,00"
+      window.aleaDinheiro(total()) + (temSobConsulta() ? ' (fora os itens sob consulta)' : '')));
     linhas.push('Frete: a combinar pelo CEP.');
     (extras || []).forEach(function (l) { linhas.push(l); });
     linhas.push('');

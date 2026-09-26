@@ -301,3 +301,9 @@ window.ALEA = {
      custo do frete seja informado antes da compra — só não fica mais colada no valor. */
   entrega: 'Jataí-GO com entrega local; demais cidades por transportadora, frete a combinar'
 };
+
+/* 25/09/2026 (lote das 20:01, msgs 1847-1848): o "ālea Luke Bowl" é a peça do arquivo 3D do Luke — o MESMO
+   luke_g.glb que a janela "Personalize aqui" do antigo Bowl Wave já usava (o Cassiano: "o do Luke eu já tenho, é o
+   único que tenho"). A página nova (produto-luke-bowl.html) ganha a mesma janela 3D sem copiar a configuração:
+   é a mesma peça, uma configuração só. Matteo, Ayla e Cláudia não têm .glb ainda -> formulário na própria página. */
+window.ALEA.modelos3d['luke-bowl'] = window.ALEA.modelos3d['bowl-wave'];
