@@ -1863,8 +1863,8 @@ html.topo-emendado .aviso-memoria { display: none !important; }
 
 /* =============================================================================
    ⚠️ v29 — RODADA 2 DO COMPUTADOR (Cassiano, 26/09/2026 03:05-03:10, áudios e vídeos 1991/1992/1997).
-   Os itens marcados [CELULAR TAMBÉM] foram pedidos dele pros dois; o resto mora dentro da régua do computador
-   (hover + ponteiro fino + largura ≥ 761 px), como a v28. */
+   v29b (áudios 2000/2004, 03:41-03:43): TUDO aqui é só do computador (hover + ponteiro fino + largura ≥ 761 px):
+   "no celular não mexe. São layouts diferentes." Nos dois ficaram só "Sacola" (texto) e o nome do pet da Ayla (HTML). */
 
 /* (A) AS SETAS ‹ › DO FEED — criadas pelo feed.js (v29): uma de cada lado da peça, no traço branco e discreto do X.
    Ficam presas no meio da tela, que é onde o carrossel assenta a foto. */
@@ -1893,17 +1893,21 @@ html.topo-emendado .aviso-memoria { display: none !important; }
   .feed .objeto { cursor: default; }
 }
 
-/* (C) [CELULAR TAMBÉM] O X DA JANELA "Personalize aqui" = o X discreto de todos os outros (etapa 109): só o traço,
-   branco, sem bola. "O X sempre deixa igual aos outros, discreto." */
-.janela3d-fechar {
-  width: 44px; height: 44px; border-radius: 0; padding: 0; background: transparent !important;
-  color: rgba(255, 255, 255, .92); font-size: 32px; font-weight: 300; line-height: 1;
-  text-shadow: 0 0 5px rgba(0, 0, 0, .45), 0 1px 2px rgba(0, 0, 0, .3);
-  opacity: .8; transition: opacity .2s ease; display: grid; place-items: center;
+/* (C) O X DA JANELA "Personalize aqui" = o X discreto de todos os outros (etapa 109): só o traço, branco, sem bola.
+   "O X sempre deixa igual aos outros, discreto." — v29b (áudios 2000/2004, 03:41-03:43): "tudo que eu pedi pra mexer
+   no site do computador é no computador; no celular não mexe. São layouts diferentes." SÓ NO COMPUTADOR: no celular
+   volta a bola branca de antes. */
+@media (hover: hover) and (pointer: fine) and (min-width: 761px) {
+  .janela3d-fechar {
+    width: 44px; height: 44px; border-radius: 0; padding: 0; background: transparent !important;
+    color: rgba(255, 255, 255, .92); font-size: 32px; font-weight: 300; line-height: 1;
+    text-shadow: 0 0 5px rgba(0, 0, 0, .45), 0 1px 2px rgba(0, 0, 0, .3);
+    opacity: .8; transition: opacity .2s ease; display: grid; place-items: center;
+  }
+  .janela3d-fechar:hover { opacity: 1; }
 }
-.janela3d-fechar:hover { opacity: 1; }
 
-/* (F) [CELULAR TAMBÉM] o recado curto que aparece quando se toca na cor do nome travada (produto.js v29) */
+/* (F) [só computador desde a v29b — o produto.js só cria a película com mouse] o recado curto que aparece quando se toca na cor do nome travada (produto.js v29) */
 .recado-trava, .produto-topo p.recado-trava {
   margin: 6px 0 0; font-size: 13px; font-weight: 600; color: var(--terracota);
   opacity: 0; transition: opacity .25s ease;
@@ -1911,6 +1915,6 @@ html.topo-emendado .aviso-memoria { display: none !important; }
 .recado-trava.visivel, .produto-topo p.recado-trava.visivel { opacity: 1; }
 .recado-trava[hidden] { display: none; }
 
-/* (I) [CELULAR TAMBÉM] a logo do rodapé virou link pro Instagram da ālea (site.js v29) */
+/* (I) [só computador desde a v29b — o site.js só liga com mouse] a logo do rodapé virou link pro Instagram da ālea (site.js v29) */
 .rodape a.marca-rodape-link { display: block; width: fit-content; margin: 0 auto; }
 .rodape a.marca-rodape-link .marca-rodape { display: block; }

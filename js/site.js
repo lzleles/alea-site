@@ -214,8 +214,10 @@ window.aleaCorDoTopo = (function () {
   /* ⚠️ v29 (Cassiano, áudio 1997, 26/09/2026 03:10): "o ālea preto também do site, ele não vai direto pro Instagram,
      arruma isso também". A logo grande do rodapé (preto) vira link pro Instagram da ālea, em aba nova. O endereço
      sai do `C.instagram` do config.js ('alea.co_', conferido na API da Meta em 16/09/2026) — não é digitado aqui.
-     Sem @ no config, a logo continua só imagem (nunca link morto). Vale no computador e no celular. */
+     Sem @ no config, a logo continua só imagem (nunca link morto). Só no computador (v29b). */
   function ligarLogoDoRodape() {
+    /* v29b (áudios 2000/2004): "tudo que eu pedi pra mexer no site do computador é no computador; no celular não mexe" */
+    if (!(window.matchMedia && window.matchMedia('(hover: hover) and (pointer: fine) and (min-width: 761px)').matches)) return;
     var usuario = (C.instagram || '').replace(/^@/, '');
     if (!usuario) return;
     Array.prototype.forEach.call(document.querySelectorAll('.rodape img.marca-rodape'), function (img) {

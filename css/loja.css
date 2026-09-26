@@ -55,8 +55,9 @@
   letter-spacing: .02em; cursor: pointer; text-decoration: none; }
 .loja-bt:hover { background: var(--laranja); }
 /* v29 (26/09/2026, Cassiano: "a cor de escolher produto preto fica muito feio, pode deixar ele claro"): o ".loja a { color: inherit }"
-   vencia a cor do botão quando ele é um <a> (o "Escolher Produtos" da sacola vazia) — letra escura no terracota. [CELULAR TAMBÉM] */
-.loja a.loja-bt { color: var(--off); }
+   vencia a cor do botão quando ele é um <a> (o "Escolher Produtos" da sacola vazia) — letra escura no terracota. */
+/* v29b (áudios 2000/2004): só no computador — no celular fica a cor de antes */
+@media (hover: hover) and (pointer: fine) and (min-width: 761px) { .loja a.loja-bt { color: var(--off); } }
 .loja-bt:disabled { background: var(--dourado); cursor: not-allowed; opacity: .75; }
 .loja-bt.entrar { min-width: 122px; }
 .loja-bt.largo { display: flex; width: 100%; min-height: 50px; }

@@ -844,10 +844,12 @@
      travada (a mesma da janela 3D, que já fazia isso lá dentro): o clique/toque TREME o "Um detalhe que transforma"
      e a cor do nome, mostra por 3,5 s "Marque a opção acima para personalizar." (a frase da janela 3D) e, se o
      quadrinho estiver fora da tela, rola até ele. A tremida é a `.treme-falta` de sempre, que já respeita o
-     "reduzir movimento". [CELULAR TAMBÉM] No produto com janela 3D (Luke) quem cuida é a janela — aqui não entra. */
+     "reduzir movimento". SÓ NO COMPUTADOR (v29b, áudios 2000/2004: "no celular não mexe"). No produto com janela 3D (Luke) quem cuida é a janela — aqui não entra. */
   var travaPagina = null, recadoTrava = null, recadoTimer = null;
   function acertarTravaDaPagina() {
     if (!corNomeBox) return;
+    /* v29b (áudios 2000/2004, 03:41-03:43): "no celular não mexe" — só com mouse de verdade e tela de computador */
+    if (!(window.matchMedia && window.matchMedia('(hover: hover) and (pointer: fine) and (min-width: 761px)').matches)) return;
     var form = corNomeBox.closest('[data-personalizar]');
     if (!form || form.classList.contains('mora-na-janela')) { if (travaPagina) travaPagina.hidden = true; return; }
     if (!travaPagina) {
