@@ -41,6 +41,9 @@
       que ter os tracinhos pro cliente passar a foto pra frente". Setas ‹ › na tela cheia, só
       com mouse (o CSS esconde no celular), e a dica da colmeia diz "Clique" no mouse.
 
+   8. A COR DO NOME TRAVADA AVISA (v29, 26/09/2026, vídeo 1991): tocar nela com o "Um detalhe
+      que transforma" desmarcado treme o detalhe e diz "Marque a opção acima para personalizar."
+
    ⚠️ A TRAVA É DE VERDADE, E NÃO SÓ VISUAL. A conferência acontece DENTRO do clique, e
    é ela que decide se o item entra. Trava que só pinta botão de cinza é trava que o
    primeiro visitante com teclado atravessa — e o que está do outro lado dela é uma
@@ -831,7 +834,67 @@
     });
     sel.disabled = true;
     sel.innerHTML = '<option value="">' + (liberar ? 'Escolha o acabamento acima' : '') + '</option>';
+    acertarTravaDaPagina();
   }
+
+  /* ⚠️ v29 — A COR DO NOME TRAVADA AVISA O QUE FALTA (Cassiano, vídeo 1991, 26/09/2026 03:07). Na página do produto
+     sem janela 3D (Matteo, Cláudia), ele clicava em Básico/Fosco/Perolizado com o "Um detalhe que transforma"
+     desmarcado: aparecia o cursor de proibido e nada acontecia. "Se eu clicar, você consegue tremer a tela e mandar
+     eu clicar aqui, pra dar certo." Agora uma película transparente fica por cima da cor do nome enquanto ela está
+     travada (a mesma da janela 3D, que já fazia isso lá dentro): o clique/toque TREME o "Um detalhe que transforma"
+     e a cor do nome, mostra por 3,5 s "Marque a opção acima para personalizar." (a frase da janela 3D) e, se o
+     quadrinho estiver fora da tela, rola até ele. A tremida é a `.treme-falta` de sempre, que já respeita o
+     "reduzir movimento". [CELULAR TAMBÉM] No produto com janela 3D (Luke) quem cuida é a janela — aqui não entra. */
+  var travaPagina = null, recadoTrava = null, recadoTimer = null;
+  function acertarTravaDaPagina() {
+    if (!corNomeBox) return;
+    var form = corNomeBox.closest('[data-personalizar]');
+    if (!form || form.classList.contains('mora-na-janela')) { if (travaPagina) travaPagina.hidden = true; return; }
+    if (!travaPagina) {
+      travaPagina = document.createElement('div');
+      travaPagina.className = 'trava-toque trava-da-pagina';
+      travaPagina.setAttribute('aria-hidden', 'true');
+      corNomeBox.appendChild(travaPagina);
+      travaPagina.addEventListener('click', function (e) {
+        e.preventDefault(); e.stopPropagation();
+        avisarCorDoNomeTravada(form);
+      });
+    }
+    var primeiro = corNomeBox.querySelector('.acabamento input');
+    travaPagina.hidden = !(primeiro && primeiro.disabled);
+  }
+  function avisarCorDoNomeTravada(form) {
+    var extra = form.querySelector('[data-extra]');
+    var rotulo = corNomeBox.closest('label') || corNomeBox;
+    if (!recadoTrava) {
+      recadoTrava = document.createElement('p');
+      recadoTrava.className = 'recado-trava';
+      recadoTrava.setAttribute('role', 'status');
+      recadoTrava.hidden = true;
+      rotulo.parentNode.insertBefore(recadoTrava, rotulo.nextSibling);
+    }
+    recadoTrava.textContent = 'Marque a opção acima para personalizar.';
+    recadoTrava.hidden = false;
+    requestAnimationFrame(function () { recadoTrava.classList.add('visivel'); });
+    clearTimeout(recadoTimer);
+    recadoTimer = setTimeout(function () {
+      recadoTrava.classList.remove('visivel');
+      setTimeout(function () { if (!recadoTrava.classList.contains('visivel')) recadoTrava.hidden = true; }, 300);
+    }, 3500);
+    [extra, rotulo].forEach(function (el) {
+      if (!el) return; el.classList.remove('treme-falta'); void el.offsetWidth; el.classList.add('treme-falta');
+    });
+    if (extra) {
+      var r = extra.getBoundingClientRect();
+      var topo = document.querySelector('.topo');
+      var cima = topo ? Math.max(0, topo.getBoundingClientRect().bottom) : 0;
+      if (r.top < cima + 8 || r.bottom > window.innerHeight - 8) {
+        var querMenos = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        window.scrollTo({ top: Math.max(0, window.scrollY + r.top - cima - 24), behavior: querMenos ? 'auto' : 'smooth' });
+      }
+    }
+  }
+  acertarTravaDaPagina();   // a cor do nome já nasce travada (o detalhe nasce desmarcado)
 
   function corDoNomeEscolhida() {
     if (!corNomeBox) return { texto: '', original: '', escolha: null };

@@ -136,7 +136,7 @@
       b.classList.toggle('tem-item', n > 0);
       var bolinha = b.querySelector('[data-quantos]');
       if (bolinha) bolinha.textContent = String(n);
-      b.setAttribute('aria-label', n ? ('Carrinho com ' + n + (n === 1 ? ' item' : ' itens')) : 'Carrinho vazio');
+      b.setAttribute('aria-label', n ? ('Sacola com ' + n + (n === 1 ? ' item' : ' itens')) : 'Sacola vazia');
     });
   }
 

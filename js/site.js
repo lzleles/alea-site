@@ -211,6 +211,27 @@ window.aleaCorDoTopo = (function () {
      Ele é o único que vai pintado por dentro. */
   var CHEIOS = { linktree: true };
 
+  /* ⚠️ v29 (Cassiano, áudio 1997, 26/09/2026 03:10): "o ālea preto também do site, ele não vai direto pro Instagram,
+     arruma isso também". A logo grande do rodapé (preto) vira link pro Instagram da ālea, em aba nova. O endereço
+     sai do `C.instagram` do config.js ('alea.co_', conferido na API da Meta em 16/09/2026) — não é digitado aqui.
+     Sem @ no config, a logo continua só imagem (nunca link morto). Vale no computador e no celular. */
+  function ligarLogoDoRodape() {
+    var usuario = (C.instagram || '').replace(/^@/, '');
+    if (!usuario) return;
+    Array.prototype.forEach.call(document.querySelectorAll('.rodape img.marca-rodape'), function (img) {
+      if (img.closest('a')) return;
+      var a = document.createElement('a');
+      a.className = 'marca-rodape-link';
+      a.href = 'https://www.instagram.com/' + usuario + '/';
+      a.target = '_blank';
+      a.rel = 'noopener';
+      a.setAttribute('aria-label', 'Instagram da ālea & Co. (@' + usuario + ')');
+      a.title = '@' + usuario;
+      img.parentNode.insertBefore(a, img);
+      a.appendChild(img);
+    });
+  }
+
   function montarRedes() {
     var caixas = document.querySelectorAll('[data-redes]');
     if (!caixas.length) return;
@@ -406,6 +427,7 @@ window.aleaCorDoTopo = (function () {
     preencherContato();
     montarMenuCategorias();
     montarRedes();
+  ligarLogoDoRodape();
     montarGavetas();
     window.aleaLigarBotoes();     // as páginas de produto já nascem prontas no HTML
     carregarConta();

@@ -637,6 +637,7 @@
     pintarContador();
     guardarPosicao();
     if (window.aleaDistorcao) window.aleaDistorcao.montar(itens[indice].querySelector('.objeto'));
+    document.dispatchEvent(new CustomEvent('alea:feed-aberto'));   // v29: as setas ‹ › do computador se acertam
   }
 
   function fechar() {
@@ -774,7 +775,10 @@
        iPhone com `touch-action: pan-y`. O 1º toque já começou a centralizar — então a tela que se
        guarda é a de ANTES do 1º toque, que é a que ele deixou. */
     var agora = Date.now();
-    if (ultimoToque && ultimoToque.peca === peca && agora - ultimoToque.t < 350) {
+    /* v29 (Cassiano, 26/09/2026 03:05): "no computador, você só vai conseguir entrar no produto se clicar em 'ver
+       produto'. Não coloque a opção de clicar duas vezes, porque ninguém clica duas vezes." No COMPUTADOR o duplo
+       clique não entra mais; o clique só centraliza a peça. No celular, o toque duplo continua como está. */
+    if (!pcDeMouse() && ultimoToque && ultimoToque.peca === peca && agora - ultimoToque.t < 350) {
       var ver = peca.querySelector('a.ver[href]');
       guardarEstadoExato(ultimoToque.topo);
       sairGuardado = true;                          // o pagehide não sobrescreve com a tela meio rolada
@@ -789,6 +793,114 @@
   /* rede: qualquer saída da página com o feed aberto guarda a tela (link do cabeçalho, sacola…) */
   window.addEventListener('pagehide', function () { if (aberto && !sairGuardado) guardarEstadoExato(); });
   var sairGuardado = false;
+
+  /* =============================================================================
+     ⚠️ v29 — O FEED NO COMPUTADOR (Cassiano, 26/09/2026 03:05-03:10, áudios + vídeo 1992).
+     Tudo aqui só vale com MOUSE de verdade e tela de computador (a mesma régua do CSS v28/v29:
+     hover + ponteiro fino + largura ≥ 761 px). No celular e no touchpad nada muda.
+
+     (1) A RODA DO MOUSE VIRA CARROSSEL. "Eu uso a bolinha do mouse; se eu rolar, está demorando muito. Tem como
+         rolar mais suave, como um carrossel, ir bem rápido dependendo da forma que eu rolo a bolinha?"
+         Medido antes (03_site\_LEIA_DESKTOP_2_2026-09-26.md): cada "clique" da roda anda 100 px e um produto tem
+         ~600-700 px — eram 6-7 cliques da roda por produto. Agora CADA CLIQUE da roda = UM PRODUTO, com a peça
+         assentando no centro da tela numa curva suave. Girar rápido manda vários cliques em sequência, e cada um
+         empilha mais um produto no destino: giro lento vai um a um, giro rápido pula vários.
+         Só a roda de MOUSE (clique de 120 no wheelDelta, ou rolagem por linhas). O touchpad continua com a rolagem
+         livre do navegador, que é a "fluida" que ele aprovou em 17/09 (5ª rodada).
+     (2) AS SETAS ‹ › DO FEED. "Quero que você coloque a setinha pra ele mudar no feed". Ao lado da peça, uma de
+         cada lado, no mesmo traço branco e discreto do X e das setas da tela cheia: › vai pro produto seguinte,
+         ‹ pro anterior (o mesmo passo da roda). No primeiro, a ‹ some; no cartão de fim, a › some. */
+  var mqPC = window.matchMedia ? window.matchMedia('(hover: hover) and (pointer: fine) and (min-width: 761px)') : null;
+  function pcDeMouse() { return !!(mqPC && mqPC.matches); }
+
+  function limiteDoFeed() { return Math.max(0, feed.scrollHeight - feed.clientHeight); }
+  /* onde o feed para em cada item: o 1º no topo (a intro da categoria aparece junto); os outros com a FOTO no
+     centro; o cartão de fim no fim */
+  function paradaDo(i) {
+    if (i <= 0) return 0;
+    var it = itens[i];
+    var alvo = it.querySelector('.area-objeto');
+    var y = alvo ? posNoFeed(alvo) + alvo.offsetHeight / 2 - feed.clientHeight / 2 : limiteDoFeed();
+    return Math.max(0, Math.min(limiteDoFeed(), y));
+  }
+  var anim = null, animando = false;
+  function quadroDaRolagem(t) {
+    if (!anim) { animando = false; return; }
+    var k = Math.min(1, (t - anim.t0) / anim.dur);
+    var e = 1 - Math.pow(1 - k, 3);                 // sai rápido e assenta devagar
+    feed.scrollTop = anim.de + (anim.para - anim.de) * e;
+    if (k < 1) requestAnimationFrame(quadroDaRolagem);
+    else { anim = null; animando = false; }
+  }
+  function rolarAte(y) {
+    y = Math.max(0, Math.min(limiteDoFeed(), y));
+    if (querMenosMovimento) { anim = null; feed.scrollTop = y; return; }
+    anim = { de: feed.scrollTop, para: y, t0: performance.now(), dur: 520 };
+    if (!animando) { animando = true; requestAnimationFrame(quadroDaRolagem); }
+  }
+  /* o próximo destino SEMPRE a partir de onde o feed VAI parar (se já está andando) — é isso que empilha */
+  function andarProdutos(passos) {
+    if (!aberto || !itens.length) return;
+    var base = anim ? anim.para : feed.scrollTop;
+    var alvo = base, i;
+    if (passos > 0) {
+      for (i = 0; i < itens.length && passos > 0; i++) {
+        var p = paradaDo(i);
+        if (p > alvo + 8) { alvo = p; passos--; }
+      }
+    } else {
+      for (i = itens.length - 1; i >= 0 && passos < 0; i--) {
+        var q = paradaDo(i);
+        if (q < alvo - 8) { alvo = q; passos++; }
+      }
+    }
+    if (alvo !== base) rolarAte(alvo);
+  }
+
+  feed.addEventListener('wheel', function (e) {
+    if (!aberto || !pcDeMouse() || e.ctrlKey || gavetaNaFrente()) return;
+    if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) return;
+    var linhas = e.deltaMode === 1;
+    var rodaDeMouse = linhas || (e.wheelDeltaY && Math.abs(e.wheelDeltaY) >= 120 && e.wheelDeltaY % 120 === 0);
+    if (!rodaDeMouse) return;                       // touchpad: a rolagem livre do navegador
+    e.preventDefault();
+    /* roda "solta" (Logitech e parecidas) manda 2-3 cliques num evento só: cada 120 é um produto */
+    var cliques = linhas ? Math.max(1, Math.round(Math.abs(e.deltaY) / 3))
+                         : Math.max(1, Math.round(Math.abs(e.wheelDeltaY) / 120));
+    andarProdutos(Math.min(cliques, 3) * (e.deltaY > 0 ? 1 : -1));
+  }, { passive: false });
+  /* quem pegar a barra de rolagem ou o teclado no meio do carrossel manda: a animação larga */
+  ['mousedown', 'keydown', 'touchstart'].forEach(function (ev) {
+    feed.addEventListener(ev, function (e) {
+      if (e.target && e.target.closest && e.target.closest('.seta-produto')) return;
+      anim = null;
+    }, { passive: true });
+  });
+
+  var setasProduto = [];
+  [[-1, 'Produto anterior', '15 5 8 12 15 19', 'ant'], [1, 'Próximo produto', '9 5 16 12 9 19', 'prox']].forEach(function (s) {
+    var b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'seta-produto seta-produto-' + s[3];
+    b.setAttribute('aria-label', s[1]);
+    b.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="' + s[2] + '"></polyline></svg>';
+    b.addEventListener('click', function (e) { e.stopPropagation(); andarProdutos(s[0]); });
+    feed.appendChild(b);
+    setasProduto.push(b);
+  });
+  var pintandoSetas = false;
+  function pintarSetasProduto() {
+    pintandoSetas = false;
+    if (!itens.length) return;
+    var onde = anim ? anim.para : feed.scrollTop;
+    feed.classList.toggle('no-primeiro', onde <= paradaDo(0) + 8);
+    feed.classList.toggle('no-fim', onde >= paradaDo(itens.length - 1) - 8);
+  }
+  feed.addEventListener('scroll', function () {
+    if (!pintandoSetas) { pintandoSetas = true; requestAnimationFrame(pintarSetasProduto); }
+  }, { passive: true });
+  document.addEventListener('alea:feed-aberto', pintarSetasProduto);
+  setTimeout(pintarSetasProduto, 0);
 
   document.dispatchEvent(new CustomEvent('alea:feed-pronto'));
 })();

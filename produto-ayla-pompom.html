@@ -73,7 +73,7 @@
     </button>
     <button class="botao-icone" type="button" data-abrir="carrinho" aria-haspopup="dialog">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 8.5h14V21H5z"></path><path d="M9 8.5V7a3 3 0 0 1 6 0v1.5"></path></svg>
-      <span class="rotulo">Carrinho</span>
+      <span class="rotulo">Sacola</span>
       <span class="quantos" data-quantos>0</span>
     </button>
   </nav>
@@ -99,13 +99,23 @@
         <p>Por serem feitos sob encomenda e personalizados conforme suas escolhas, os pedidos não poderão ser cancelados ou devolvidos após a confirmação do pagamento caso a produção já tenha começado, exceto em casos de defeito, vício ou erro de fabricação.</p>
       </section>
 
+      <!-- v29 (Cassiano, 26/09/2026 03:08): "tem que ter a janelinha do nome do seu pet, porque cada pet vai ter um
+           nome. Só o nome; não vai ter a parte de escolher cor do nome, porque a cor do nome é só uma." Só o campo do
+           nome: sem o detalhe de R$ 30, sem cor do nome e sem cores da peça. O produto.js já cobra o nome e o manda
+           pra sacola (personalizacao.nome_pet), igual aos outros. -->
+      <form class="personalizar" data-personalizar autocomplete="off">
+        <label>Nome do pet
+          <input type="text" name="nome_pet" maxlength="18" placeholder="Digite aqui.">
+        </label>
+      </form>
+
       <label class="aceite" data-aceite>
         <input type="checkbox" data-aceite-caixa>
         <span>Declaro que revisei cuidadosamente todas as informações da personalização, incluindo nome, grafia e cores. Declaro, ainda, estar ciente e de acordo com as condições acima aplicáveis a produtos personalizados, inclusive quanto a cancelamentos e devoluções.</span>
       </label>
 
       <p class="recado-aceite" data-recado-aceite hidden>
-        Marque a declaração acima para adicionar ao carrinho.
+        Marque a declaração acima para adicionar à sacola.
       </p>
       <div class="botoes-produto" data-botoes>
         <button class="botao" type="button" data-comprar-agora
@@ -114,7 +124,7 @@
           Comprar agora
         </button>
         <button class="botao-sacola" type="button" data-add-carrinho
-                aria-label="Adicionar ao carrinho" title="Adicionar ao carrinho">
+                aria-label="Adicionar à sacola" title="Adicionar à sacola">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 8.5h14V21H5z"></path><path d="M9 8.5V7a3 3 0 0 1 6 0v1.5"></path></svg>
         </button>
       </div>
