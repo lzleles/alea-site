@@ -1774,3 +1774,20 @@ html.topo-emendado .album-tela { background: var(--cor-do-topo) !important; -web
   border-radius: 0; box-shadow: none;
 }
 
+/* =============================================================================
+   ⚠️ v26 — A LUPA NA TELA CHEIA (Cassiano, 25/09/2026 22:00, áudio 1904): "quando a foto estiver em tela cheia, deixa
+   a gente dar zoom (...) eu gosto de dar zoom pra ver detalhe". Quem amplia é o produto.js, com transform na <img>.
+   Aqui: (1) `touch-action: none` = o navegador não faz NADA com o dedo na tela cheia (nem pinça de página, nem toque
+   duplo de página) — a lupa é toda nossa; (2) a foto amplia a partir do canto (origem 0 0, a conta do JS é nessa
+   base); (3) o X e as bolinhas ficam POR CIMA da foto ampliada; (4) will-change só DURANTE o gesto — parado, a foto é
+   redesenhada nítida no tamanho novo (o Safari deixa borrada a camada que fica com will-change pra sempre). */
+.telacheia { touch-action: none; overflow: hidden; -webkit-user-select: none; user-select: none; }
+.telacheia .fechar-x, .telacheia .legenda-tc { position: relative; z-index: 2; }
+.telacheia img { transform-origin: 0 0; -webkit-user-drag: none; }
+.telacheia.mexendo img { will-change: transform; }
+.telacheia.com-zoom img { -webkit-touch-callout: none; }
+@media (hover: hover) and (pointer: fine) {
+  .telacheia img { cursor: zoom-in; }
+  .telacheia.com-zoom img { cursor: grab; }
+  .telacheia.arrastando, .telacheia.arrastando img { cursor: grabbing; }
+}
