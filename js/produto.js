@@ -416,6 +416,11 @@
     /* v22 (áudio 1699): tocar em OUTRA foto da colmeia troca a ampliação direto pra ela (o clique segue pro ouvinte
        da colmeia, que fecha a antiga e amplia a nova); só o toque FORA das fotos é engolido e apenas devolve. */
     if (ev.target.closest('[data-colmeia] [data-favo]')) return;
+    /* v30 (26/09/2026, pedido do Cassiano; a v29 está em 03_site/_versoes_anteriores/personalizar_matteo_claudia_antes_2026-09-26/js/):
+       com a miniatura aberta, o "← voltar para o feed" é a ÚNICA saída que funciona no 1º toque e volta NA HORA.
+       Antes ele também era engolido (o 1º toque só fechava a ampliação e era preciso tocar de novo). O resto da página
+       continua como na v19: o 1º toque fora só devolve a miniatura. Vale no celular e no computador. */
+    if (ev.target.closest('a.voltar')) { fecharFavos(); return; }
     ev.preventDefault();
     ev.stopPropagation();
     fecharFavos();

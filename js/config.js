@@ -307,3 +307,43 @@ window.ALEA = {
    único que tenho"). A página nova (produto-luke-bowl.html) ganha a mesma janela 3D sem copiar a configuração:
    é a mesma peça, uma configuração só. Matteo, Ayla e Cláudia não têm .glb ainda -> formulário na própria página. */
 window.ALEA.modelos3d['luke-bowl'] = window.ALEA.modelos3d['bowl-wave'];
+
+/* 26/09/2026 (pedido do Cassiano: "o Matteo e a Cláudia iguais ao Luke"): as duas ganham a janela 3D "Personalize aqui",
+   cada uma com o SEU arquivo. A Ayla fica sem (áudio 1864: peça sem personalização).
+   Os .glb saem do 07_render_capa/exportar_glb_configurador_v3_varias_partes_e_logo.py, SEM decimar (alvo 999999):
+   decimado a 16-20 mil faces, a divisa das cores virava serrote e o Matteo perdia a forma (visto em 26/09).
+   `original` = as cores que o PRÓPRIO arquivo 3D dele traz (project_settings do .3mf), com o nome oficial do filamento.
+   Os campos novos (zonaNome, bicolor, fonteInvertida, nomeInicial) estão explicados no personalizar3d.js v7. */
+window.ALEA.modelos3d['matteo-texturized'] = {
+  /* 13_lote_2026-09-25_2001/02_ALEA Matteo Texturized_msg1851.zip -> "ALEA Elevated Dog Bowl Texturized.3mf",
+     objeto 5 (placa "P"). Zonas: extrusora 1 = topo (a parte de cima, onde o nome está), 2 = base. */
+  glb: 'modelos/matteo_g.glb',
+  nome: 'modelos/matteo_g_nome.json',
+  /* o arquivo grava o nome em Arial; no site vai a Arimo (licença livre SIL OFL 1.1, em fonts/arimo_LICENSE.txt; mesma medida de letra da Arial) */
+  fonte: 'fonts/arimo.ttf',
+  fonteInvertida: false,
+  zonaNome: 'topo',
+  /* só bicolor e monocromático (áudio 1863). Bicolor: cor 1 = topo, cor 2 = base. */
+  bicolor: { topo: 0, principal: 0, base: 1 },
+  original: {
+    topo:      { site: 'Preto', hex: '#000000', acabamento: 'basico', oficial: 'Bambu Lab · PLA · Lite · Black' },
+    principal: { site: 'Preto', hex: '#000000', acabamento: 'basico', oficial: 'Bambu Lab · PLA · Lite · Black' },
+    base:      { site: 'Cáqui', hex: '#E8DBB7', acabamento: 'fosco',  oficial: 'Bambu Lab · PLA · Matte · Desert Tan (11401)' }
+  }
+};
+window.ALEA.modelos3d['claudia-wave'] = {
+  /* 13_lote_2026-09-25_2001/04_ALEA Claudia Wave_separados/ALEA Cláudia Wave_msg1859.3mf, objeto 32 (placa "Wave - G").
+     Zonas: extrusora 3 = topo (o aro), 1 = principal (o corpo, onde o nome está), 2 = base (a onda). */
+  glb: 'modelos/claudia_g.glb',
+  nome: 'modelos/claudia_g_nome.json',
+  fonte: 'fonts/defante.otf',
+  /* o arquivo traz "Chica" (a cachorrinha das fotos); a peça se chama Cláudia, e o mesmo arquivo tem "Cláudia" no objeto 20 */
+  nomeInicial: 'Cláudia',
+  /* bicolor como ele imprime (foto claudiawave_capa): cor 1 = aro e corpo, cor 2 = a onda de baixo */
+  bicolor: { topo: 0, principal: 0, base: 1 },
+  original: {
+    topo:      { site: 'Vermelho', hex: '#C6001A', acabamento: 'basico',     oficial: 'Bambu Lab · PLA · Lite · Red (16200)' },
+    principal: { site: 'Mármore',  hex: '#D3C5A3', acabamento: 'basico',     oficial: 'Bambu Lab · PLA · Marble' },
+    base:      { site: 'Azul',     hex: '#76D9F4', acabamento: 'perolizado', oficial: 'Bambu Lab · PLA · Silk' }
+  }
+};

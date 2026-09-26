@@ -654,6 +654,20 @@
 
   window.aleaFeed = { abrir: abrir, fechar: fechar, aberto: function () { return aberto; } };
 
+  /* ⚠️ v30 (26/09/2026, pedido do Cassiano; a v29 está em 03_site/_versoes_anteriores/personalizar_matteo_claudia_antes_2026-09-26/js/):
+     "no menu de categorias do fim do feed, tocar na categoria ATUAL leva ao começo dela". Antes, o link da
+     categoria em que a pessoa já está (`#pet` com o endereço já em `#pet`) não fazia NADA: o endereço não muda,
+     então o `hashchange` não dispara. Agora o toque na categoria atual rola o feed até o TOPO (a intro da
+     categoria + o 1º produto), com a rolagem suave (ou direta, se o aparelho pede menos movimento).
+     Tocar em OUTRA categoria continua indo pelo `hashchange`, como sempre. Vale no celular e no computador. */
+  feed.addEventListener('click', function (e) {
+    var a = e.target.closest && e.target.closest('[data-menu-categorias] a[data-categoria]');
+    if (!a || !aberto || a.getAttribute('data-categoria') !== categoriaAtual) return;
+    e.preventDefault();
+    indice = 0;
+    feed.scrollTo({ top: 0, behavior: querMenosMovimento ? 'auto' : 'smooth' });
+  });
+
   /* ==================================================================== os gestos */
   /* ⚠️ 5ª RODADA: A RODA E O DEDO NA VERTICAL NÃO SÃO MAIS NOSSOS.
      Saiu o `wheel` com `preventDefault` e saiu o `touchmove` que matava a inércia. Eram a

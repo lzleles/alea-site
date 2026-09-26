@@ -5,8 +5,8 @@
              pet GRAVADO ao vivo e as cores da peça e do nome trocando na hora, conforme o formulário.
    entrada: ALEA.modelos3d[slug] e ALEA.filamentos (config.js); o formulário [data-personalizar] da página
    saida: a janela (modal); o formulário de verdade MORA dentro dela enquanto está aberta
-   status: protótipo v6 (23/09/2026, etapa 60)
-   validado_em: 23/09/2026 (teste headless desktop e 390 px)
+   status: v7 (26/09/2026, Matteo e Cláudia com a janela 3D)
+   validado_em: 26/09/2026 (teste headless 1440 px e 390 px, na prévia)
 */
 /* =============================================================================
    HISTÓRICO (a v1 da etapa 53 está em 03_site/_versoes_anteriores/js_2026-09-23/)
@@ -44,6 +44,17 @@
    v6 (etapa 60, 16:51-16:53): no iPhone o toque em opção DESATIVADA não chega em lugar nenhum (o Safari engole) —
       o recado nunca aparecia. Agora uma PELÍCULA invisível cobre as bolinhas e a janela da cor do nome enquanto
       estão travadas e é ela que pega o toque. E, sem nome, o quadradinho do detalhe fica apagado como as bolinhas.
+   v7 (26/09/2026, pedido do Cassiano: "o Matteo e a Cláudia iguais ao Luke"; a v6 está em
+      03_site/_versoes_anteriores/personalizar_matteo_claudia_antes_2026-09-26/js/): a janela deixou de supor o Luke.
+      Quatro coisas passam a vir do config.js de cada peça (sem nada disso, tudo fica como no Luke):
+      1. `zonaNome` — em que zona o nome está gravado. No Luke é a parede do meio ('principal'); no Matteo é o
+         TOPO (a parte preta). A letra sem cor segue a cor DESSA zona; antes seguia sempre a do meio, e no Matteo
+         o nome sairia da cor da base.
+      2. `bicolor` — qual das 2 cores vai em cada zona. Luke: topo = cor 1, meio e base = cor 2. Cláudia: topo e
+         meio = cor 1, a onda de baixo = cor 2 (é como a peça dele é impressa; foto claudiawave_capa).
+      3. `fonteInvertida` — a Defante (.otf, curvas CFF) precisa desenhar os contornos ao contrário; a Arimo
+         (.ttf, a mesma medida da Arial que o arquivo do Matteo usa) não.
+      4. `nomeInicial` — o nome que a peça mostra ao abrir, quando o arquivo traz outro (a Cláudia vem com "Chica").
    ============================================================================= */
 
 var ACABAMENTO_MATERIAL = {           // como cada acabamento reflete a luz
@@ -337,7 +348,9 @@ export async function abrirJanela3D(cfg, aoFechar, aoMontar, opcoes) {
   var ordemZonas = ['topo', 'principal', 'base'];
   var mats = {};
   ordemZonas.forEach(function (z) { mats[z] = material(cfg.original[z].hex, cfg.original[z].acabamento); });
-  var matLetra = mats.principal.clone();
+  var zonaNome = cfg.zonaNome || 'principal';                          // v7 (1)
+  var BICOLOR = cfg.bicolor || { topo: 0, principal: 1, base: 1 };      // v7 (2)
+  var matLetra = mats[zonaNome].clone();
 
   /* ---------------- a peça e o quadro do nome */
   var [gltf, quadro, fonteBin] = await Promise.all([
@@ -345,7 +358,7 @@ export async function abrirJanela3D(cfg, aoFechar, aoMontar, opcoes) {
     fetch(cfg.nome).then(function (r) { return r.json(); }),
     /* reversed: a Defante é .otf (curvas CFF) e desenha os contornos no sentido contrário — sem isso o miolo do
        "o" e do "a" saía cheio (visto no "Cassiano", etapa 55) */
-    new Promise(function (ok, erro) { var L = new TTFLoader(); L.reversed = true; L.load(cfg.fonte, ok, undefined, erro); })
+    new Promise(function (ok, erro) { var L = new TTFLoader(); L.reversed = cfg.fonteInvertida !== false; L.load(cfg.fonte, ok, undefined, erro); })
   ]);
   if (!vivo) return;
   var fonte = new Font(fonteBin);
@@ -508,7 +521,7 @@ export async function abrirJanela3D(cfg, aoFechar, aoMontar, opcoes) {
     if (modo) {
       var e = Array.prototype.map.call(campos, escolhaDoCampo);
       if (modo.value === 'tricolor') { escolha.topo = e[0]; escolha.principal = e[1]; escolha.base = e[2]; }
-      else if (modo.value === 'bicolor') { escolha.topo = e[0]; escolha.principal = e[1]; escolha.base = e[1]; }
+      else if (modo.value === 'bicolor') { ordemZonas.forEach(function (z) { escolha[z] = e[BICOLOR[z]]; }); }
       else if (modo.value === 'monocromatico') { escolha.topo = escolha.principal = escolha.base = e[0]; }
     }
     ordemZonas.forEach(function (z) {
@@ -524,10 +537,11 @@ export async function abrirJanela3D(cfg, aoFechar, aoMontar, opcoes) {
     else {
       /* (6) a letra é a MESMA cor da peça; só a sombra de dentro muda de tom pra ler: peça escura -> um pouco mais
          clara; peça clara -> um pouco mais escura. Sem contorno, sem brilho (o cliente não pode achar que vem assim) */
-      var Lp = luminancia('#' + mats.principal.color.getHexString());
-      if (Lp < 0.18) matLetra.color.copy(mats.principal.color).lerp(new THREE.Color(0xffffff), 0.12);
-      else matLetra.color.copy(mats.principal.color).multiplyScalar(0.72);
-      matLetra.roughness = mats.principal.roughness; matLetra.metalness = mats.principal.metalness;
+      var mz = mats[zonaNome];
+      var Lp = luminancia('#' + mz.color.getHexString());
+      if (Lp < 0.18) matLetra.color.copy(mz.color).lerp(new THREE.Color(0xffffff), 0.12);
+      else matLetra.color.copy(mz.color).multiplyScalar(0.72);
+      matLetra.roughness = mz.roughness; matLetra.metalness = mz.metalness;
     }
     ajustarFundo(ordemZonas.map(function (z) { return '#' + mats[z].color.getHexString(); }));
   }
@@ -537,7 +551,7 @@ export async function abrirJanela3D(cfg, aoFechar, aoMontar, opcoes) {
   function nomeParaMostrar() {
     var v = campoNome ? campoNome.value.trim() : '';
     if (v) return v;
-    return passoAtual === 0 ? (quadro.text_info.text || '') : '';
+    return passoAtual === 0 ? (cfg.nomeInicial || quadro.text_info.text || '') : '';
   }
   window.aleaGravarNome = function () { gravar(nomeParaMostrar()); };
   frente = camera.position.clone();
