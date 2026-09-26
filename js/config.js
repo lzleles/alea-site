@@ -209,10 +209,11 @@ window.ALEA = {
      25/09/2026: a LISTA REAL dele substituiu as de teste (ver o bloco `filamentos` abaixo). */
   filamentos: {
     /* LISTA REAL do Cassiano (25/09/2026, audios 1786-1815, tudo PLA; nomes do site trocados por ele na
-       msg 1827; sem 4a aba - audio 1830; + Rosa Silk msg 1835). Gerado por 03_site/07_gerar_filamentos_config_v3_rosa_silk_2026-09-25.py
-       a partir de 03_site/_LISTA_FILAMENTOS_DELE_2026-09-25.json - nao editar a mao. Antes: cores de TESTE
-       (Azul/Amarelo/Verde) no Basico e Perolizado e as 5 foscas Bambu da msg 546.
-       hex = cor OFICIAL do fabricante; eSUN Silk Lime = aproximado (medido na foto oficial da eSUN). */
+       msg 1827; sem 4a aba - audio 1830; + Rosa Silk msg 1835). Gerado por 03_site/07_gerar_filamentos_config_v4_textura_por_cor_2026-09-26.py
+       a partir de 03_site/_LISTA_FILAMENTOS_DELE_2026-09-25.json + _TEXTURAS_FILAMENTO.json - nao editar a mao.
+       hex = cor OFICIAL do fabricante; eSUN Silk Lime = aproximado (medido na foto oficial da eSUN).
+       v4 (26/09/2026): `textura` = filamento com efeito (Marmore: foto IMG_0039 da Chica), `hex_oficial` =
+       o do catalogo quando o hex veio da foto dele, `rugosidade`/`metal` = brilho proprio da cor. */
     basico: [
       { site: 'Laranja', hex: '#FF671F', original: 'Bambu Lab · PLA · Lite · Orange (16301)' },
       { site: 'Vermelho', hex: '#C6001A', original: 'Bambu Lab · PLA · Lite · Red (16200)' },
@@ -225,7 +226,7 @@ window.ALEA = {
       { site: 'Preto', hex: '#272729', original: 'eSUN · PLA · PLA-Basic · Black' },
       { site: 'Roxo', hex: '#603BA0', original: 'Elegoo · PLA · PLA · Purple' },
       { site: 'Marrom', hex: '#5F3839', original: 'Multfila · PLA · Mult Speed · Marrom (PCI-PLA-046)' },
-      { site: 'Mármore', hex: '#E4E4E4', original: 'SUNLU · PLA · High Speed Marble · Chestnut Brown Marble' }
+      { site: 'Mármore', hex: '#E4E4E4', original: 'SUNLU · PLA · High Speed Marble · Chestnut Brown Marble', textura: { img: 'img/texturas/marmore.png', mm: [78.2, 39.1], contraste: 1 } }
     ],
     fosco: [
       { site: 'Branco', hex: '#F6F6F6', original: 'Elegoo · PLA · Matte · Matte White' },
@@ -323,6 +324,13 @@ window.ALEA.modelos3d['matteo-texturized'] = {
   fonte: 'fonts/arimo.ttf',
   fonteInvertida: false,
   zonaNome: 'topo',
+  /* 26/09/2026 (vídeos dele msgs 2067-2068: "o do Matteo é texturizado (...) lá na pré-visualização ele já tem que
+     estar com essa textura"): a PELE FELPUDA que o fatiador aplica em TODAS as paredes. Não é forma do arquivo (a
+     malha é lisa); é ajuste do projeto, copiado do .3mf (Metadata/project_settings.config): fuzzy_skin = allwalls,
+     modo displacement, ruído billow, 4 oitavas, persistência 0,5, escala 1 mm, espessura 0,2 mm, pontos a cada 0,8 mm.
+     Conferido no G-code fatiado (07_render_capa/textura_2026-09-26/fatiado): a parede externa foge da lisa até
+     +0,35-0,37 mm, com um ponto a cada 0,85-0,88 mm. A janela 3D desenha o relevo na luz (sem peso de malha). */
+  pele: { ruido: 'billow', oitavas: 4, persistencia: 0.5, escalaMm: 1, espessuraMm: 0.2 },
   /* só bicolor e monocromático (áudio 1863). Bicolor: cor 1 = topo, cor 2 = base. */
   bicolor: { topo: 0, principal: 0, base: 1 },
   original: {

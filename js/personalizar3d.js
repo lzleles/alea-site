@@ -5,8 +5,8 @@
              pet GRAVADO ao vivo e as cores da peça e do nome trocando na hora, conforme o formulário.
    entrada: ALEA.modelos3d[slug] e ALEA.filamentos (config.js); o formulário [data-personalizar] da página
    saida: a janela (modal); o formulário de verdade MORA dentro dela enquanto está aberta
-   status: v7 (26/09/2026, Matteo e Cláudia com a janela 3D)
-   validado_em: 26/09/2026 (teste headless 1440 px e 390 px, na prévia)
+   status: v8 (26/09/2026, pele felpuda do Matteo e textura do Mármore)
+   validado_em: 26/09/2026 (prints na prévia, 1440 px e 390 px: 03_site/_prints_textura_2026-09-26/)
 */
 /* =============================================================================
    HISTÓRICO (a v1 da etapa 53 está em 03_site/_versoes_anteriores/js_2026-09-23/)
@@ -55,6 +55,19 @@
       3. `fonteInvertida` — a Defante (.otf, curvas CFF) precisa desenhar os contornos ao contrário; a Arimo
          (.ttf, a mesma medida da Arial que o arquivo do Matteo usa) não.
       4. `nomeInicial` — o nome que a peça mostra ao abrir, quando o arquivo traz outro (a Cláudia vem com "Chica").
+   v8 (26/09/2026, vídeos do Cassiano msgs 2067-2070: "sempre que você pegar um projeto, você fatia a mesa dele (...) o
+      do Matteo é texturizado"; "o mármore (...) tem que ter essa pigmentação (...) não pode ficar liso"; a v7 está em
+      03_site/_versoes_anteriores/textura_3d_antes_2026-09-26/js/):
+      1. PELE FELPUDA (`cfg.pele`, config.js): a peça sai do fatiador com a parede toda granulada (fuzzy skin do .3mf:
+         ruído billow, 4 oitavas, persistência 0,5, escala 1 mm, espessura 0,2 mm). A malha continua a lisa do arquivo
+         (leve pro celular); o relevo é desenhado NA LUZ, ponto a ponto, com o mesmo ruído e os mesmos números do
+         arquivo, só nas paredes (topo e fundo planos ficam lisos, como no fatiador). O grão mais fino que um pixel
+         some sozinho (senão tremeria ao girar).
+      2. TEXTURA POR COR (`textura` na cor, em ALEA.filamentos, escrita pelo gerador v4): filamento com efeito
+         (Mármore = branco com pintas cinza, tirado da foto IMG_0039 da Chica) pinta a zona com hex × o desenho da
+         foto, projetado pelos 3 eixos (sem emenda). A cor sem `textura` continua lisa — Sakura Pink e Light Cyan não
+         mudaram (áudio 2078: "estão perfeitas").
+      3. `rugosidade`/`metal` na cor (opcional) sobrescrevem o brilho do acabamento só naquela cor.
    ============================================================================= */
 
 var ACABAMENTO_MATERIAL = {           // como cada acabamento reflete a luz
@@ -336,21 +349,144 @@ export async function abrirJanela3D(cfg, aoFechar, aoMontar, opcoes) {
   (function laco() { if (!vivo) return; controles.update(); renderer.render(cena, camera); requestAnimationFrame(laco); })();
 
   /* ---------------- materiais */
-  function material(hex, acab) {
-    var m = new THREE.MeshStandardMaterial(Object.assign({ color: new THREE.Color(hex), flatShading: true, side: THREE.DoubleSide },
-      ACABAMENTO_MATERIAL[acab] || ACABAMENTO_MATERIAL.fosco));
-    m.userData.acab = acab; return m;
+  /* v8: a PELE FELPUDA (1) e a TEXTURA DA COR (2) entram no sombreador de cada material. Tudo é medido em mm no
+     espaço da peça (a malha está em metros, sem transformação), então o grão tem o tamanho de verdade. */
+  var PELE = cfg.pele || null;
+  var branco1px = new THREE.DataTexture(new Uint8Array([128, 128, 128, 255]), 1, 1);
+  branco1px.needsUpdate = true;
+  var texturas = {};
+  function texturaDe(url) {
+    if (!texturas[url]) {
+      var t = new THREE.TextureLoader().load(url);
+      t.wrapS = t.wrapT = THREE.RepeatWrapping;
+      t.colorSpace = THREE.NoColorSpace;             // é desenho (razão de luz), não cor
+      t.anisotropy = renderer.capabilities.getMaxAnisotropy();
+      texturas[url] = t;
+    }
+    return texturas[url];
   }
-  function pintar(m, hex, acab) {
+  var GLSL_RUIDO = [
+    'varying vec3 vPosW;',
+    'uniform vec4 uPele;',        // x liga, y espessura (mm), z frequência (1/mm), w persistência
+    'uniform float uPeleOit;',
+    'uniform float uUsaMapa;',
+    'uniform sampler2D uMapa;',
+    'uniform vec2 uMapaMm;',
+    'uniform float uContraste;',
+    /* ruído de gradiente 3D clássico (Perlin; Stefan Gustavson, domínio público) — o mesmo tipo do libnoise que o
+       Bambu Studio usa no "billow" */
+    'vec4 aP289(vec4 x){return x-floor(x*(1.0/289.0))*289.0;}',
+    'vec4 aPerm(vec4 x){return aP289(((x*34.0)+10.0)*x);}',
+    'vec4 aTaylor(vec4 r){return 1.79284291400159-0.85373472095314*r;}',
+    'vec3 aFade(vec3 t){return t*t*t*(t*(t*6.0-15.0)+10.0);}',
+    'float aCnoise(vec3 P){',
+    ' vec3 Pi0=floor(P);vec3 Pi1=Pi0+vec3(1.0);Pi0=aP289(Pi0.xyzz).xyz;Pi1=aP289(Pi1.xyzz).xyz;',
+    ' vec3 Pf0=fract(P);vec3 Pf1=Pf0-vec3(1.0);',
+    ' vec4 ix=vec4(Pi0.x,Pi1.x,Pi0.x,Pi1.x);vec4 iy=vec4(Pi0.yy,Pi1.yy);vec4 iz0=Pi0.zzzz;vec4 iz1=Pi1.zzzz;',
+    ' vec4 ixy=aPerm(aPerm(ix)+iy);vec4 ixy0=aPerm(ixy+iz0);vec4 ixy1=aPerm(ixy+iz1);',
+    ' vec4 gx0=ixy0*(1.0/7.0);vec4 gy0=fract(floor(gx0)*(1.0/7.0))-0.5;gx0=fract(gx0);',
+    ' vec4 gz0=vec4(0.5)-abs(gx0)-abs(gy0);vec4 sz0=step(gz0,vec4(0.0));gx0-=sz0*(step(0.0,gx0)-0.5);gy0-=sz0*(step(0.0,gy0)-0.5);',
+    ' vec4 gx1=ixy1*(1.0/7.0);vec4 gy1=fract(floor(gx1)*(1.0/7.0))-0.5;gx1=fract(gx1);',
+    ' vec4 gz1=vec4(0.5)-abs(gx1)-abs(gy1);vec4 sz1=step(gz1,vec4(0.0));gx1-=sz1*(step(0.0,gx1)-0.5);gy1-=sz1*(step(0.0,gy1)-0.5);',
+    ' vec3 g000=vec3(gx0.x,gy0.x,gz0.x);vec3 g100=vec3(gx0.y,gy0.y,gz0.y);vec3 g010=vec3(gx0.z,gy0.z,gz0.z);vec3 g110=vec3(gx0.w,gy0.w,gz0.w);',
+    ' vec3 g001=vec3(gx1.x,gy1.x,gz1.x);vec3 g101=vec3(gx1.y,gy1.y,gz1.y);vec3 g011=vec3(gx1.z,gy1.z,gz1.z);vec3 g111=vec3(gx1.w,gy1.w,gz1.w);',
+    ' vec4 n0=aTaylor(vec4(dot(g000,g000),dot(g010,g010),dot(g100,g100),dot(g110,g110)));g000*=n0.x;g010*=n0.y;g100*=n0.z;g110*=n0.w;',
+    ' vec4 n1=aTaylor(vec4(dot(g001,g001),dot(g011,g011),dot(g101,g101),dot(g111,g111)));g001*=n1.x;g011*=n1.y;g101*=n1.z;g111*=n1.w;',
+    ' float n000=dot(g000,Pf0);float n100=dot(g100,vec3(Pf1.x,Pf0.yz));float n010=dot(g010,vec3(Pf0.x,Pf1.y,Pf0.z));',
+    ' float n110=dot(g110,vec3(Pf1.xy,Pf0.z));float n001=dot(g001,vec3(Pf0.xy,Pf1.z));float n101=dot(g101,vec3(Pf1.x,Pf0.y,Pf1.z));',
+    ' float n011=dot(g011,vec3(Pf0.x,Pf1.yz));float n111=dot(g111,Pf1);',
+    ' vec3 f=aFade(Pf0);vec4 nz=mix(vec4(n000,n100,n010,n110),vec4(n001,n101,n011,n111),f.z);',
+    ' vec2 nyz=mix(nz.xy,nz.zw,f.y);return 2.2*mix(nyz.x,nyz.y,f.x);}',
+    /* billow (libnoise): soma das oitavas de (2|ruído|-1), cada uma com o dobro da frequência e "persistência" da
+       força. A oitava mais fina que ~2 pixels na tela é apagada (senão o grão cintila ao girar). */
+    'float aBillow(vec3 p, float px){',
+    ' float s=0.0, a=1.0, f=uPele.z;',
+    ' for(int i=0;i<8;i++){ if(float(i)>=uPeleOit) break;',
+    '  float lamb=1.0/f; float some=clamp(lamb/max(px,1e-4)-1.0,0.0,1.0);',
+    '  s+=a*some*(2.0*abs(aCnoise(p*f))-1.0); a*=uPele.w; f*=2.0; }',
+    ' return s;}'
+  ].join('\n');
+  var GLSL_PELE = [
+    '#include <normal_fragment_maps>',
+    'if (uPele.x > 0.5) {',
+    ' vec3 pW = vPosW * 1000.0;',
+    ' vec3 nW = normalize(cross(dFdx(vPosW), dFdy(vPosW)));',
+    /* só PAREDE: o fatiador enruga o contorno de cada camada; topo e fundo planos saem lisos */
+    ' float parede = 1.0 - smoothstep(0.75, 0.95, abs(nW.y));',
+    ' if (parede > 0.0) {',
+    '  vec3 t1 = normalize(cross(vec3(0.0, 1.0, 0.0), nW)); vec3 t2 = cross(nW, t1);',
+    '  float px = max(length(dFdx(pW)), length(dFdy(pW))); float e = 0.04;',
+    '  float h0 = aBillow(pW, px), h1 = aBillow(pW + t1 * e, px), h2 = aBillow(pW + t2 * e, px);',
+    '  vec3 np = normalize(nW - parede * uPele.y * ((h1 - h0) / e * t1 + (h2 - h0) / e * t2));',
+    '  normal = normalize(mat3(viewMatrix) * np);',
+    ' }',
+    '}'
+  ].join('\n');
+  var GLSL_MAPA = [
+    '#include <map_fragment>',
+    'if (uUsaMapa > 0.5) {',
+    ' vec3 pM = vPosW * 1000.0;',
+    ' vec3 nM = normalize(cross(dFdx(vPosW), dFdy(vPosW)));',
+    ' vec3 wM = pow(abs(nM), vec3(4.0)); wM /= (wM.x + wM.y + wM.z);',
+    ' vec2 kM = 1.0 / uMapaMm;',
+    ' float tM = texture(uMapa, pM.zy * kM).r * wM.x + texture(uMapa, pM.xz * kM).r * wM.y + texture(uMapa, pM.xy * kM).r * wM.z;',
+    /* a textura guarda 0,5 + (razão - 1) × 2  (07_textura_de_filamento_v1): razão = 1 + (t - 0,5) × 0,5 */
+    ' diffuseColor.rgb *= max(0.0, 1.0 + (tM - 0.5) * 0.5 * uContraste);',
+    '}'
+  ].join('\n');
+  function vestir(m) {
+    var u = {
+      uPele: { value: PELE ? new THREE.Vector4(1, PELE.espessuraMm || 0.2, 1 / (PELE.escalaMm || 1), PELE.persistencia || 0.5)
+                           : new THREE.Vector4(0, 0, 1, 0.5) },
+      uPeleOit: { value: PELE ? (PELE.oitavas || 4) : 0 },
+      uUsaMapa: { value: 0 }, uMapa: { value: branco1px },
+      uMapaMm: { value: new THREE.Vector2(50, 50) }, uContraste: { value: 1 }
+    };
+    m._alea = u;
+    m.onBeforeCompile = function (s) {
+      Object.keys(u).forEach(function (k) { s.uniforms[k] = u[k]; });
+      s.vertexShader = 'varying vec3 vPosW;\n' + s.vertexShader.replace('#include <project_vertex>',
+        '#include <project_vertex>\nvPosW = (modelMatrix * vec4(transformed, 1.0)).xyz;');
+      s.fragmentShader = GLSL_RUIDO + '\n' + s.fragmentShader
+        .replace('#include <map_fragment>', GLSL_MAPA)
+        .replace('#include <normal_fragment_maps>', GLSL_PELE);
+    };
+    m.customProgramCacheKey = function () { return 'alea-v8'; };
+    return m;
+  }
+  function material(hex, acab, extra) {
+    var m = vestir(new THREE.MeshStandardMaterial(Object.assign({ color: new THREE.Color(hex), flatShading: true, side: THREE.DoubleSide },
+      ACABAMENTO_MATERIAL[acab] || ACABAMENTO_MATERIAL.fosco)));
+    pintar(m, hex, acab, extra); return m;
+  }
+  function pintar(m, hex, acab, extra) {
     var a = ACABAMENTO_MATERIAL[acab] || ACABAMENTO_MATERIAL.fosco;
-    m.color.set(hex); m.roughness = a.roughness; m.metalness = a.metalness; m.userData.acab = acab;
+    extra = extra || {};
+    m.color.set(hex);
+    m.roughness = extra.rugosidade != null ? extra.rugosidade : a.roughness;
+    m.metalness = extra.metal != null ? extra.metal : a.metalness;
+    m.userData.acab = acab;
+    var tx = extra.textura, u = m._alea;
+    if (!u) return;
+    u.uUsaMapa.value = tx ? 1 : 0;
+    u.uMapa.value = tx ? texturaDe(tx.img) : branco1px;
+    if (tx) { u.uMapaMm.value.set(tx.mm[0], tx.mm[1]); u.uContraste.value = tx.contraste != null ? tx.contraste : 1; }
+  }
+  /* a cor de um filamento pelo acabamento + nome do site (traz a textura e o brilho próprio, se tiver) */
+  var FIL = (window.ALEA || {}).filamentos || {};
+  function filamento(acab, cor) {
+    return (FIL[acab] || []).filter(function (x) { return x.site === cor; })[0] || null;
   }
   var ordemZonas = ['topo', 'principal', 'base'];
   var mats = {};
-  ordemZonas.forEach(function (z) { mats[z] = material(cfg.original[z].hex, cfg.original[z].acabamento); });
+  ordemZonas.forEach(function (z) {
+    var o = cfg.original[z];
+    mats[z] = material(o.hex, o.acabamento, filamento(o.acabamento, o.site));
+  });
   var zonaNome = cfg.zonaNome || 'principal';                          // v7 (1)
   var BICOLOR = cfg.bicolor || { topo: 0, principal: 1, base: 1 };      // v7 (2)
-  var matLetra = mats[zonaNome].clone();
+  /* a letra: mesma pele felpuda (o fatiador enruga TODAS as paredes, inclusive as da gravação), sem textura própria */
+  var matLetra = vestir(mats[zonaNome].clone());
 
   /* ---------------- a peça e o quadro do nome */
   var [gltf, quadro, fonteBin] = await Promise.all([
@@ -487,17 +623,12 @@ export async function abrirJanela3D(cfg, aoFechar, aoMontar, opcoes) {
   controles.update();
 
   /* ---------------- o formulário manda na peça */
-  var FIL = (window.ALEA || {}).filamentos || {};
-  function hexDe(acab, cor) {
-    var f = (FIL[acab] || []).filter(function (x) { return x.site === cor; })[0];
-    return f && f.hex;
-  }
   function escolhaDoCampo(c) {
     if (!c) return null;
     var ac = c.querySelector('.acabamento input:checked'), sel = c.querySelector('select');
     if (!ac || !sel || !sel.value) return null;
-    var hex = hexDe(ac.value, sel.value);
-    return hex ? { hex: hex, acab: ac.value } : null;
+    var f = filamento(ac.value, sel.value);                 // v8: a cor inteira (hex + textura + brilho próprio)
+    return f && f.hex ? { hex: f.hex, acab: ac.value, fil: f } : null;
   }
   /* FUNDO QUE ACOMPANHA A PEÇA (item 2): tom médio; se a peça ficar clara, o estúdio escurece um pouco;
      se ficar escura, clareia — o contraste nunca some */
@@ -525,15 +656,16 @@ export async function abrirJanela3D(cfg, aoFechar, aoMontar, opcoes) {
       else if (modo.value === 'monocromatico') { escolha.topo = escolha.principal = escolha.base = e[0]; }
     }
     ordemZonas.forEach(function (z) {
-      var x = escolha[z] || { hex: cfg.original[z].hex, acab: cfg.original[z].acabamento };
-      pintar(mats[z], x.hex, x.acab);
+      var o = cfg.original[z];
+      var x = escolha[z] || { hex: o.hex, acab: o.acabamento, fil: filamento(o.acabamento, o.site) };
+      pintar(mats[z], x.hex, x.acab, x.fil);
     });
     /* o nome: com "Um detalhe que transforma" + cor escolhida, a letra ganha a cor; sem isso, é a parede na sombra */
     var extra = form.querySelector('[data-extra-caixa]');
     var corNome = extra && extra.checked ? escolhaDoCampo(form.querySelector('.campo-cor-nome')) : null;
     nomeColorido = !!corNome;
     if (preenchida) preenchida.visible = nomeColorido;
-    if (corNome) pintar(matLetra, corNome.hex, corNome.acab);
+    if (corNome) pintar(matLetra, corNome.hex, corNome.acab, corNome.fil);
     else {
       /* (6) a letra é a MESMA cor da peça; só a sombra de dentro muda de tom pra ler: peça escura -> um pouco mais
          clara; peça clara -> um pouco mais escura. Sem contorno, sem brilho (o cliente não pode achar que vem assim) */
@@ -542,6 +674,9 @@ export async function abrirJanela3D(cfg, aoFechar, aoMontar, opcoes) {
       if (Lp < 0.18) matLetra.color.copy(mz.color).lerp(new THREE.Color(0xffffff), 0.12);
       else matLetra.color.copy(mz.color).multiplyScalar(0.72);
       matLetra.roughness = mz.roughness; matLetra.metalness = mz.metalness;
+      /* v8: a gravação é o mesmo filamento da parede -> mesma textura (as pintas do mármore seguem dentro da letra) */
+      ['uUsaMapa', 'uMapa', 'uContraste'].forEach(function (k) { matLetra._alea[k].value = mz._alea[k].value; });
+      matLetra._alea.uMapaMm.value.copy(mz._alea.uMapaMm.value);
     }
     ajustarFundo(ordemZonas.map(function (z) { return '#' + mats[z].color.getHexString(); }));
   }
