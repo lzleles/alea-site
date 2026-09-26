@@ -179,6 +179,16 @@
           }).join('') + '</span>'
         : '';
 
+      /* v28 (Cassiano, vídeo 1981, 26/09/2026 02:19): "aqui no computador só (...) tem que ter a barrinha aqui pro cara
+         passar as fotos pra frente". As setas que ele mandou tirar em 15/09 voltam SÓ NO COMPUTADOR: nascem no HTML,
+         mas o CSS só as mostra com mouse de verdade (hover: hover e pointer: fine). No celular continua o arrastar +
+         bolinhas, sem seta nenhuma. Só aparecem em cartão com 2 ou mais fotos. */
+      var setas = quantas > 1
+        ? '<button type="button" class="seta-feed seta-feed-ant" data-seta-feed="-1" aria-label="Foto anterior">' +
+            '<svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="15 5 8 12 15 19"></polyline></svg></button>' +
+          '<button type="button" class="seta-feed seta-feed-prox" data-seta-feed="1" aria-label="Próxima foto">' +
+            '<svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="9 5 16 12 9 19"></polyline></svg></button>'
+        : '';
       /* a dica fica FORA do quadrado, logo abaixo dele: dentro, ela cobria as bolinhas
          (visto por ele na 3ª rodada de 15/09/2026). */
       var dica = (i === 0 && quantas > 1)
@@ -196,7 +206,7 @@
         '<div class="area-objeto">' +
           '<div class="objeto' + (c.recorte ? '' : ' com-cenario') + '" data-distorcao data-forca="0.30" ' +
                'role="group" aria-label="' + c.produto + ' personalizado para ' + c.nome + '">' +
-            imgs + pontos +
+            imgs + pontos + setas +
           '</div>' + dica +
         '</div>' +
         '<div class="legenda">' +
@@ -733,7 +743,16 @@
 
   /* --- clique: bolinha troca foto, o resto avança ------------------------- */
   palco.addEventListener('click', function (e) {
-    var bolinha = e.target.closest('[data-foto]');
+    /* v28: a seta do computador passa a foto do cartão dela (e não dá a volta: na ponta ela não faz nada) */
+    var seta = e.target.closest('[data-seta-feed]');
+    if (seta) {
+      var itemS = seta.closest('.item') || itens[indice];
+      var fotosS = fotosDo(itemS);
+      var atualS = fotosS.findIndex(function (f) { return f.classList.contains('ativa'); });
+      var dirS = parseInt(seta.getAttribute('data-seta-feed'), 10);
+      if (atualS + dirS >= 0 && atualS + dirS < fotosS.length) pedirFoto(itemS, atualS + dirS, dirS);
+      return;
+    }    var bolinha = e.target.closest('[data-foto]');
     if (bolinha) {
       var n = parseInt(bolinha.getAttribute('data-foto'), 10);
       var item = bolinha.closest('.item') || itens[indice];   // ETAPA 15: a bolinha é DA peça dela

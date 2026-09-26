@@ -1796,3 +1796,67 @@ html.topo-emendado .album-tela { background: var(--cor-do-topo) !important; -web
    o aviso "Posso lembrar as peças que você viu" ficava POR CIMA da foto em tela cheia/álbum e roubava o toque de baixo
    (as bolinhas). Enquanto houver camada aberta (html.topo-emendado, ligado pelo site.js), ele some; volta ao fechar. */
 html.topo-emendado .aviso-memoria { display: none !important; }
+
+
+/* =============================================================================
+   ⚠️ v28 — O SITE NO COMPUTADOR (26/09/2026). Cassiano, 02:16: "tem um monte de erro no site, mas é no site do
+   computador"; vídeo 1981 (02:19): "aqui no computador só, viu? No celular não, pelo amor de Deus".
+   REGRA DESTE BLOCO: tudo aqui mora dentro de @media (hover: hover) and (pointer: fine) [mouse de verdade] E largura de computador (min-width: 761px) —
+   as duas coisas juntas (o item 3 é só largura, 901 a 1240 px, que celular não alcança). Nada daqui alcança o celular — conferido em 390 px, print a print, antes e depois
+   (03_site\_prints_desktop_2026-09-26\). */
+
+/* (1) AS SETAS DA TELA CHEIA — criadas pelo produto.js (v28); fora do mouse elas não existem pra tela */
+.telacheia .seta-tc { display: none; }
+@media (hover: hover) and (pointer: fine) and (min-width: 761px) {
+  .telacheia .seta-tc {
+    display: grid; place-items: center;
+    position: absolute; top: 50%; z-index: 3; transform: translateY(-50%);
+    width: 64px; height: 120px; padding: 0; border: 0; background: transparent; cursor: pointer;
+    color: rgba(255, 255, 255, .92); opacity: .8; transition: opacity .2s ease;
+    filter: drop-shadow(0 0 3px rgba(0, 0, 0, .45)) drop-shadow(0 1px 2px rgba(0, 0, 0, .3));
+  }
+  .telacheia .seta-tc svg { width: 40px; height: 40px; fill: none; stroke: currentColor; stroke-width: 1.4; stroke-linecap: round; stroke-linejoin: round; }
+  .telacheia .seta-tc:hover, .telacheia .seta-tc:focus-visible { opacity: 1; }
+  .telacheia .seta-tc-ant { left: 8px; }
+  .telacheia .seta-tc-prox { right: 8px; }
+  .telacheia.na-primeira .seta-tc-ant, .telacheia.uma-so .seta-tc { display: none; }
+}
+
+/* (2) AS SETAS DO CARTÃO DO FEED — criadas pelo feed.js (v28) só em cartão com 2+ fotos; só com mouse */
+.feed .seta-feed { display: none; }
+@media (hover: hover) and (pointer: fine) and (min-width: 761px) {
+  .feed .seta-feed {
+    display: grid; place-items: center;
+    position: absolute; top: 50%; z-index: 7; transform: translateY(-50%);
+    width: 52px; height: 96px; padding: 0; border: 0; background: transparent; cursor: pointer;
+    color: rgba(255, 255, 255, .92); opacity: .75; transition: opacity .2s ease;
+    filter: drop-shadow(0 0 3px rgba(0, 0, 0, .45)) drop-shadow(0 1px 2px rgba(0, 0, 0, .3));
+  }
+  .feed .seta-feed svg { width: 34px; height: 34px; fill: none; stroke: currentColor; stroke-width: 1.4; stroke-linecap: round; stroke-linejoin: round; }
+  .feed .seta-feed:hover, .feed .seta-feed:focus-visible { opacity: 1; }
+  .feed .seta-feed-ant { left: 4px; }
+  .feed .seta-feed-prox { right: 4px; }
+}
+
+/* (3) A COLMEIA DO PRODUTO ENTRE 901 E 1240 px (notebook pequeno, tablet deitado): a coluna da foto fica estreita pros
+   3 favos de 150 px e a colmeia virava 2 colunas em zigue-zague (7 linhas, medido em 1024). Aqui o favo acompanha a
+   tela, e volta o desenho de 3 colunas das telas grandes. Abaixo de 901 px (celular) nada muda. */
+@media (min-width: 901px) and (max-width: 1240px) {
+  .produto-topo .colmeia { --favo: clamp(96px, 12vw, 150px); }
+}
+
+/* (4) A JANELA DO ÁLBUM NO COMPUTADOR: tinha altura fixa de 90% da tela, e com 9 fotos sobrava metade da janela
+   vazia embaixo (medido em 1440 e 1920). No computador ela passa a ter a altura das fotos, com o mesmo teto. */
+@media (hover: hover) and (pointer: fine) and (min-width: 761px) {
+  .album-tela .album-caixa { height: auto; max-height: min(90svh, 900px); }
+  /* a foto ampliada na última fileira cresce pra baixo: o respiro de baixo é pra ela não ser cortada pela borda */
+  .album-tela .album-grade { padding-bottom: calc(var(--favo) * .9); }
+}
+
+/* (5) O AVISO "Posso lembrar as peças que você viu" ficava POR CIMA da janela do álbum e da janela 3D do Personalize
+   aqui, tampando o fim delas (prints 1440_32 e 1440_40). No computador ele espera a janela fechar — o mesmo que a v27
+   já faz na tela cheia. */
+@media (hover: hover) and (pointer: fine) and (min-width: 761px) {
+  body:has(.album-tela.aberta) .aviso-memoria,
+  body:has(.janela3d-fundo.visivel) .aviso-memoria { display: none !important; }
+}
