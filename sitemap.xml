@@ -1,39 +1,45 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- GERADO por 01_gerar_paginas_v4_topo_3d_e_rodape_curto.py em 23/09/2026. Nao editar a mao. -->
+<!-- GERADO por 01_gerar_paginas_v18_quatro_produtos_2026-09-25.py em 25/09/2026. Nao editar a mao.
+     Produtos = os da VITRINE do produtos.js (os antigos saíram do feed em 25/09; as páginas ficam no disco). -->
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://www.aleaco.art.br/</loc>
-    <lastmod>2026-09-23</lastmod>
+    <lastmod>2026-09-25</lastmod>
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://www.aleaco.art.br/produto-bowl-wave.html</loc>
-    <lastmod>2026-09-23</lastmod>
+    <loc>https://www.aleaco.art.br/produto-luke-bowl.html</loc>
+    <lastmod>2026-09-25</lastmod>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.aleaco.art.br/produto-poop-bag-holder.html</loc>
-    <lastmod>2026-09-23</lastmod>
+    <loc>https://www.aleaco.art.br/produto-matteo-texturized.html</loc>
+    <lastmod>2026-09-25</lastmod>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.aleaco.art.br/produto-kit.html</loc>
-    <lastmod>2026-09-23</lastmod>
+    <loc>https://www.aleaco.art.br/produto-ayla-pompom.html</loc>
+    <lastmod>2026-09-25</lastmod>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://www.aleaco.art.br/produto-claudia-wave.html</loc>
+    <lastmod>2026-09-25</lastmod>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://www.aleaco.art.br/a-alea.html</loc>
-    <lastmod>2026-09-23</lastmod>
+    <lastmod>2026-09-25</lastmod>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://www.aleaco.art.br/trocas-e-entrega.html</loc>
-    <lastmod>2026-09-23</lastmod>
+    <lastmod>2026-09-25</lastmod>
     <priority>0.4</priority>
   </url>
   <url>
     <loc>https://www.aleaco.art.br/privacidade.html</loc>
-    <lastmod>2026-09-23</lastmod>
+    <lastmod>2026-09-25</lastmod>
     <priority>0.4</priority>
   </url>
 </urlset>

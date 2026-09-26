@@ -93,6 +93,24 @@ window.CATEGORIAS = [
    `categoria` tem que ser um `id` da lista lá em cima. Errou o nome? A peça não
    aparece em feed nenhum — e a conferência do fim deste arquivo reclama no console
    em vez de deixar você descobrir pelo cliente. */
+/* ⚠️ 25/09/2026 (lote das 20:01, msg 1884 do Cassiano): "Tira tudo o que está lá, e coloca somente os que te mandei!"
+   A vitrine passa a ter SÓ os 4 produtos do lote, NA ORDEM em que ele mandou (áudio 1850: "o Luke é o 1º, o principal").
+   Título = nome da pasta/zip dele, com o "ALEA" escrito como o ālea do site (áudio 1852). Preço: "sob consulta"
+   (msg 1885) -> `preco: null`, que o site já mostra como "Sob consulta" no feed, na página e na sacola.
+   A foto do feed é SÓ a capa quadrada (<prefixo>_capaq, feita pelo 06_fotos_profissionais_v2): o feed desenha num
+   quadrado (WebGL) e foto que não é quadrada sai esticada; as outras fotos do lote não são quadradas, e fazê-las
+   quadradas seria cortar cachorro ou comedouro (_REGRA_CAPA_DO_FEED.md). Todas as fotos estão na página do produto.
+   ⚠ Matteo e Ayla: a Capa.JPG deles NÃO cabe na regra da capa ("essa foto não serve pra capa"): o capaq deles é a foto
+   INTEIRA com faixas lisas dos lados, provisório até ele mandar outra capa. Ver 03_site/_LEIA_4_PRODUTOS_2026-09-25.md.
+   O que estava aqui antes (Bowl Wave de Luke, Ayla, Tina Preta, Chica, Matteo, Cláudia; Poop Bag; Kit) SAIU da vitrine
+   — as páginas e as fotos continuam no disco. A lista antiga, pra voltar num piscar, está no comentário logo abaixo. */
+window.VITRINE = [
+  { produto: 'ālea Luke Bowl',         nome: 'Luke',    categoria: 'pet', preco: null, pagina: 'luke-bowl',         recorte: false, fotos: ['lukebowl_capaq'] },
+  { produto: 'ālea Matteo Texturized', nome: 'Matteo',  categoria: 'pet', preco: null, pagina: 'matteo-texturized', recorte: false, fotos: ['matteotex_capaq'] },
+  { produto: 'ālea Ayla Pompom',       nome: 'Ayla',    categoria: 'pet', preco: null, pagina: 'ayla-pompom',       recorte: false, fotos: ['aylapompom_capaq'] },
+  { produto: 'ālea Cláudia Wave',      nome: 'Cláudia', categoria: 'pet', preco: null, pagina: 'claudia-wave',      recorte: false, fotos: ['claudiawave_capaq'] }
+];
+/* A VITRINE ATÉ 25/09/2026 20:01 (fora do ar por ordem dele, msg 1884) — guardada, não apagada:
 window.VITRINE = [
   { produto: 'ālea Bowl Wave', nome: 'Luke',       categoria: 'pet', preco: 179,  pagina: 'bowl-wave',       recorte: false,  fotos: ['pro_luke_1q','luke_1','luke_2','luke_3','luke_4'] },
   { produto: 'ālea Bowl Wave', nome: 'Ayla',       categoria: 'pet', preco: 179,  pagina: 'bowl-wave',       recorte: false, fotos: ['ayla_1','ayla_2','ayla_3','ayla_4'] },
@@ -103,6 +121,7 @@ window.VITRINE = [
   { produto: 'ālea Poop Bag',  nome: 'Chica',      categoria: 'pet', preco: 59,   pagina: 'poop-bag-holder', recorte: false,  fotos: ['saquinho_1','saquinho_2','saquinho_3'] },
   { produto: 'Kit ālea',       nome: 'Tina Preta', categoria: 'pet', preco: null, pagina: 'kit',             recorte: false,  fotos: ['kit_1','kit_2','kit_3'] }
 ];
+*/
 
 
 /* ---------------------------------------------------------------------------
@@ -120,6 +139,103 @@ window.VITRINE = [
    cliente (PETG aguenta calor e sol; PLA não), e o Cassiano pediu justamente para ser
    perguntado a cada peça nova. */
 window.PRODUTOS = [
+
+  /* ===================================================================================================
+     OS 4 PRODUTOS DO LOTE DE 25/09/2026 20:01 (msgs 1847-1865 do Cassiano). Páginas geradas pelo
+     01_gerar_paginas_v18_quatro_produtos_2026-09-25.py; fotos pelo 06_fotos_profissionais_v2_lote_4_produtos_2026-09-25.py.
+     - DESCRIÇÃO VAZIA DE PROPÓSITO (resumo e paragrafos): ele vai mandar a de cada um (áudio 1856: "uma por uma").
+       A página só mostra o "*Ps.: Acompanha tigela em inox." (regra dele de 22/09 pra TODO comedouro, gerador v10).
+     - PREÇO null = "Sob consulta" (msg 1885).
+     - MATERIAL 'PLA': lido do arquivo 3D DELE de cada peça (Metadata/project_settings.config do .3mf: filament_type =
+       PLA em todos os filamentos), não suposto. O do Luke é o mesmo arquivo do antigo Bowl Wave.
+     - `cores_peca`: as opções de "Cores da peça" daquela página (regra geral dele, áudio 1865: o MONOCROMÁTICO NUNCA
+       sai da personalização). `personalizavel: false` = sem botão/formulário de personalização (Ayla, áudio 1864).
+     - ÁLBUM só existe se houver foto daquela configuração (áudio 1865). Ordem: Tricolor · Bicolor · Monocromático.
+     ⚠ ORDEM DOS CAMPOS: slug, nome, ... capa ANTES de configuracoes (o leitor por regex da v17 pega o 1º `nome:`/`capa:`).
+     =================================================================================================== */
+
+  {
+    slug: 'luke-bowl',
+    nome: 'ālea Luke Bowl',
+    linha: 'Comedouro',
+    categoria: 'pet',
+    preco: null,
+    material: 'PLA',
+    /* ⚠ CAPA TROCÁVEL: ele autorizou MELHORAR a capa (áudio 1849: o comedouro é branco e o nome some), com aprovação
+       dele antes. A versão nova entra pelo 06_fotos_profissionais_v2 (_capas_novas/luke-bowl.jpg) SEM mexer aqui. */
+    capa: 'lukebowl_capa',
+    /* medidas: as do antigo Bowl Wave, que SÃO do arquivo 3D do Luke (caixa do objeto, tamanho G) e o peso que ele
+       mandou em 24/09 01:39 (198 g com a tigela; a ficha mostra +10%, regra dele). Mesma peça, mesmo número. */
+    medidas: { peso_g: 198, altura_cm: 8.4, largura_cm: 21.3, comprimento_cm: 21.2 },
+    cores_peca: ['tricolor', 'bicolor', 'monocromatico'],   // as mesmas do Bowl Wave de hoje (a janela 3D é a do Luke)
+    /* SEM álbum bicolor: não há foto de bicolor do Luke (áudio 1848). */
+    configuracoes: [
+      { id: 'tricolor',      nome: 'Tricolor',      capa: 'lukebowl_capa', fotos: ['lukebowl_capa', 'lukebowl_0005', 'lukebowl_9148', 'lukebowl_9170', 'lukebowl_9185', 'lukebowl_9189', 'lukebowl_wa182751', 'lukebowl_wa182753', 'lukebowl_wa183050'] },
+      { id: 'monocromatico', nome: 'Monocromático', capa: 'lukebowl_0241', fotos: ['lukebowl_0241', 'lukebowl_9291', 'lukebowl_9295', 'lukebowl_9304', 'lukebowl_9307', 'lukebowl_9312', 'lukebowl_9313', 'lukebowl_9318'] }
+    ],
+    resumo: '',
+    paragrafos: [],
+    galeria: ['lukebowl_0005', 'lukebowl_9148', 'lukebowl_9170', 'lukebowl_wa182751', 'lukebowl_wa182753', 'lukebowl_wa183050']
+  },
+
+  {
+    slug: 'matteo-texturized',
+    nome: 'ālea Matteo Texturized',
+    linha: 'Comedouro',
+    categoria: 'pet',
+    preco: null,
+    material: 'PLA',          // .3mf dele: Bambu PLA Lite + Bambu PLA Matte
+    capa: 'matteotex_capa',
+    cores_peca: ['bicolor', 'monocromatico'],               // áudio 1863: "NÃO existe tricolor"
+    /* SEM álbuns (áudio 1863): não há foto monocromática dele, e ele não mandou mais fotos. */
+    resumo: '',
+    paragrafos: [],
+    galeria: ['matteotex_0094', 'matteotex_9202', 'matteotex_9220', 'matteotex_9240', 'matteotex_9255', 'matteotex_9262']
+  },
+
+  {
+    slug: 'ayla-pompom',
+    nome: 'ālea Ayla Pompom',
+    linha: 'Comedouro',
+    categoria: 'pet',
+    preco: null,
+    material: 'PLA',          // .3mf dele: Bambu PLA Silk + PLA Matte + PLA Lite
+    capa: 'aylapompom_capa',
+    /* áudio 1864: melancia com as sementes, "único e exclusivo, SEM personalização" -> sem botão de personalização,
+       sem álbuns; só as fotos e o comprar. A ficha mostra Personalização e Cores como "a informar" (escondidas no ar)
+       até ele dizer o texto: o padrão ("Totalmente personalizável") seria falso nesta peça. */
+    personalizavel: false,
+    resumo: '',
+    paragrafos: [],
+    galeria: ['aylapompom_0145', 'aylapompom_9120', 'aylapompom_9737', 'aylapompom_9859', 'aylapompom_9931', 'aylapompom_9935']
+  },
+
+  {
+    slug: 'claudia-wave',
+    /* ⚠ TÍTULO A CONFIRMAR COM ELE: o zip diz "ALEA Cláudia Wave"; a transcrição do áudio 1856 ouviu "Cloud Wave". */
+    nome: 'ālea Cláudia Wave',
+    linha: 'Comedouro',
+    categoria: 'pet',
+    preco: null,
+    material: 'PLA',          // .3mf dele: Bambu PLA Marble + PLA Silk + PLA Lite
+    /* ⚠ CAPA TROCÁVEL: vai virar a versão com a homenagem (coroa com asas, áudio 1856), feita à parte. Entra pelo
+       06_fotos_profissionais_v2 (_capas_novas/claudia-wave.jpg) SEM mexer aqui. */
+    capa: 'claudiawave_capa',
+    cores_peca: ['tricolor', 'bicolor', 'monocromatico'],   // áudio 1865: sem ÁLBUM mono, mas a personalização mono FICA
+    configuracoes: [
+      /* tricolor: 2 fotos, sem Capa.JPG -> a 1ª é a capa do álbum */
+      { id: 'tricolor', nome: 'Tricolor', capa: 'claudiawave_0020', fotos: ['claudiawave_0020', 'claudiawave_0104'] },
+      { id: 'bicolor',  nome: 'Bicolor',  capa: 'claudiawave_capa', fotos: ['claudiawave_capa', 'claudiawave_0166', 'claudiawave_0196', 'claudiawave_9528', 'claudiawave_9566', 'claudiawave_9569', 'claudiawave_9570', 'claudiawave_9572', 'claudiawave_9587', 'claudiawave_9590', 'claudiawave_9647', 'claudiawave_9648', 'claudiawave_9654', 'claudiawave_9674', 'claudiawave_9676', 'claudiawave_9695', 'claudiawave_9698'] }
+    ],
+    resumo: '',
+    paragrafos: [],
+    galeria: ['claudiawave_0039', 'claudiawave_0196', 'claudiawave_9569', 'claudiawave_9590', 'claudiawave_9676', 'claudiawave_9698']
+  },
+
+  /* ===================================================================================================
+     OS PRODUTOS ANTIGOS — fora da vitrine desde 25/09/2026 (msg 1884). As páginas continuam no disco e
+     estes blocos ficam pra elas não quebrarem (e pra voltar, se ele quiser). Não aparecem no feed.
+     =================================================================================================== */
 
   {
     slug: 'bowl-wave',

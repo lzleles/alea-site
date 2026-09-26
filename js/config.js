@@ -206,27 +206,55 @@ window.ALEA = {
      também o nome ORIGINAL do filamento (regra dele: "pra mim aparece o nome original").
        site ...... o que o cliente lê (português, sem Lite/Basic/Matte/Silk)
        original .. Marca · Tipo · Acabamento · Cor, EXATO como ele falou (nunca normalizar)
-     ⚠ TESTE: Azul, Amarelo e Verde nos 3 acabamentos, pra ele ver o desenho. Os ORIGINAIS abaixo
-     são provisórios ("a confirmar") — a lista real vem dele e substitui esta. */
+     25/09/2026: a LISTA REAL dele substituiu as de teste (ver o bloco `filamentos` abaixo). */
   filamentos: {
-    /* ETAPA 55: cada cor com o CÓDIGO OFICIAL da cor (hex) — é ele que pinta a peça na janela 3D.
-       Fosco = as 5 que ele escolheu (msg 546). Básico e Perolizado seguem de TESTE (Azul/Amarelo/Verde e Dourado). */
+    /* LISTA REAL do Cassiano (25/09/2026, audios 1786-1815, tudo PLA; nomes do site trocados por ele na
+       msg 1827; sem 4a aba - audio 1830; + Rosa Silk msg 1835). Gerado por 03_site/07_gerar_filamentos_config_v3_rosa_silk_2026-09-25.py
+       a partir de 03_site/_LISTA_FILAMENTOS_DELE_2026-09-25.json - nao editar a mao. Antes: cores de TESTE
+       (Azul/Amarelo/Verde) no Basico e Perolizado e as 5 foscas Bambu da msg 546.
+       hex = cor OFICIAL do fabricante; eSUN Silk Lime = aproximado (medido na foto oficial da eSUN). */
     basico: [
-      { site: 'Azul',        hex: '#0A2989', original: 'Bambu Lab · PLA · Basic · Blue (10601)' },
-      { site: 'Amarelo',     hex: '#F4EE2A', original: 'Bambu Lab · PLA · Basic · Yellow (10400)' },
-      { site: 'Verde',       hex: '#00AE42', original: 'Bambu Lab · PLA · Basic · Bambu Green (10501)' }
+      { site: 'Laranja', hex: '#FF671F', original: 'Bambu Lab · PLA · Lite · Orange (16301)' },
+      { site: 'Vermelho', hex: '#C6001A', original: 'Bambu Lab · PLA · Lite · Red (16200)' },
+      { site: 'Amarelo Girassol', hex: '#FFB549', original: 'Bambu Lab · PLA · Lite · Sunflower Yellow (16401)' },
+      { site: 'Amarelo', hex: '#EFE255', original: 'Bambu Lab · PLA · Lite · Yellow (16400)' },
+      { site: 'Azul Bebê', hex: '#4DAFDA', original: 'Bambu Lab · PLA · Lite · Cyan (16600)' },
+      { site: 'Azul', hex: '#004EA8', original: 'Bambu Lab · PLA · Lite · Blue (16601)' },
+      { site: 'Verde', hex: '#00BB31', original: 'Bambu Lab · PLA · Lite · Green (16501)' },
+      { site: 'Verde Oliva', hex: '#1B1F11', original: 'eSUN · PLA · Basic · Olive Green' },
+      { site: 'Preto', hex: '#272729', original: 'eSUN · PLA · PLA-Basic · Black' },
+      { site: 'Roxo', hex: '#603BA0', original: 'Elegoo · PLA · PLA · Purple' },
+      { site: 'Marrom', hex: '#5F3839', original: 'Multfila · PLA · Mult Speed · Marrom (PCI-PLA-046)' },
+      { site: 'Mármore', hex: '#E4E4E4', original: 'SUNLU · PLA · High Speed Marble · Chestnut Brown Marble' }
     ],
     fosco: [
-      { site: 'Amarelo',     hex: '#F7D959', original: 'Bambu Lab · PLA · Matte · Lemon Yellow (11400)' },
-      { site: 'Rosa',        hex: '#E8AFCF', original: 'Bambu Lab · PLA · Matte · Sakura Pink (11201)' },
-      { site: 'Azul Claro',  hex: '#A3D8E1', original: 'Bambu Lab · PLA · Matte · Ice Blue (11601)' },
-      { site: 'Azul Escuro', hex: '#042F56', original: 'Bambu Lab · PLA · Matte · Dark Blue (11602)' },
-      { site: 'Terracota',   hex: '#B15533', original: 'Bambu Lab · PLA · Matte · Terracotta (11203)' }
+      { site: 'Branco', hex: '#F6F6F6', original: 'Elegoo · PLA · Matte · Matte White' },
+      { site: 'Amarelo', hex: '#F7D863', original: 'Elegoo · PLA · Matte · Sunshine Yellow' },
+      { site: 'Laranja', hex: '#E88F13', original: 'Multfila · PLA · Mult Matte · Laranja (4225-PCI-PLM-060)' },
+      { site: 'Rosa Claro', hex: '#F9C2D5', original: 'Elegoo · PLA · Matte · Sakura Pink' },
+      { site: 'Bordô', hex: '#B32563', original: 'Multfila · PLA · Mult Matte · Bordô (4225-PCI-PLM-118)' },
+      { site: 'Lilás', hex: '#9D85D1', original: 'Elegoo · PLA · Matte · Lavender Purple' },
+      { site: 'Azul Bebê', hex: '#B3F3FD', original: 'Elegoo · PLA · Matte · Ice Blue' },
+      { site: 'Azul Marinho', hex: '#2D3F6F', original: 'Elegoo · PLA · Matte · Navy Blue' },
+      { site: 'Verde Menta', hex: '#DBEBBA', original: 'Elegoo · PLA · Matte · Mint Green' },
+      { site: 'Cinza', hex: '#9B9EA0', original: 'Bambu Lab · PLA · Matte · Ash Gray (11102)' },
+      { site: 'Cáqui', hex: '#E8DBB7', original: 'Bambu Lab · PLA · Matte · Desert Tan (11401)' },
+      { site: 'Areia', hex: '#CBA881', original: 'Multfila · PLA · Mult Matte · Areia (4225-PCI-PLM-123)' },
+      { site: 'Caramelo', hex: '#D3B7A7', original: 'Bambu Lab · PLA · Matte · Latte Brown (11800)' },
+      { site: 'Terracota', hex: '#AC7362', original: 'Multfila · PLA · Mult Matte · Marrom Terracota (4225-PCI-PLM-124)' }
     ],
     perolizado: [
-      { site: 'Azul',        hex: '#147BD1', original: 'Bambu Lab · PLA · Silk · Blue (13601)' },
-      { site: 'Verde',       hex: '#4CE4A0', original: 'Bambu Lab · PLA · Silk · Green (13502)' },
-      { site: 'Dourado',     hex: '#E5B03D', original: 'Bambu Lab · PLA · Silk · Gold (13401)' }
+      { site: 'Branco', hex: '#FFFFFF', original: 'Elegoo · PLA · Silk · Silk White' },
+      { site: 'Prata', hex: '#B2C1DA', original: 'SUNLU · PLA · Silk PLA+ · Silk Silver' },
+      { site: 'Dourado', hex: '#D09531', original: 'Multfila · PLA · Mult Silk · Ouro Envelhecido (4226-PCI-PLS-048)' },
+      { site: 'Laranja', hex: '#F15505', original: 'Voolt3D · PLA · V-Silk · Laranja (PL-LJ-SK-1)' },
+      { site: 'Vermelho', hex: '#DA342E', original: 'Multfila · PLA · Mult Silk · Vermelho Metalizado (4226-PCI-PLS-026)' },
+      { site: 'Rosa', hex: '#FF7F6F', original: 'eSUN · PLA · PLA-Silk · Pink' },
+      { site: 'Azul Aqua', hex: '#6BBFE3', original: 'eSUN · PLA · Silk · Aqua' },
+      { site: 'Azul', hex: '#358AE8', original: 'Multfila · PLA · Mult Silk · Azul Safira Metalizado (4226-PCI-PLS-025)' },
+      { site: 'Azul Céu', hex: '#035EB7', original: 'Voolt3D · PLA · V-Silk · Azul Sky (PL-AZ-SY-SK-1)' },
+      { site: 'Verde Limão', hex: '#A3E810', original: 'eSUN · PLA · PLA-Silk · Lime' },
+      { site: 'Verde', hex: '#129856', original: 'Voolt3D · PLA · V-Silk · Verde (PL-VD-SK-1)' }
     ]
   },
   /* como cada acabamento aparece (a ordem é a da tela) e o que ele acrescenta ao nome da cor:
@@ -273,3 +301,9 @@ window.ALEA = {
      custo do frete seja informado antes da compra — só não fica mais colada no valor. */
   entrega: 'Jataí-GO com entrega local; demais cidades por transportadora, frete a combinar'
 };
+
+/* 25/09/2026 (lote das 20:01, msgs 1847-1848): o "ālea Luke Bowl" é a peça do arquivo 3D do Luke — o MESMO
+   luke_g.glb que a janela "Personalize aqui" do antigo Bowl Wave já usava (o Cassiano: "o do Luke eu já tenho, é o
+   único que tenho"). A página nova (produto-luke-bowl.html) ganha a mesma janela 3D sem copiar a configuração:
+   é a mesma peça, uma configuração só. Matteo, Ayla e Cláudia não têm .glb ainda -> formulário na própria página. */
+window.ALEA.modelos3d['luke-bowl'] = window.ALEA.modelos3d['bowl-wave'];

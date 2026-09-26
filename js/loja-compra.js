@@ -92,9 +92,12 @@
   /* ETAPA 62 (22:08, Cassiano): "ninguém mais fica preocupado com quanto vai pagar de frete nessa página (...)
      vamos deixar essa página mais clean" — na SACOLA sai o bloco Entrega e a linha do frete; ele volta no fim. */
   function htmlTotais(semFrete) {
-    return '<div class="loja-totais"><div><span>Subtotal</span><span>' + dinheiro(subtotal()) + '</span></div>' +
+    /* 25/09/2026 (msg 1885, produtos "sob consulta"): sacola só com peça sem preço mostrava "R$ 0,00" no subtotal e
+       no total. Agora diz "Sob consulta" (a regra mora no carrinho.js, textoTotal). O WhatsApp segue igual. */
+    var soConsulta = sobConsulta() && !subtotal();
+    return '<div class="loja-totais"><div><span>Subtotal</span><span>' + (soConsulta ? 'Sob consulta' : dinheiro(subtotal())) + '</span></div>' +
       (semFrete ? '' : '<div><span>Frete</span><span>a calcular</span></div>') +
-      '<div class="total"><span>Total</span><span>' + dinheiro(subtotal()) + (sobConsulta() ? ' + itens sob consulta' : '') + '</span></div></div>';
+      '<div class="total"><span>Total</span><span>' + (soConsulta ? 'Sob consulta' : dinheiro(subtotal()) + (sobConsulta() ? ' + itens sob consulta' : '')) + '</span></div></div>';
   }
 
   /* ======================================================= SACOLA DE COMPRAS */

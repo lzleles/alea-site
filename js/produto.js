@@ -32,6 +32,11 @@
    5. A TRAVA DO ACEITE, agora sem recado fixo na tela: "somente quando clicar em comprar
       agora ou adicionar ao carrinho, tremer os botões e aparecer essa mensagem".
 
+   6. A LUPA NA TELA CHEIA (v26, 25/09/2026, áudio 1904 das 22:00): "quando a foto estiver
+      em tela cheia, deixa a gente dar zoom (...) eu gosto de dar zoom pra ver detalhe".
+      Pinça com dois dedos, toque duplo, roda e duplo clique ampliam SÓ A FOTO (a página
+      nunca). Ampliada, um dedo arrasta a foto; em 1× os gestos de sempre voltam.
+
    ⚠️ A TRAVA É DE VERDADE, E NÃO SÓ VISUAL. A conferência acontece DENTRO do clique, e
    é ela que decide se o item entra. Trava que só pinta botão de cinza é trava que o
    primeiro visitante com teclado atravessa — e o que está do outro lado dela é uma
@@ -458,8 +463,11 @@
     var palco = telacheia.querySelector('[data-palco-tc]');
     var pontos = telacheia.querySelector('[data-pontos-tc]');
     var conta = telacheia.querySelector('[data-conta-tc]');
+    /* v26: trocar de foto SEMPRE volta a 1× (a foto nova nasce sem transform); draggable=false tira o "arrastar a
+       imagem" nativo do computador, que brigava com o arrasto da lupa */
+    zoom.zerar();
     palco.innerHTML = '<img src="' + tcLista[tcOrdem[tcAtual]] + '" alt="Foto ' +
-      (tcAtual + 1) + ' de ' + tcLista.length + '">';
+      (tcAtual + 1) + ' de ' + tcLista.length + '" draggable="false">';
     pontos.innerHTML = tcLista.map(function (_, k) {
       return '<i class="' + (k === tcAtual ? 'on' : '') + '"></i>';
     }).join('');
@@ -476,37 +484,240 @@
     pintarTelaCheia();
   }
 
+  /* ⚠️ v26 — A LUPA NA TELA CHEIA (Cassiano, áudio 1904, 25/09/2026 22:00): "quando a foto estiver em tela cheia,
+     deixa a gente dar zoom. Porque tem muita gente que gosta de dar zoom, eu inclusive, eu gosto de dar zoom pra ver
+     detalhe (...) e se eu vou dar zoom, não tem essa opção."
+     - Quem amplia é SÓ A FOTO: transform (translate + scale) na <img>, sem recarregar nada. A página nunca dá zoom (o
+       viewport não muda): `touch-action: none` no CSS, `preventDefault` no touchmove (já existia, v20) e os eventos
+       gesture* do Safari cancelados enquanto a tela cheia está aberta.
+     - Celular: pinça com 2 dedos até 4×, centrada entre os dedos; toque duplo alterna 1× ↔ 2,5× no ponto tocado.
+       AMPLIADA, um dedo ARRASTA a foto, sem deixar aparecer vazio além da borda — e aí arrastar pra cima/baixo NÃO
+       fecha e pro lado NÃO passa. De volta a 1×, os gestos da v20 valem de novo. Trocar de foto sempre volta a 1×.
+     - Computador: a roda amplia no cursor, arrastar com o mouse move a foto ampliada, duplo clique alterna 1× ↔ 2,5×,
+       Esc fecha. Como a roda agora é a lupa, quem passa foto com o mouse é a roda de LADO (touchpad), o arrastar pro
+       lado em 1× (o mesmo gesto do dedo) e as setas do teclado.
+     - Com a foto ampliada, tocar fora dela NÃO fecha (o dedo erra fácil quando a foto cobre a tela): sai pelo X, pelo
+       Esc, ou voltando a 1×. */
+  var ZOOM_MAX = 4, ZOOM_DUPLO = 2.5;
+  var zoom = (function () {
+    var z = 1, px = 0, py = 0;           // escala e deslocamento (px de tela) da foto; a origem é o canto de cima-esquerdo
+    var ax = 0, ay = 0, apx = 0, apy = 0; // início do arrasto
+    var pinca = null;                     // início da pinça: distância, escala e o ponto da foto sob os dedos
+    var ultimoArrasto = 0;
+    function foto() { return telacheia && telacheia.querySelector('[data-palco-tc] img'); }
+    /* o retângulo da foto em 1× — offset* ignoram o transform, então vale mesmo no meio de uma animação */
+    function base() {
+      var i = foto();
+      if (!i || i.offsetWidth < 2) return null;
+      var r = telacheia.getBoundingClientRect();
+      return { l: r.left + i.offsetLeft, t: r.top + i.offsetTop, w: i.offsetWidth, h: i.offsetHeight };
+    }
+    /* nunca mostra vazio além da borda: foto maior que a tela = a borda dela não entra na tela; menor = centrada no
+       lugar de sempre (e dentro da tela) */
+    function limitar(b) {
+      var V = telacheia.clientWidth, H = telacheia.clientHeight, W = b.w * z, A = b.h * z;
+      if (W <= V) px = Math.min(V - W - b.l, Math.max(-b.l, (b.w - W) / 2));
+      else px = Math.min(-b.l, Math.max(V - W - b.l, px));
+      if (A <= H) py = Math.min(H - A - b.t, Math.max(-b.t, (b.h - A) / 2));
+      else py = Math.min(-b.t, Math.max(H - A - b.t, py));
+    }
+    function pintar(animar) {
+      var i = foto();
+      if (!i) return;
+      i.style.transition = animar ? 'transform .26s cubic-bezier(.2, .7, .2, 1)' : 'none';
+      i.style.transform = z === 1 ? '' : 'translate(' + px + 'px, ' + py + 'px) scale(' + z + ')';
+      telacheia.classList.toggle('com-zoom', z > 1);
+    }
+    /* amplia pra `nz` deixando PARADO o ponto de tela (sx, sy) — é o "centrado entre os dedos / no cursor" */
+    function para(nz, sx, sy, animar) {
+      var b = base();
+      if (!b) return;
+      var u = (sx - b.l - px) / z, v = (sy - b.t - py) / z;
+      z = Math.max(1, Math.min(ZOOM_MAX, nz));
+      if (z < 1.02) z = 1;
+      px = sx - b.l - z * u; py = sy - b.t - z * v;
+      limitar(b); pintar(animar);
+    }
+    function meio(t1, t2) { return { x: (t1.clientX + t2.clientX) / 2, y: (t1.clientY + t2.clientY) / 2, d: Math.hypot(t1.clientX - t2.clientX, t1.clientY - t2.clientY) }; }
+    return {
+      ampliada: function () { return z > 1; },
+      zerar: function () { z = 1; px = 0; py = 0; pinca = null; if (telacheia) telacheia.classList.remove('com-zoom', 'mexendo', 'arrastando'); },
+      alternar: function (sx, sy) { if (z > 1) para(1, sx, sy, true); else para(ZOOM_DUPLO, sx, sy, true); },
+      roda: function (fator, sx, sy, animar) { para(z * fator, sx, sy, animar); },
+      comecarPinca: function (t1, t2) {
+        var b = base();
+        if (!b) { pinca = null; return; }
+        var m = meio(t1, t2);
+        pinca = { d0: Math.max(m.d, 1), z0: z, u: (m.x - b.l - px) / z, v: (m.y - b.t - py) / z };
+        telacheia.classList.add('mexendo');
+      },
+      moverPinca: function (t1, t2) {
+        var b = base();
+        if (!pinca || !b) return;
+        var m = meio(t1, t2);
+        z = Math.max(1, Math.min(ZOOM_MAX, pinca.z0 * m.d / pinca.d0));
+        px = m.x - b.l - z * pinca.u; py = m.y - b.t - z * pinca.v;
+        limitar(b); pintar(false);
+      },
+      comecarArrasto: function (x, y) { ax = x; ay = y; apx = px; apy = py; telacheia.classList.add('mexendo'); },
+      moverArrasto: function (x, y) {
+        var b = base();
+        if (!b) return;
+        px = apx + (x - ax); py = apy + (y - ay);
+        limitar(b); pintar(false);
+      },
+      /* soltou todos os dedos (ou o mouse): quase 1× vira 1× exato, e sai o will-change pra foto ser redesenhada nítida */
+      soltar: function () {
+        pinca = null;
+        telacheia.classList.remove('mexendo');
+        if (z > 1 && z < 1.05) { var b = base(); z = 1; if (b) limitar(b); pintar(true); }
+      },
+      relimitar: function () { var b = base(); if (b && z > 1) { limitar(b); pintar(false); } },
+      marcarArrasto: function () { ultimoArrasto = Date.now(); },
+      /* o clique que termina um arrasto do mouse não é clique; e com a foto ampliada, tocar fora dela não fecha */
+      engoleClique: function () { return z > 1 || Date.now() - ultimoArrasto < 400; }
+    };
+  })();
+
   window.aleaAbrirTelaCheia = abrirTelaCheia;
   if (telacheia) {
     telacheia.addEventListener('click', function (ev) {
       if (ev.target.closest('[data-fechar-tc]')) { fecharTelaCheia(); return; }
+      if (zoom.engoleClique()) return;   // v26
       /* clicar em qualquer lugar que não seja a foto fecha — ele pediu essa saída pra
          quem abriu a tela cheia sem querer */
       if (!ev.target.closest('img')) fecharTelaCheia();
     });
 
     /* v20 (áudios 1668-1669): passive:false + preventDefault = a página de trás NUNCA rola com a tela cheia aberta;
-       arrastar pro lado passa (como antes); arrastar pra cima ou pra baixo FECHA. */
+       arrastar pro lado passa (como antes); arrastar pra cima ou pra baixo FECHA.
+       v26: esses dois gestos só valem com a foto em 1× e UM dedo. Dois dedos = pinça; foto ampliada = um dedo arrasta a
+       foto. O dedo que sobra de uma pinça não passa nem fecha até soltar tudo (senão a pinça terminava fechando). */
     var tx = null, ty = null;
-    telacheia.addEventListener('touchstart', function (e) { tx = e.touches[0].clientX; ty = e.touches[0].clientY; }, { passive: true });
+    var gz = null;                       // gesto da lupa em curso: 'pinca' | 'arrasto' | 'resto' (dedo que sobrou)
+    var toqueIni = null, ultimoToque = null, ultimoTouch = 0;
+    telacheia.addEventListener('touchstart', function (e) {
+      ultimoTouch = Date.now();
+      if (e.touches.length >= 2) {
+        tx = null; toqueIni = null; ultimoToque = null;
+        gz = 'pinca'; zoom.comecarPinca(e.touches[0], e.touches[1]);
+        return;
+      }
+      var t = e.touches[0];
+      toqueIni = { x: t.clientX, y: t.clientY, quando: Date.now(), longe: false };
+      if (zoom.ampliada()) { tx = null; gz = 'arrasto'; zoom.comecarArrasto(t.clientX, t.clientY); return; }
+      gz = null;
+      tx = t.clientX; ty = t.clientY;
+    }, { passive: true });
     telacheia.addEventListener('touchmove', function (e) {
       e.preventDefault();
-      if (tx === null) return;
-      var dx = tx - e.touches[0].clientX, dy = e.touches[0].clientY - ty;
+      ultimoTouch = Date.now();
+      var t = e.touches[0];
+      if (toqueIni && Math.hypot(t.clientX - toqueIni.x, t.clientY - toqueIni.y) > 10) toqueIni.longe = true;
+      if (e.touches.length >= 2) {
+        if (gz !== 'pinca') { tx = null; toqueIni = null; gz = 'pinca'; zoom.comecarPinca(e.touches[0], e.touches[1]); }
+        zoom.moverPinca(e.touches[0], e.touches[1]);
+        return;
+      }
+      if (gz === 'arrasto') { zoom.moverArrasto(t.clientX, t.clientY); return; }
+      if (gz || tx === null) return;
+      var dx = tx - t.clientX, dy = t.clientY - ty;
       if (Math.abs(dy) > 70 && Math.abs(dy) > Math.abs(dx)) { tx = null; fecharTelaCheia(); return; }
       if (Math.abs(dx) < 40) return;
       tx = null;
       andarTelaCheia(dx > 0 ? 1 : -1);
     }, { passive: false });
-    telacheia.addEventListener('touchend', function () { tx = null; }, { passive: true });
+    telacheia.addEventListener('touchend', function (e) {
+      ultimoTouch = Date.now();
+      tx = null;
+      if (e.touches.length >= 2) { zoom.comecarPinca(e.touches[0], e.touches[1]); return; }
+      if (e.touches.length === 1) {
+        /* saiu um dedo da pinça: com a foto ampliada o que ficou continua ARRASTANDO; em 1× ele não faz nada */
+        var r = e.touches[0];
+        toqueIni = null;
+        if (zoom.ampliada()) { gz = 'arrasto'; zoom.comecarArrasto(r.clientX, r.clientY); } else gz = 'resto';
+        return;
+      }
+      gz = null;
+      zoom.soltar();
+      /* o TOQUE DUPLO: dois toques curtos (sem arrastar) em até 320 ms, no mesmo lugar */
+      var ti = toqueIni; toqueIni = null;
+      if (!ti || ti.longe || Date.now() - ti.quando > 350) { ultimoToque = null; return; }
+      var agora = Date.now();
+      if (ultimoToque && agora - ultimoToque.quando < 320 && Math.hypot(ti.x - ultimoToque.x, ti.y - ultimoToque.y) < 40) {
+        ultimoToque = null;
+        if (!telacheia.classList.contains('aberta')) return;
+        if (e.cancelable) e.preventDefault();   // sem clique fantasma e sem o zoom de página do Safari
+        zoom.alternar(ti.x, ti.y);
+        return;
+      }
+      ultimoToque = { x: ti.x, y: ti.y, quando: agora };
+    }, { passive: false });
+    telacheia.addEventListener('touchcancel', function () { tx = null; gz = null; toqueIni = null; zoom.soltar(); }, { passive: true });
 
+    /* v26: o Safari do iPhone tem os eventos próprios de pinça (gesture*) — cancelados, pra ele não ampliar a PÁGINA */
+    ['gesturestart', 'gesturechange', 'gestureend'].forEach(function (nome) {
+      document.addEventListener(nome, function (e) {
+        if (telacheia.classList.contains('aberta')) e.preventDefault();
+      }, { passive: false });
+    });
+
+    /* v26: a roda (vertical) é a LUPA, ampliando no ponto do cursor; a pinça do touchpad chega como roda + Ctrl.
+       A roda de LADO (touchpad, Shift+roda) passa foto em 1× — uma por gesto — e move a foto quando ampliada. */
+    var rodaLado = 0;
     telacheia.addEventListener('wheel', function (e) {
       if (!telacheia.classList.contains('aberta')) return;
-      var d = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
-      if (Math.abs(d) < 8) return;
       e.preventDefault();
-      andarTelaCheia(d > 0 ? 1 : -1);
+      var escala = e.deltaMode === 1 ? 16 : (e.deltaMode === 2 ? 400 : 1);
+      var dx = e.deltaX * escala, dy = e.deltaY * escala;
+      if (e.shiftKey && !dx) { dx = dy; dy = 0; }
+      if (!e.ctrlKey && Math.abs(dx) > Math.abs(dy)) {
+        if (zoom.ampliada()) { zoom.comecarArrasto(0, 0); zoom.moverArrasto(-dx, 0); zoom.soltar(); return; }
+        if (Math.abs(dx) < 8 || Date.now() - rodaLado < 450) return;
+        rodaLado = Date.now();
+        andarTelaCheia(dx > 0 ? 1 : -1);
+        return;
+      }
+      if (!dy) return;
+      var fator = Math.exp(-dy * (e.ctrlKey ? 0.01 : 0.0025));
+      zoom.roda(fator, e.clientX, e.clientY, Math.abs(dy) >= 50);
     }, { passive: false });
+
+    /* v26: duplo clique alterna 1× ↔ 2,5× no ponto clicado (só na foto, ou em qualquer lugar se já estiver ampliada) */
+    telacheia.addEventListener('dblclick', function (e) {
+      if (Date.now() - ultimoTouch < 800) return;          // o toque duplo do celular já foi tratado acima
+      if (e.target.closest('[data-fechar-tc]')) return;
+      if (!zoom.ampliada() && !e.target.closest('img')) return;
+      e.preventDefault();
+      zoom.alternar(e.clientX, e.clientY);
+    });
+
+    /* v26: ARRASTAR COM O MOUSE — ampliada, move a foto; em 1×, arrastar pro lado passa (o mesmo gesto do dedo) */
+    var rato = null;
+    telacheia.addEventListener('pointerdown', function (e) {
+      if (e.pointerType !== 'mouse' || e.button !== 0 || e.target.closest('[data-fechar-tc]')) return;
+      rato = { x: e.clientX, y: e.clientY, movido: false, ampliada: zoom.ampliada() };
+      if (rato.ampliada) zoom.comecarArrasto(e.clientX, e.clientY);
+    });
+    window.addEventListener('pointermove', function (e) {
+      if (!rato || e.pointerType !== 'mouse') return;
+      if (!rato.movido && Math.hypot(e.clientX - rato.x, e.clientY - rato.y) > 5) { rato.movido = true; telacheia.classList.add('arrastando'); }
+      if (rato.movido && rato.ampliada) zoom.moverArrasto(e.clientX, e.clientY);
+    });
+    window.addEventListener('pointerup', function (e) {
+      if (!rato || e.pointerType !== 'mouse') return;
+      var r = rato; rato = null;
+      telacheia.classList.remove('arrastando');
+      if (r.ampliada) zoom.soltar();
+      if (!r.movido) return;
+      zoom.marcarArrasto();
+      var dx = e.clientX - r.x, dy = e.clientY - r.y;
+      if (!r.ampliada && Math.abs(dx) >= 60 && Math.abs(dx) > Math.abs(dy)) andarTelaCheia(dx < 0 ? 1 : -1);
+    });
+    telacheia.addEventListener('dragstart', function (e) { e.preventDefault(); });
+
+    /* v26: girou o celular ou mudou a janela com a foto ampliada — ela continua ampliada, só volta pra dentro da borda */
+    window.addEventListener('resize', function () { if (telacheia.classList.contains('aberta')) zoom.relimitar(); });
   }
 
   document.addEventListener('keydown', function (ev) {
