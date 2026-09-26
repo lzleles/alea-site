@@ -37,6 +37,10 @@
       Pinça com dois dedos, toque duplo, roda e duplo clique ampliam SÓ A FOTO (a página
       nunca). Ampliada, um dedo arrasta a foto; em 1× os gestos de sempre voltam.
 
+   7. O COMPUTADOR (v28, 26/09/2026, vídeo 1981 das 02:19): "aqui no computador só (...) tem
+      que ter os tracinhos pro cliente passar a foto pra frente". Setas ‹ › na tela cheia, só
+      com mouse (o CSS esconde no celular), e a dica da colmeia diz "Clique" no mouse.
+
    ⚠️ A TRAVA É DE VERDADE, E NÃO SÓ VISUAL. A conferência acontece DENTRO do clique, e
    é ela que decide se o item entra. Trava que só pinta botão de cinza é trava que o
    primeiro visitante com teclado atravessa — e o que está do outro lado dela é uma
@@ -472,6 +476,9 @@
       return '<i class="' + (k === tcAtual ? 'on' : '') + '"></i>';
     }).join('');
     conta.textContent = (tcAtual + 1) + ' / ' + tcLista.length;
+    /* v28: na 1ª foto a seta de voltar some; com uma foto só, somem as duas */
+    telacheia.classList.toggle('na-primeira', tcAtual === 0);
+    telacheia.classList.toggle('uma-so', tcLista.length < 2);
   }
 
   /* ⚠️ SEM VOLTA: passar do fim (ou do começo) FECHA em vez de dar a volta. É o pedido
@@ -579,10 +586,36 @@
     };
   })();
 
+  /* v28 (26/09/2026, varredura do computador): no mouse não existe "toque" — a 2ª dica da colmeia diz "Clique
+     novamente". Só com mouse de verdade E tela de computador (a mesma régua do CSS v28); no celular o texto fica
+     exatamente o de sempre. */
+  if (window.matchMedia && window.matchMedia('(hover: hover) and (pointer: fine) and (min-width: 761px)').matches) {
+    Array.prototype.forEach.call(document.querySelectorAll('.colmeia-dica2'), function (p) {
+      p.textContent = p.textContent.replace(/^Toque/, 'Clique');
+    });
+  }
+
   window.aleaAbrirTelaCheia = abrirTelaCheia;
   if (telacheia) {
+    /* ⚠️ v28 — AS SETAS DO COMPUTADOR (Cassiano, vídeo 1981, 26/09/2026 02:19): "aqui no computador só, viu? No celular
+       não, pelo amor de Deus. Tem que ter os tracinhos aqui pro cliente passar a foto pra frente." Desde a lupa (v26) a
+       roda do mouse amplia, e quem passava foto no mouse era só o teclado e o arrastar — ninguém descobre isso sozinho.
+       As duas setas nascem SEMPRE no HTML, mas o CSS só as mostra com mouse de verdade (hover: hover e pointer: fine):
+       no celular elas não existem pra tela. Mesmo traço branco e discreto do X (etapa 109). A regra do "sem volta"
+       continua: a › na última foto FECHA, igual ao arrastar e à seta do teclado. Na primeira foto a ‹ some. */
+    [[-1, 'Foto anterior', '15 5 8 12 15 19'], [1, 'Próxima foto', '9 5 16 12 9 19']].forEach(function (s) {
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'seta-tc ' + (s[0] < 0 ? 'seta-tc-ant' : 'seta-tc-prox');
+      b.setAttribute('data-seta-tc', String(s[0]));
+      b.setAttribute('aria-label', s[1]);
+      b.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="' + s[2] + '"></polyline></svg>';
+      telacheia.appendChild(b);
+    });
     telacheia.addEventListener('click', function (ev) {
       if (ev.target.closest('[data-fechar-tc]')) { fecharTelaCheia(); return; }
+      var seta = ev.target.closest('[data-seta-tc]');
+      if (seta) { andarTelaCheia(parseInt(seta.getAttribute('data-seta-tc'), 10)); return; }   // v28
       if (zoom.engoleClique()) return;   // v26
       /* clicar em qualquer lugar que não seja a foto fecha — ele pediu essa saída pra
          quem abriu a tela cheia sem querer */
@@ -686,7 +719,7 @@
     /* v26: duplo clique alterna 1× ↔ 2,5× no ponto clicado (só na foto, ou em qualquer lugar se já estiver ampliada) */
     telacheia.addEventListener('dblclick', function (e) {
       if (Date.now() - ultimoTouch < 800) return;          // o toque duplo do celular já foi tratado acima
-      if (e.target.closest('[data-fechar-tc]')) return;
+      if (e.target.closest('[data-fechar-tc], [data-seta-tc]')) return;   // v28: clicar rápido na seta não é lupa
       if (!zoom.ampliada() && !e.target.closest('img')) return;
       e.preventDefault();
       zoom.alternar(e.clientX, e.clientY);
@@ -695,7 +728,7 @@
     /* v26: ARRASTAR COM O MOUSE — ampliada, move a foto; em 1×, arrastar pro lado passa (o mesmo gesto do dedo) */
     var rato = null;
     telacheia.addEventListener('pointerdown', function (e) {
-      if (e.pointerType !== 'mouse' || e.button !== 0 || e.target.closest('[data-fechar-tc]')) return;
+      if (e.pointerType !== 'mouse' || e.button !== 0 || e.target.closest('[data-fechar-tc], [data-seta-tc]')) return;
       rato = { x: e.clientX, y: e.clientY, movido: false, ampliada: zoom.ampliada() };
       if (rato.ampliada) zoom.comecarArrasto(e.clientX, e.clientY);
     });
