@@ -70,7 +70,7 @@ window.ALEA = {
      INSTÂNCIA DE TESTE do servidor (chaves de TESTE do Mercado Pago — nada é cobrado). No ar este valor é ignorado:
      o pagamento usa o api_conta e só aparece quando o servidor do ar ligar o pagamento (hoje não liga).
      Ver js/loja-pagamento.js e ZELES\Conta_Cliente\03_implantar\instalar_pagamento_teste_v1.sh. */
-  api_pagamento_previa: 'https://api.aleaco.art.br/teste',
+  api_pagamento_previa: 'https://api.aleaco.art.br/acesso',   // 26/09: a /teste saiu do ar em 25/09 (teste separado da producao); a instancia de teste e a /acesso (so IP da casa)
 
   /* A FRASE DA MARCA. Ela abre o site (escrita letra por letra) e fecha o rodapé.
      Um lugar só: mudou aqui, mudou nos dois. */

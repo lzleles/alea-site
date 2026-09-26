@@ -4,7 +4,10 @@
    objetivo: O PAGAMENTO DENTRO DO SITE (Mercado Pago, Pix + cartão de crédito pelo Payment Brick) na etapa 3 do Finalizar Compra, vestido com o tema "alea_fundo" que o Cassiano aprovou em 24/09/2026 22h37.
    entrada: window.ALEA (api_conta; api_pagamento_previa só na prévia); GET <api>/api/config -> "pagamento" (public key); o SDK do MP (sdk.mercadopago.com/js/v2)
    saida: window.aleaPagamento { disponivel(), montar(), desmontar(), pagar(), consultar() }; quem desenha a tela é o loja-compra.js
-   status: prévia (25/09/2026) — no ar só liga quando o servidor da conta devolver "pagamento" no /api/config
+   status: prévia (25/09/2026; 26/09 + desafio anti-robô no pagar) — no ar só liga quando o servidor da conta devolver "pagamento" no /api/config
+   mudou em 26/09/2026 (janela zeles-alea-seguranca-100, "resolver 100%"): antes de POST /api/pagamento o site resolve o
+     desafio da Cloudflare (Turnstile, ação 'pagar') quando o /api/config manda "desafio" e envia o token no cabeçalho
+     X-Desafio. Sem isso o anti-carding do servidor, depois de 1 recusa, fecha o cartão por 1 h (falha fechada).
    validado_em: 2026-09-25 (prévia /pagamento/, MP em modo TESTE: cartão aprovado, recusado e Pix com QR)
 */
 /* =============================================================================
@@ -68,6 +71,56 @@
     return sdkPromessa;
   }
 
+  /* ---------------- desafio anti-robô do pagamento (26/09/2026): o mesmo widget do pedido de código, ação 'pagar'.
+     Invisível quase sempre; se a Cloudflare pedir um clique, a caixinha aparece logo acima do formulário do MP. */
+  var cfgBruta = null;
+  function configBruta() {
+    if (!cfgBruta) cfgBruta = fetch(API + '/api/config', { credentials: 'omit' })
+      .then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; });
+    return cfgBruta;
+  }
+  var tsPromessa = null;
+  function carregarTurnstile() {
+    if (window.turnstile) return Promise.resolve(window.turnstile);
+    if (!tsPromessa) tsPromessa = new Promise(function (ok, falha) {
+      var s = document.createElement('script');
+      s.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit'; s.async = true;
+      s.onload = function () { window.turnstile ? ok(window.turnstile) : falha(new Error('x')); };
+      s.onerror = function () { tsPromessa = null; falha(new Error('x')); };
+      document.head.appendChild(s);
+    });
+    return tsPromessa;
+  }
+  var alvoDesafio = null;
+  var tsWidget = null;
+  function tokenPagar() {
+    return configBruta().then(function (c) {
+      var d = c && c.desafio && c.desafio.site_key ? c.desafio : null;
+      if (!d) return null;
+      return carregarTurnstile().then(function (ts) {
+        return new Promise(function (ok, falha) {
+          if (tsWidget !== null) { try { ts.remove(tsWidget); } catch (e) { /* já saiu */ } tsWidget = null; }
+          var velha = document.querySelector('.loja-desafio-pagar');
+          if (velha && velha.parentNode) velha.parentNode.removeChild(velha);
+          var caixa = document.createElement('div');
+          caixa.className = 'loja-desafio-pagar';
+          caixa.style.margin = '0 0 12px';
+          var alvo = alvoDesafio && document.getElementById(alvoDesafio);
+          if (alvo && alvo.parentNode) alvo.parentNode.insertBefore(caixa, alvo); else document.body.appendChild(caixa);
+          var feito = false;
+          var fim = function (erro, tok) { if (feito) return; feito = true; if (erro) falha(new Error(erro)); else ok(tok); };
+          tsWidget = ts.render(caixa, {
+            sitekey: d.site_key, action: 'pagar', appearance: 'interaction-only', language: 'pt-br',
+            callback: function (tok) { fim(null, tok); },
+            'error-callback': function () { fim('A verificação de segurança falhou. Tente de novo.'); return true; },
+            'expired-callback': function () { fim('A verificação de segurança expirou. Tente de novo.'); },
+            'timeout-callback': function () { fim('A verificação de segurança demorou demais. Tente de novo.'); }
+          });
+        });
+      }, function () { throw new Error('Não deu pra carregar a verificação de segurança. Confira a internet e tente de novo.'); });
+    });
+  }
+
   function desmontar() {
     if (controle) { try { controle.unmount(); } catch (e) { /* já saiu */ } }
     controle = null;
@@ -76,6 +129,7 @@
   /* opcoes: { alvoId, valor, pagador:{email,nome,sobrenome,cpf}, aoEnviar(selecionado, formData) -> Promise, aoPronto, aoErro } */
   function montar(opcoes) {
     desmontar();
+    alvoDesafio = opcoes.alvoId;
     return disponivel().then(function (cfg) {
       if (!cfg) throw new Error('desligado');
       return carregarSdk().then(function () {
@@ -101,11 +155,13 @@
     });
   }
 
-  function chamar(metodo, caminho, corpo) {
+  function chamar(metodo, caminho, corpo, extras) {
+    var cab = corpo ? { 'Content-Type': 'application/json', 'X-Alea': '1' } : { 'X-Alea': '1' };
+    if (extras) for (var k in extras) if (Object.prototype.hasOwnProperty.call(extras, k)) cab[k] = extras[k];
     return fetch(API + caminho, {
       method: metodo,
       credentials: NA_PREVIA ? 'omit' : 'include',          // no ar, o pedido de quem está logado vai pra conta dele
-      headers: corpo ? { 'Content-Type': 'application/json', 'X-Alea': '1' } : { 'X-Alea': '1' },
+      headers: cab,
       body: corpo ? JSON.stringify(corpo) : undefined
     }).then(function (r) {
       return r.json().catch(function () { return {}; }).then(function (j) {
@@ -115,7 +171,11 @@
     });
   }
 
-  function pagar(corpo) { return chamar('POST', '/api/pagamento', corpo); }
+  function pagar(corpo) {       // 26/09: o token do desafio vai junto (um por tentativa; o widget nasce e morre a cada uma)
+    return tokenPagar().then(function (tok) {
+      return chamar('POST', '/api/pagamento', corpo, tok ? { 'X-Desafio': tok } : null);
+    });
+  }
   function consultar(numero, chave) {
     return chamar('GET', '/api/pagamento/' + encodeURIComponent(numero) + '?chave=' + encodeURIComponent(chave));
   }
