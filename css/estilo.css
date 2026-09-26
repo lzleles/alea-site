@@ -1791,3 +1791,8 @@ html.topo-emendado .album-tela { background: var(--cor-do-topo) !important; -web
   .telacheia.com-zoom img { cursor: grab; }
   .telacheia.arrastando, .telacheia.arrastando img { cursor: grabbing; }
 }
+
+/* v27 — O AVISO DA MEMÓRIA NÃO COBRE A TELA CHEIA (25/09/2026, achado no teste do zoom, prints de 03_site\_prints_zoom_2026-09-25\):
+   o aviso "Posso lembrar as peças que você viu" ficava POR CIMA da foto em tela cheia/álbum e roubava o toque de baixo
+   (as bolinhas). Enquanto houver camada aberta (html.topo-emendado, ligado pelo site.js), ele some; volta ao fechar. */
+html.topo-emendado .aviso-memoria { display: none !important; }
