@@ -5,7 +5,10 @@
    entrada: window.ALEA (api_conta, conta_previa); localStorage; servidor da conta
    saida: window.aleaLoja
    status: prévia (23/09/2026) — o motor SERVIDOR chama as rotas PROPOSTAS abaixo; o contrato final é da casa
-   validado_em: 2026-09-23 (Playwright, motor prévia)
+   validado_em: 2026-09-26 (Playwright contra a instância de teste e o ar; desafio do código)
+   26/09/2026 (L-0024, segurança, ordem do Lázaro): o pedido de código passa pelo DESAFIO ANTI-ROBÔ (Cloudflare
+   Turnstile) quando o servidor manda "desafio" no /api/config. Um robô de fora pediu código pra 23 e-mails falsos em
+   25-26/09; o servidor passou a exigir o token no cabeçalho X-Desafio. Sem "desafio" no config, tudo segue como antes.
 */
 /* =============================================================================
    loja-dados.js — de onde vêm e pra onde vão os dados da conta e da compra
@@ -166,10 +169,12 @@
   };
 
   /* --------------------------------------------------------- motor SERVIDOR */
-  function api(metodo, caminho, corpo) {
+  function api(metodo, caminho, corpo, extras) {
+    var cab = corpo !== undefined ? { 'Content-Type': 'application/json', 'X-Alea': '1' } : { 'X-Alea': '1' };
+    if (extras) for (var k in extras) if (Object.prototype.hasOwnProperty.call(extras, k)) cab[k] = extras[k];
     return fetch(API + caminho, {
       method: metodo, credentials: 'include',
-      headers: corpo !== undefined ? { 'Content-Type': 'application/json', 'X-Alea': '1' } : { 'X-Alea': '1' },
+      headers: cab,
       body: corpo !== undefined ? JSON.stringify(corpo) : undefined
     }).then(function (r) {
       return r.json().catch(function () { return {}; }).then(function (j) {
@@ -195,9 +200,63 @@
     j.politica_aceita = j.politica_em_dia !== false;
     return j;
   }
+  /* ------------------------------------------------ desafio anti-robô do pedido de código (26/09/2026, L-0024)
+     O /api/config diz a chave PÚBLICA do Turnstile ("desafio": {site_key, acao}). Antes de pedir o código, um widget
+     novo roda dentro do formulário: quase sempre passa sozinho, sem aparecer; se a Cloudflare quiser um clique, a
+     caixinha aparece ali mesmo. Cada token vale um pedido só, por isso o widget nasce e morre a cada pedido. */
+  var TS_SCRIPT = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';
+  var tsCarregando = null;
+  function carregarTurnstile() {
+    if (window.turnstile) return Promise.resolve(window.turnstile);
+    if (tsCarregando) return tsCarregando;
+    tsCarregando = new Promise(function (ok, falha) {
+      var s = document.createElement('script');
+      s.src = TS_SCRIPT; s.async = true; s.defer = true;
+      s.onload = function () { window.turnstile ? ok(window.turnstile) : falha(new Error('x')); };
+      s.onerror = function () { falha(new Error('x')); };
+      document.head.appendChild(s);
+    }).catch(function () {
+      tsCarregando = null;
+      throw new Error('Não deu pra carregar a verificação de segurança. Confira a internet e tente de novo.');
+    });
+    return tsCarregando;
+  }
+  var tsWidget = null;
+  function tokenDesafio(d) {
+    return carregarTurnstile().then(function (ts) {
+      return new Promise(function (ok, falha) {
+        var alvo = document.querySelector('form[data-form="codigo-pedir"]') || document.body;
+        if (tsWidget !== null) { try { ts.remove(tsWidget); } catch (e) { /* já saiu da tela */ } tsWidget = null; }
+        var velha = document.querySelector('.loja-desafio');
+        if (velha && velha.parentNode) velha.parentNode.removeChild(velha);
+        var caixa = document.createElement('div');
+        caixa.className = 'loja-desafio';
+        caixa.style.margin = '12px 0 0';
+        alvo.appendChild(caixa);
+        var feito = false;
+        var fim = function (erro, token) {
+          if (feito) return; feito = true;
+          if (erro) falha(new Error(erro)); else ok(token);
+        };
+        tsWidget = ts.render(caixa, {
+          sitekey: d.site_key, action: d.acao || 'codigo', appearance: 'interaction-only', language: 'pt-br',
+          callback: function (t) { fim(null, t); },
+          'error-callback': function () { fim('A verificação de segurança falhou. Tente de novo.'); return true; },
+          'expired-callback': function () { fim('A verificação de segurança expirou. Tente de novo.'); },
+          'timeout-callback': function () { fim('A verificação de segurança demorou demais. Tente de novo.'); }
+        });
+      });
+    });
+  }
+
   var servidor = {
     eu: function () { return api('GET', '/api/eu').then(daFicha); },
-    enviarCodigo: function (email) { return api('POST', '/api/codigo', { email: email }); },
+    enviarCodigo: function (email) {
+      return api('GET', '/api/config').then(function (c) { return c && c.desafio && c.desafio.site_key ? c.desafio : null; },
+                                            function () { return null; })
+        .then(function (d) { return d ? tokenDesafio(d) : null; })
+        .then(function (tok) { return api('POST', '/api/codigo', { email: email }, tok ? { 'X-Desafio': tok } : null); });
+    },
     entrarCodigo: function (email, codigo) { return api('POST', '/api/entrar', { provedor: 'codigo', email: email, codigo: codigo }).then(daFicha); },
     entrarSenha: function (email, senha) { return api('POST', '/api/entrar', { provedor: 'senha', email: email, senha: senha }).then(daFicha); },
     entrarGoogle: function (credencial) { return api('POST', '/api/entrar', { provedor: 'google', credencial: credencial }).then(daFicha); },
