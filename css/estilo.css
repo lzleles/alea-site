@@ -448,35 +448,48 @@ body.marca-anima .marca-anim .escrita-janela .escrita {
    qualquer escala. Quando a capivara assenta, esta peça encolhe pra dentro do centro da
    capivara (a mesma origem das letras, o caminho inverso) e some. Só existe na animação: no
    repouso e pra quem pula, fica invisível (a marca parada não tem "& Co." ao lado). */
-.marca-anim .eco-capivara { opacity: 0; }
-body.marca-medida:not(.marca-anima) .marca-anim .eco-capivara {
+/* RODADA 3 (áudios 2167-2168, 26/09/2026 21:40) — O "& Co." É ENGOLIDO PELA PERNA, SEM FADE.
+   "Pense que a pata da capivara está na frente dele. Pense que é um poste […] a partir da hora
+   que ele começa a atravessar a peça da capivara, ela já não pode aparecer para o outro lado do
+   poste." Então não há mais opacidade: é OCLUSÃO com borda dura.
+   · `.eco-janela` é uma caixa do tamanho da marca que faz EXATAMENTE o movimento da capivara
+     (mesmo transform, mesma origem, mesma curva). Por isso o recorte dela fica grudado na perna
+     em qualquer escala — gigante no começo, 1,551 no fim, no 1440 e no 390.
+   · O recorte (`clip-path`) é a borda de FORA da perna dianteira, medida no SVG da capivara
+     renderizado a 3462 px: x 972 em y 545 e x 949 em y 655 (a perna é inclinada, 0,209 de x por
+     y). Prolongada até o topo (x 1086 = 31,37%) e o pé da caixa (x 883 = 25,50%), ela vira o lado
+     esquerdo de um polígono: à direita da perna, 100% visível; à esquerda, nada. Borda reta.
+   · O "& Co." desliza PRA ESQUERDA dentro da janela, em unidades da própria marca: 340 unidades
+     (9,82% da caixa) — o bastante pra o ponto final (x 1276) passar da perna (x 951 nessa altura). */
+.marca-anim .eco-janela {
+  position: absolute; inset: 0;
+  transform-origin: var(--cap-x) var(--cap-y);
+  transform: var(--cap-fim);
+  -webkit-clip-path: polygon(31.37% 0%, 100% 0%, 100% 100%, 25.50% 100%);
+  clip-path: polygon(31.37% 0%, 100% 0%, 100% 100%, 25.50% 100%);
+}
+body.marca-medida:not(.marca-anima) .marca-anim .eco-janela {
   transform: translate(var(--cap-dx, 0px), var(--cap-dy, 0px)) scale(var(--cap-k, 3));
-  transform-origin: var(--cap-x) var(--cap-y);
-  opacity: 1;
 }
+body.marca-anima .marca-anim .eco-janela {
+  animation: capivara-chega 3.6s cubic-bezier(.34, .01, .2, 1) 1.4s both;
+}
+.marca-anim .eco-capivara { opacity: 0; }
+body.marca-medida:not(.marca-anima) .marca-anim .eco-capivara { opacity: 1; transform: none; }
+/* 5,0s: a capivara assentou e o "&" está encostado na perna → começa a atravessar; 1,7s depois
+   (6,7s) o ponto final passou da perna e ele sumiu inteiro. Velocidade constante: é um objeto
+   passando atrás de um poste. O `opacity: 0` do último quadro só guarda o estado final (a essa
+   altura ele já está 100% atrás da perna) — não há fade. */
 body.marca-anima .marca-anim .eco-capivara {
-  transform-origin: var(--cap-x) var(--cap-y);
-  animation: eco-entra-na-capivara 5.6s cubic-bezier(.34, .01, .2, 1) 1.4s both;
+  animation: eco-engolido-pela-perna 1.7s linear 5.0s both;
 }
-/* AJUSTE do Cassiano (15:41): ele entra RETO PRA ESQUERDA (não na diagonal encolhendo pro
-   centro) e NA VELOCIDADE DAS LETRAS (1s). Os 3,6s primeiros são o trajeto colado à capivara
-   (mesma curva dela); o último 1s é o mergulho horizontal, com a curva das letras. */
-@keyframes eco-entra-na-capivara {
-  from    { transform: translate(var(--cap-dx, 0px), var(--cap-dy, 0px)) scale(var(--cap-k, 3)); opacity: 1; }
-  /* ABERTURA CENTRALIZADA (26/09/2026): ele assenta colado à capivara JÁ NO CENTRO (o mesmo
-     `--cap-fim` dela) e dali faz o mergulho de antes: 18% reto pra esquerda, sumindo. */
-  /* RODADA 2 (áudios 2158/2159, 26/09/2026 21:30): "na hora que ele começa a entrar, já começa
-     a esconder". Medido no SVG: o "&" começa em x 970 e a linha da perna dianteira está em
-     x 951-973 na mesma altura — ele JÁ encosta na perna quando assenta. Então o apagar começa
-     ali mesmo (5,0s), é longo (1,7s) e termina ANTES da barriga (as linhas de dentro das patas
-     ficam em x 750-770): o trajeto é de 208 unidades (= 9,32% da caixa na escala 1,551), e ele
-     chega a 0 com 85% do caminho feito, o "&" em ~x 793. Antes: 1s, 18% da caixa, apagando junto
-     com o movimento até dentro da barriga. Duração total 3,6 + 2,0 = 5,6s. */
-  64.29%  { transform: var(--cap-fim); opacity: 1;
-            animation-timing-function: cubic-bezier(.3, 0, .7, 1); }     /* 5,0s: assentou ao lado, já na perna */
-  94.64%  { opacity: 0; }                                                 /* 6,7s: apagou, antes da barriga */
-  to      { transform: translate(22.83%, 21.18%) scale(1.551); opacity: 0; } /* 7,0s: 32,15% - 9,32% */
+@keyframes eco-engolido-pela-perna {
+  from   { transform: none;               opacity: 1; }
+  99.9%  { transform: translateX(-9.82%); opacity: 1; }
+  to     { transform: translateX(-9.82%); opacity: 0; }
 }
+/* A versão anterior (rodada 2: `eco-entra-na-capivara`, o "& Co." colado na capivara e apagando
+   em fade de 1,7s) saiu daqui na rodada 3 — está no commit fb5cd7a se ele quiser comparar. */
 
 /* o resto da tela só aparece quando a capivara já chegou — é o "revelando o site".
    ⚠️ A FRASE TEM A VEZ DELA, SEPARADA DO MENU: ela só acende quando o datilógrafo

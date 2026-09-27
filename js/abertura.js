@@ -68,7 +68,9 @@
   var PAUSA_CAPIVARA_MS = 1400;    // ela fica PARADA, gigante, antes de andar (3ª rodada)
   var CAPIVARA_MS = 3600;          // e leva 3,6s indo devagar pro centro
   /* RODADA 2 (áudios 2158/2159, 26/09/2026 21:30): o "& Co." apaga mais devagar, começando
-     já na perna (1,7s de apagar dentro de 2s de trajeto), e a escrita sobe em 4,5s. */
+     já na perna (1,7s de apagar dentro de 2s de trajeto), e a escrita sobe em 4,5s.
+     RODADA 3 (áudios 2167-2168, 21:40): sem fade — o "& Co." é engolido pela perna (recorte de
+     borda reta, ver `.eco-janela` no CSS), de 5,0s a 6,7s. Os tempos daqui não mudaram. */
   var ECO_SOME_MS = 1500;          // a escrita começa quando o "& Co." está quase apagado (5,0 + 1,5 = 6,5s; CSS: delay 6.5s)
   var ESCRITA_MS = 4500;           // a escrita sai de baixo da capivara, devagar (CSS: 4.5s)
   var FIM_DA_MARCA = PAUSA_CAPIVARA_MS + CAPIVARA_MS + ECO_SOME_MS + ESCRITA_MS;  // 11,0s
