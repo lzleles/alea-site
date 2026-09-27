@@ -2261,3 +2261,8 @@ body.nome-dourado {
 .personalizar label.sem-nome input:focus { outline-offset: 2px; }
 /* v37 (27/09/2026, áudio 2331): "ficou muito afastado" — o produto.js v35 põe `left` logo depois do texto "NOME DO PET"
    (14 px); o `right: 0` acima só vale se a medida falhar. */
+/* v38 (27/09/2026, áudio 2337): "pode ficar um pouquinho menor, ficou desproporcional em relação ao nome do pet" —
+   caixa 20 → 14 px e frase 14,5 → 12,5 px (o título NOME DO PET tem 13 px em caixa alta). A v37 está em
+   03_site/_versoes_anteriores/sem_nome_menor_antes_2026-09-27/css/. */
+.personalizar label.sem-nome { top: -1px; gap: 6px; font-size: 12.5px; font-weight: 500; }
+.personalizar label.sem-nome input { width: 14px; height: 14px; border-radius: 3px; }
