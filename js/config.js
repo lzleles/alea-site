@@ -129,11 +129,15 @@ window.ALEA = {
      ETAPA 31 (22/09/2026, 21:33): CORES termina com "entre filamento básico, fosco ou perolizado."
      (palavras dele; era "entre filamentos básicos, foscos ou brilhosos." — "perolizado" é o nome
      que ele passou a usar pro acabamento, como no exemplo da cor do nome). */
+  /* 27/09/2026 (áudio 2333 + texto 2334 do Cassiano): a linha CORES SAIU da ficha ("é bom ficar menor"), e o
+     Material PLA passa a mostrar a frase dele (material_pla). Aplicado nas páginas por
+     03_site/_ficha_material_pla_sem_cores_v1_2026-09-27.py. O gerador de páginas ainda escreve o formato antigo:
+     rodar esse script depois dele. */
   ficha_padrao: {
     personalizacao: 'Nome do pet em baixo relevo na cor do objeto.',
     producao: 'Sob encomenda, 3 dias úteis após a confirmação de pagamento!',
-    cores: 'Totalmente personalizável, podendo escolher entre filamento básico, ' +
-           'fosco ou perolizado.'
+    material_pla: 'PLA é um material utilizado na impressão 3D, produzido a partir de fontes renováveis, ' +
+                  'como milho e cana-de-açúcar. É leve, versátil e proporciona excelente acabamento.'
   },
 
   /* ADICIONAIS DE PERSONALIZACAO — o que soma no preco da peca.
