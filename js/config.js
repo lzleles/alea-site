@@ -385,7 +385,7 @@ window.ALEA.modelos3d['claudia-wave'] = {
    em português." A lista abaixo guarda o nome ORIGINAL (pra ele); o produto.js mostra o nome da personalização
    (cor + sufixo do acabamento, ex.: "Cinza Fosco"). Filamento que NÃO está à venda cai aqui, com o nome em português: */
 window.ALEA.filamentosNomeCliente = {
-  "Bambu Lab · PLA · Matte · Ivory White": "Branco Fosco",                          // _FILAMENTOS_APRENDIDOS linha 8
+  "Bambu Lab · PLA · Matte · Ivory White": "Branco Fosco",                          // À VENDA (é o Branco fosco, 11100 — áudio 2332); fica aqui só pra casar o nome sem código
   "Bambu Lab · PLA · Matte · Charcoal": "Preto Fosco",                              // ele: Charcoal = "Preto"
   "Fulljoy · PLA · Silk · Yellow Green": "Verde e Amarelo Perolizado",              // dual color verde+amarelo
   "Elegoo · PLA · Silk · Gold": "Dourado Perolizado",                               // áudio 2293

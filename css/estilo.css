@@ -2259,3 +2259,5 @@ body.nome-dourado {
   accent-color: var(--terracota); cursor: pointer; border-radius: 4px;
 }
 .personalizar label.sem-nome input:focus { outline-offset: 2px; }
+/* v37 (27/09/2026, áudio 2331): "ficou muito afastado" — o produto.js v35 põe `left` logo depois do texto "NOME DO PET"
+   (14 px); o `right: 0` acima só vale se a medida falhar. */

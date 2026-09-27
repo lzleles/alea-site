@@ -137,6 +137,24 @@
     sn.setAttribute('data-sem-nome-rot', '');
     sn.innerHTML = '<input type="checkbox" data-sem-nome-caixa> <span>Sem nome</span>';
     bloco.appendChild(sn);
+    /* v35 (27/09/2026, áudio 2331 do Cassiano: "ficou muito afastado, coloca a caixinha logo depois do nome do pet"):
+       o quadradinho sai do canto direito e encosta logo DEPOIS do texto "NOME DO PET". Mede a largura do texto do
+       título (o nó de texto do label) e posiciona a 14 px dele; refaz ao mudar o tamanho da tela. */
+    var colarNoTitulo = function () {
+      var no = null;
+      for (var i = 0; i < rot.childNodes.length; i++) {
+        if (rot.childNodes[i].nodeType === 3 && rot.childNodes[i].textContent.trim()) { no = rot.childNodes[i]; break; }
+      }
+      if (!no) return;
+      var r = document.createRange(); r.selectNodeContents(no);
+      var larg = r.getBoundingClientRect().right - rot.getBoundingClientRect().left;
+      if (larg > 0) { sn.style.left = Math.ceil(larg + 14) + 'px'; sn.style.right = 'auto'; }
+    };
+    colarNoTitulo();
+    window.addEventListener('resize', colarNoTitulo);
+    if (window.ResizeObserver) new ResizeObserver(colarNoTitulo).observe(rot);   // janela Personalize abre depois (0 px antes)
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(colarNoTitulo);
+    window.aleaColarSemNome = colarNoTitulo;
     semNomeCaixa = sn.querySelector('input');
     var guardado = '';
     window.aleaMarcarSemNome = function (marcar) {
