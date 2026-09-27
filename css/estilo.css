@@ -2094,8 +2094,22 @@ html.topo-emendado .aviso-memoria { display: none !important; }
      (na b2e8a7d o azul caía todo no ×, fino, e o nome ficava só laranja). O × passa de peso 300 pra 500 pra a cor aparecer.
    · Bordas: realce claro de 1 px embaixo e contorno escuro fino (lê no creme e no card), por `filter` + stroke.
    · Antes (b2e8a7d, degradê chapado): _versoes_anteriores/nome_silk_antes_2026-09-27/estilo_b2e8a7d.css */
-.feed .produto-mini .collab, .produto-topo h1 .collab {
-  --collab-cores: linear-gradient(90deg, #00b8f0 0%, #19c6ff 16%, #0a9ad6 30%, #ff8a1a 50%, #e8401e 72%, #ffbe2e 100%);
+/* v33 — O DEGRADÊ TERMINA NO VERDE DOURADO DA MARCA (áudios 2298/2300 do Cassiano, 27/09/2026): "o final deles não acaba
+   com aquele verde que você chama de dourado (…) o azul perfeito, impecável; o terracota com laranja também lindo, mas ele
+   tem que acabar naquele verde dourado. Ele nem apareceu nos degradês." A ponta era #ffbe2e (ouro amarelo-laranja), e em
+   nome curto ("× Luke") ela quase não aparecia. O AZUL e o LARANJA/TERRACOTA são as MESMAS cores; o acabamento silk
+   (reflexo, volume, contorno, halo) é o MESMO. Muda só o FIM: o último ~30% é o oliva-dourado da marca (--dourado #AA9661,
+   frase da abertura #af9559), e o laranja/terracota chegam um pouco antes pra abrir esse espaço.
+     A (fiel)      #AA9661 > #b9a56e > #AA9661, a partir de 72%            → body.nome-verde-a
+     B (luminosa)  #b7a24f > #d1be6b > #bfab58 (mesmo matiz oliva ~48°, mais claro e vivo), a partir de 71%  → PADRÃO
+                   (e body.nome-verde-b, igual ao padrão, pra comparação)
+     C (espaço)    o tom da B, a partir de 62% (azul e laranja comprimidos) → body.nome-verde-c
+     o fim antigo  #ffbe2e (commit f9ae81c), guardado                         → body.nome-ouro-silk
+   As variáveis moram no BODY (não mais no .collab) pra que o coração da Lista de Desejos (loja.css, v2) use o MESMO degradê
+   e siga a variação escolhida sem repetir as cores. Antes: _versoes_anteriores/nome_verde_dourado_antes_2026-09-27/. */
+body {
+  --collab-cores: linear-gradient(90deg, #00b8f0 0%, #19c6ff 16%, #0a9ad6 30%, #ff8a1a 45%, #e8401e 60%,
+                                         #b7a24f 71%, #d1be6b 85%, #bfab58 100%);
   --collab-volume: linear-gradient(180deg, rgba(255, 255, 255, .45) 0%, rgba(255, 255, 255, 0) 38%,
                                    rgba(0, 0, 0, 0) 58%, rgba(40, 10, 0, .30) 100%);
   /* faixas em `em` (acompanham o tamanho da letra: no card miúdo não viram buraco) */
@@ -2105,17 +2119,36 @@ html.topo-emendado .aviso-memoria { display: none !important; }
                       rgba(0, 0, 0, .08) .95em, rgba(255, 255, 255, 0) 1.1em, rgba(255, 255, 255, 0) 1.6em);
   --collab-contorno: rgba(70, 25, 10, .55);
   --collab-halo: drop-shadow(0 1px 0 rgba(255, 255, 255, .75)) drop-shadow(0 0 1.5px rgba(255, 140, 40, .45));
-  color: #e8401e;
-  width: -webkit-fit-content; width: -moz-fit-content; width: fit-content;
-  animation: none;
+  --collab-liso: #e8401e;     /* a cor lisa de quem não tem background-clip: text */
 }
-body.nome-dourado .feed .produto-mini .collab, body.nome-dourado .produto-topo h1 .collab {
+body.nome-verde-a {
+  --collab-cores: linear-gradient(90deg, #00b8f0 0%, #19c6ff 16%, #0a9ad6 30%, #ff8a1a 45%, #e8401e 60%,
+                                         #AA9661 72%, #b9a56e 86%, #AA9661 100%);
+}
+body.nome-verde-b {
+  --collab-cores: linear-gradient(90deg, #00b8f0 0%, #19c6ff 16%, #0a9ad6 30%, #ff8a1a 45%, #e8401e 60%,
+                                         #b7a24f 71%, #d1be6b 85%, #bfab58 100%);
+}
+body.nome-verde-c {
+  --collab-cores: linear-gradient(90deg, #00b8f0 0%, #19c6ff 13%, #0a9ad6 25%, #ff8a1a 38%, #e8401e 51%,
+                                         #b7a24f 62%, #d1be6b 80%, #bfab58 100%);
+}
+body.nome-ouro-silk {
+  --collab-cores: linear-gradient(90deg, #00b8f0 0%, #19c6ff 16%, #0a9ad6 30%, #ff8a1a 50%, #e8401e 72%, #ffbe2e 100%);
+}
+/* a alternativa dourada (26/09) vem por último: com a classe ligada, ela vence qualquer variação acima */
+body.nome-dourado {
   --collab-cores: linear-gradient(100deg, #8a7340 0%, #af9559 30%, #d9c38b 50%, #af9559 70%, #8a7340 100%);
   --collab-volume: linear-gradient(transparent, transparent);
   --collab-reflexo: linear-gradient(transparent, transparent);
   --collab-contorno: rgba(110, 88, 42, .85);
   --collab-halo: none;
-  color: #af9559;
+  --collab-liso: #af9559;
+}
+.feed .produto-mini .collab, .produto-topo h1 .collab {
+  color: var(--collab-liso);
+  width: -webkit-fit-content; width: -moz-fit-content; width: fit-content;
+  animation: none;
 }
 @supports ((-webkit-background-clip: text) or (background-clip: text)) {
   .feed .produto-mini .collab, .produto-topo h1 .collab {

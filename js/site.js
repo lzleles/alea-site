@@ -6,6 +6,9 @@
    saida: Links, menus, redes, campos preenchidos e gavetas interativas
    status: ativo (cabecalho proposto pelo Codex em 2026-09-20, confianca ALTA; conferir na proxima vez que o script rodar)
    validado_em: TBD
+   27/09/2026: o botão novo do topo `data-abrir="desejos"` (coração, entre Conta e Sacola — áudio 2300 do Cassiano) leva
+      à lista-de-desejos.html, do mesmo jeito que a Conta leva à conta.html. Antes:
+      03_site/_versoes_anteriores/lista_desejos_antes_2026-09-27/js/site.js
 */
 /* =============================================================================
    site.js — o que vale em TODA página (abertura, feed, produto, textos)
@@ -358,6 +361,8 @@ window.aleaCorDoTopo = (function () {
          do lado da sacola, em meu perfil, para aparecer essa página". O carrinho continua gaveta. */
       if (b && b.getAttribute('data-abrir') === 'conta') { e.preventDefault(); location.href = 'conta.html'; return; }
       if (b && b.getAttribute('data-abrir') === 'carrinho') { e.preventDefault(); location.href = 'finalizar-compra.html'; return; }
+      /* 27/09/2026 (áudio 2300 do Cassiano): o coração do topo, entre a Conta e a Sacola, leva à página da Lista de Desejos */
+      if (b && b.getAttribute('data-abrir') === 'desejos') { e.preventDefault(); location.href = 'lista-de-desejos.html'; return; }
       if (b) { e.preventDefault(); abrir(b.getAttribute('data-abrir')); return; }
       if (e.target.closest('[data-fechar-gaveta]')) fechar();
     });

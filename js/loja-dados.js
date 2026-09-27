@@ -6,6 +6,11 @@
    saida: window.aleaLoja
    status: prévia (23/09/2026) — o motor SERVIDOR chama as rotas PROPOSTAS abaixo; o contrato final é da casa
    validado_em: 2026-09-23 (Playwright, motor prévia)
+   v2 (27/09/2026, áudio 2300 do Cassiano): o coração da página da peça ganha o DEGRADÊ PEROLIZADO do "× Nome". O botão
+      leva agora 2 spans a mais — `.coracao-silk` (o coração recortado por mask, pintado com o degradê) e `.coracao-texto`
+      (o texto, com background-clip: text); o SVG antigo fica dentro, como reserva de navegador sem suporte (loja.css v2
+      decide qual aparece). A lista em si (alea_desejos_v1 no aparelho) não mudou. Antes:
+      03_site/_versoes_anteriores/lista_desejos_antes_2026-09-27/js/loja-dados.js
 */
 /* =============================================================================
    loja-dados.js — de onde vêm e pra onde vão os dados da conta e da compra
@@ -298,7 +303,8 @@
       b.setAttribute('aria-pressed', tem ? 'true' : 'false');
       b.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">' +
         '<path d="M12 20.5s-7.5-4.6-9.3-9.2C1.4 8 3.4 4.5 6.9 4.5c2.1 0 3.6 1.2 5.1 3 1.5-1.8 3-3 5.1-3 3.5 0 5.5 3.5 4.2 6.8-1.8 4.6-9.3 9.2-9.3 9.2z"/></svg>' +
-        '<span>' + (tem ? 'Na sua Lista de Desejos' : 'Adicionar à Lista de Desejos') + '</span>';
+        '<span class="coracao-silk" aria-hidden="true"></span>' +
+        '<span class="coracao-texto">' + (tem ? 'Na sua Lista de Desejos' : 'Adicionar à Lista de Desejos') + '</span>';
     };
     b.addEventListener('click', function () { desejos.alternar(slug); pintar(); });
     pintar();
