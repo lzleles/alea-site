@@ -142,7 +142,8 @@
       }).catch(function (e) { aberto = false; console.warn('janela 3D', e); })
         .then(function () { b.classList.remove('carregando'); });
     }
-    b.addEventListener('click', function () { abrir(); });
+    /* v31 (áudio 2263): cada toque em "Personalize aqui" começa com as Cores da peça vazias (ver aleaLimparCoresDaPeca) */
+    b.addEventListener('click', function () { if (!aberto && window.aleaLimparCoresDaPeca) window.aleaLimparCoresDaPeca(); abrir(); });
     window.aleaAbrirPersonalizar = abrir;
   })();
   var botaoSacola = document.querySelector('[data-add-carrinho]');
@@ -932,6 +933,17 @@
      filamento sazonal não se promete antes de existir. */
   var caixaCores = document.querySelector('[data-cores-peca]');
   var camposCores = document.querySelector('[data-cores-campos]');
+  /* v31 (msg 2268 do Cassiano, 27/09/2026): a frase pequena entre o título "Cores da peça" e as opções. O texto mora
+     no config.js (`ALEA.fraseCoresDaPeca`); sem ele, nada entra. */
+  (function fraseDasCores() {
+    var txt = (window.ALEA || {}).fraseCoresDaPeca;
+    var tit = caixaCores && caixaCores.querySelector('.rotulo-grupo');
+    if (!txt || !tit || caixaCores.querySelector('.dica-cores')) return;
+    var p = document.createElement('p');
+    p.className = 'dica-cores';
+    p.textContent = txt;
+    tit.insertAdjacentElement('afterend', p);
+  })();
 
   /* ⚠️ ETAPA 28 (22/09/2026, 21:19): o SORTEIO saiu — "algumas não têm tantas opções por se tratar
      de filamento". Agora é UMA cor por caixa, FIXA, na ordem que ele ditou, de cima pra baixo:
@@ -1333,31 +1345,19 @@
     else window.addEventListener('load', function () { setTimeout(abrirEditando, 50); }, { once: true });
   })();
 
-  /* v31 — A COR DA CAPA (áudio 2253 do Cassiano, 27/09/2026): "o comedouro tem que ficar na COR DA CAPA quando abre a
-     personalização". Quem NÃO está editando um item da sacola já encontra as "Cores da peça" marcadas com as cores
-     da capa (config.js, `modelos3d[slug].capa`): o modo (Tricolor/Bicolor) e, em cada janela, acabamento + cor. A peça
-     3D lê o formulário ao abrir (personalizar3d.js `aplicarForm`), então abre igual. O cliente troca à vontade.
-     Editando da sacola, vale o que ele tinha escolhido (acima). A v30 está em
+  /* v31 — CORES DA PEÇA COMEÇAM VAZIAS A CADA ABERTURA (áudio 2263 do Cassiano, 27/09/2026 — substitui o "form já
+     marcado com a cor da capa" da prévia 4438fdf): "toda vez que abrir a personalização, a parte Cores da peça começa
+     SEM NENHUMA opção marcada", pra o cliente escolher de novo. Quem mostra a cor da CAPA é só a peça 3D (config.js,
+     `modelos3d[slug].original`), que pinta com o original enquanto nada está escolhido.
+     Limpa: Tricolor/Bicolor/Monocromático, as janelas de acabamento e cor. NÃO mexe no Nome do pet nem no detalhe.
+     EXCEÇÃO: editando um item da sacola (`?editar=`), valem as escolhas daquele item. A v30 está em
      03_site/_versoes_anteriores/cor_da_capa_antes_2026-09-27/. */
-  (function corDaCapa() {
-    if (editando || !caixaCores || !camposCores || !botaoComprar) return;
-    var m3 = ((window.ALEA || {}).modelos3d || {})[botaoComprar.getAttribute('data-slug')];
-    var capa = m3 && m3.capa;
-    if (!capa) return;
-    var r = caixaCores.querySelector('input[name="cores_peca"][value="' + capa.modo + '"]');
-    if (!r || caixaCores.querySelector('input[name="cores_peca"]:checked')) return;
-    r.checked = true;
-    desenharCamposDeCor(r);
-    Array.prototype.forEach.call(camposCores.querySelectorAll('.campo-cor'), function (c, k) {
-      var e = (capa.escolhas || [])[k];
-      var rad = e && c.querySelector('.acabamento input[value="' + e.acabamento + '"]');
-      if (!rad) return;
-      rad.checked = true;
-      rad.dispatchEvent(new Event('change', { bubbles: true }));
-      c.querySelector('select').value = e.cor;
-    });
-    if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
-  })();
+  window.aleaLimparCoresDaPeca = function () {
+    if (editando || !caixaCores || !camposCores) return;
+    Array.prototype.forEach.call(caixaCores.querySelectorAll('input[name="cores_peca"]'), function (r) { r.checked = false; });
+    camposCores.innerHTML = '';
+    caixaCores.classList.remove('faltou');
+  };
 
   function porNoCarrinho(eDepoisFechar) {
     var faltas = oQueFalta();

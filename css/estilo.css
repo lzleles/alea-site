@@ -2133,3 +2133,11 @@ body.nome-dourado .feed .produto-mini .collab, body.nome-dourado .produto-topo h
   margin: 0 0 14px; max-width: 34em;
   font-size: 14.5px; line-height: 1.45; color: var(--tinta-fraca);
 }
+
+/* FRASE DAS CORES DA PEÇA (msg 2268 do Cassiano, 27/09/2026): bem pequena e discreta, na cor do texto secundário, entre o
+   título "Cores da peça" e as opções. Vale no computador e no celular. Texto em config.js (ALEA.fraseCoresDaPeca). */
+.cores-peca .dica-cores {
+  margin: 2px 0 10px; max-width: 32em;
+  font-size: 11.5px; line-height: 1.4; font-weight: 400; letter-spacing: 0; text-transform: none;
+  color: var(--tinta-fraca);
+}

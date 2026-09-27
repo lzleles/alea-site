@@ -307,9 +307,13 @@ window.ALEA = {
    luke_g.glb que a janela "Personalize aqui" do antigo Bowl Wave já usava (o Cassiano: "o do Luke eu já tenho, é o
    único que tenho"). A página nova (produto-luke-bowl.html) ganha a mesma janela 3D sem copiar a configuração:
    é a mesma peça, uma configuração só. Matteo, Ayla e Cláudia não têm .glb ainda -> formulário na própria página. */
+/* FRASE DAS CORES DA PEÇA (msg 2268 do Cassiano, 27/09/2026, texto EXATO): vai bem pequena entre o título "Cores da
+   peça" e as opções Tricolor/Bicolor/Monocromático, em todos os produtos (produto.js v31). Trocar AQUI. */
+window.ALEA.fraseCoresDaPeca = 'Qualquer dúvida, nas fotos em tela cheia, você encontra os nomes e as tonalidades reais de cada cor.';
 window.ALEA.modelos3d['luke-bowl'] = window.ALEA.modelos3d['bowl-wave'];
-/* COR DA CAPA (áudio 2253 do Cassiano, 27/09/2026): o formulário abre marcado com as cores da foto lukebowl_capa —
-   tricolor: topo Laranja (Básico), corpo Branco (Fosco), base Cinza (Fosco). A peça 3D já abria nessas cores. */
+/* COR DA CAPA (áudio 2253 do Cassiano, 27/09/2026): cores da foto lukebowl_capa — tricolor: topo Laranja (Básico),
+   corpo Branco (Fosco), base Cinza (Fosco). A peça 3D já abria nelas (`original`). Só registro: o formulário começa
+   VAZIO (áudio 2263). */
 window.ALEA.modelos3d['luke-bowl'].capa = { modo: 'tricolor', escolhas: [
   { acabamento: 'basico', cor: 'Laranja' }, { acabamento: 'fosco', cor: 'Branco' }, { acabamento: 'fosco', cor: 'Cinza' }] };
 
@@ -335,8 +339,8 @@ window.ALEA.modelos3d['matteo-texturized'] = {
      Conferido no G-code fatiado (07_render_capa/textura_2026-09-26/fatiado): a parede externa foge da lisa até
      +0,35-0,37 mm, com um ponto a cada 0,85-0,88 mm. A janela 3D desenha o relevo na luz (sem peso de malha). */
   pele: { ruido: 'billow', oitavas: 4, persistencia: 0.5, escalaMm: 1, espessuraMm: 0.2 },
-  /* COR DA CAPA (áudio 2253, 27/09/2026): o formulário abre marcado com as cores da foto matteotex_capa — topo preto,
-     base cáqui (as mesmas do `original`, que já batiam com a capa). */
+  /* COR DA CAPA (áudio 2253, 27/09/2026): cores da foto matteotex_capa — topo preto, base cáqui (as mesmas do `original`,
+     que já batiam com a capa). Só registro: o formulário começa VAZIO (áudio 2263) e a peça abre no `original`. */
   capa: { modo: 'bicolor', escolhas: [{ acabamento: 'basico', cor: 'Preto' }, { acabamento: 'fosco', cor: 'Cáqui' }] },
   /* só bicolor e monocromático (áudio 1863). Bicolor: cor 1 = topo, cor 2 = base. */
   bicolor: { topo: 0, principal: 0, base: 1 },
@@ -358,7 +362,8 @@ window.ALEA.modelos3d['claudia-wave'] = {
   bicolor: { topo: 0, principal: 0, base: 1 },
   /* COR DA CAPA (áudio 2253 do Cassiano, 27/09/2026): "o comedouro tem que ficar na COR DA CAPA quando abre a
      personalização. A capa da Cláudia é bicolor: BRANCO PEROLIZADO com AQUA PEROLIZADO". A peça abre assim (aro e
-     corpo = cor 1, a onda = cor 2, como na foto claudiawave_capa) e o formulário já vem marcado igual (`capa`).
+     corpo = cor 1, a onda = cor 2, como na foto claudiawave_capa). O formulário começa VAZIO (áudio 2263); `capa` é só
+     registro das cores da foto, ninguém lê.
      ANTES: as cores que o .3mf trazia — aro Vermelho (Bambu PLA Lite Red), corpo Mármore, onda Azul Silk. O aro
      vermelho parecia "solto" em cima da peça: medido no .glb, ele ENCOSTA no corpo (corpo até y 120,3 mm, aro de
      120,2 a 136,3 mm, os dois com raio 82-88 mm) — era só a cor diferente, que não existe na peça da capa. */
