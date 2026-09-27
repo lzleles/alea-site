@@ -250,7 +250,7 @@ window.ALEA = {
     ],
     perolizado: [
       { site: 'Branco', hex: '#FFFFFF', original: 'Elegoo · PLA · Silk · Silk White', rugosidade: 0.2, metal: 0.05 },
-      { site: 'Prata', hex: '#B2C1DA', original: 'SUNLU · PLA · Silk PLA+ · Silk Silver' },
+      { site: 'Prata', hex: '#C4C3C4', original: 'SUNLU · PLA · Silk PLA+ · Silk Silver', hex_oficial: '#B2C1DA' },
       { site: 'Dourado', hex: '#D09531', original: 'Multfila · PLA · Mult Silk · Ouro Envelhecido (4226-PCI-PLS-048)' },
       { site: 'Laranja', hex: '#F15505', original: 'Voolt3D · PLA · V-Silk · Laranja (PL-LJ-SK-1)' },
       { site: 'Vermelho', hex: '#DA342E', original: 'Multfila · PLA · Mult Silk · Vermelho Metalizado (4226-PCI-PLS-026)' },
