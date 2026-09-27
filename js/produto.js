@@ -500,10 +500,26 @@
        .telacheia, e um invólucro posicionado em volta da foto quebraria essa conta. Por isso ela é posta no lugar
        MEDINDO a foto (quando ela carrega, a cada troca de foto e quando a janela muda de tamanho).
      - Some com a foto ampliada (CSS .com-zoom) e não pega clique (pointer-events: none): tocar nela é tocar na foto. */
+  /* v33 (27/09/2026, áudio 2295): o cliente lê o NOME DA PERSONALIZAÇÃO ("Cinza Fosco"), nunca o código do filamento.
+     Procura o original em ALEA.filamentos (cor + sufixo do acabamento); fora da venda, em ALEA.filamentosNomeCliente.
+     Sem tradução = a linha NÃO aparece (código não vai pro cliente). */
+  function nomeDoCliente(original) {
+    var A = window.ALEA || {};
+    var extra = (A.filamentosNomeCliente || {})[original];
+    if (extra) return extra;
+    var acabs = A.acabamentos || [];
+    for (var i = 0; i < acabs.length; i++) {
+      var cores = (A.filamentos || {})[acabs[i].id] || [];
+      for (var j = 0; j < cores.length; j++) {
+        if (cores[j].original === original) return cores[j].site + (acabs[i].sufixo || '');
+      }
+    }
+    return '';
+  }
   var caixaFil = null;
   function pintarFilamentos(img, chave) {
     if (!telacheia) return;
-    var lista = ((window.ALEA || {}).filamentosPorFoto || {})[chave] || [];
+    var lista = (((window.ALEA || {}).filamentosPorFoto || {})[chave] || []).map(nomeDoCliente).filter(Boolean);
     if (!caixaFil) {
       caixaFil = document.createElement('ul');
       caixaFil.className = 'filamentos-tc';

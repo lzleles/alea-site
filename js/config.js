@@ -380,6 +380,18 @@ window.ALEA.modelos3d['claudia-wave'] = {
    peça, nome EXATO como na lista dele ou como ele confirmou, ex.: Ivory White, Silk Yellow Green, Charcoal). Foto sem
    linha ou com [] = nada aparece. A chave é o caminho da foto grande.
    Origem: 03_site/_FILAMENTOS_POR_FOTO_PALPITE_2026-09-27.json (com a confiança e o motivo de cada palpite). */
+/* O QUE O CLIENTE LÊ na tela cheia (27/09/2026, áudio 2295 do Cassiano): "aqueles códigos, aquela nomenclatura é só entre
+   eu e você. Entre o cliente e a foto vai ter que ser os nomes lá da personalização. Básico, fosco, perolizado e os nomes
+   em português." A lista abaixo guarda o nome ORIGINAL (pra ele); o produto.js mostra o nome da personalização
+   (cor + sufixo do acabamento, ex.: "Cinza Fosco"). Filamento que NÃO está à venda cai aqui, com o nome em português: */
+window.ALEA.filamentosNomeCliente = {
+  "Bambu Lab · PLA · Matte · Ivory White": "Branco Fosco",                          // _FILAMENTOS_APRENDIDOS linha 8
+  "Bambu Lab · PLA · Matte · Charcoal": "Preto Fosco",                              // ele: Charcoal = "Preto"
+  "Fulljoy · PLA · Silk · Yellow Green": "Verde e Amarelo Perolizado",              // dual color verde+amarelo
+  "Elegoo · PLA · Silk · Gold": "Dourado Perolizado",                               // áudio 2293
+  "Multfila · PLA · Silk Dual Color · Dourado e Vermelho": "Dourado e Vermelho Perolizado", // áudio 2290
+  "Elegoo · PLA · Silk Dual Color · Black Purple": "Preto e Roxo Perolizado"        // áudio 2292
+};
 window.ALEA.filamentosPorFoto = {
   "img/produtos/lukebowl_capa.jpg": ["Bambu Lab · PLA · Lite · Orange (16301)", "Bambu Lab · PLA · Matte · Ivory White", "Bambu Lab · PLA · Matte · Ash Gray (11102)"],
   "img/produtos/lukebowl_0005.jpg": ["Bambu Lab · PLA · Lite · Orange (16301)", "Bambu Lab · PLA · Matte · Ivory White", "Bambu Lab · PLA · Matte · Ash Gray (11102)"],
