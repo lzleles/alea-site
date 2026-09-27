@@ -112,7 +112,7 @@
       var det = descrever(i);
       return '<div class="loja-item" data-linha="' + n + '">' +
         '<img src="' + esc(foto(i)) + '" alt="" loading="lazy" onerror="' + fotoReserva(i) + '">' +
-        '<div class="nome">' + esc(i.nome) + (det ? '<small>' + esc(det) + '</small>' : '') + '</div>' +
+        '<div class="nome">' + esc(i.nome).replace(/ × /g, ' × ') + (det   /* NOMES COLLAB 26/09: "× Ayla" não se separa */ ? '<small>' + esc(det) + '</small>' : '') + '</div>' +
         '<button type="button" class="tirar" data-tirar-item="' + n + '" aria-label="Tirar ' + esc(i.nome) + ' da sacola">&times;</button>' +
         '<div class="linha-qtd"><span class="loja-passos">' +
           '<button type="button" data-passo="-1" data-item="' + n + '" aria-label="Diminuir">−</button><span>' + qtd(i) + '</span>' +
@@ -237,7 +237,7 @@
     return '<div class="loja-resumo"><h2>Resumo do Pedido</h2>' + itens().map(function (i) {
       var det = descrever(i);
       return '<div class="linha"><img src="' + esc(foto(i)) + '" alt="" onerror="' + fotoReserva(i) + '">' +
-        '<div>' + (qtd(i) > 1 ? qtd(i) + '× ' : '') + esc(i.nome) + (det ? '<small>' + esc(det) + '</small>' : '') + '</div>' +
+        '<div>' + (qtd(i) > 1 ? qtd(i) + '× ' : '') + esc(i.nome).replace(/ × /g, ' × ') + (det ? '<small>' + esc(det) + '</small>' : '') + '</div>' +
         '<div>' + (i.preco ? dinheiro(i.preco * qtd(i)) : 'Sob consulta') + '</div></div>';
     }).join('') + '<a class="voltar-sacola" href="#/sacola">Voltar para a Sacola de Compras</a>' + htmlTotais() + '</div>';
   }

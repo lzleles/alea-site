@@ -430,7 +430,8 @@ body.marca-anima .marca-anim .capivara {
 body.marca-anima .marca-anim .escrita-janela .escrita {
   /* curva que começa e termina macia: com saída rápida (medido no 1º print) ela fazia 80% do
      trajeto no primeiro segundo e não parecia "devagar" */
-  animation: escrita-sai-de-baixo 4.5s cubic-bezier(.42, 0, .3, 1) 6.5s both;
+  /* RODADA 4 (26/09/2026): 50% mais rápida — 3,0s começando aos 6,0s (era 4,5s aos 6,5s). Mesma curva. */
+  animation: escrita-sai-de-baixo 3s cubic-bezier(.42, 0, .3, 1) 6s both;
 }
 @keyframes escrita-sai-de-baixo {
   from { transform: translateY(-100%); }
@@ -481,7 +482,8 @@ body.marca-medida:not(.marca-anima) .marca-anim .eco-capivara { opacity: 1; tran
    passando atrás de um poste. O `opacity: 0` do último quadro só guarda o estado final (a essa
    altura ele já está 100% atrás da perna) — não há fade. */
 body.marca-anima .marca-anim .eco-capivara {
-  animation: eco-engolido-pela-perna 1.7s linear 5.0s both;
+  /* RODADA 4 (26/09/2026): 50% mais rápido — 1,7s ÷ 1,5 = 1,133s (5,0 → 6,13s). Mesma curva (linear). */
+  animation: eco-engolido-pela-perna 1.133s linear 5.0s both;
 }
 @keyframes eco-engolido-pela-perna {
   from   { transform: none;               opacity: 1; }
@@ -2041,3 +2043,28 @@ html.topo-emendado .aviso-memoria { display: none !important; }
   font-size: 26px; font-weight: 300; line-height: 1; color: var(--tinta-fraca); cursor: pointer;
 }
 .janela3d-ciente-fechar:hover { color: var(--tinta); }
+
+/* =============================================================================
+   ⚠️ NOMES COLLAB (Cassiano, 26/09/2026) — feed.js v32 e as 4 páginas de produto (03_site/_nomes_collab_v1_2026-09-26.py).
+   O nome termina em "× Nome do pet" ("ālea Pet Bowl × Luke"). Onde o nome aparece GRANDE (h1 da página e card do
+   feed) o "× Luke" desce PEQUENO numa linha própria; na sacola, no resumo e no WhatsApp vai inteiro numa linha.
+   Vale no computador E no celular (é o nome do produto). Embaixo do h1 entra a linha de busca em português. */
+.feed .produto-mini .collab {
+  display: block; margin-top: 5px;
+  font-size: .56em; font-weight: 400; letter-spacing: .16em; line-height: 1.2;
+  color: rgba(255, 255, 255, .82);
+}
+.produto-topo h1 .collab {
+  display: block; margin-top: 6px;
+  font-size: .5em; font-weight: 400; letter-spacing: .02em; line-height: 1.2;
+}
+/* o × da Defante é minúsculo (parece um ponto): ele sai na Hanken Grotesk, fina, do tamanho da letra */
+.feed .produto-mini .collab .x, .produto-topo h1 .collab .x {
+  font-family: var(--fonte-corpo); font-weight: 300; font-size: 1.25em; line-height: 1; letter-spacing: 0;
+  vertical-align: -.06em;
+}
+.produto-topo h1:has(+ .sub-busca) { margin-bottom: 8px; }
+.produto-topo .sub-busca {
+  margin: 0 0 14px; max-width: 34em;
+  font-size: 14.5px; line-height: 1.45; color: var(--tinta-fraca);
+}

@@ -71,9 +71,13 @@
      já na perna (1,7s de apagar dentro de 2s de trajeto), e a escrita sobe em 4,5s.
      RODADA 3 (áudios 2167-2168, 21:40): sem fade — o "& Co." é engolido pela perna (recorte de
      borda reta, ver `.eco-janela` no CSS), de 5,0s a 6,7s. Os tempos daqui não mudaram. */
-  var ECO_SOME_MS = 1500;          // a escrita começa quando o "& Co." está quase apagado (5,0 + 1,5 = 6,5s; CSS: delay 6.5s)
-  var ESCRITA_MS = 4500;           // a escrita sai de baixo da capivara, devagar (CSS: 4.5s)
-  var FIM_DA_MARCA = PAUSA_CAPIVARA_MS + CAPIVARA_MS + ECO_SOME_MS + ESCRITA_MS;  // 11,0s
+  /* RODADA 4 (26/09/2026, pedido do Cassiano): o "& Co." engolido e a escrita 50% MAIS RÁPIDOS (velocidade 1,5x,
+     duração ÷ 1,5), mesma curva e mesma ordem: engolido 5,0 → 6,13s (era 6,7s); escrita 6,0 → 9,0s (era 6,5 → 11,0s).
+     A frase e o menu vêm atrás sozinhos (FIM_DA_MARCA), 2 s mais cedo. A rodada 3 está em
+     03_site/_versoes_anteriores/abertura_rodada4_antes_2026-09-26/. */
+  var ECO_SOME_MS = 1000;          // a escrita começa quando o "& Co." está quase engolido (5,0 + 1,0 = 6,0s; CSS: delay 6.0s). Era 1500
+  var ESCRITA_MS = 3000;           // a escrita sai de baixo da capivara (CSS: 3.0s). Era 4500
+  var FIM_DA_MARCA = PAUSA_CAPIVARA_MS + CAPIVARA_MS + ECO_SOME_MS + ESCRITA_MS;  // 9,0s (era 11,0s)
 
   /* =======================================================================
      1) F5 VOLTA PRO COMEÇO — e por que isso não é automático

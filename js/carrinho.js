@@ -221,7 +221,8 @@
            a ultima coisa que alguem quer ver antes de fechar um pedido. */
         '<img src="' + (i.miniatura || ('img/produtos/' + i.capa + '_obj_m.webp')) + '" alt="" loading="lazy" ' +
         'onerror="this.onerror=null;this.src=&quot;img/produtos/' + i.capa + '_m.jpg&quot;">' +
-        '<div class="lado"><div class="cabeca-linha"><div class="titulo">' + i.nome + '</div>' +
+        /* NOMES COLLAB (26/09/2026): "× Ayla" nunca se separa — o × não fica sozinho no fim da linha */
+        '<div class="lado"><div class="cabeca-linha"><div class="titulo">' + String(i.nome).replace(/ × /g, ' × ') + '</div>' +
         '<button class="tirar-x" type="button" data-tirar="' + n + '" aria-label="Tirar ' + i.nome +
         ' da sacola" title="Tirar da sacola">&times;</button></div>' +
         '<div class="detalhe">' + (descreverItem(i) || 'sem personalização') + '</div>' +

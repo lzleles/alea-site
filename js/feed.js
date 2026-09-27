@@ -96,6 +96,18 @@
     return String(txt).replace(/[āa]lea/gi, '<span class="marca-nome">ālea</span>');
   }
 
+  /* ⚠️ v32 — NOMES COLLAB (26/09/2026, decididos pelo Cassiano; a v31 está em
+     03_site/_versoes_anteriores/nomes_collab_antes_2026-09-26/js/): o nome do produto termina em "× Nome do pet"
+     ("ālea Pet Bowl × Luke"). No card, o "× Luke" desce PEQUENO numa linha própria (`.collab`, estilo.css
+     "NOMES COLLAB"); o nome principal fica na régua de sempre. Nome sem " × " sai como antes. */
+  function nomeNoCard(txt) {
+    txt = String(txt);
+    var i = txt.lastIndexOf(' × ');
+    if (i < 0) return comNomeMarca(txt);
+    /* o "×" vai num span próprio: o × da Defante é um pontinho (visto no print de 26/09); o `.x` o desenha na Hanken */
+    return comNomeMarca(txt.slice(0, i)) + ' <span class="collab"><span class="x">×</span>' + txt.slice(i + 2) + '</span>';
+  }
+
   function nomeDaCategoria(id) {
     var c = (window.CATEGORIAS || []).filter(function (x) { return x.id === id; })[0];
     return c ? c.nome : String(id || '').toUpperCase();
@@ -212,7 +224,7 @@
         '<div class="legenda">' +
           '<span class="lado-esquerdo">' +
             '<span class="categoria">' + nomeDaCategoria(c.categoria) + '</span>' +
-            '<span class="produto-mini">' + comNomeMarca(c.produto) + '</span>' +
+            '<span class="produto-mini">' + nomeNoCard(c.produto) + '</span>' +   // v32
             '<a class="ver" href="produto-' + c.pagina + '.html">ver produto →</a>' +
           '</span>' +
           (mostrarPreco ? '<span class="valor">' + (c.preco === null ? 'Sob consulta' : moeda(c.preco)) + '</span>' : '') +
