@@ -265,7 +265,7 @@ window.ALEA = {
   /* como cada acabamento aparece (a ordem é a da tela) e o que ele acrescenta ao nome da cor:
      Básico não acrescenta nada ("Azul"); Fosco e Perolizado sim ("Azul Fosco", "Azul Perolizado"). */
   acabamentos: [
-    { id: 'basico',     rotulo: 'Básico',     sufixo: '' },
+    { id: 'basico',     rotulo: 'Clássico',   sufixo: '' },   // 27/09/2026, áudio 2341: "Básico" -> "Clássico" (mais elegante); o id fica 'basico' (a sacola guarda o id) e a cor continua sem sufixo ("Azul")
     { id: 'fosco',      rotulo: 'Fosco',      sufixo: ' Fosco' },
     { id: 'perolizado', rotulo: 'Perolizado', sufixo: ' Perolizado' }
   ],
