@@ -284,7 +284,7 @@ window.ALEA = {
       original: {
         topo:      { site: 'Laranja', hex: '#FF671F', acabamento: 'basico', oficial: 'Bambu Lab · PLA · Lite · Orange (16301)' },
         principal: { site: 'Branco',  hex: '#FFFFFF', acabamento: 'fosco',  oficial: 'Bambu Lab · PLA · Matte · Ivory White (11100)' },
-        base:      { site: 'Cinza',   hex: '#9B9EA0', acabamento: 'fosco',  oficial: 'Bambu Lab · PLA · Matte · Ash Gray (11102)' }
+        base:      { site: 'Cinza',   hex: '#C4C6C8', acabamento: 'fosco',  oficial: 'Bambu Lab · PLA · Matte · Ash Gray (11102)' }
       },
       abas: [
         { id: 'original', rotulo: 'Original' },
