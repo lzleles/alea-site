@@ -85,7 +85,7 @@ var AVISO_COR_CAIXA = 'Estou ciente da possível variação de cor.';
 /* a frase longa (msg 2181), se ele pedir de volta:
 var AVISO_COR_CAIXA = 'Estou ciente de que as cores exibidas na tela podem apresentar pequenas variações em relação ao produto real.'; */
 var AVISO_COR_BOTAO = 'Continuar';
-var AVISO_COR_CHAVE = 'alea_ciente_cor';     // sessionStorage: aceito uma vez, vale pra visita toda
+var AVISO_COR_CHAVE = 'alea_ciente_cor';     // sessionStorage: marca que aceitou (vai no pedido); v10: NÃO pula mais o aviso
 
 function cienteDaCor() {
   if (window.aleaCienteCor) return true;
@@ -288,8 +288,11 @@ export async function abrirJanela3D(cfg, aoFechar, aoMontar, opcoes) {
   requestAnimationFrame(function () { fundo.classList.add('visivel'); });
 
   /* v9 — O AVISO DE VARIAÇÃO DE COR, por cima da janela, antes de personalizar (computador e celular) */
+  /* v10 (27/09/2026, áudio 2259 do Cassiano): o aviso aparece TODA VEZ que a personalização abre (computador e celular),
+     com o quadradinho DESMARCADO — saiu o "aceito uma vez vale pra visita" (antes: `if (cienteDaCor()) return;`).
+     O `gravarCienteDaCor` continua: é ele que põe "Cliente ciente da variação de cor da tela" no pedido.
+     A v9 está em 03_site/_versoes_anteriores/cor_da_capa_antes_2026-09-27/. */
   (function avisoDeCor() {
-    if (cienteDaCor()) return;
     var janela = fundo.querySelector('.janela3d');
     var debaixo = ['.janela3d-palco', '.janela3d-lado', '.janela3d-fechar'].map(function (q) { return fundo.querySelector(q); })
       .filter(Boolean);
