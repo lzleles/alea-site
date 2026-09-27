@@ -112,16 +112,21 @@
          a marca nova exata. A ordem dos áudios dele (15:05): a capivara entra COM o "& Co." do
          lado (`.eco-capivara`); quando ela assenta, o "& Co." mergulha nela; então o ālea sai
          letra por letra; e no fim o "& Co." aparece embaixo (`.eco-final`). -->
+    <!-- ABERTURA CENTRALIZADA (áudio do Cassiano de 26/09/2026 21:13): a capivara entra grande com o
+         "& Co." do lado (igual antes), mas em vez de ir pra esquerda ela DIMINUI e fica NO CENTRO; o
+         "& Co." do lado some como antes; e a escrita nova "ālea & Co." (v11, letra a letra) sai de
+         BAIXO da capivara, devagar e toda junta, e para centralizada embaixo dela.
+         As peças letra1-4 e eco_final continuam em img/marca/e_co/ (não foram apagadas), só não
+         entram mais aqui. Reverter = voltar este bloco, o bloco ABERTURA do estilo.css e o
+         abertura.js pro commit 4f3ccfa. -->
     <div class="marca-anim" aria-hidden="true">
       <img class="eco-capivara" src="img/marca/e_co/eco_capivara.svg" alt="">
       <img class="capivara" src="img/marca/e_co/capivara.svg" alt="">
-      <!-- o "& Co." final vem ANTES das letras de propósito: ele desce de TRÁS do ālea, então
-           tem que ficar atrás delas na pilha (ajuste do Cassiano, 15:41). -->
-      <img class="eco-final" src="img/marca/e_co/eco_final.svg" alt="">
-      <img class="letra l1" src="img/marca/e_co/letra1.svg" alt="">
-      <img class="letra l2" src="img/marca/e_co/letra2.svg" alt="">
-      <img class="letra l3" src="img/marca/e_co/letra3.svg" alt="">
-      <img class="letra l4" src="img/marca/e_co/letra4.svg" alt="">
+      <!-- a janela recorta a escrita na linha dos pés da capivara: é isso que faz ela
+           "sair de baixo" da capivara em vez de aparecer por cima dela. -->
+      <div class="escrita-janela">
+        <img class="escrita" src="img/marca/e_co/escrita_letra_a_letra.svg" alt="">
+      </div>
     </div>
 
     <!-- a frase vai INTEIRA no HTML (Google e leitor de tela leem mesmo sem JS); o JS

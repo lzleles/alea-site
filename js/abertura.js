@@ -41,6 +41,11 @@
      3. "'voltar para categorias' vira 'voltar para a página inicial', e aí vai ter a
          animação, tudo de novo, normal"                        → `tocarAbertura()`
 
+   ABERTURA CENTRALIZADA (26/09/2026, áudio das 21:13) — a capivara entra grande com o "& Co."
+   do lado (igual), mas DIMINUI e fica NO CENTRO em vez de ir pra esquerda; o "& Co." some como
+   antes; a escrita nova "ālea & Co." (v11) sai de baixo dela devagar, toda junta; depois a frase
+   datilografada em DEGRADÊ (azul > laranja > terracota > dourado) e o menu. Antes: commit 4f3ccfa.
+
    ⚠️ QUEM VÊ A ABERTURA E QUEM NÃO VÊ — a régua mudou na 4ª rodada (17/09/2026, item 2):
    "quando clica em F5 ela faz a animação perfeita igual deve ser, mas quando clico no site
    da barra de pesquisa e dou enter, ele não faz a animação e permanece como está! Quero que
@@ -56,15 +61,15 @@
   if (!corpo.classList.contains('home')) return;
 
   /* Os tempos, num lugar só. Têm que bater com os `animation-delay` do CSS. */
+  /* ABERTURA CENTRALIZADA (áudio do Cassiano de 26/09/2026 21:13): a capivara diminui e fica
+     NO CENTRO (mesma curva e tempo), o "& Co." do lado some como antes, e a escrita nova
+     "ālea & Co." sai de baixo dela, devagar e toda junta. As letras uma a uma e o "& Co." que
+     descia no fim saíram — com eles, LETRA_MS, ENTRE_LETRAS_MS e ECO_FINAL_MS. */
   var PAUSA_CAPIVARA_MS = 1400;    // ela fica PARADA, gigante, antes de andar (3ª rodada)
-  var CAPIVARA_MS = 3600;          // e leva 3,6s indo devagar pro lugar dela
-  var ECO_ENTRA_MS = 1000;         // REBRAND 22/09 (ajuste 15:41): "& Co." vai reto pra esquerda na velocidade das letras
-  var LETRA_MS = 1000;             // cada letra leva 1s pra sair da capivara
-  var ENTRE_LETRAS_MS = 700;       // e a seguinte parte 0,7s depois da anterior
-  var LETRAS = 4;
-  var ECO_FINAL_MS = 1000;         // REBRAND 22/09 (ajuste 15:41): "& Co." desce de trás do ālea na velocidade das letras
-  var FIM_DAS_LETRAS = PAUSA_CAPIVARA_MS + CAPIVARA_MS + ECO_ENTRA_MS +
-                       ENTRE_LETRAS_MS * (LETRAS - 1) + LETRA_MS;                 // 8,9s
+  var CAPIVARA_MS = 3600;          // e leva 3,6s indo devagar pro centro
+  var ECO_ENTRA_MS = 1000;         // REBRAND 22/09 (ajuste 15:41): "& Co." vai reto pra esquerda e some
+  var ESCRITA_MS = 3000;           // 26/09: a escrita sai de baixo da capivara, devagar (CSS: 3s a partir de 6.0s)
+  var FIM_DA_MARCA = PAUSA_CAPIVARA_MS + CAPIVARA_MS + ECO_ENTRA_MS + ESCRITA_MS;  // 9,0s
 
   /* =======================================================================
      1) F5 VOLTA PRO COMEÇO — e por que isso não é automático
@@ -299,13 +304,21 @@
     var cursor = document.createElement('span');
     cursor.className = 'cursor';
     cursor.setAttribute('aria-hidden', 'true');
+    /* 26/09/2026: o RESTO da frase fica na caixa, invisível — é o que faz o degradê cobrir a
+       frase inteira desde a primeira letra (ver `.abertura .assinatura` no CSS). */
+    var resto = document.createElement('span');
+    resto.className = 'resto';
+    resto.setAttribute('aria-hidden', 'true');
+    resto.textContent = frase;
     alvo.appendChild(letras);
     alvo.appendChild(cursor);
+    alvo.appendChild(resto);
 
     var i = 0;
     (function escrever() {
       if (pulou) return;            /* clicou no meio da frase: quem termina é o pular */
       letras.textContent = frase.slice(0, ++i);
+      resto.textContent = frase.slice(i);
       if (i < frase.length) {
         /* ritmo irregular de propósito: passo fixo soa a máquina, e o que ele pediu
            foi "como se estivesse digitando". A vírgula e o ponto seguram um pouco. */
@@ -388,8 +401,8 @@
     /* a frase só começa DEPOIS da última letra do logo, e o menu só depois da frase
        (quem acende o menu é o fim do datilógrafo, lá em cima). Guardado porque o
        "pular" precisa cancelar esta espera — senão a frase recomeçaria sozinha. */
-    /* REBRAND 22/09: a frase só depois que o "& Co." apareceu embaixo (FIM + os 0,6s dele) */
-    esperaDaFrase = setTimeout(datilografar, FIM_DAS_LETRAS + ECO_FINAL_MS + 200);
+    /* 26/09: a frase só depois que a escrita "ālea & Co." parou embaixo da capivara */
+    esperaDaFrase = setTimeout(datilografar, FIM_DA_MARCA + 200);
   }
 
   /* =======================================================================
