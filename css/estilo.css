@@ -2141,3 +2141,20 @@ body.nome-dourado .feed .produto-mini .collab, body.nome-dourado .produto-topo h
   font-size: 11.5px; line-height: 1.4; font-weight: 400; letter-spacing: 0; text-transform: none;
   color: var(--tinta-fraca);
 }
+
+/* =============================================================================
+   v32 — OS FILAMENTOS DE CADA FOTO, SÓ NA TELA CHEIA (27/09/2026; é o que a frase da msg 2268 promete: "nas fotos em
+   tela cheia, você encontra os nomes e as tonalidades reais de cada cor"). Canto de baixo à direita, DENTRO da foto:
+   um filamento por linha, de cima pra baixo na peça. Quem põe no lugar (em cima da foto) é o produto.js, que mede a
+   foto; aqui é só a cara. Some com a foto ampliada (lupa) pra não tapar o detalhe. A lista mora em config.js
+   (ALEA.filamentosPorFoto). Foto sem entrada = a caixa nem aparece. Vale no computador e no celular. */
+.telacheia .filamentos-tc {
+  position: absolute; z-index: 2; margin: 0; padding: 6px 9px; list-style: none;
+  background: rgba(20, 16, 13, .58); color: #fff; border-radius: 8px;
+  -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px);
+  font-size: 11px; line-height: 1.45; font-weight: 500; letter-spacing: .01em; text-align: left;
+  pointer-events: none; box-sizing: border-box;
+}
+.telacheia .filamentos-tc li { margin: 0; padding: 0; }
+.telacheia .filamentos-tc[hidden], .telacheia.com-zoom .filamentos-tc { display: none; }
+@media (min-width: 761px) { .telacheia .filamentos-tc { font-size: 12px; padding: 7px 11px; } }

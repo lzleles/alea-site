@@ -488,7 +488,47 @@
     /* v28: na 1ª foto a seta de voltar some; com uma foto só, somem as duas */
     telacheia.classList.toggle('na-primeira', tcAtual === 0);
     telacheia.classList.toggle('uma-so', tcLista.length < 2);
+    pintarFilamentos(palco.querySelector('img'), tcLista[tcOrdem[tcAtual]]);
   }
+
+  /* ⚠️ v32 — OS FILAMENTOS DA FOTO, SÓ NA TELA CHEIA (27/09/2026). A frase das cores da peça (msg 2268 do Cassiano)
+     promete: "nas fotos em tela cheia, você encontra os nomes e as tonalidades reais de cada cor". Então, com a foto em
+     tela cheia, o canto de baixo à direita DA FOTO mostra os filamentos dela, um por linha, de cima pra baixo na peça.
+     - A lista vem de ALEA.filamentosPorFoto (config.js), pela MESMA chave que a tela cheia usa ("img/produtos/x.jpg"),
+       então vale igual pra foto da colmeia e pra foto do álbum. Foto sem entrada (ou lista vazia) = nada aparece.
+     - A caixa mora direto na .telacheia (não dentro do palco): a lupa mede a foto por offsetLeft/offsetTop contra a
+       .telacheia, e um invólucro posicionado em volta da foto quebraria essa conta. Por isso ela é posta no lugar
+       MEDINDO a foto (quando ela carrega, a cada troca de foto e quando a janela muda de tamanho).
+     - Some com a foto ampliada (CSS .com-zoom) e não pega clique (pointer-events: none): tocar nela é tocar na foto. */
+  var caixaFil = null;
+  function pintarFilamentos(img, chave) {
+    if (!telacheia) return;
+    var lista = ((window.ALEA || {}).filamentosPorFoto || {})[chave] || [];
+    if (!caixaFil) {
+      caixaFil = document.createElement('ul');
+      caixaFil.className = 'filamentos-tc';
+      caixaFil.setAttribute('aria-label', 'Filamentos desta foto, de cima para baixo');
+      telacheia.appendChild(caixaFil);
+    }
+    caixaFil.hidden = true;
+    if (!img || !lista.length) { caixaFil.innerHTML = ''; return; }
+    caixaFil.innerHTML = lista.map(function (f) {
+      return '<li>' + String(f).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }) + '</li>';
+    }).join('');
+    var posicionar = function () { if (palcoImgAtual() === img) colocarFilamentos(img); };
+    if (img.complete && img.naturalWidth) posicionar();
+    else img.addEventListener('load', posicionar, { once: true });
+  }
+  function palcoImgAtual() { return telacheia && telacheia.querySelector('[data-palco-tc] img'); }
+  function colocarFilamentos(img) {
+    if (!caixaFil || !caixaFil.innerHTML || !img || img.offsetWidth < 2) return;
+    var folga = img.offsetWidth < 500 ? 8 : 12;
+    caixaFil.style.maxWidth = Math.max(120, img.offsetWidth - 2 * folga) + 'px';
+    caixaFil.style.right = Math.max(0, telacheia.clientWidth - (img.offsetLeft + img.offsetWidth)) + folga + 'px';
+    caixaFil.style.bottom = Math.max(0, telacheia.clientHeight - (img.offsetTop + img.offsetHeight)) + folga + 'px';
+    caixaFil.hidden = false;
+  }
+  window.addEventListener('resize', function () { if (caixaFil && !caixaFil.hidden) colocarFilamentos(palcoImgAtual()); });
 
   /* ⚠️ SEM VOLTA: passar do fim (ou do começo) FECHA em vez de dar a volta. É o pedido
      dele, e a razão é boa — carrossel que gira pra sempre não deixa o visitante saber
