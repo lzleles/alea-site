@@ -67,9 +67,11 @@
      descia no fim saíram — com eles, LETRA_MS, ENTRE_LETRAS_MS e ECO_FINAL_MS. */
   var PAUSA_CAPIVARA_MS = 1400;    // ela fica PARADA, gigante, antes de andar (3ª rodada)
   var CAPIVARA_MS = 3600;          // e leva 3,6s indo devagar pro centro
-  var ECO_ENTRA_MS = 1000;         // REBRAND 22/09 (ajuste 15:41): "& Co." vai reto pra esquerda e some
-  var ESCRITA_MS = 3000;           // 26/09: a escrita sai de baixo da capivara, devagar (CSS: 3s a partir de 6.0s)
-  var FIM_DA_MARCA = PAUSA_CAPIVARA_MS + CAPIVARA_MS + ECO_ENTRA_MS + ESCRITA_MS;  // 9,0s
+  /* RODADA 2 (áudios 2158/2159, 26/09/2026 21:30): o "& Co." apaga mais devagar, começando
+     já na perna (1,7s de apagar dentro de 2s de trajeto), e a escrita sobe em 4,5s. */
+  var ECO_SOME_MS = 1500;          // a escrita começa quando o "& Co." está quase apagado (5,0 + 1,5 = 6,5s; CSS: delay 6.5s)
+  var ESCRITA_MS = 4500;           // a escrita sai de baixo da capivara, devagar (CSS: 4.5s)
+  var FIM_DA_MARCA = PAUSA_CAPIVARA_MS + CAPIVARA_MS + ECO_SOME_MS + ESCRITA_MS;  // 11,0s
 
   /* =======================================================================
      1) F5 VOLTA PRO COMEÇO — e por que isso não é automático

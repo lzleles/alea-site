@@ -366,10 +366,16 @@ body.tem-clareira .abertura::before {
      O centro dela está em 17,85% da largura; andar 32,15% da largura a leva pra 50%. É um
      `translate` em % da própria peça — e a peça tem a largura da caixa (inset 0) —, então vale
      em qualquer tela sem medir nada. */
-  --cap-fim: translate(32.15%, 0px) scale(1);
-  /* a escrita desce ABAIXO da caixa (a caixa só tem 6,4% da largura livre embaixo da capivara;
-     a escrita tem 16%): este respiro reserva o lugar dela, pra a frase não subir por baixo. */
-  margin-bottom: calc(var(--marca-w) * .105);
+  /* RODADA 2 (áudios 2158/2159, 26/09/2026 21:30): "você só vai inverter os tamanhos" — a
+     capivara final fica com a LARGURA que a escrita tinha (55,37% da caixa: janela 62% × tinta
+     89,3% do SVG) e a escrita com a que a capivara tinha (35,70% = 1236 / 3462,47).
+     Escala = 55,37 / 35,70 = 1,551, em torno do centro dela (--cap-x/--cap-y). Crescendo no
+     centro, a cabeça subiria 203,6 unidades acima da caixa; o 21,18% (= 205,6 / 970,75 da
+     altura) desce ela pra a cabeça começar no topo da caixa. Os pés vão pra 119,4% da altura. */
+  --cap-fim: translate(32.15%, 21.18%) scale(1.551);
+  /* a escrita desce ABAIXO da caixa. Rodada 2: pés da capivara a 0,3348×largura, escrita com
+     0,1029×largura de altura → fundo em 0,4377; a caixa tem 0,2804 → faltam 0,157 + respiro. */
+  margin-bottom: calc(var(--marca-w) * .168);
   visibility: hidden;                    /* liberada pelo JS, ver acima */
 }
 .marca-anim img { position: absolute; inset: 0; width: 100%; height: 100%; }
@@ -409,9 +415,12 @@ body.marca-anima .marca-anim .capivara {
       A `.escrita-janela` começa na linha dos pés da capivara (y 748 de 970,75 = 77,05% da
       caixa) e recorta o que está acima dela: a escrita parte escondida (translateY -100%) e
       desce inteira até o lugar. Assim ela "nasce" debaixo da capivara, nunca por cima.
-      Começa quando o "& Co." do lado já sumiu (1,4 + 3,6 + 1,0 = 6,0s) e leva 3,0s. */
+      Começa quando o "& Co." do lado já sumiu (1,4 + 3,6 + 1,0 = 6,0s) e leva 3,0s.
+      RODADA 2 (26/09/2026 21:30): a janela desce pros pés da capivara MAIOR (119,4% da caixa,
+      ver --cap-fim), encolhe pra 39,97% (tinta = 35,70%, a largura que a capivara tinha), e a
+      subida fica mais lenta: 4,5s, começando aos 6,5s (quando o "& Co." acabou de apagar). */
 .marca-anim .escrita-janela {
-  position: absolute; top: 77.05%; left: 50%; width: 62%;
+  position: absolute; top: 119.4%; left: 50%; width: 39.97%;
   transform: translateX(-50%);
   overflow: hidden;
 }
@@ -421,7 +430,7 @@ body.marca-anima .marca-anim .capivara {
 body.marca-anima .marca-anim .escrita-janela .escrita {
   /* curva que começa e termina macia: com saída rápida (medido no 1º print) ela fazia 80% do
      trajeto no primeiro segundo e não parecia "devagar" */
-  animation: escrita-sai-de-baixo 3s cubic-bezier(.42, 0, .3, 1) 6.0s both;
+  animation: escrita-sai-de-baixo 4.5s cubic-bezier(.42, 0, .3, 1) 6.5s both;
 }
 @keyframes escrita-sai-de-baixo {
   from { transform: translateY(-100%); }
@@ -447,7 +456,7 @@ body.marca-medida:not(.marca-anima) .marca-anim .eco-capivara {
 }
 body.marca-anima .marca-anim .eco-capivara {
   transform-origin: var(--cap-x) var(--cap-y);
-  animation: eco-entra-na-capivara 4.6s cubic-bezier(.34, .01, .2, 1) 1.4s both;
+  animation: eco-entra-na-capivara 5.6s cubic-bezier(.34, .01, .2, 1) 1.4s both;
 }
 /* AJUSTE do Cassiano (15:41): ele entra RETO PRA ESQUERDA (não na diagonal encolhendo pro
    centro) e NA VELOCIDADE DAS LETRAS (1s). Os 3,6s primeiros são o trajeto colado à capivara
@@ -456,9 +465,17 @@ body.marca-anima .marca-anim .eco-capivara {
   from    { transform: translate(var(--cap-dx, 0px), var(--cap-dy, 0px)) scale(var(--cap-k, 3)); opacity: 1; }
   /* ABERTURA CENTRALIZADA (26/09/2026): ele assenta colado à capivara JÁ NO CENTRO (o mesmo
      `--cap-fim` dela) e dali faz o mergulho de antes: 18% reto pra esquerda, sumindo. */
-  78.26%  { transform: var(--cap-fim); opacity: 1;
-            animation-timing-function: cubic-bezier(.22, .78, .3, 1); }  /* 3,6s: assentou ao lado */
-  to      { transform: translate(14.15%, 0px) scale(1); opacity: 0; }    /* 4,6s: 32,15% - 18% = foi reto pra esquerda, pra dentro da capivara */
+  /* RODADA 2 (áudios 2158/2159, 26/09/2026 21:30): "na hora que ele começa a entrar, já começa
+     a esconder". Medido no SVG: o "&" começa em x 970 e a linha da perna dianteira está em
+     x 951-973 na mesma altura — ele JÁ encosta na perna quando assenta. Então o apagar começa
+     ali mesmo (5,0s), é longo (1,7s) e termina ANTES da barriga (as linhas de dentro das patas
+     ficam em x 750-770): o trajeto é de 208 unidades (= 9,32% da caixa na escala 1,551), e ele
+     chega a 0 com 85% do caminho feito, o "&" em ~x 793. Antes: 1s, 18% da caixa, apagando junto
+     com o movimento até dentro da barriga. Duração total 3,6 + 2,0 = 5,6s. */
+  64.29%  { transform: var(--cap-fim); opacity: 1;
+            animation-timing-function: cubic-bezier(.3, 0, .7, 1); }     /* 5,0s: assentou ao lado, já na perna */
+  94.64%  { opacity: 0; }                                                 /* 6,7s: apagou, antes da barriga */
+  to      { transform: translate(22.83%, 21.18%) scale(1.551); opacity: 0; } /* 7,0s: 32,15% - 9,32% */
 }
 
 /* o resto da tela só aparece quando a capivara já chegou — é o "revelando o site".
