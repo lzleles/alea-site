@@ -2107,9 +2107,24 @@ html.topo-emendado .aviso-memoria { display: none !important; }
      o fim antigo  #ffbe2e (commit f9ae81c), guardado                         → body.nome-ouro-silk
    As variáveis moram no BODY (não mais no .collab) pra que o coração da Lista de Desejos (loja.css, v2) use o MESMO degradê
    e siga a variação escolhida sem repetir as cores. Antes: _versoes_anteriores/nome_verde_dourado_antes_2026-09-27/. */
+/* v34 — "× SEMPRE AZUL; DEGRADÊ PROPORCIONAL SÓ NO NOME" (áudio 2308 do Cassiano, 27/09/2026 01:26): "esse degradê ficou
+   muito desproporcional. Vamos deixar o X sempre nesse azul (…) e a gente vai começar o degradê no nome (…) O verde
+   prevaleceu muito (…) se tem quatro letras, o degradê tem que ser mais ou menos igual pra todas as letras. No Luke tem
+   duas letras com verde, só o U fazendo o degradê."
+   · O "×" é AZUL CIANO SÓLIDO (#00b8f0) com o mesmo silk (reflexo + volume + contorno + halo): `--collab-x`.
+   · O degradê é medido pela largura do NOME (<span class="nome">, posto no HTML pelo _nomes_collab_v3, no feed.js v34 e,
+     onde faltar, pelo site.js), em 4 FATIAS IGUAIS (~25% cada) com transições curtas e iguais (8% cada):
+       azul ciano 0-21% · laranja #ff8a1a 29-46% · terracota #e8401e 54-71% · verde dourado (tom da B) 79-100%.
+     Em "Luke": L azul, u laranja, k terracota, e verde; em "Ayla Pompom", ao longo das 11 letras.
+   · Variações (classe no <body>): o padrão é o tom B; `nome-verde-a` = o mesmo desenho com o #AA9661 fiel;
+     `nome-ouro-silk` = o mesmo desenho terminando no ouro antigo #ffbe2e; `nome-verde-c` (a de "mais espaço pro verde")
+     foi APOSENTADA por este pedido e agora é igual ao padrão; `nome-dourado` continua (× e nome dourados).
+   · .collab sem o span .nome (fallback): o degradê cai no .collab inteiro, como na v33, pra o nome nunca sumir.
+   Antes (209ad74): _versoes_anteriores/x_azul_nome_proporcional_antes_2026-09-27/css/estilo.css */
 body {
-  --collab-cores: linear-gradient(90deg, #00b8f0 0%, #19c6ff 16%, #0a9ad6 30%, #ff8a1a 45%, #e8401e 60%,
-                                         #b7a24f 71%, #d1be6b 85%, #bfab58 100%);
+  --collab-x: linear-gradient(#00b8f0, #00b8f0);
+  --collab-cores: linear-gradient(90deg, #00b8f0 0%, #19c6ff 10%, #0a9ad6 21%, #ff8a1a 29%, #ff8a1a 46%,
+                                         #e8401e 54%, #e8401e 71%, #b7a24f 79%, #d1be6b 90%, #bfab58 100%);
   --collab-volume: linear-gradient(180deg, rgba(255, 255, 255, .45) 0%, rgba(255, 255, 255, 0) 38%,
                                    rgba(0, 0, 0, 0) 58%, rgba(40, 10, 0, .30) 100%);
   /* faixas em `em` (acompanham o tamanho da letra: no card miúdo não viram buraco) */
@@ -2120,43 +2135,61 @@ body {
   --collab-contorno: rgba(70, 25, 10, .55);
   --collab-halo: drop-shadow(0 1px 0 rgba(255, 255, 255, .75)) drop-shadow(0 0 1.5px rgba(255, 140, 40, .45));
   --collab-liso: #e8401e;     /* a cor lisa de quem não tem background-clip: text */
+  --collab-x-liso: #00b8f0;
 }
 body.nome-verde-a {
-  --collab-cores: linear-gradient(90deg, #00b8f0 0%, #19c6ff 16%, #0a9ad6 30%, #ff8a1a 45%, #e8401e 60%,
-                                         #AA9661 72%, #b9a56e 86%, #AA9661 100%);
+  --collab-cores: linear-gradient(90deg, #00b8f0 0%, #19c6ff 10%, #0a9ad6 21%, #ff8a1a 29%, #ff8a1a 46%,
+                                         #e8401e 54%, #e8401e 71%, #AA9661 79%, #b9a56e 90%, #AA9661 100%);
 }
-body.nome-verde-b {
-  --collab-cores: linear-gradient(90deg, #00b8f0 0%, #19c6ff 16%, #0a9ad6 30%, #ff8a1a 45%, #e8401e 60%,
-                                         #b7a24f 71%, #d1be6b 85%, #bfab58 100%);
-}
-body.nome-verde-c {
-  --collab-cores: linear-gradient(90deg, #00b8f0 0%, #19c6ff 13%, #0a9ad6 25%, #ff8a1a 38%, #e8401e 51%,
-                                         #b7a24f 62%, #d1be6b 80%, #bfab58 100%);
+body.nome-verde-b, body.nome-verde-c {
+  --collab-cores: linear-gradient(90deg, #00b8f0 0%, #19c6ff 10%, #0a9ad6 21%, #ff8a1a 29%, #ff8a1a 46%,
+                                         #e8401e 54%, #e8401e 71%, #b7a24f 79%, #d1be6b 90%, #bfab58 100%);
 }
 body.nome-ouro-silk {
-  --collab-cores: linear-gradient(90deg, #00b8f0 0%, #19c6ff 16%, #0a9ad6 30%, #ff8a1a 50%, #e8401e 72%, #ffbe2e 100%);
+  --collab-cores: linear-gradient(90deg, #00b8f0 0%, #19c6ff 10%, #0a9ad6 21%, #ff8a1a 29%, #ff8a1a 46%,
+                                         #e8401e 54%, #e8401e 71%, #ffbe2e 79%, #ffbe2e 100%);
 }
 /* a alternativa dourada (26/09) vem por último: com a classe ligada, ela vence qualquer variação acima */
 body.nome-dourado {
+  --collab-x: linear-gradient(#af9559, #af9559);
   --collab-cores: linear-gradient(100deg, #8a7340 0%, #af9559 30%, #d9c38b 50%, #af9559 70%, #8a7340 100%);
   --collab-volume: linear-gradient(transparent, transparent);
   --collab-reflexo: linear-gradient(transparent, transparent);
   --collab-contorno: rgba(110, 88, 42, .85);
   --collab-halo: none;
   --collab-liso: #af9559;
+  --collab-x-liso: #af9559;
 }
 .feed .produto-mini .collab, .produto-topo h1 .collab {
   color: var(--collab-liso);
   width: -webkit-fit-content; width: -moz-fit-content; width: fit-content;
   animation: none;
 }
+.feed .produto-mini .collab .x, .produto-topo h1 .collab .x { color: var(--collab-x-liso); }
 @supports ((-webkit-background-clip: text) or (background-clip: text)) {
   .feed .produto-mini .collab, .produto-topo h1 .collab {
-    background-image: var(--collab-reflexo), var(--collab-volume), var(--collab-cores);
-    -webkit-background-clip: text; background-clip: text;
     -webkit-text-fill-color: transparent;
     -webkit-text-stroke: .35px var(--collab-contorno);
     filter: var(--collab-halo);
+  }
+  /* o × e o NOME: cada um com o próprio fundo recortado na letra; o do nome mede SÓ o nome */
+  .feed .produto-mini .collab .x, .produto-topo h1 .collab .x,
+  .feed .produto-mini .collab .nome, .produto-topo h1 .collab .nome {
+    -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: none;
+  }
+  .feed .produto-mini .collab .x, .produto-topo h1 .collab .x {
+    background-image: var(--collab-reflexo), var(--collab-volume), var(--collab-x);
+  }
+  .feed .produto-mini .collab .nome, .produto-topo h1 .collab .nome {
+    display: inline-block;
+    background-image: var(--collab-reflexo), var(--collab-volume), var(--collab-cores);
+  }
+  /* reserva: .collab que chegou sem o span .nome → o degradê no .collab inteiro (como na v33) */
+  .feed .produto-mini .collab:not(:has(.nome)), .produto-topo h1 .collab:not(:has(.nome)) {
+    background-image: var(--collab-reflexo), var(--collab-volume), var(--collab-cores);
+    -webkit-background-clip: text; background-clip: text;
   }
   .feed .produto-mini .collab { font-weight: 600; }
   .feed .produto-mini .collab .x, .produto-topo h1 .collab .x { font-weight: 500; }

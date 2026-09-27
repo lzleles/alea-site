@@ -9,6 +9,8 @@
    27/09/2026: o botão novo do topo `data-abrir="desejos"` (coração, entre Conta e Sacola — áudio 2300 do Cassiano) leva
       à lista-de-desejos.html, do mesmo jeito que a Conta leva à conta.html. Antes:
       03_site/_versoes_anteriores/lista_desejos_antes_2026-09-27/js/site.js
+   27/09/2026 (áudio 2308): embrulharNomeCollab() põe o nome do "× Nome" num <span class="nome"> onde faltar (o degradê
+      proporcional mede o nome). Antes: 03_site/_versoes_anteriores/x_azul_nome_proporcional_antes_2026-09-27/js/site.js
 */
 /* =============================================================================
    site.js — o que vale em TODA página (abertura, feed, produto, textos)
@@ -420,6 +422,23 @@ window.aleaCorDoTopo = (function () {
     document.body.appendChild(s);
   }
 
+  /* 27/09/2026 (áudio 2308 do Cassiano): o degradê do "× Nome" mede o NOME, que precisa estar num <span class="nome">.
+     As 4 páginas de produto e o feed.js (v34) já saem assim; isto embrulha qualquer .collab que chegue sem o span
+     (página refeita por gerador antigo), pra o nome nunca ficar sem cor. Só mexe no texto que vem DEPOIS do ×. */
+  function embrulharNomeCollab() {
+    Array.prototype.forEach.call(document.querySelectorAll('.collab'), function (c) {
+      if (c.querySelector('.nome')) return;
+      var x = c.querySelector('.x');
+      var no = x ? x.nextSibling : c.firstChild;
+      if (!no || no.nodeType !== 3) return;
+      var t = no.nodeValue, sep = /^[  ]/.test(t) ? t.charAt(0) : '';
+      var n = document.createElement('span');
+      n.className = 'nome'; n.textContent = t.slice(sep.length);
+      no.nodeValue = sep;
+      c.insertBefore(n, no.nextSibling);
+    });
+  }
+
   /* -------------------------------------------------------------------- início */
   /* ETAPA 72 (24/09/2026): linha da ficha ainda sem número (ex.: "Peso e dimensões — a informar") só aparece na
      PRÉVIA; no site do ar ela some. Nunca mostrar "a informar" pro cliente de verdade. */
@@ -430,6 +449,7 @@ window.aleaCorDoTopo = (function () {
 
   function iniciar() {
     esconderFaltas();
+    embrulharNomeCollab();
     ligarVoltarProFeed();
     preencherContato();
     montarMenuCategorias();

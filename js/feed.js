@@ -6,6 +6,8 @@
    saida: Feed de produtos, filtros visuais, navegação e posição persistida
    status: ativo (cabecalho proposto pelo Codex em 2026-09-20, confianca ALTA; conferir na proxima vez que o script rodar)
    validado_em: TBD
+   v34 (27/09/2026, áudio 2308): no card, o nome do "× Nome" vai num <span class="nome"> (o degradê mede o nome, e o
+      × fica azul sólido). Antes: 03_site/_versoes_anteriores/x_azul_nome_proporcional_antes_2026-09-27/js/feed.js
 */
 /* =============================================================================
    feed.js — o feed: um objeto por tela, preto, deslizando pra cima
@@ -108,7 +110,10 @@
     var i = Math.max(txt.lastIndexOf(' × '), txt.lastIndexOf(' × '));
     if (i < 0) return comNomeMarca(txt);
     /* o "×" vai num span próprio: o × da Defante é um pontinho (visto no print de 26/09); o `.x` o desenha na Hanken */
-    return comNomeMarca(txt.slice(0, i)) + ' <span class="collab"><span class="x">×</span>' + txt.slice(i + 2) + '</span>';
+    /* v34 (27/09/2026, áudio 2308 do Cassiano): o NOME ganha span próprio (.nome). O "×" fica sempre azul e o degradê
+       é medido pela largura do NOME, em 4 fatias iguais (estilo.css v34). O espaço (comum ou sem quebra) fica fora. */
+    return comNomeMarca(txt.slice(0, i)) + ' <span class="collab"><span class="x">×</span>' + txt.charAt(i + 2) +
+      '<span class="nome">' + txt.slice(i + 3) + '</span></span>';
   }
 
   function nomeDaCategoria(id) {
