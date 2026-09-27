@@ -179,7 +179,12 @@ window.PRODUTOS = [
       { id: 'monocromatico', nome: 'Monocromático', capa: 'lukebowl_0241', fotos: ['lukebowl_0241', 'lukebowl_9291', 'lukebowl_9295', 'lukebowl_9304', 'lukebowl_9307', 'lukebowl_9312', 'lukebowl_9313', 'lukebowl_9318'] }
     ],
     resumo: '',
-    paragrafos: [],
+    paragrafos: [   // 27/09/2026: texto DELE aprovado no Telegram (msgs 2371-2427)
+      "A ideia deste comedouro veio da vontade de criar algo com muita personalidade, um presente pro meu cachorro. Pra quem não sabe, eu tenho dois Goldens, e o meu primeiro se chama Luke, que é o lindão/gordão aí da capa! Haha’",
+      "Eu queria uma peça bonita, leve, colorida e, CLARO, em low poly.",
+      "Só que foram muitos desafios. Eu não sabia modelar, muito menos fazer low poly. Pedi ajuda à minha cunhada, que é arquiteta, e depois de muito trabalho e testes, a gente chegou nessa peça, que eu achei incrível.",
+      "Então fique à vontade para usar e abusar da sua criatividade pra também deixar ela do jeitinho que seu pet merece!"
+    ],
     galeria: ['lukebowl_0005', 'lukebowl_9148', 'lukebowl_9170', 'lukebowl_wa182751', 'lukebowl_wa182753', 'lukebowl_wa183050']
   },
 
@@ -194,7 +199,12 @@ window.PRODUTOS = [
     cores_peca: ['bicolor', 'monocromatico'],               // áudio 1863: "NÃO existe tricolor"
     /* SEM álbuns (áudio 1863): não há foto monocromática dele, e ele não mandou mais fotos. */
     resumo: '',
-    paragrafos: [],
+    paragrafos: [   // 27/09/2026: texto DELE aprovado no Telegram (msgs 2371-2427)
+      "Depois de criar o meu primeiro comedouro, bateu aquele sentimento de justiça de pai: tudo que se dá pra um filho, tem que dar pro outro! Haha’",
+      "Se o Luke tinha ganhado o dele, o Matteo também tinha que ganhar. Só que não podia ser igual, tinha que ser diferente.",
+      "Foi aí que surgiu a ideia de um comedouro elevado: o pote fica mais perto da altura do peito dele, e ele come sem precisar abaixar tanto o pescoço.",
+      "E, pra não ficar igual mesmo, ele ganhou textura: na impressão, o bico faz pequenos movimentos aleatórios nas paredes, e a peça sai com um toque áspero, diferente do liso."
+    ],
     galeria: ['matteotex_0094', 'matteotex_9202', 'matteotex_9220', 'matteotex_9240', 'matteotex_9255', 'matteotex_9262']
   },
 
@@ -211,7 +221,12 @@ window.PRODUTOS = [
        até ele dizer o texto: o padrão ("Totalmente personalizável") seria falso nesta peça. */
     personalizavel: false,
     resumo: '',
-    paragrafos: [],
+    paragrafos: [   // 27/09/2026: texto DELE aprovado no Telegram (msgs 2371-2427)
+      "O comedouro da Ayla veio de mais um sentimento de justiça. Eu já tinha criado um pra cada um dos meus filhos, e ainda faltava a minha irmã caçula, a filha preferida da minha mãe! Haha’",
+      "A Ayla não é uma cachorra, é uma artista! Tem milhares de seguidores no Instagram (@aylapompom) e, acima de tudo, é muito fotogênica. Pra ela, tinha que ser algo jamais visto, surpreendente e muito chamativo.",
+      "E como ela é muito comilona, na hora de criar lembrei da Magali, da Turma da Mônica, que também é associada à melancia, a fruta preferida dela. Pra mim, melancia tem uma combinação de cores linda, que sempre funciona em objeto, textura e desenho. Tinha tudo a ver com ela.",
+      "Por isso, esse comedouro é uma edição especial, feita exclusivamente para ela."
+    ],
     galeria: ['aylapompom_0145', 'aylapompom_9120', 'aylapompom_9737', 'aylapompom_9859', 'aylapompom_9931', 'aylapompom_9935']
   },
 
@@ -233,7 +248,14 @@ window.PRODUTOS = [
       { id: 'bicolor',  nome: 'Bicolor',  capa: 'claudiawave_capa', fotos: ['claudiawave_capa', 'claudiawave_0166', 'claudiawave_0196', 'claudiawave_9528', 'claudiawave_9566', 'claudiawave_9569', 'claudiawave_9570', 'claudiawave_9572', 'claudiawave_9587', 'claudiawave_9590', 'claudiawave_9647', 'claudiawave_9648', 'claudiawave_9654', 'claudiawave_9674', 'claudiawave_9676', 'claudiawave_9695', 'claudiawave_9698'] }
     ],
     resumo: '',
-    paragrafos: [],
+    paragrafos: [   // 27/09/2026: texto DELE aprovado no Telegram (msgs 2371-2427)
+      "O ālea Pet Bowl Wave foi criado pensando em dar mais cor a um comedouro elevado. O do Matteo a gente quis texturizado e com poucas cores. Já o Wave tem essas ondas na base e foi pensado desde o início pra três cores.",
+      "Mas você pode personalizar do seu jeito, com três cores, com duas ou com uma só. Nele dá pra brincar com a imaginação!",
+      "Foi nele também que experimentei, pela primeira vez, o filamento em tom de mármore. Ele não é áspero como o texturizado, mas lembra muito um mármore de verdade. Chama muita atenção e é muito bonito, como dá pra ver nas fotos dos álbuns.",
+      "E vocês devem ter reparado no anjinho da foto de capa, né? Esse anjinho é a Cláudia.",
+      "A Cláudia foi a nossa modelo na divulgação da coleção Pet Bowl Wave. Muito fotogênica, foi quem mais fez a equipe rir na hora das fotos, com seu jeito brincalhão e medroso.",
+      "Infelizmente, um dia depois das fotos, ela foi atropelada e não resistiu. Por isso resolvi fazer essa collab com o nome dela, pra que a Cláudia siga com a gente em cada peça."
+    ],
     galeria: ['claudiawave_0039', 'claudiawave_0196', 'claudiawave_9569', 'claudiawave_9590', 'claudiawave_9676', 'claudiawave_9698']
   },
 
