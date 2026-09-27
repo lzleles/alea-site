@@ -254,10 +254,10 @@ window.ALEA = {
       { site: 'Dourado', hex: '#D09531', original: 'Multfila · PLA · Mult Silk · Ouro Envelhecido (4226-PCI-PLS-048)' },
       { site: 'Laranja', hex: '#F15505', original: 'Voolt3D · PLA · V-Silk · Laranja (PL-LJ-SK-1)' },
       { site: 'Vermelho', hex: '#DA342E', original: 'Multfila · PLA · Mult Silk · Vermelho Metalizado (4226-PCI-PLS-026)' },
-      { site: 'Rosa', hex: '#FF7F6F', original: 'eSUN · PLA · PLA-Silk · Pink' },
-      { site: 'Azul Aqua', hex: '#6BBFE3', original: 'eSUN · PLA · Silk · Aqua', rugosidade: 0.2, metal: 0.18 },
+      { site: 'Rosa', hex: '#E78498', original: 'eSUN · PLA · PLA-Silk · Pink', hex_oficial: '#FF7F6F' },
+      { site: 'Azul Aqua', hex: '#51B8D0', original: 'eSUN · PLA · Silk · Aqua', hex_oficial: '#6BBFE3', rugosidade: 0.2, metal: 0.18 },
       { site: 'Azul', hex: '#358AE8', original: 'Multfila · PLA · Mult Silk · Azul Safira Metalizado (4226-PCI-PLS-025)' },
-      { site: 'Azul Céu', hex: '#035EB7', original: 'Voolt3D · PLA · V-Silk · Azul Sky (PL-AZ-SY-SK-1)' },
+      { site: 'Azul Céu', hex: '#1B8DCC', original: 'Voolt3D · PLA · V-Silk · Azul Sky (PL-AZ-SY-SK-1)', hex_oficial: '#035EB7' },
       { site: 'Verde Limão', hex: '#A3E810', original: 'eSUN · PLA · PLA-Silk · Lime' },
       { site: 'Verde', hex: '#129856', original: 'Voolt3D · PLA · V-Silk · Verde (PL-VD-SK-1)' }
     ]
@@ -374,7 +374,7 @@ window.ALEA.modelos3d['claudia-wave'] = {
   original: {
     topo:      { site: 'Branco',    hex: '#FFFFFF', acabamento: 'perolizado', oficial: 'Elegoo · PLA · Silk · Silk White' },
     principal: { site: 'Branco',    hex: '#FFFFFF', acabamento: 'perolizado', oficial: 'Elegoo · PLA · Silk · Silk White' },
-    base:      { site: 'Azul Aqua', hex: '#6BBFE3', acabamento: 'perolizado', oficial: 'eSUN · PLA · Silk · Aqua' }
+    base:      { site: 'Azul Aqua', hex: '#51B8D0', acabamento: 'perolizado', oficial: 'eSUN · PLA · Silk · Aqua' }
   },
   capa: { modo: 'bicolor', escolhas: [{ acabamento: 'perolizado', cor: 'Branco' }, { acabamento: 'perolizado', cor: 'Azul Aqua' }] }
 };
