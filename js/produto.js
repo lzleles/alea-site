@@ -4,8 +4,8 @@
    objetivo: Controla galeria, tela cheia, personalização, preço, aceite e inclusão de produtos no carrinho.
    entrada: DOM da página, configuração comercial e dados do produto
    saida: Galeria interativa, item personalizado e comandos para o carrinho
-   status: ativo (cabecalho proposto pelo Codex em 2026-09-20, confianca ALTA; conferir na proxima vez que o script rodar)
-   validado_em: TBD
+   status: ativo — v34 (27/09/2026, quadradinho "Sem nome" no campo do nome; saiu a pergunta "Deseja mesmo não adicionar nome?")
+   validado_em: 27/09/2026 (Playwright 390 e 1440, 03_site/_testar_sem_nome_v1_2026-09-27.py)
 */
 /* =============================================================================
    produto.js — o que só a página de produto faz
@@ -43,6 +43,10 @@
 
    8. A COR DO NOME TRAVADA AVISA (v29, 26/09/2026, vídeo 1991): tocar nela com o "Um detalhe
       que transforma" desmarcado treme o detalhe e diz "Marque a opção acima para personalizar."
+
+   9. O QUADRADINHO "SEM NOME" (v34, 27/09/2026, áudios 2319-2322): ao lado do título "Nome do pet", em
+      toda página com o campo (dentro da janela Personalize e na página sem 3D). Vazio e desmarcado = a
+      trava de sempre; marcado = passa sem nome (o item vai com sem_nome). Ver quadradinhoSemNome().
 
    ⚠️ A TRAVA É DE VERDADE, E NÃO SÓ VISUAL. A conferência acontece DENTRO do clique, e
    é ela que decide se o item entra. Trava que só pinta botão de cinza é trava que o
@@ -105,6 +109,58 @@
   var telacheia = document.querySelector('[data-telacheia]');
   var caixaAceite = document.querySelector('[data-aceite-caixa]');
   var botaoComprar = document.querySelector('[data-comprar-agora]');
+
+  /* ⚠️ v34 (27/09/2026, áudios 2319-2322 do Cassiano, print 2321 = o quadradinho do aviso de cor como MODELO): "na
+     frente do nome, vamos colocar a mensagem 'Sem nome' e o quadradinho (...) se o cliente passar sem marcar essa
+     opção, você vai tremer a tela pedindo para colocar o nome do pet (...) vamos TIRAR aquela mensagem de 'não
+     adicionar nome'". O quadradinho NASCE AQUI, por JS, em TODA página que tem o campo Nome do pet (Luke, Matteo,
+     Cláudia dentro da janela Personalize; Ayla e as outras na própria página) — o gerador de páginas (v18) não
+     escreve o campo, então nada muda nele. Monta: <div class="campo-nome"> [o rótulo Nome do pet] [☐ Sem nome] </div>
+     (o quadradinho fica na linha do título "NOME DO PET", à direita — CSS v34).
+     A regra é a de sempre, com um estado só: marcado = o formulário ganha `data-sem-nome` (o mesmo sinal que a
+     pergunta "Deseja mesmo não adicionar nome?" dava, e que oQueFalta, montarItem, carrinho.js e a peça 3D já leem).
+     MARCAR guarda o que estava digitado, esvazia e trava o campo; DESMARCAR devolve o texto e reabre o campo — nada
+     do que o cliente digitou se perde. A v33 está em 03_site/_versoes_anteriores/sem_nome_quadradinho_antes_2026-09-27/. */
+  var semNomeCaixa = null;
+  (function quadradinhoSemNome() {
+    var form = document.querySelector('[data-personalizar]');
+    var campoN = form && form.querySelector('[name="nome_pet"]');
+    var rot = campoN && campoN.closest('label');
+    if (!rot || form.querySelector('[data-sem-nome-caixa]')) return;
+    var bloco = document.createElement('div');
+    bloco.className = 'campo-nome';
+    bloco.setAttribute('data-campo-nome', '');
+    rot.parentNode.insertBefore(bloco, rot);
+    bloco.appendChild(rot);
+    var sn = document.createElement('label');
+    sn.className = 'sem-nome';
+    sn.setAttribute('data-sem-nome-rot', '');
+    sn.innerHTML = '<input type="checkbox" data-sem-nome-caixa> <span>Sem nome</span>';
+    bloco.appendChild(sn);
+    semNomeCaixa = sn.querySelector('input');
+    var guardado = '';
+    window.aleaMarcarSemNome = function (marcar) {
+      if (semNomeCaixa.checked !== !!marcar) semNomeCaixa.checked = !!marcar;
+      if (marcar) {
+        if (campoN.value.trim()) guardado = campoN.value;
+        campoN.value = '';
+        campoN.disabled = true;
+        form.setAttribute('data-sem-nome', '');
+        rot.classList.remove('faltou');
+        var rec = document.querySelector('[data-recado-aceite]');
+        if (rec && rec.textContent === 'Por favor, digite o nome do pet.') rec.hidden = true;
+      } else {
+        campoN.disabled = false;
+        if (!campoN.value && guardado) campoN.value = guardado;
+        guardado = '';
+        form.removeAttribute('data-sem-nome');
+      }
+    };
+    semNomeCaixa.addEventListener('change', function () {
+      window.aleaMarcarSemNome(semNomeCaixa.checked);
+      if (!semNomeCaixa.checked) { try { campoN.focus({ preventScroll: true }); } catch (e) { campoN.focus(); } }
+    });
+  })();
 
   /* ⚠️ ETAPA 53 (23/09/2026, 14:27, protótipo): botão "Personalize aqui" -> janela com a peça em 3D, nome
      gravado ao vivo e cores trocando na hora (js/personalizar3d.js). Só aparece no produto que tem modelo 3D
@@ -1182,7 +1238,8 @@
   function oQueFalta() {
     var faltas = [];
     var nome = document.querySelector('[data-personalizar] [name="nome_pet"]');
-    /* ETAPA 58 (8): "Deseja mesmo não adicionar nome?" -> Sim marca o formulário (data-sem-nome) e o nome não é cobrado */
+    /* ETAPA 58 (8) -> v34: o quadradinho "Sem nome" marcado põe `data-sem-nome` no formulário e o nome não é cobrado
+       (a pergunta "Deseja mesmo não adicionar nome?" saiu). Desmarcado e vazio: a trava de sempre, frase de sempre. */
     var formSN = document.querySelector('[data-personalizar]');
     var semNome = formSN && formSN.hasAttribute('data-sem-nome');
     if (nome && !nome.value.trim() && !semNome) faltas.push({ el: nome.closest('label') || nome, texto: 'Por favor, digite o nome do pet.' });
@@ -1390,7 +1447,11 @@
     /* ⚠️ ETAPA 58 (11) (16:24, com 2 prints — substitui a ETAPA 47): "editar" volta pra esta página PARADA na
        posição dos botões (Personalize aqui, declaração, Comprar à vista) e JÁ com a janela de personalizar aberta,
        tudo preenchido, a peça de frente, centralizada e parada. */
-    if (p.sem_nome) { var fsn = document.querySelector('[data-personalizar]'); if (fsn) fsn.setAttribute('data-sem-nome', ''); }
+    /* v34: o item salvo "sem nome" volta com o quadradinho Sem nome MARCADO (campo vazio e travado) */
+    if (p.sem_nome) {
+      if (window.aleaMarcarSemNome) window.aleaMarcarSemNome(true);
+      else { var fsn = document.querySelector('[data-personalizar]'); if (fsn) fsn.setAttribute('data-sem-nome', ''); }
+    }
     if (p.cores && p.cores.escolhas) window.aleaMiniatura3D = item.miniatura || null;
     if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
     function abrirEditando() {

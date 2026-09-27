@@ -5,8 +5,8 @@
              pet GRAVADO ao vivo e as cores da peça e do nome trocando na hora, conforme o formulário.
    entrada: ALEA.modelos3d[slug] e ALEA.filamentos (config.js); o formulário [data-personalizar] da página
    saida: a janela (modal); o formulário de verdade MORA dentro dela enquanto está aberta
-   status: v9 (26/09/2026, aviso de variação de cor com aceite antes de personalizar)
-   validado_em: 26/09/2026 (prints na prévia, 1440 px e 390 px: 03_site/_prints_textura_2026-09-26/)
+   status: v11 (27/09/2026, quadradinho "Sem nome" no passo 1; saiu a pergunta "Deseja mesmo não adicionar nome?")
+   validado_em: 27/09/2026 (Playwright 1440 px e 390 px: 03_site/_testar_sem_nome_v1_2026-09-27.py)
 */
 /* =============================================================================
    HISTÓRICO (a v1 da etapa 53 está em 03_site/_versoes_anteriores/js_2026-09-23/)
@@ -76,6 +76,14 @@
       vale pra VISITA inteira (sessionStorage `alea_ciente_cor`), em qualquer produto. O pedido que chega pro Cassiano
       leva "Cliente ciente da variação de cor da tela" (carrinho.js). Vale no COMPUTADOR e no CELULAR.
       O tamanho 2× da janela no computador (vídeo 2176) é só CSS (estilo.css, bloco v31): aqui nada mudou pra isso.
+   v10 (27/09/2026, áudio 2259): o aviso de cor aparece TODA VEZ que a janela abre (ver o bloco do aviso, lá embaixo).
+   v11 (27/09/2026, áudios 2319-2322 do Cassiano; a v10 está em 03_site/_versoes_anteriores/sem_nome_quadradinho_antes_2026-09-27/js/):
+      "vamos TIRAR aquela mensagem de 'não adicionar nome'" — a pergunta "Deseja mesmo não adicionar nome?" (v4, etapa 58)
+      NÃO é mais chamada (o código dela fica comentado, logo abaixo do Próximo). No lugar, o quadradinho "Sem nome" ao lado
+      do título Nome do pet (quem o cria é o produto.js v34; aqui ele entra no passo 1 junto do campo). No Próximo do
+      passo 1: nome vazio e quadradinho desmarcado = a trava de sempre (treme, cor de falta, "Por favor, digite o nome do
+      pet.", cursor no campo) — nenhuma frase nova; marcado = segue pro passo 2, sem nome. Marcar tira a letra da peça na
+      hora (antes, no passo 1 vazio, a peça mostrava o nome original da foto).
    ============================================================================= */
 
 /* ⚠️ OS TEXTOS DO AVISO DE COR — trocar AQUI, e só aqui. Os dois são do Cassiano, palavra por palavra (26/09/2026).
@@ -147,6 +155,8 @@ export async function abrirJanela3D(cfg, aoFechar, aoMontar, opcoes) {
   var passos = [];
   if (form) {
     var nomeRot = (form.querySelector('[name="nome_pet"]') || {}).closest ? form.querySelector('[name="nome_pet"]').closest('label') : null;
+    /* v11: o passo 1 é o bloco inteiro (rótulo Nome do pet + quadradinho Sem nome), quando o produto.js o montou */
+    if (nomeRot && nomeRot.closest('[data-campo-nome]')) nomeRot = nomeRot.closest('[data-campo-nome]');
     var extraRot = form.querySelector('[data-extra]');
     var corNomeRot = form.querySelector('.campo-cor-nome') ? form.querySelector('.campo-cor-nome').closest('label') : null;
     var coresRot = form.querySelector('[data-cores-peca]');
@@ -243,7 +253,8 @@ export async function abrirJanela3D(cfg, aoFechar, aoMontar, opcoes) {
     if (acao === 'voltar') { mostrarPasso(passoAtual - 1); if (window.aleaGravarNome) window.aleaGravarNome(); }
     else if (acao === 'proximo') {
       var cn = form && form.querySelector('[name="nome_pet"]');
-      if (passoAtual === 0 && cn && !cn.value.trim()) { perguntarSemNome(); return; }
+      /* v11: sem nome e sem o quadradinho marcado = a trava de sempre (era: perguntarSemNome()) */
+      if (passoAtual === 0 && cn && !cn.value.trim() && !form.hasAttribute('data-sem-nome')) { faltaONome(cn); return; }
       mostrarPasso(passoAtual + 1);
       if (window.aleaGravarNome) window.aleaGravarNome();
     }
@@ -255,7 +266,15 @@ export async function abrirJanela3D(cfg, aoFechar, aoMontar, opcoes) {
     }
     else if (acao === 'pronto') fechar();
   });
-  /* (8) "Deseja mesmo não adicionar nome?" — Sim: segue sem nome (e o Comprar deixa passar); Não: volta pro campo */
+  /* v11: a trava do nome no passo 1 — a MESMA da compra: cor de falta no rótulo, treme, a frase de sempre, cursor no campo */
+  function faltaONome(cn) {
+    var rotN = cn.closest('label') || cn;
+    rotN.classList.add('faltou');
+    avisarNoPasso('Por favor, digite o nome do pet.', [rotN]);
+    try { cn.focus({ preventScroll: true }); } catch (e) { cn.focus(); }
+  }
+  /* (8) "Deseja mesmo não adicionar nome?" — SAIU na v11 (áudios 2319-2322: "vamos tirar aquela mensagem"). Fica guardado
+     aqui, comentado, caso ele peça de volta; ninguém mais chama. O código original, inteiro:
   function perguntarSemNome() {
     var velho = fundo.querySelector('.janela3d-pergunta'); if (velho) velho.remove();
     var q = document.createElement('div');
@@ -275,6 +294,7 @@ export async function abrirJanela3D(cfg, aoFechar, aoMontar, opcoes) {
       } else if (cn) { try { cn.focus({ preventScroll: true }); } catch (e2) { cn.focus(); } }
     });
   }
+  (fim do código guardado da pergunta) */
 
   /* a trava de compra marca a falta com .faltou: a janela abre no passo da PRIMEIRA falta */
   window.aleaIrParaFalta = function () {
@@ -748,6 +768,7 @@ export async function abrirJanela3D(cfg, aoFechar, aoMontar, opcoes) {
   /* (7) o NOME na peça: abre com o original da foto; digitou, muda; apagou no passo 1, volta o original; saiu do
      passo 1 em branco (confirmado), a peça fica lisa */
   function nomeParaMostrar() {
+    if (form && form.hasAttribute('data-sem-nome')) return '';   // v11: quadradinho Sem nome marcado = peça lisa
     var v = campoNome ? campoNome.value.trim() : '';
     if (v) return v;
     return passoAtual === 0 ? (cfg.nomeInicial || quadro.text_info.text || '') : '';
@@ -783,6 +804,13 @@ export async function abrirJanela3D(cfg, aoFechar, aoMontar, opcoes) {
       clearTimeout(espera);
       if (campoNome.value.trim() && form) form.removeAttribute('data-sem-nome');
       espera = setTimeout(function () { gravar(nomeParaMostrar()); }, 60);
+      if (campoNome.value.trim()) recadoPasso.hidden = true;
+    }
+    /* v11: marcou/desmarcou o Sem nome -> a peça fica lisa / volta o nome na hora, e o recado de falta some */
+    if (ev.target && ev.target.hasAttribute && ev.target.hasAttribute('data-sem-nome-caixa')) {
+      clearTimeout(espera);
+      if (ev.target.checked) recadoPasso.hidden = true;
+      espera = setTimeout(function () { gravar(nomeParaMostrar()); }, 0);
     }
     setTimeout(aplicarForm, 0);   // depois que o produto.js redesenhar as janelas de cor
   }

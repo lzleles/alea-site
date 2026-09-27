@@ -2240,3 +2240,22 @@ body.nome-dourado {
 .telacheia .filamentos-tc li { margin: 0; padding: 0; }
 .telacheia .filamentos-tc[hidden], .telacheia.com-zoom .filamentos-tc { display: none; }
 @media (min-width: 761px) { .telacheia .filamentos-tc { font-size: 12px; padding: 7px 11px; } }
+
+/* =============================================================================
+   v36 — O QUADRADINHO "SEM NOME" (27/09/2026, áudios 2319-2322 do Cassiano; o modelo visual é o print 2321 = o
+   quadradinho "Estou ciente da possível variação de cor." do aviso de cor: caixa de 20 px na cor da marca, frase em
+   tinta, negrito leve, caixa normal). "Na frente do nome": fica NA LINHA DO TÍTULO "NOME DO PET", encostado à direita,
+   e o campo continua inteiro embaixo. Quem cria é o produto.js v34 (em toda página com o campo: dentro da janela
+   Personalize e na página sem 3D). Marcado, o campo fica vazio e travado (o estilo de campo desativado de sempre).
+   Vale no computador e no celular. A v35 está em 03_site/_versoes_anteriores/sem_nome_quadradinho_antes_2026-09-27/css/. */
+.personalizar .campo-nome { position: relative; }
+.personalizar label.sem-nome {
+  position: absolute; top: -3px; right: 0;
+  display: flex; align-items: center; gap: 8px; cursor: pointer;
+  font-size: 14.5px; font-weight: 600; line-height: 1.4; letter-spacing: 0; text-transform: none; color: var(--tinta);
+}
+.personalizar label.sem-nome input {
+  width: 20px; height: 20px; margin: 0; padding: 0; flex: 0 0 auto;
+  accent-color: var(--terracota); cursor: pointer; border-radius: 4px;
+}
+.personalizar label.sem-nome input:focus { outline-offset: 2px; }
