@@ -168,6 +168,10 @@
     /* ETAPA 44: o material (PLA) SAI da sacola — "não faz sentido estar ali". Continua indo na
        mensagem do WhatsApp (é informação de produção pra quem faz a peça). */
     if (i.material && comMaterial) partes.push(i.material);
+    /* 26/09/2026 (Cassiano, áudios 2178/2180): o aceite do aviso de cor da janela "Personalize" entra em TODA descrição
+       do item — na sacola, no "Resumo do Pedido" do Finalizar Compra (loja-compra.js) e no pedido que chega pra ele.
+       Quem marca é o personalizar3d.js (v9); quem grava no item, o produto.js. */
+    if (p.ciente_cor) partes.push('Cliente ciente da variação de cor da tela');
     return partes.join(' · ');
   }
 

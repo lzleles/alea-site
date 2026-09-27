@@ -254,6 +254,8 @@
 
     itens = Array.prototype.slice.call(palco.querySelectorAll('.item'));
     categoriaAtual = catId;
+    cartoesAtuais = lista;
+    montarGaleriasPC();                                  // v31: só no computador (ver o bloco v31 lá embaixo)
 
     if (window.aleaLigarBotoes) window.aleaLigarBotoes(palco);
     /* o menu do cartão de fim nasce aqui, depois que o site.js já montou os outros */
@@ -348,6 +350,7 @@
   }
 
   function voltarPraPrimeira(item) {
+    if (item.__galeriaPC) { mostrarGaleriaPC(item, -1); pintarSetasFoto(item); }   // v31
     var fotos = fotosDo(item);
     if (fotos.length < 2) return;
     var atual = fotos.findIndex(function (f) { return f.classList.contains('ativa'); });
@@ -523,7 +526,8 @@
       return Math.max(0, fotosDo(it).findIndex(function (f) { return f.classList.contains('ativa'); }));
     });
     var estado = { cat: categoriaAtual, top: (typeof topoForcado === 'number') ? topoForcado : feed.scrollTop,
-                   fotos: fotos, foco: emFoco ? itens.indexOf(emFoco) : -1 };
+                   fotos: fotos, foco: emFoco ? itens.indexOf(emFoco) : -1,
+                   galeria: itens.map(function (it) { return fotoDaGaleria(it); }) };   // v31
     try { sessionStorage.setItem(EXATO, JSON.stringify(estado)); } catch (e) { /* aba anônima */ }
   }
 
@@ -598,6 +602,9 @@
     var exato = estadoExatoPedido(catId);             // ETAPA 17
     if (exato) {
       itens.forEach(function (it, k) { fixarFoto(it, exato.fotos[k] || 0); });
+      if (exato.galeria) itens.forEach(function (it, k) {                          // v31
+        if (it.__galeriaPC && exato.galeria[k] >= 0) { mostrarGaleriaPC(it, exato.galeria[k]); pintarSetasFoto(it); }
+      });
       emFoco = (exato.foco >= 0 && itens[exato.foco]) ? itens[exato.foco] : null;
     } else {
       voltarPraPrimeira(itens[indice]);
@@ -747,6 +754,7 @@
     else if (e.key === 'Home') { e.preventDefault(); irParaItem(0, true); }
     else if (e.key === 'End') { e.preventDefault(); irParaItem(itens.length - 1, true); }
     else if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
+      if (item && item.__galeriaPC) { e.preventDefault(); andarFotoPC(item, e.key === 'ArrowRight' ? 1 : -1); return; }   // v31
       var fotos = fotosDo(item);
       if (fotos.length < 2) return;
       e.preventDefault();
@@ -758,6 +766,12 @@
 
   /* --- clique: bolinha troca foto, o resto avança ------------------------- */
   palco.addEventListener('click', function (e) {
+    /* v31: a seta ‹ › do computador passa as FOTOS do próprio produto (e nunca rola a página) */
+    var setaFoto = e.target.closest('[data-seta-foto]');
+    if (setaFoto) {
+      andarFotoPC(setaFoto.closest('.item'), parseInt(setaFoto.getAttribute('data-seta-foto'), 10));
+      return;
+    }
     /* v28: a seta do computador passa a foto do cartão dela (e não dá a volta: na ponta ela não faz nada) */
     var seta = e.target.closest('[data-seta-feed]');
     if (seta) {
@@ -767,7 +781,8 @@
       var dirS = parseInt(seta.getAttribute('data-seta-feed'), 10);
       if (atualS + dirS >= 0 && atualS + dirS < fotosS.length) pedirFoto(itemS, atualS + dirS, dirS);
       return;
-    }    var bolinha = e.target.closest('[data-foto]');
+    }
+    var bolinha = e.target.closest('[data-foto]');
     if (bolinha) {
       var n = parseInt(bolinha.getAttribute('data-foto'), 10);
       var item = bolinha.closest('.item') || itens[indice];   // ETAPA 15: a bolinha é DA peça dela
@@ -821,9 +836,8 @@
          empilha mais um produto no destino: giro lento vai um a um, giro rápido pula vários.
          Só a roda de MOUSE (clique de 120 no wheelDelta, ou rolagem por linhas). O touchpad continua com a rolagem
          livre do navegador, que é a "fluida" que ele aprovou em 17/09 (5ª rodada).
-     (2) AS SETAS ‹ › DO FEED. "Quero que você coloque a setinha pra ele mudar no feed". Ao lado da peça, uma de
-         cada lado, no mesmo traço branco e discreto do X e das setas da tela cheia: › vai pro produto seguinte,
-         ‹ pro anterior (o mesmo passo da roda). No primeiro, a ‹ some; no cartão de fim, a › some. */
+     (2) [SAIU NA v31 — vídeo 2175: "não é pra ele ir pra debaixo, é pra ele passar as fotos aqui"] as setas ‹ › que
+         iam pro produto seguinte/anterior. A v29 está em 03_site/_versoes_anteriores/setas_e_modal_antes_2026-09-26/. */
   var mqPC = window.matchMedia ? window.matchMedia('(hover: hover) and (pointer: fine) and (min-width: 761px)') : null;
   function pcDeMouse() { return !!(mqPC && mqPC.matches); }
 
@@ -886,35 +900,113 @@
   /* quem pegar a barra de rolagem ou o teclado no meio do carrossel manda: a animação larga */
   ['mousedown', 'keydown', 'touchstart'].forEach(function (ev) {
     feed.addEventListener(ev, function (e) {
-      if (e.target && e.target.closest && e.target.closest('.seta-produto')) return;
+      if (e.target && e.target.closest && e.target.closest('.seta-foto')) return;
       anim = null;
     }, { passive: true });
   });
 
-  var setasProduto = [];
-  [[-1, 'Produto anterior', '15 5 8 12 15 19', 'ant'], [1, 'Próximo produto', '9 5 16 12 9 19', 'prox']].forEach(function (s) {
-    var b = document.createElement('button');
-    b.type = 'button';
-    b.className = 'seta-produto seta-produto-' + s[3];
-    b.setAttribute('aria-label', s[1]);
-    b.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="' + s[2] + '"></polyline></svg>';
-    b.addEventListener('click', function (e) { e.stopPropagation(); andarProdutos(s[0]); });
-    feed.appendChild(b);
-    setasProduto.push(b);
-  });
-  var pintandoSetas = false;
-  function pintarSetasProduto() {
-    pintandoSetas = false;
-    if (!itens.length) return;
-    var onde = anim ? anim.para : feed.scrollTop;
-    feed.classList.toggle('no-primeiro', onde <= paradaDo(0) + 8);
-    feed.classList.toggle('no-fim', onde >= paradaDo(itens.length - 1) - 8);
+  /* =============================================================================
+     ⚠️ v31 — AS SETAS DO FEED PASSAM AS FOTOS DO PRÓPRIO PRODUTO (Cassiano, 26/09/2026, vídeo 2175).
+     "aqui eu clico [na setinha], ele vai pra debaixo, não é pra ele ir pra debaixo, é pra ele passar as fotos aqui.
+      Essa setinha tem que ficar centralizada com a foto, e quando eu clicar nela ele vai passar as fotos desse
+      produto. Pra rolar a tela, eu vou rolar no mouse, eu não vou rolar a tela clicando aqui."
+     SÓ NO COMPUTADOR (a mesma régua de sempre: mqPC). No celular NADA disto nasce: nem a galeria, nem as setas.
+     - SAÍRAM as setas ‹ › de "produto seguinte/anterior" da v29 (presas no meio da TELA). A roda do mouse continua
+       rolando a página, com o carrossel da v29 (um clique da roda = um produto) — é ela que "rola a tela".
+     - ENTRARAM duas setas por cartão, coladas nas laterais da FOTO dele e no meio da altura dela, no mesmo traço
+       discreto. A fila de fotos é a MESMA da página do produto (a colmeia): a capa do feed (a versão quadrada da capa
+       da página) e depois `PRODUTOS[slug].galeria`, na ordem — nada novo, nada inventado.
+     - As fotos da página NÃO são quadradas: aparecem NA PROPORÇÃO DELAS, inteiras, dentro do quadrado da capa, sem
+       recorte e sem esticar (regra dele: "no álbum e na colmeia a foto aparece na proporção dela", _REGRA_CAPA_DO_FEED).
+       Por isso elas não passam pela lona WebGL (que desenha num quadrado) — ficam numa camada própria por cima.
+     - Na 1ª foto a ‹ some; na última, a › DÁ A VOLTA pra 1ª (é um carrossel de fotos; não existe parede).
+     - Cartão com 1 foto só (sem galeria): sem setas. */
+  var cartoesAtuais = [];
+
+  function galeriaDoCartao(c) {
+    if (!c) return [];
+    var p = (window.PRODUTOS || []).filter(function (x) { return x.slug === c.pagina; })[0];
+    return ((p && p.galeria) || []).filter(function (f) { return (c.fotos || []).indexOf(f) < 0; });
   }
-  feed.addEventListener('scroll', function () {
-    if (!pintandoSetas) { pintandoSetas = true; requestAnimationFrame(pintarSetasProduto); }
-  }, { passive: true });
-  document.addEventListener('alea:feed-aberto', pintarSetasProduto);
-  setTimeout(pintarSetasProduto, 0);
+  function imgsDaGaleria(item) { return item.__galeriaPC ? Array.prototype.slice.call(item.__galeriaPC.querySelectorAll('img')) : []; }
+  function fotoDaGaleria(item) {
+    return imgsDaGaleria(item).findIndex(function (i) { return i.classList.contains('ativa'); });
+  }
+  function totalPC(item) { return fotosDo(item).length + imgsDaGaleria(item).length; }
+  function atualPC(item) {
+    var g = fotoDaGaleria(item);
+    if (g >= 0) return fotosDo(item).length + g;
+    return Math.max(0, fotosDo(item).findIndex(function (f) { return f.classList.contains('ativa'); }));
+  }
+
+  function montarGaleriaPC(item, c) {
+    if (!item || item.__galeriaPC || item.__semGaleriaPC || !c) return;
+    var extras = galeriaDoCartao(c);
+    if (fotosDo(item).length + extras.length < 2) { item.__semGaleriaPC = true; return; }   // 1 foto só: sem setas
+    var area = item.querySelector('.area-objeto');
+    var g = document.createElement('div');
+    g.className = 'galeria-pc';
+    g.innerHTML = extras.map(function (f, k) {
+      return '<img src="img/produtos/' + f + '.jpg" loading="lazy" decoding="async" alt="' + c.produto +
+        ' — foto ' + (k + 2) + '">';
+    }).join('');
+    area.appendChild(g);
+    [[-1, 'Foto anterior', '15 5 8 12 15 19', 'ant'], [1, 'Próxima foto', '9 5 16 12 9 19', 'prox']].forEach(function (s) {
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'seta-foto seta-foto-' + s[3];
+      b.setAttribute('data-seta-foto', String(s[0]));
+      b.setAttribute('aria-label', s[1]);
+      b.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="' + s[2] + '"></polyline></svg>';
+      area.appendChild(b);
+    });
+    area.classList.add('tem-galeria-pc');
+    item.__galeriaPC = g;
+    pintarSetasFoto(item);
+  }
+
+  function montarGaleriasPC() {
+    if (!pcDeMouse()) return;
+    itens.forEach(function (it) {
+      var i = parseInt(it.getAttribute('data-i'), 10);
+      if (!isNaN(i) && cartoesAtuais[i]) montarGaleriaPC(it, cartoesAtuais[i]);
+    });
+  }
+  /* a janela do computador que ficou larga depois de aberta (ou o mouse que chegou) também ganha as setas */
+  if (mqPC && mqPC.addEventListener) mqPC.addEventListener('change', montarGaleriasPC);
+
+  /* k = -1 esconde a camada (volta a valer a foto da lona); k >= 0 mostra a foto k da galeria */
+  function mostrarGaleriaPC(item, k) {
+    var imgs = imgsDaGaleria(item);
+    imgs.forEach(function (im, j) { im.classList.toggle('ativa', j === k); });
+    var area = item.querySelector('.area-objeto');
+    if (area) area.classList.toggle('na-galeria', k >= 0);
+    if (k >= 0 && imgs[k + 1] && imgs[k + 1].loading === 'lazy') imgs[k + 1].loading = 'eager';   // a próxima já vem
+  }
+
+  function pintarSetasFoto(item) {
+    var area = item && item.querySelector('.area-objeto');
+    if (!area) return;
+    area.classList.toggle('foto-primeira', atualPC(item) === 0);
+  }
+
+  function andarFotoPC(item, dir) {
+    if (!item || !item.__galeriaPC) return;
+    var L = fotosDo(item).length, T = totalPC(item);
+    var n = atualPC(item) + dir;
+    if (n < 0) return;                       // na 1ª a ‹ nem aparece
+    if (n >= T) n = 0;                       // na última, a › dá a volta pra 1ª
+    if (n >= L) {
+      mostrarGaleriaPC(item, n - L);
+    } else {
+      mostrarGaleriaPC(item, -1);
+      var atualLona = Math.max(0, fotosDo(item).findIndex(function (f) { return f.classList.contains('ativa'); }));
+      if (atualLona !== n) pedirFoto(item, n, n > atualLona ? 1 : -1);
+    }
+    var dica = item.querySelector('[data-dica]');
+    if (dica) dica.classList.add('some');
+    pintarSetasFoto(item);
+  }
 
   document.dispatchEvent(new CustomEvent('alea:feed-pronto'));
 })();

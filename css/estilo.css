@@ -1925,23 +1925,10 @@ html.topo-emendado .aviso-memoria { display: none !important; }
    v29b (áudios 2000/2004, 03:41-03:43): TUDO aqui é só do computador (hover + ponteiro fino + largura ≥ 761 px):
    "no celular não mexe. São layouts diferentes." Nos dois ficaram só "Sacola" (texto) e o nome do pet da Ayla (HTML). */
 
-/* (A) AS SETAS ‹ › DO FEED — criadas pelo feed.js (v29): uma de cada lado da peça, no traço branco e discreto do X.
-   Ficam presas no meio da tela, que é onde o carrossel assenta a foto. */
-.feed .seta-produto { display: none; }
+/* (A) [SAIU NA v31 — vídeo 2175] as setas ‹ › de produto seguinte/anterior, presas no meio da tela. Agora as setas do
+   feed passam as FOTOS do produto: ver o bloco v31 no fim deste arquivo. A v29 está em
+   03_site/_versoes_anteriores/setas_e_modal_antes_2026-09-26/css/. */
 @media (hover: hover) and (pointer: fine) and (min-width: 761px) {
-  .feed .seta-produto {
-    display: grid; place-items: center;
-    position: fixed; top: 50%; z-index: 8; transform: translateY(-50%);
-    width: 64px; height: 120px; padding: 0; border: 0; background: transparent; cursor: pointer;
-    color: rgba(255, 255, 255, .95); opacity: .85; transition: opacity .2s ease;
-    filter: drop-shadow(0 0 3px rgba(0, 0, 0, .5)) drop-shadow(0 1px 2px rgba(0, 0, 0, .35));
-  }
-  .feed .seta-produto svg { width: 44px; height: 44px; fill: none; stroke: currentColor; stroke-width: 1.4; stroke-linecap: round; stroke-linejoin: round; }
-  .feed .seta-produto:hover, .feed .seta-produto:focus-visible { opacity: 1; }
-  .feed .seta-produto-ant { left: calc(50% - var(--objeto) / 2 - 96px); }
-  .feed .seta-produto-prox { right: calc(50% - var(--objeto) / 2 - 96px); }
-  .feed.no-primeiro .seta-produto-ant, .feed.no-fim .seta-produto-prox { display: none; }
-
   /* (B) no computador só se entra no produto pelo "ver produto" — então ele vira um botão que se vê */
   .feed .ver {
     font-size: 13.5px; font-weight: 600; letter-spacing: .06em; opacity: 1;
@@ -1977,3 +1964,80 @@ html.topo-emendado .aviso-memoria { display: none !important; }
 /* (I) [só computador desde a v29b — o site.js só liga com mouse] a logo do rodapé virou link pro Instagram da ālea (site.js v29) */
 .rodape a.marca-rodape-link { display: block; width: fit-content; margin: 0 auto; }
 .rodape a.marca-rodape-link .marca-rodape { display: block; }
+
+
+/* =============================================================================
+   ⚠️ v31 — RODADA 3 DO COMPUTADOR (Cassiano, 26/09/2026, vídeos 2175 e 2176). SÓ COMPUTADOR (hover + ponteiro fino +
+   largura ≥ 761 px): "computador é computador, celular é celular". No celular nada disto existe — o feed.js nem cria
+   a galeria e as setas, e o tamanho da janela de personalizar fica o de antes (conferido em 390, print a print).
+   A versão anterior destes arquivos: 03_site/_versoes_anteriores/setas_e_modal_antes_2026-09-26/. */
+@media (hover: hover) and (pointer: fine) and (min-width: 761px) {
+  /* (1) AS SETAS DA FOTO DO FEED (vídeo 2175): coladas nas laterais da foto, no meio da altura DELA (não da tela),
+     no mesmo traço branco e discreto de antes. Passam as fotos do próprio produto; a roda do mouse rola a página. */
+  .feed .area-objeto.tem-galeria-pc { position: relative; }
+  .feed .seta-foto {
+    display: grid; place-items: center;
+    position: absolute; top: calc(var(--objeto) / 2); z-index: 8; transform: translateY(-50%);
+    width: 64px; height: 120px; padding: 0; border: 0; background: transparent; cursor: pointer;
+    color: rgba(255, 255, 255, .95); opacity: .85; transition: opacity .2s ease;
+    filter: drop-shadow(0 0 3px rgba(0, 0, 0, .5)) drop-shadow(0 1px 2px rgba(0, 0, 0, .35));
+  }
+  .feed .seta-foto svg { width: 44px; height: 44px; fill: none; stroke: currentColor; stroke-width: 1.4; stroke-linecap: round; stroke-linejoin: round; }
+  .feed .seta-foto:hover, .feed .seta-foto:focus-visible { opacity: 1; }
+  .feed .seta-foto-ant { left: calc(50% - var(--objeto) / 2 - 64px); }
+  .feed .seta-foto-prox { right: calc(50% - var(--objeto) / 2 - 64px); }
+  .feed .area-objeto.foto-primeira .seta-foto-ant { display: none; }
+  /* as setas da v28 (de dentro da foto) davam o mesmo passo; com a galeria elas ficam de fora pra não haver dois pares */
+  .feed .area-objeto.tem-galeria-pc .seta-feed { display: none; }
+
+  /* a camada das fotos da página do produto: do tamanho da capa, e cada foto NA PROPORÇÃO DELA, inteira, no meio —
+     sem recorte, sem esticar ("no álbum e na colmeia a foto aparece na proporção dela", _REGRA_CAPA_DO_FEED.md) */
+  .feed .galeria-pc {
+    position: absolute; top: 0; left: calc(50% - var(--objeto) / 2); z-index: 5;
+    width: var(--objeto); height: var(--objeto); pointer-events: none;
+  }
+  .feed .galeria-pc img {
+    position: absolute; inset: 0; margin: auto; width: auto; height: auto; max-width: 100%; max-height: 100%;
+    border-radius: var(--raio); box-shadow: 0 40px 90px -50px rgba(0, 0, 0, .9);
+    opacity: 0; transition: opacity .45s ease;
+  }
+  .feed .galeria-pc img.ativa { opacity: 1; }
+  .feed .area-objeto.na-galeria .objeto { opacity: 0; transition: opacity .45s ease; }
+  .feed .area-objeto.tem-galeria-pc .objeto { transition: opacity .45s ease, background .45s ease, box-shadow .45s ease; }
+
+  /* (2) A JANELA "PERSONALIZE" 2× MAIOR (vídeo 2176): "deixar ela maior, ela ficou pequena. Não tela cheia, mas só
+     aumentar ela. Aumenta ela o dobro disso aqui." Era 960 × 420 px (medido em 1440 × 900). Agora o dobro — 1920 ×
+     840 — com teto de 92% da largura e 90% da altura da tela, pra nunca virar tela cheia. O 3D acompanha sozinho: o
+     personalizar3d.js observa o palco (ResizeObserver) e refaz o tamanho do desenho e o enquadramento da peça. */
+  .janela3d { width: min(1920px, 92vw); height: min(840px, 90vh); max-height: 90vh; }
+  .janela3d-palco { min-height: 0; }
+  .janela3d-lado { max-height: none; overflow: auto; }
+}
+
+/* =============================================================================
+   ⚠️ O AVISO DE VARIAÇÃO DE COR (Cassiano, 26/09/2026, áudios 2178/2180, textos 2179/2181) — personalizar3d.js v9.
+   Uma janelinha por cima da janela "Personalize", antes de personalizar. VALE NO COMPUTADOR E NO CELULAR (é aviso de
+   cor; o celular é onde mais importa). Mesmo papel, tinta, cantos e botão da janela de personalizar. */
+.janela3d-ciente {
+  position: absolute; inset: 0; z-index: 6; display: grid; place-items: center; padding: 16px;
+  background: rgba(20, 16, 12, .28); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
+  border-radius: 18px;
+}
+.janela3d-ciente-caixa {
+  position: relative; width: min(460px, 100%); max-height: 100%; overflow: auto;
+  display: grid; gap: 16px; padding: 30px 24px 22px;
+  background: var(--papel, #F5EFE6); color: var(--tinta); border-radius: 18px; box-shadow: 0 20px 60px rgba(0, 0, 0, .3);
+}
+.janela3d-ciente-texto { margin: 0; font-size: 15.5px; line-height: 1.5; }
+.janela3d-ciente-marca {
+  display: flex; align-items: flex-start; gap: 10px; cursor: pointer;
+  font-size: 14.5px; font-weight: 600; line-height: 1.4; color: var(--tinta);
+}
+.janela3d-ciente-marca input { width: 20px; height: 20px; margin: 1px 0 0; flex: 0 0 auto; accent-color: var(--terracota); cursor: pointer; }
+.janela3d-ciente-seguir { width: 100%; }
+.janela3d-ciente-seguir:disabled { opacity: .42; cursor: not-allowed; filter: grayscale(.35); }
+.janela3d-ciente-fechar {
+  position: absolute; top: 6px; right: 8px; width: 36px; height: 36px; padding: 0; border: 0; background: transparent;
+  font-size: 26px; font-weight: 300; line-height: 1; color: var(--tinta-fraca); cursor: pointer;
+}
+.janela3d-ciente-fechar:hover { color: var(--tinta); }

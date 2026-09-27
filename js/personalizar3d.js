@@ -5,7 +5,7 @@
              pet GRAVADO ao vivo e as cores da peça e do nome trocando na hora, conforme o formulário.
    entrada: ALEA.modelos3d[slug] e ALEA.filamentos (config.js); o formulário [data-personalizar] da página
    saida: a janela (modal); o formulário de verdade MORA dentro dela enquanto está aberta
-   status: v8 (26/09/2026, pele felpuda do Matteo e textura do Mármore)
+   status: v9 (26/09/2026, aviso de variação de cor com aceite antes de personalizar)
    validado_em: 26/09/2026 (prints na prévia, 1440 px e 390 px: 03_site/_prints_textura_2026-09-26/)
 */
 /* =============================================================================
@@ -68,7 +68,36 @@
          foto, projetado pelos 3 eixos (sem emenda). A cor sem `textura` continua lisa — Sakura Pink e Light Cyan não
          mudaram (áudio 2078: "estão perfeitas").
       3. `rugosidade`/`metal` na cor (opcional) sobrescrevem o brilho do acabamento só naquela cor.
+   v9 (26/09/2026, áudios 2178/2180 e textos 2179/2181 do Cassiano; a v8 está em
+      03_site/_versoes_anteriores/setas_e_modal_antes_2026-09-26/js/): ao ABRIR a janela, antes de personalizar, abre
+      por cima uma janelinha com o AVISO DE VARIAÇÃO DE COR (texto dele, exato) e um quadradinho "Estou ciente…". O
+      "Continuar" só acende com o quadradinho marcado; marcado + Continuar libera a personalização. Fechar a janelinha
+      sem marcar (X, Esc ou clique fora) fecha a personalização junto: não se personaliza sem aceitar. Aceito uma vez,
+      vale pra VISITA inteira (sessionStorage `alea_ciente_cor`), em qualquer produto. O pedido que chega pro Cassiano
+      leva "Cliente ciente da variação de cor da tela" (carrinho.js). Vale no COMPUTADOR e no CELULAR.
+      O tamanho 2× da janela no computador (vídeo 2176) é só CSS (estilo.css, bloco v31): aqui nada mudou pra isso.
    ============================================================================= */
+
+/* ⚠️ OS TEXTOS DO AVISO DE COR — trocar AQUI, e só aqui. Os dois são do Cassiano, palavra por palavra (26/09/2026).
+   A frase do quadradinho foi encurtada por ele; a longa fica guardada logo abaixo, caso ele queira voltar. */
+var AVISO_COR_TEXTO = 'Buscamos representar as cores com a maior fidelidade possível. Ainda assim, pequenas variações de tonalidade podem ocorrer entre a visualização na tela e o produto real, devido às diferentes configurações de brilho, contraste e cor de cada dispositivo.';
+var AVISO_COR_CAIXA = 'Estou ciente da possível variação de cor.';
+/* a frase longa (msg 2181), se ele pedir de volta:
+var AVISO_COR_CAIXA = 'Estou ciente de que as cores exibidas na tela podem apresentar pequenas variações em relação ao produto real.'; */
+var AVISO_COR_BOTAO = 'Continuar';
+var AVISO_COR_CHAVE = 'alea_ciente_cor';     // sessionStorage: aceito uma vez, vale pra visita toda
+
+function cienteDaCor() {
+  if (window.aleaCienteCor) return true;
+  try { return !!sessionStorage.getItem(AVISO_COR_CHAVE); } catch (e) { return false; }
+}
+function gravarCienteDaCor() {
+  window.aleaCienteCor = true;
+  try { sessionStorage.setItem(AVISO_COR_CHAVE, new Date().toISOString()); } catch (e) { /* aba anônima: vale até sair da página */ }
+}
+function escaparHtml(t) {
+  return String(t).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; });
+}
 
 var ACABAMENTO_MATERIAL = {           // como cada acabamento reflete a luz
   fosco:      { roughness: 0.9,  metalness: 0.0 },
@@ -257,6 +286,38 @@ export async function abrirJanela3D(cfg, aoFechar, aoMontar, opcoes) {
   };
   mostrarPasso(0);
   requestAnimationFrame(function () { fundo.classList.add('visivel'); });
+
+  /* v9 — O AVISO DE VARIAÇÃO DE COR, por cima da janela, antes de personalizar (computador e celular) */
+  (function avisoDeCor() {
+    if (cienteDaCor()) return;
+    var janela = fundo.querySelector('.janela3d');
+    var debaixo = ['.janela3d-palco', '.janela3d-lado', '.janela3d-fechar'].map(function (q) { return fundo.querySelector(q); })
+      .filter(Boolean);
+    debaixo.forEach(function (el) { el.setAttribute('inert', ''); el.setAttribute('aria-hidden', 'true'); });
+    var av = document.createElement('div');
+    av.className = 'janela3d-ciente';
+    av.innerHTML =
+      '<div class="janela3d-ciente-caixa" role="alertdialog" aria-modal="true" aria-labelledby="janela3d-ciente-texto">' +
+        '<button type="button" class="janela3d-ciente-fechar" aria-label="Fechar">&times;</button>' +
+        '<p class="janela3d-ciente-texto" id="janela3d-ciente-texto">' + escaparHtml(AVISO_COR_TEXTO) + '</p>' +
+        '<label class="janela3d-ciente-marca"><input type="checkbox" data-ciente-caixa> <span>' +
+          escaparHtml(AVISO_COR_CAIXA) + '</span></label>' +
+        '<button type="button" class="botao janela3d-ciente-seguir" disabled>' + escaparHtml(AVISO_COR_BOTAO) + '</button>' +
+      '</div>';
+    janela.appendChild(av);
+    var caixa = av.querySelector('[data-ciente-caixa]');
+    var seguir = av.querySelector('.janela3d-ciente-seguir');
+    caixa.addEventListener('change', function () { seguir.disabled = !caixa.checked; });
+    seguir.addEventListener('click', function () {
+      if (!caixa.checked) return;
+      gravarCienteDaCor();
+      debaixo.forEach(function (el) { el.removeAttribute('inert'); el.removeAttribute('aria-hidden'); });
+      if (av.parentNode) av.parentNode.removeChild(av);
+    });
+    /* fechar sem aceitar = fechar a personalização (o Esc e o clique fora já fecham a janela inteira) */
+    av.querySelector('.janela3d-ciente-fechar').addEventListener('click', function () { fechar(); });
+    try { caixa.focus({ preventScroll: true }); } catch (e) { /* nada */ }
+  })();
   var palco = fundo.querySelector('.janela3d-palco');
   var canvas = fundo.querySelector('canvas');
   var vivo = true;

@@ -1089,7 +1089,9 @@
         cor_nome: corDoNomeEscolhida().texto,
         cor_nome_original: corDoNomeEscolhida().original,
         cor_nome_escolha: corDoNomeEscolhida().escolha,
-        cores: coresEscolhidas()
+        cores: coresEscolhidas(),
+        /* 26/09/2026: marcou o "Estou ciente da possível variação de cor" na janela Personalize (personalizar3d.js v9) */
+        ciente_cor: (function () { if (window.aleaCienteCor) return true; try { return !!sessionStorage.getItem('alea_ciente_cor'); } catch (e) { return false; } })()
       },
       extras: extras,
       /* o ACEITE vai junto do item, com data e hora. É a prova de que a declaração foi
