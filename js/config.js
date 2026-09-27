@@ -226,7 +226,7 @@ window.ALEA = {
       { site: 'Azul Bebê', hex: '#4DAFDA', original: 'Bambu Lab · PLA · Lite · Cyan (16600)' },
       { site: 'Azul', hex: '#004EA8', original: 'Bambu Lab · PLA · Lite · Blue (16601)' },
       { site: 'Verde', hex: '#00BB31', original: 'Bambu Lab · PLA · Lite · Green (16501)' },
-      { site: 'Verde Oliva', hex: '#1B1F11', original: 'eSUN · PLA · Basic · Olive Green' },
+      { site: 'Verde Oliva', hex: '#57604A', original: 'eSUN · PLA · Basic · Olive Green', hex_oficial: '#1B1F11' },
       { site: 'Preto', hex: '#272729', original: 'eSUN · PLA · PLA-Basic · Black' },
       { site: 'Roxo', hex: '#603BA0', original: 'Elegoo · PLA · PLA · Purple' },
       { site: 'Marrom', hex: '#5F3839', original: 'Multfila · PLA · Mult Speed · Marrom (PCI-PLA-046)' },
