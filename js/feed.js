@@ -100,9 +100,12 @@
      03_site/_versoes_anteriores/nomes_collab_antes_2026-09-26/js/): o nome do produto termina em "× Nome do pet"
      ("ālea Pet Bowl × Luke"). No card, o "× Luke" desce PEQUENO numa linha própria (`.collab`, estilo.css
      "NOMES COLLAB"); o nome principal fica na régua de sempre. Nome sem " × " sai como antes. */
+  /* v33 (26/09/2026, "× Ayla Pompom"): o nome da Ayla usa ESPAÇO SEM QUEBRA depois do × ("× Ayla Pompom"),
+     pra não partir na sacola. A v32 só procurava " × " e, com o sem-quebra, o card perdia a linha pequena. Agora
+     acha os dois. A v32 está em 03_site/_versoes_anteriores/rodada5_dourado_ayla_antes_2026-09-26/. */
   function nomeNoCard(txt) {
     txt = String(txt);
-    var i = txt.lastIndexOf(' × ');
+    var i = Math.max(txt.lastIndexOf(' × '), txt.lastIndexOf(' × '));
     if (i < 0) return comNomeMarca(txt);
     /* o "×" vai num span próprio: o × da Defante é um pontinho (visto no print de 26/09); o `.x` o desenha na Hanken */
     return comNomeMarca(txt.slice(0, i)) + ' <span class="collab"><span class="x">×</span>' + txt.slice(i + 2) + '</span>';

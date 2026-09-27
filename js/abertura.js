@@ -75,9 +75,15 @@
      duração ÷ 1,5), mesma curva e mesma ordem: engolido 5,0 → 6,13s (era 6,7s); escrita 6,0 → 9,0s (era 6,5 → 11,0s).
      A frase e o menu vêm atrás sozinhos (FIM_DA_MARCA), 2 s mais cedo. A rodada 3 está em
      03_site/_versoes_anteriores/abertura_rodada4_antes_2026-09-26/. */
-  var ECO_SOME_MS = 1000;          // a escrita começa quando o "& Co." está quase engolido (5,0 + 1,0 = 6,0s; CSS: delay 6.0s). Era 1500
-  var ESCRITA_MS = 3000;           // a escrita sai de baixo da capivara (CSS: 3.0s). Era 4500
-  var FIM_DA_MARCA = PAUSA_CAPIVARA_MS + CAPIVARA_MS + ECO_SOME_MS + ESCRITA_MS;  // 9,0s (era 11,0s)
+  /* RODADA 5 (26/09/2026, pedido do Cassiano): as duas animações 30% MAIS RÁPIDAS (duração ÷ 1,3), mesma curva e ordem:
+     "& Co." engolido 5,0 → 5,87s (0,872s); escrita 5,17 → 7,48s (2,308s). E SEM BURACO: no iPhone ficava ~1 s de tela
+     vazia entre o último pedaço do "& Co." sumir e o 1º pixel da escrita aparecer (ela nasce escondida acima da janela).
+     O início da escrita foi recuado até o 1º pixel dela coincidir com o sumiço do "& Co." (medido por pixel). A frase
+     e o menu vêm atrás sozinhos pelo FIM_DA_MARCA (frase aos ~7,68s, era ~9,2s). Rodada 4 em
+     03_site/_versoes_anteriores/rodada5_dourado_ayla_antes_2026-09-26/. */
+  var ECO_SOME_MS = 170;           // a escrita começa 0,17s depois do "& Co." (CSS: delay 5.17s). Era 1000          // a escrita começa quando o "& Co." está quase engolido (5,0 + 1,0 = 6,0s; CSS: delay 6.0s). Era 1500
+  var ESCRITA_MS = 2308;           // a escrita sai de baixo da capivara (CSS: 2.308s). Era 3000 (e antes 4500)
+  var FIM_DA_MARCA = PAUSA_CAPIVARA_MS + CAPIVARA_MS + ECO_SOME_MS + ESCRITA_MS;  // 7,478s (era 9,0s; antes 11,0s)
 
   /* =======================================================================
      1) F5 VOLTA PRO COMEÇO — e por que isso não é automático

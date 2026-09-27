@@ -112,7 +112,7 @@ window.CATEGORIAS = [
 window.VITRINE = [
   { produto: 'ālea Pet Bowl × Luke',                      nome: 'Luke',    categoria: 'pet', preco: null, pagina: 'luke-bowl',         recorte: false, fotos: ['lukebowl_capaq'] },
   { produto: 'ālea Elevated Pet Bowl × Matteo',           nome: 'Matteo',  categoria: 'pet', preco: null, pagina: 'matteo-texturized', recorte: false, fotos: ['matteotex_capaq'] },
-  { produto: 'ālea Pet Bowl – Watermelon Edition × Ayla', nome: 'Ayla',    categoria: 'pet', preco: null, pagina: 'ayla-pompom',       recorte: false, fotos: ['aylapompom_capaq'] },
+  { produto: 'ālea Pet Bowl – Watermelon Edition × Ayla Pompom', nome: 'Ayla Pompom',    categoria: 'pet', preco: null, pagina: 'ayla-pompom',       recorte: false, fotos: ['aylapompom_capaq'] },
   { produto: 'ālea Pet Bowl Wave × Cláudia',              nome: 'Cláudia', categoria: 'pet', preco: null, pagina: 'claudia-wave',      recorte: false, fotos: ['claudiawave_capaq'] }
 ];
 /* A VITRINE ATÉ 25/09/2026 20:01 (fora do ar por ordem dele, msg 1884) — guardada, não apagada:
@@ -200,7 +200,7 @@ window.PRODUTOS = [
 
   {
     slug: 'ayla-pompom',
-    nome: 'ālea Pet Bowl – Watermelon Edition × Ayla',
+    nome: 'ālea Pet Bowl – Watermelon Edition × Ayla Pompom',
     linha: 'Comedouro',
     categoria: 'pet',
     preco: null,

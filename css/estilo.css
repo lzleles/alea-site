@@ -431,7 +431,12 @@ body.marca-anima .marca-anim .escrita-janela .escrita {
   /* curva que começa e termina macia: com saída rápida (medido no 1º print) ela fazia 80% do
      trajeto no primeiro segundo e não parecia "devagar" */
   /* RODADA 4 (26/09/2026): 50% mais rápida — 3,0s começando aos 6,0s (era 4,5s aos 6,5s). Mesma curva. */
-  animation: escrita-sai-de-baixo 3s cubic-bezier(.42, 0, .3, 1) 6s both;
+  /* RODADA 5 (26/09/2026): 30% mais rápida (÷1,3) — 2,308s, mesma curva — e começa aos 5,17s: no iPhone havia ~1 s de
+     tela vazia entre o "& Co." sumir e a escrita aparecer (a escrita parte ESCONDIDA acima da janela e, com a curva
+     macia, o 1º pixel só aparece ~28% do trajeto depois). O início foi recuado pra que o 1º pixel visível da escrita
+     caia no mesmo instante em que o último pedaço do "& Co." some atrás da perna — medido por pixel em
+     03_site/_medir_abertura_rodada5_v2_estavel_2026-09-26.py. Era: 3s aos 6s. */
+  animation: escrita-sai-de-baixo 2.308s cubic-bezier(.42, 0, .3, 1) 5.17s both;
 }
 @keyframes escrita-sai-de-baixo {
   from { transform: translateY(-100%); }
@@ -483,7 +488,8 @@ body.marca-medida:not(.marca-anima) .marca-anim .eco-capivara { opacity: 1; tran
    altura ele já está 100% atrás da perna) — não há fade. */
 body.marca-anima .marca-anim .eco-capivara {
   /* RODADA 4 (26/09/2026): 50% mais rápido — 1,7s ÷ 1,5 = 1,133s (5,0 → 6,13s). Mesma curva (linear). */
-  animation: eco-engolido-pela-perna 1.133s linear 5.0s both;
+  /* RODADA 5 (26/09/2026): 30% mais rápido — 1,133s ÷ 1,3 = 0,872s (5,0 → 5,87s). Mesma curva (linear). */
+  animation: eco-engolido-pela-perna 0.872s linear 5.0s both;
 }
 @keyframes eco-engolido-pela-perna {
   from   { transform: none;               opacity: 1; }
@@ -2062,6 +2068,48 @@ html.topo-emendado .aviso-memoria { display: none !important; }
 .feed .produto-mini .collab .x, .produto-topo h1 .collab .x {
   font-family: var(--fonte-corpo); font-weight: 300; font-size: 1.25em; line-height: 1; letter-spacing: 0;
   vertical-align: -.06em;
+}
+/* "× NOME" EM DEGRADÊ BRILHOSO — O PADRÃO (decisão do Cassiano, áudios 2242/2243 de 26/09/2026: "o degradê ficou lindo,
+   lindo mesmo", com MAIS COR e MUITO MAIS BRILHO "pra destacar que é uma collab").
+   · As 4 cores da identidade, na MESMA ORDEM da frase da abertura (azul > laranja > terracota > dourado), só que mais
+     saturadas e luminosas: #3aa8d8 > #ff8a2a > #e8502a > #f2b93a (a frase usa #6c96a7 > #bd6a2c > #9d3e20 > #af9559).
+   · O BRILHO é ESTÁTICO: uma faixa creme translúcida em diagonal no meio (2ª camada do `background-image`) e um halo
+     quente leve (`filter: drop-shadow`). NADA pisca nem anima (`animation: none` medido no print).
+   · `background-clip: text` (+ -webkit-, o que o Safari do iPhone lê) com a letra transparente; o "×" (span .x) herda a
+     letra transparente, então sai no degradê também.
+   · `width: fit-content`: o span é `display: block`; sem isto o degradê se esticaria na LINHA INTEIRA e o nome, curto,
+     ficaria só com o azul da ponta.
+   · Legibilidade no fundo creme e no do card: contorno de 0,3 px em marrom translúcido (`-webkit-text-stroke`; o
+     `text-shadow` não serve: com a letra transparente ele apareceria POR DENTRO dela). No card (letra miúda) peso 600.
+   · Sem suporte a `background-clip: text` → `color` terracota liso (o `@supports` só liga o degradê onde funciona).
+   · ALTERNATIVA guardada (não ligada): `body.nome-dourado` = o dourado brilhoso da 1ª proposta desta rodada
+     (#8a7340 > #af9559 > #d9c38b > #af9559 > #8a7340). Antes: _versoes_anteriores/rodada5_dourado_ayla_antes_2026-09-26/. */
+.feed .produto-mini .collab, .produto-topo h1 .collab {
+  --collab-cores: linear-gradient(90deg, #3aa8d8 0%, #ff8a2a 36%, #e8502a 66%, #f2b93a 100%);
+  --collab-reflexo: linear-gradient(115deg, rgba(255, 252, 240, 0) 40%, rgba(255, 252, 240, .38) 49%,
+                                    rgba(255, 252, 240, .38) 51%, rgba(255, 252, 240, 0) 60%);
+  --collab-contorno: rgba(80, 35, 15, .6);
+  --collab-halo: drop-shadow(0 0 1px rgba(255, 150, 60, .55));
+  color: #e8502a;
+  width: -webkit-fit-content; width: -moz-fit-content; width: fit-content;
+  animation: none;
+}
+body.nome-dourado .feed .produto-mini .collab, body.nome-dourado .produto-topo h1 .collab {
+  --collab-cores: linear-gradient(100deg, #8a7340 0%, #af9559 30%, #d9c38b 50%, #af9559 70%, #8a7340 100%);
+  --collab-reflexo: linear-gradient(transparent, transparent);
+  --collab-contorno: rgba(110, 88, 42, .85);
+  --collab-halo: none;
+  color: #af9559;
+}
+@supports ((-webkit-background-clip: text) or (background-clip: text)) {
+  .feed .produto-mini .collab, .produto-topo h1 .collab {
+    background-image: var(--collab-reflexo), var(--collab-cores);
+    -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent;
+    -webkit-text-stroke: .3px var(--collab-contorno);
+    filter: var(--collab-halo);
+  }
+  .feed .produto-mini .collab { font-weight: 600; }
 }
 .produto-topo h1:has(+ .sub-busca) { margin-bottom: 8px; }
 .produto-topo .sub-busca {
