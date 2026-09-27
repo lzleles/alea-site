@@ -234,7 +234,7 @@ window.ALEA = {
     ],
     fosco: [
       { site: 'Branco', hex: '#F6F6F6', original: 'Elegoo · PLA · Matte · Matte White' },
-      { site: 'Amarelo', hex: '#F7D863', original: 'Elegoo · PLA · Matte · Sunshine Yellow' },
+      { site: 'Amarelo', hex: '#F5C325', original: 'Elegoo · PLA · Matte · Sunshine Yellow', hex_oficial: '#F7D863' },
       { site: 'Laranja', hex: '#E88F13', original: 'Multfila · PLA · Mult Matte · Laranja (4225-PCI-PLM-060)' },
       { site: 'Rosa Claro', hex: '#F9C2D5', original: 'Elegoo · PLA · Matte · Sakura Pink' },
       { site: 'Bordô', hex: '#B32563', original: 'Multfila · PLA · Mult Matte · Bordô (4225-PCI-PLM-118)' },
