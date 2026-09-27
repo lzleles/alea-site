@@ -1333,6 +1333,32 @@
     else window.addEventListener('load', function () { setTimeout(abrirEditando, 50); }, { once: true });
   })();
 
+  /* v31 — A COR DA CAPA (áudio 2253 do Cassiano, 27/09/2026): "o comedouro tem que ficar na COR DA CAPA quando abre a
+     personalização". Quem NÃO está editando um item da sacola já encontra as "Cores da peça" marcadas com as cores
+     da capa (config.js, `modelos3d[slug].capa`): o modo (Tricolor/Bicolor) e, em cada janela, acabamento + cor. A peça
+     3D lê o formulário ao abrir (personalizar3d.js `aplicarForm`), então abre igual. O cliente troca à vontade.
+     Editando da sacola, vale o que ele tinha escolhido (acima). A v30 está em
+     03_site/_versoes_anteriores/cor_da_capa_antes_2026-09-27/. */
+  (function corDaCapa() {
+    if (editando || !caixaCores || !camposCores || !botaoComprar) return;
+    var m3 = ((window.ALEA || {}).modelos3d || {})[botaoComprar.getAttribute('data-slug')];
+    var capa = m3 && m3.capa;
+    if (!capa) return;
+    var r = caixaCores.querySelector('input[name="cores_peca"][value="' + capa.modo + '"]');
+    if (!r || caixaCores.querySelector('input[name="cores_peca"]:checked')) return;
+    r.checked = true;
+    desenharCamposDeCor(r);
+    Array.prototype.forEach.call(camposCores.querySelectorAll('.campo-cor'), function (c, k) {
+      var e = (capa.escolhas || [])[k];
+      var rad = e && c.querySelector('.acabamento input[value="' + e.acabamento + '"]');
+      if (!rad) return;
+      rad.checked = true;
+      rad.dispatchEvent(new Event('change', { bubbles: true }));
+      c.querySelector('select').value = e.cor;
+    });
+    if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
+  })();
+
   function porNoCarrinho(eDepoisFechar) {
     var faltas = oQueFalta();
     if (faltas.length) {

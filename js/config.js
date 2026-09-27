@@ -245,13 +245,13 @@ window.ALEA = {
       { site: 'Terracota', hex: '#AC7362', original: 'Multfila · PLA · Mult Matte · Marrom Terracota (4225-PCI-PLM-124)' }
     ],
     perolizado: [
-      { site: 'Branco', hex: '#FFFFFF', original: 'Elegoo · PLA · Silk · Silk White' },
+      { site: 'Branco', hex: '#FFFFFF', original: 'Elegoo · PLA · Silk · Silk White', rugosidade: 0.2, metal: 0.05 },
       { site: 'Prata', hex: '#B2C1DA', original: 'SUNLU · PLA · Silk PLA+ · Silk Silver' },
       { site: 'Dourado', hex: '#D09531', original: 'Multfila · PLA · Mult Silk · Ouro Envelhecido (4226-PCI-PLS-048)' },
       { site: 'Laranja', hex: '#F15505', original: 'Voolt3D · PLA · V-Silk · Laranja (PL-LJ-SK-1)' },
       { site: 'Vermelho', hex: '#DA342E', original: 'Multfila · PLA · Mult Silk · Vermelho Metalizado (4226-PCI-PLS-026)' },
       { site: 'Rosa', hex: '#FF7F6F', original: 'eSUN · PLA · PLA-Silk · Pink' },
-      { site: 'Azul Aqua', hex: '#6BBFE3', original: 'eSUN · PLA · Silk · Aqua' },
+      { site: 'Azul Aqua', hex: '#6BBFE3', original: 'eSUN · PLA · Silk · Aqua', rugosidade: 0.2, metal: 0.18 },
       { site: 'Azul', hex: '#358AE8', original: 'Multfila · PLA · Mult Silk · Azul Safira Metalizado (4226-PCI-PLS-025)' },
       { site: 'Azul Céu', hex: '#035EB7', original: 'Voolt3D · PLA · V-Silk · Azul Sky (PL-AZ-SY-SK-1)' },
       { site: 'Verde Limão', hex: '#A3E810', original: 'eSUN · PLA · PLA-Silk · Lime' },
@@ -308,6 +308,10 @@ window.ALEA = {
    único que tenho"). A página nova (produto-luke-bowl.html) ganha a mesma janela 3D sem copiar a configuração:
    é a mesma peça, uma configuração só. Matteo, Ayla e Cláudia não têm .glb ainda -> formulário na própria página. */
 window.ALEA.modelos3d['luke-bowl'] = window.ALEA.modelos3d['bowl-wave'];
+/* COR DA CAPA (áudio 2253 do Cassiano, 27/09/2026): o formulário abre marcado com as cores da foto lukebowl_capa —
+   tricolor: topo Laranja (Básico), corpo Branco (Fosco), base Cinza (Fosco). A peça 3D já abria nessas cores. */
+window.ALEA.modelos3d['luke-bowl'].capa = { modo: 'tricolor', escolhas: [
+  { acabamento: 'basico', cor: 'Laranja' }, { acabamento: 'fosco', cor: 'Branco' }, { acabamento: 'fosco', cor: 'Cinza' }] };
 
 /* 26/09/2026 (pedido do Cassiano: "o Matteo e a Cláudia iguais ao Luke"): as duas ganham a janela 3D "Personalize aqui",
    cada uma com o SEU arquivo. A Ayla fica sem (áudio 1864: peça sem personalização).
@@ -331,6 +335,9 @@ window.ALEA.modelos3d['matteo-texturized'] = {
      Conferido no G-code fatiado (07_render_capa/textura_2026-09-26/fatiado): a parede externa foge da lisa até
      +0,35-0,37 mm, com um ponto a cada 0,85-0,88 mm. A janela 3D desenha o relevo na luz (sem peso de malha). */
   pele: { ruido: 'billow', oitavas: 4, persistencia: 0.5, escalaMm: 1, espessuraMm: 0.2 },
+  /* COR DA CAPA (áudio 2253, 27/09/2026): o formulário abre marcado com as cores da foto matteotex_capa — topo preto,
+     base cáqui (as mesmas do `original`, que já batiam com a capa). */
+  capa: { modo: 'bicolor', escolhas: [{ acabamento: 'basico', cor: 'Preto' }, { acabamento: 'fosco', cor: 'Cáqui' }] },
   /* só bicolor e monocromático (áudio 1863). Bicolor: cor 1 = topo, cor 2 = base. */
   bicolor: { topo: 0, principal: 0, base: 1 },
   original: {
@@ -349,9 +356,16 @@ window.ALEA.modelos3d['claudia-wave'] = {
   nomeInicial: 'Cláudia',
   /* bicolor como ele imprime (foto claudiawave_capa): cor 1 = aro e corpo, cor 2 = a onda de baixo */
   bicolor: { topo: 0, principal: 0, base: 1 },
+  /* COR DA CAPA (áudio 2253 do Cassiano, 27/09/2026): "o comedouro tem que ficar na COR DA CAPA quando abre a
+     personalização. A capa da Cláudia é bicolor: BRANCO PEROLIZADO com AQUA PEROLIZADO". A peça abre assim (aro e
+     corpo = cor 1, a onda = cor 2, como na foto claudiawave_capa) e o formulário já vem marcado igual (`capa`).
+     ANTES: as cores que o .3mf trazia — aro Vermelho (Bambu PLA Lite Red), corpo Mármore, onda Azul Silk. O aro
+     vermelho parecia "solto" em cima da peça: medido no .glb, ele ENCOSTA no corpo (corpo até y 120,3 mm, aro de
+     120,2 a 136,3 mm, os dois com raio 82-88 mm) — era só a cor diferente, que não existe na peça da capa. */
   original: {
-    topo:      { site: 'Vermelho', hex: '#C6001A', acabamento: 'basico',     oficial: 'Bambu Lab · PLA · Lite · Red (16200)' },
-    principal: { site: 'Mármore',  hex: '#D3C5A3', acabamento: 'basico',     oficial: 'Bambu Lab · PLA · Marble' },
-    base:      { site: 'Azul',     hex: '#76D9F4', acabamento: 'perolizado', oficial: 'Bambu Lab · PLA · Silk' }
-  }
+    topo:      { site: 'Branco',    hex: '#FFFFFF', acabamento: 'perolizado', oficial: 'Elegoo · PLA · Silk · Silk White' },
+    principal: { site: 'Branco',    hex: '#FFFFFF', acabamento: 'perolizado', oficial: 'Elegoo · PLA · Silk · Silk White' },
+    base:      { site: 'Azul Aqua', hex: '#6BBFE3', acabamento: 'perolizado', oficial: 'eSUN · PLA · Silk · Aqua' }
+  },
+  capa: { modo: 'bicolor', escolhas: [{ acabamento: 'perolizado', cor: 'Branco' }, { acabamento: 'perolizado', cor: 'Azul Aqua' }] }
 };
