@@ -377,26 +377,27 @@ window.ALEA.modelos3d['claudia-wave'] = {
 
 /* FILAMENTOS DE CADA FOTO — aparecem SÓ com a foto em TELA CHEIA, no canto de baixo à direita (produto.js v32, 27/09/2026).
    É PALPITE da casa, olhando as fotos: o Cassiano corrige a lista aqui (um filamento por linha, de CIMA pra BAIXO na
-   peça, nome EXATO como na lista dele). Foto sem linha ou com [] = nada aparece. A chave é o caminho da foto grande.
+   peça, nome EXATO como na lista dele ou como ele confirmou, ex.: Ivory White, Silk Yellow Green, Charcoal). Foto sem
+   linha ou com [] = nada aparece. A chave é o caminho da foto grande.
    Origem: 03_site/_FILAMENTOS_POR_FOTO_PALPITE_2026-09-27.json (com a confiança e o motivo de cada palpite). */
 window.ALEA.filamentosPorFoto = {
-  "img/produtos/lukebowl_capa.jpg": ["Bambu Lab · PLA · Lite · Orange (16301)", "Elegoo · PLA · Matte · Matte White", "Bambu Lab · PLA · Matte · Ash Gray (11102)"],
-  "img/produtos/lukebowl_0005.jpg": ["Bambu Lab · PLA · Lite · Orange (16301)", "Elegoo · PLA · Matte · Matte White", "Bambu Lab · PLA · Matte · Ash Gray (11102)"],
-  "img/produtos/lukebowl_9148.jpg": ["Bambu Lab · PLA · Lite · Orange (16301)", "Elegoo · PLA · Matte · Matte White", "Bambu Lab · PLA · Matte · Ash Gray (11102)"],
-  "img/produtos/lukebowl_9170.jpg": ["Bambu Lab · PLA · Lite · Orange (16301)", "Elegoo · PLA · Matte · Matte White", "Bambu Lab · PLA · Matte · Ash Gray (11102)"],
+  "img/produtos/lukebowl_capa.jpg": ["Bambu Lab · PLA · Lite · Orange (16301)", "Bambu Lab · PLA · Matte · Ivory White", "Bambu Lab · PLA · Matte · Ash Gray (11102)"],
+  "img/produtos/lukebowl_0005.jpg": ["Bambu Lab · PLA · Lite · Orange (16301)", "Bambu Lab · PLA · Matte · Ivory White", "Bambu Lab · PLA · Matte · Ash Gray (11102)"],
+  "img/produtos/lukebowl_9148.jpg": ["Bambu Lab · PLA · Lite · Orange (16301)", "Bambu Lab · PLA · Matte · Ivory White", "Bambu Lab · PLA · Matte · Ash Gray (11102)"],
+  "img/produtos/lukebowl_9170.jpg": ["Bambu Lab · PLA · Lite · Orange (16301)", "Bambu Lab · PLA · Matte · Ivory White", "Bambu Lab · PLA · Matte · Ash Gray (11102)"],
   "img/produtos/lukebowl_wa182751.jpg": ["Bambu Lab · PLA · Matte · Latte Brown (11800)", "SUNLU · PLA · High Speed Marble · Chestnut Brown Marble", "Multfila · PLA · Mult Speed · Marrom (PCI-PLA-046)"],
   "img/produtos/lukebowl_wa182753.jpg": ["Bambu Lab · PLA · Matte · Latte Brown (11800)", "SUNLU · PLA · High Speed Marble · Chestnut Brown Marble", "Multfila · PLA · Mult Speed · Marrom (PCI-PLA-046)"],
   "img/produtos/lukebowl_wa183050.jpg": ["Bambu Lab · PLA · Matte · Latte Brown (11800)", "SUNLU · PLA · High Speed Marble · Chestnut Brown Marble", "Multfila · PLA · Mult Speed · Marrom (PCI-PLA-046)"],
-  "img/produtos/lukebowl_9185.jpg": ["Bambu Lab · PLA · Lite · Orange (16301)", "Elegoo · PLA · Matte · Matte White", "Bambu Lab · PLA · Matte · Ash Gray (11102)"],
-  "img/produtos/lukebowl_9189.jpg": ["Bambu Lab · PLA · Lite · Orange (16301)", "Elegoo · PLA · Matte · Matte White", "Bambu Lab · PLA · Matte · Ash Gray (11102)"],
-  "img/produtos/lukebowl_0241.jpg": ["Voolt3D · PLA · V-Silk · Verde (PL-VD-SK-1)"],
-  "img/produtos/lukebowl_9291.jpg": ["Voolt3D · PLA · V-Silk · Verde (PL-VD-SK-1)"],
-  "img/produtos/lukebowl_9295.jpg": ["Voolt3D · PLA · V-Silk · Verde (PL-VD-SK-1)"],
-  "img/produtos/lukebowl_9304.jpg": ["Voolt3D · PLA · V-Silk · Verde (PL-VD-SK-1)"],
-  "img/produtos/lukebowl_9307.jpg": ["Voolt3D · PLA · V-Silk · Verde (PL-VD-SK-1)"],
-  "img/produtos/lukebowl_9312.jpg": ["Voolt3D · PLA · V-Silk · Verde (PL-VD-SK-1)"],
-  "img/produtos/lukebowl_9313.jpg": ["Voolt3D · PLA · V-Silk · Verde (PL-VD-SK-1)"],
-  "img/produtos/lukebowl_9318.jpg": ["Voolt3D · PLA · V-Silk · Verde (PL-VD-SK-1)"],
+  "img/produtos/lukebowl_9185.jpg": ["Bambu Lab · PLA · Lite · Orange (16301)", "Bambu Lab · PLA · Matte · Ivory White", "Bambu Lab · PLA · Matte · Ash Gray (11102)"],
+  "img/produtos/lukebowl_9189.jpg": ["Bambu Lab · PLA · Lite · Orange (16301)", "Bambu Lab · PLA · Matte · Ivory White", "Bambu Lab · PLA · Matte · Ash Gray (11102)"],
+  "img/produtos/lukebowl_0241.jpg": ["Fulljoy · PLA · Silk · Yellow Green"],
+  "img/produtos/lukebowl_9291.jpg": ["Fulljoy · PLA · Silk · Yellow Green"],
+  "img/produtos/lukebowl_9295.jpg": ["Fulljoy · PLA · Silk · Yellow Green"],
+  "img/produtos/lukebowl_9304.jpg": ["Fulljoy · PLA · Silk · Yellow Green"],
+  "img/produtos/lukebowl_9307.jpg": ["Fulljoy · PLA · Silk · Yellow Green"],
+  "img/produtos/lukebowl_9312.jpg": ["Fulljoy · PLA · Silk · Yellow Green"],
+  "img/produtos/lukebowl_9313.jpg": ["Fulljoy · PLA · Silk · Yellow Green"],
+  "img/produtos/lukebowl_9318.jpg": ["Fulljoy · PLA · Silk · Yellow Green"],
   "img/produtos/matteotex_capa.jpg": ["Bambu Lab · PLA · Matte · Charcoal", "Bambu Lab · PLA · Matte · Desert Tan (11401)"],
   "img/produtos/matteotex_0094.jpg": ["Bambu Lab · PLA · Matte · Charcoal", "Bambu Lab · PLA · Matte · Desert Tan (11401)"],
   "img/produtos/matteotex_9202.jpg": ["Bambu Lab · PLA · Matte · Charcoal", "Bambu Lab · PLA · Matte · Desert Tan (11401)"],
@@ -431,7 +432,7 @@ window.ALEA.filamentosPorFoto = {
   "img/produtos/claudiawave_9654.jpg": ["Multfila · PLA · Mult Silk · Vermelho Metalizado (4226-PCI-PLS-026)", "eSUN · PLA · PLA-Basic · Black"],
   "img/produtos/claudiawave_9674.jpg": ["Multfila · PLA · Mult Silk · Vermelho Metalizado (4226-PCI-PLS-026)", "eSUN · PLA · PLA-Basic · Black"],
   "img/produtos/claudiawave_9695.jpg": ["Multfila · PLA · Mult Silk · Vermelho Metalizado (4226-PCI-PLS-026)", "eSUN · PLA · PLA-Basic · Black"],
-  "img/produtos/lukebowl_capaq.jpg": ["Bambu Lab · PLA · Lite · Orange (16301)", "Elegoo · PLA · Matte · Matte White", "Bambu Lab · PLA · Matte · Ash Gray (11102)"],
+  "img/produtos/lukebowl_capaq.jpg": ["Bambu Lab · PLA · Lite · Orange (16301)", "Bambu Lab · PLA · Matte · Ivory White", "Bambu Lab · PLA · Matte · Ash Gray (11102)"],
   "img/produtos/matteotex_capaq.jpg": ["Bambu Lab · PLA · Matte · Charcoal", "Bambu Lab · PLA · Matte · Desert Tan (11401)"],
   "img/produtos/aylapompom_capaq.jpg": ["Bambu Lab · PLA · Lite · Red (16200)", "eSUN · PLA · PLA-Basic · Black", "Elegoo · PLA · Matte · Matte White", "Voolt3D · PLA · V-Silk · Verde (PL-VD-SK-1)"],
   "img/produtos/claudiawave_capaq.jpg": ["Elegoo · PLA · Silk · Silk White", "Bambu Lab · PLA · Lite · Sunflower Yellow (16401)", "eSUN · PLA · Silk · Aqua"]
