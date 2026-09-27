@@ -2084,18 +2084,34 @@ html.topo-emendado .aviso-memoria { display: none !important; }
    · Sem suporte a `background-clip: text` → `color` terracota liso (o `@supports` só liga o degradê onde funciona).
    · ALTERNATIVA guardada (não ligada): `body.nome-dourado` = o dourado brilhoso da 1ª proposta desta rodada
      (#8a7340 > #af9559 > #d9c38b > #af9559 > #8a7340). Antes: _versoes_anteriores/rodada5_dourado_ayla_antes_2026-09-26/. */
+/* ACABAMENTO SILK / PEROLIZADO (áudios 2248/2249 do Cassiano, 27/09/2026): "queria mais brilho, como se fosse um
+   PEROLIZADO, igual aquele filamento SILK (…) ficou como acabamento fosco/básico; o azul ciano está bem apagadinho".
+   A letra agora tem 3 camadas de fundo recortadas nela (de cima pra baixo), TODAS PARADAS:
+     1. reflexo especular: faixas estreitas quase brancas em diagonal, alternando claro/escuro (metal acetinado);
+     2. volume: claro no alto da letra e sombra embaixo (a cor fica mais escura na "dobra", como o filamento silk);
+     3. as 4 cores da identidade, vivas: ciano elétrico #00b8f0 > laranja #ff8a1a > terracota #e8401e > ouro #ffbe2e.
+   · O ciano ocupa os primeiros 30%: em "× Luke" o × leva só ~25% da largura, então o "Lu" sai AZUL e o "ke" laranja
+     (na b2e8a7d o azul caía todo no ×, fino, e o nome ficava só laranja). O × passa de peso 300 pra 500 pra a cor aparecer.
+   · Bordas: realce claro de 1 px embaixo e contorno escuro fino (lê no creme e no card), por `filter` + stroke.
+   · Antes (b2e8a7d, degradê chapado): _versoes_anteriores/nome_silk_antes_2026-09-27/estilo_b2e8a7d.css */
 .feed .produto-mini .collab, .produto-topo h1 .collab {
-  --collab-cores: linear-gradient(90deg, #3aa8d8 0%, #ff8a2a 36%, #e8502a 66%, #f2b93a 100%);
-  --collab-reflexo: linear-gradient(115deg, rgba(255, 252, 240, 0) 40%, rgba(255, 252, 240, .38) 49%,
-                                    rgba(255, 252, 240, .38) 51%, rgba(255, 252, 240, 0) 60%);
-  --collab-contorno: rgba(80, 35, 15, .6);
-  --collab-halo: drop-shadow(0 0 1px rgba(255, 150, 60, .55));
-  color: #e8502a;
+  --collab-cores: linear-gradient(90deg, #00b8f0 0%, #19c6ff 16%, #0a9ad6 30%, #ff8a1a 50%, #e8401e 72%, #ffbe2e 100%);
+  --collab-volume: linear-gradient(180deg, rgba(255, 255, 255, .45) 0%, rgba(255, 255, 255, 0) 38%,
+                                   rgba(0, 0, 0, 0) 58%, rgba(40, 10, 0, .30) 100%);
+  /* faixas em `em` (acompanham o tamanho da letra: no card miúdo não viram buraco) */
+  --collab-reflexo: repeating-linear-gradient(118deg,
+                      rgba(255, 255, 255, 0) 0em, rgba(255, 255, 255, 0) .55em,
+                      rgba(255, 255, 255, .62) .68em, rgba(255, 255, 255, 0) .82em,
+                      rgba(0, 0, 0, .08) .95em, rgba(255, 255, 255, 0) 1.1em, rgba(255, 255, 255, 0) 1.6em);
+  --collab-contorno: rgba(70, 25, 10, .55);
+  --collab-halo: drop-shadow(0 1px 0 rgba(255, 255, 255, .75)) drop-shadow(0 0 1.5px rgba(255, 140, 40, .45));
+  color: #e8401e;
   width: -webkit-fit-content; width: -moz-fit-content; width: fit-content;
   animation: none;
 }
 body.nome-dourado .feed .produto-mini .collab, body.nome-dourado .produto-topo h1 .collab {
   --collab-cores: linear-gradient(100deg, #8a7340 0%, #af9559 30%, #d9c38b 50%, #af9559 70%, #8a7340 100%);
+  --collab-volume: linear-gradient(transparent, transparent);
   --collab-reflexo: linear-gradient(transparent, transparent);
   --collab-contorno: rgba(110, 88, 42, .85);
   --collab-halo: none;
@@ -2103,13 +2119,14 @@ body.nome-dourado .feed .produto-mini .collab, body.nome-dourado .produto-topo h
 }
 @supports ((-webkit-background-clip: text) or (background-clip: text)) {
   .feed .produto-mini .collab, .produto-topo h1 .collab {
-    background-image: var(--collab-reflexo), var(--collab-cores);
+    background-image: var(--collab-reflexo), var(--collab-volume), var(--collab-cores);
     -webkit-background-clip: text; background-clip: text;
     -webkit-text-fill-color: transparent;
-    -webkit-text-stroke: .3px var(--collab-contorno);
+    -webkit-text-stroke: .35px var(--collab-contorno);
     filter: var(--collab-halo);
   }
   .feed .produto-mini .collab { font-weight: 600; }
+  .feed .produto-mini .collab .x, .produto-topo h1 .collab .x { font-weight: 500; }
 }
 .produto-topo h1:has(+ .sub-busca) { margin-bottom: 8px; }
 .produto-topo .sub-busca {
