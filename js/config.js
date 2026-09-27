@@ -429,6 +429,7 @@ window.ALEA.filamentosPorFoto = {
   "img/produtos/aylapompom_9931.jpg": [],
   "img/produtos/aylapompom_9935.jpg": [],
   "img/produtos/claudiawave_capa.jpg": ["Elegoo · PLA · Silk · Silk White", "Elegoo · PLA · Silk · Gold", "eSUN · PLA · Silk · Aqua"],
+  "img/produtos/claudiawave_anjo.jpg": ["Elegoo · PLA · Silk · Silk White", "Elegoo · PLA · Silk · Gold", "eSUN · PLA · Silk · Aqua"],   // 27/09 capa homenagem (msg 2362): PALPITE = mesmas cores da capa antiga; perguntado a ele
   "img/produtos/claudiawave_0039.jpg": ["Elegoo · PLA · Matte · Sakura Pink", "SUNLU · PLA · High Speed Marble · Chestnut Brown Marble", "Bambu Lab · PLA · Lite · Cyan (16600)"],
   "img/produtos/claudiawave_0196.jpg": ["Multfila · PLA · Silk Dual Color · Dourado e Vermelho", "Elegoo · PLA · Silk Dual Color · Black Purple"],
   "img/produtos/claudiawave_9569.jpg": ["Elegoo · PLA · Silk · Silk White", "Elegoo · PLA · Silk · Gold", "eSUN · PLA · Silk · Aqua"],
