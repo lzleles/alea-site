@@ -302,7 +302,10 @@
     };
     b.addEventListener('click', function () { desejos.alternar(slug); pintar(); });
     pintar();
-    h1.insertAdjacentElement('afterend', b);
+    /* NOMES COLLAB (26/09/2026): a linha de busca ("Comedouro para cães e gatos — …") fica colada no nome;
+       o coração entra depois dela, não entre as duas */
+    var sub = h1.nextElementSibling;
+    ((sub && sub.classList.contains('sub-busca')) ? sub : h1).insertAdjacentElement('afterend', b);
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', coracao); else coracao();
 })();
