@@ -11,6 +11,8 @@
       03_site/_versoes_anteriores/lista_desejos_antes_2026-09-27/js/site.js
    27/09/2026 (áudio 2308): embrulharNomeCollab() põe o nome do "× Nome" num <span class="nome"> onde faltar (o degradê
       proporcional mede o nome). Antes: 03_site/_versoes_anteriores/x_azul_nome_proporcional_antes_2026-09-27/js/site.js
+   27/09/2026 (áudio 2317): o coração do TOPO fica colorido (degradê perolizado) quando a Lista de Desejos tem alguma peça;
+      vazia = igual antes. Bloco no fim do arquivo. Antes: 03_site/_versoes_anteriores/coracao_topo_colorido_antes_2026-09-27/
 */
 /* =============================================================================
    site.js — o que vale em TODA página (abertura, feed, produto, textos)
@@ -467,4 +469,35 @@ window.aleaCorDoTopo = (function () {
   } else {
     iniciar();
   }
+})();
+
+/* CORAÇÃO DO TOPO COLORIDO QUANDO A LISTA TEM PEÇA (áudio 2317 do Cassiano, 27/09/2026): "se a pessoa tiver alguma coisa
+   na lista de desejos, o coração dela lá em cima vai ficar sempre colorido. Se ela não tiver, vai permanecer igual."
+   Lê a lista direto do aparelho (a mesma chave do loja-dados.js, alea_desejos_v1), porque nem toda página carrega o
+   loja-dados.js. Repinta ao tocar num coração/remover (depois do clique), quando outra aba muda a lista e ao voltar
+   pelo "voltar" do navegador. O desenho (span .coracao-silk-topo com o degradê) está no estilo.css v35. */
+(function () {
+  function temDesejos() {
+    try { var l = JSON.parse(localStorage.getItem('alea_desejos_v1') || '[]'); return Array.isArray(l) && l.length > 0; }
+    catch (e) { return false; }
+  }
+  function pintar() {
+    var tem = temDesejos();
+    document.querySelectorAll('[data-abrir="desejos"]').forEach(function (b) {
+      if (!b.querySelector('.coracao-silk-topo')) {
+        var s = document.createElement('span');
+        s.className = 'coracao-silk-topo'; s.setAttribute('aria-hidden', 'true');
+        b.insertBefore(s, b.firstChild);
+      }
+      b.classList.toggle('tem-desejos', tem);
+    });
+  }
+  /* na CAPTURA (antes do botão agir): o coração da peça reescreve o próprio innerHTML no clique, e depois disso o alvo
+     do toque já saiu da página e o closest() não o acha mais */
+  document.addEventListener('click', function (e) {
+    if (e.target && e.target.closest && e.target.closest('[data-desejo], .loja-desejos button, .loja-desejos .tirar')) setTimeout(pintar, 0);
+  }, true);
+  window.addEventListener('storage', function (e) { if (!e.key || e.key === 'alea_desejos_v1') pintar(); });
+  window.addEventListener('pageshow', pintar);
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', pintar); else pintar();
 })();
