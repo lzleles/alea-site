@@ -104,11 +104,16 @@ window.CATEGORIAS = [
    INTEIRA com faixas lisas dos lados, provisório até ele mandar outra capa. Ver 03_site/_LEIA_4_PRODUTOS_2026-09-25.md.
    O que estava aqui antes (Bowl Wave de Luke, Ayla, Tina Preta, Chica, Matteo, Cláudia; Poop Bag; Kit) SAIU da vitrine
    — as páginas e as fotos continuam no disco. A lista antiga, pra voltar num piscar, está no comentário logo abaixo. */
+/* ⚠️ NOMES COLLAB (26/09/2026, decididos pelo Cassiano): "Pet Bowl" no lugar de "Dog Bowl", o pet vira "× Nome" no fim
+   e a Cláudia leva acento. Antes: ālea Luke Bowl / ālea Matteo Texturized / ālea Ayla Pompom / ālea Cláudia Wave.
+   O feed.js (v32) parte o nome no " × " e desenha o "× Nome" pequeno numa 2ª linha; sacola, resumo e WhatsApp usam o
+   nome inteiro numa linha (vem do data-nome da página). Slug, página e fotos NÃO mudaram (links continuam valendo).
+   Quem aplica a troca: 03_site/_nomes_collab_v1_2026-09-26.py (idempotente). */
 window.VITRINE = [
-  { produto: 'ālea Luke Bowl',         nome: 'Luke',    categoria: 'pet', preco: null, pagina: 'luke-bowl',         recorte: false, fotos: ['lukebowl_capaq'] },
-  { produto: 'ālea Matteo Texturized', nome: 'Matteo',  categoria: 'pet', preco: null, pagina: 'matteo-texturized', recorte: false, fotos: ['matteotex_capaq'] },
-  { produto: 'ālea Ayla Pompom',       nome: 'Ayla',    categoria: 'pet', preco: null, pagina: 'ayla-pompom',       recorte: false, fotos: ['aylapompom_capaq'] },
-  { produto: 'ālea Cláudia Wave',      nome: 'Cláudia', categoria: 'pet', preco: null, pagina: 'claudia-wave',      recorte: false, fotos: ['claudiawave_capaq'] }
+  { produto: 'ālea Pet Bowl × Luke',                      nome: 'Luke',    categoria: 'pet', preco: null, pagina: 'luke-bowl',         recorte: false, fotos: ['lukebowl_capaq'] },
+  { produto: 'ālea Elevated Pet Bowl × Matteo',           nome: 'Matteo',  categoria: 'pet', preco: null, pagina: 'matteo-texturized', recorte: false, fotos: ['matteotex_capaq'] },
+  { produto: 'ālea Pet Bowl – Watermelon Edition × Ayla Pompom', nome: 'Ayla Pompom',    categoria: 'pet', preco: null, pagina: 'ayla-pompom',       recorte: false, fotos: ['aylapompom_capaq'] },
+  { produto: 'ālea Pet Bowl Wave × Cláudia',              nome: 'Cláudia', categoria: 'pet', preco: null, pagina: 'claudia-wave',      recorte: false, fotos: ['claudiawave_capaq'] }
 ];
 /* A VITRINE ATÉ 25/09/2026 20:01 (fora do ar por ordem dele, msg 1884) — guardada, não apagada:
 window.VITRINE = [
@@ -156,7 +161,7 @@ window.PRODUTOS = [
 
   {
     slug: 'luke-bowl',
-    nome: 'ālea Luke Bowl',
+    nome: 'ālea Pet Bowl × Luke',
     linha: 'Comedouro',
     categoria: 'pet',
     preco: null,
@@ -180,7 +185,7 @@ window.PRODUTOS = [
 
   {
     slug: 'matteo-texturized',
-    nome: 'ālea Matteo Texturized',
+    nome: 'ālea Elevated Pet Bowl × Matteo',
     linha: 'Comedouro',
     categoria: 'pet',
     preco: null,
@@ -195,7 +200,7 @@ window.PRODUTOS = [
 
   {
     slug: 'ayla-pompom',
-    nome: 'ālea Ayla Pompom',
+    nome: 'ālea Pet Bowl – Watermelon Edition × Ayla Pompom',
     linha: 'Comedouro',
     categoria: 'pet',
     preco: null,
@@ -213,7 +218,7 @@ window.PRODUTOS = [
   {
     slug: 'claudia-wave',
     /* ⚠ TÍTULO A CONFIRMAR COM ELE: o zip diz "ALEA Cláudia Wave"; a transcrição do áudio 1856 ouviu "Cloud Wave". */
-    nome: 'ālea Cláudia Wave',
+    nome: 'ālea Pet Bowl Wave × Cláudia',
     linha: 'Comedouro',
     categoria: 'pet',
     preco: null,

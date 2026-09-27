@@ -4,8 +4,8 @@
    objetivo: Controla galeria, tela cheia, personalização, preço, aceite e inclusão de produtos no carrinho.
    entrada: DOM da página, configuração comercial e dados do produto
    saida: Galeria interativa, item personalizado e comandos para o carrinho
-   status: ativo (cabecalho proposto pelo Codex em 2026-09-20, confianca ALTA; conferir na proxima vez que o script rodar)
-   validado_em: TBD
+   status: ativo — v34 (27/09/2026, quadradinho "Sem nome" no campo do nome; saiu a pergunta "Deseja mesmo não adicionar nome?")
+   validado_em: 27/09/2026 (Playwright 390 e 1440, 03_site/_testar_sem_nome_v1_2026-09-27.py)
 */
 /* =============================================================================
    produto.js — o que só a página de produto faz
@@ -40,6 +40,13 @@
    7. O COMPUTADOR (v28, 26/09/2026, vídeo 1981 das 02:19): "aqui no computador só (...) tem
       que ter os tracinhos pro cliente passar a foto pra frente". Setas ‹ › na tela cheia, só
       com mouse (o CSS esconde no celular), e a dica da colmeia diz "Clique" no mouse.
+
+   8. A COR DO NOME TRAVADA AVISA (v29, 26/09/2026, vídeo 1991): tocar nela com o "Um detalhe
+      que transforma" desmarcado treme o detalhe e diz "Marque a opção acima para personalizar."
+
+   9. O QUADRADINHO "SEM NOME" (v34, 27/09/2026, áudios 2319-2322): ao lado do título "Nome do pet", em
+      toda página com o campo (dentro da janela Personalize e na página sem 3D). Vazio e desmarcado = a
+      trava de sempre; marcado = passa sem nome (o item vai com sem_nome). Ver quadradinhoSemNome().
 
    ⚠️ A TRAVA É DE VERDADE, E NÃO SÓ VISUAL. A conferência acontece DENTRO do clique, e
    é ela que decide se o item entra. Trava que só pinta botão de cinza é trava que o
@@ -103,6 +110,76 @@
   var caixaAceite = document.querySelector('[data-aceite-caixa]');
   var botaoComprar = document.querySelector('[data-comprar-agora]');
 
+  /* ⚠️ v34 (27/09/2026, áudios 2319-2322 do Cassiano, print 2321 = o quadradinho do aviso de cor como MODELO): "na
+     frente do nome, vamos colocar a mensagem 'Sem nome' e o quadradinho (...) se o cliente passar sem marcar essa
+     opção, você vai tremer a tela pedindo para colocar o nome do pet (...) vamos TIRAR aquela mensagem de 'não
+     adicionar nome'". O quadradinho NASCE AQUI, por JS, em TODA página que tem o campo Nome do pet (Luke, Matteo,
+     Cláudia dentro da janela Personalize; Ayla e as outras na própria página) — o gerador de páginas (v18) não
+     escreve o campo, então nada muda nele. Monta: <div class="campo-nome"> [o rótulo Nome do pet] [☐ Sem nome] </div>
+     (o quadradinho fica na linha do título "NOME DO PET", à direita — CSS v34).
+     A regra é a de sempre, com um estado só: marcado = o formulário ganha `data-sem-nome` (o mesmo sinal que a
+     pergunta "Deseja mesmo não adicionar nome?" dava, e que oQueFalta, montarItem, carrinho.js e a peça 3D já leem).
+     MARCAR guarda o que estava digitado, esvazia e trava o campo; DESMARCAR devolve o texto e reabre o campo — nada
+     do que o cliente digitou se perde. A v33 está em 03_site/_versoes_anteriores/sem_nome_quadradinho_antes_2026-09-27/. */
+  var semNomeCaixa = null;
+  (function quadradinhoSemNome() {
+    var form = document.querySelector('[data-personalizar]');
+    var campoN = form && form.querySelector('[name="nome_pet"]');
+    var rot = campoN && campoN.closest('label');
+    if (!rot || form.querySelector('[data-sem-nome-caixa]')) return;
+    var bloco = document.createElement('div');
+    bloco.className = 'campo-nome';
+    bloco.setAttribute('data-campo-nome', '');
+    rot.parentNode.insertBefore(bloco, rot);
+    bloco.appendChild(rot);
+    var sn = document.createElement('label');
+    sn.className = 'sem-nome';
+    sn.setAttribute('data-sem-nome-rot', '');
+    sn.innerHTML = '<input type="checkbox" data-sem-nome-caixa> <span>Sem nome</span>';
+    bloco.appendChild(sn);
+    /* v35 (27/09/2026, áudio 2331 do Cassiano: "ficou muito afastado, coloca a caixinha logo depois do nome do pet"):
+       o quadradinho sai do canto direito e encosta logo DEPOIS do texto "NOME DO PET". Mede a largura do texto do
+       título (o nó de texto do label) e posiciona a 14 px dele; refaz ao mudar o tamanho da tela. */
+    var colarNoTitulo = function () {
+      var no = null;
+      for (var i = 0; i < rot.childNodes.length; i++) {
+        if (rot.childNodes[i].nodeType === 3 && rot.childNodes[i].textContent.trim()) { no = rot.childNodes[i]; break; }
+      }
+      if (!no) return;
+      var r = document.createRange(); r.selectNodeContents(no);
+      var larg = r.getBoundingClientRect().right - rot.getBoundingClientRect().left;
+      if (larg > 0) { sn.style.left = Math.ceil(larg + 14) + 'px'; sn.style.right = 'auto'; }
+    };
+    colarNoTitulo();
+    window.addEventListener('resize', colarNoTitulo);
+    if (window.ResizeObserver) new ResizeObserver(colarNoTitulo).observe(rot);   // janela Personalize abre depois (0 px antes)
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(colarNoTitulo);
+    window.aleaColarSemNome = colarNoTitulo;
+    semNomeCaixa = sn.querySelector('input');
+    var guardado = '';
+    window.aleaMarcarSemNome = function (marcar) {
+      if (semNomeCaixa.checked !== !!marcar) semNomeCaixa.checked = !!marcar;
+      if (marcar) {
+        if (campoN.value.trim()) guardado = campoN.value;
+        campoN.value = '';
+        campoN.disabled = true;
+        form.setAttribute('data-sem-nome', '');
+        rot.classList.remove('faltou');
+        var rec = document.querySelector('[data-recado-aceite]');
+        if (rec && rec.textContent === 'Por favor, digite o nome do pet.') rec.hidden = true;
+      } else {
+        campoN.disabled = false;
+        if (!campoN.value && guardado) campoN.value = guardado;
+        guardado = '';
+        form.removeAttribute('data-sem-nome');
+      }
+    };
+    semNomeCaixa.addEventListener('change', function () {
+      window.aleaMarcarSemNome(semNomeCaixa.checked);
+      if (!semNomeCaixa.checked) { try { campoN.focus({ preventScroll: true }); } catch (e) { campoN.focus(); } }
+    });
+  })();
+
   /* ⚠️ ETAPA 53 (23/09/2026, 14:27, protótipo): botão "Personalize aqui" -> janela com a peça em 3D, nome
      gravado ao vivo e cores trocando na hora (js/personalizar3d.js). Só aparece no produto que tem modelo 3D
      no config.js; o three.js só é baixado no clique. */
@@ -139,7 +216,8 @@
       }).catch(function (e) { aberto = false; console.warn('janela 3D', e); })
         .then(function () { b.classList.remove('carregando'); });
     }
-    b.addEventListener('click', function () { abrir(); });
+    /* v31 (áudio 2263): cada toque em "Personalize aqui" começa com as Cores da peça vazias (ver aleaLimparCoresDaPeca) */
+    b.addEventListener('click', function () { if (!aberto && window.aleaLimparCoresDaPeca) window.aleaLimparCoresDaPeca(); abrir(); });
     window.aleaAbrirPersonalizar = abrir;
   })();
   var botaoSacola = document.querySelector('[data-add-carrinho]');
@@ -413,6 +491,11 @@
     /* v22 (áudio 1699): tocar em OUTRA foto da colmeia troca a ampliação direto pra ela (o clique segue pro ouvinte
        da colmeia, que fecha a antiga e amplia a nova); só o toque FORA das fotos é engolido e apenas devolve. */
     if (ev.target.closest('[data-colmeia] [data-favo]')) return;
+    /* v30 (26/09/2026, pedido do Cassiano; a v29 está em 03_site/_versoes_anteriores/personalizar_matteo_claudia_antes_2026-09-26/js/):
+       com a miniatura aberta, o "← voltar para o feed" é a ÚNICA saída que funciona no 1º toque e volta NA HORA.
+       Antes ele também era engolido (o 1º toque só fechava a ampliação e era preciso tocar de novo). O resto da página
+       continua como na v19: o 1º toque fora só devolve a miniatura. Vale no celular e no computador. */
+    if (ev.target.closest('a.voltar')) { fecharFavos(); return; }
     ev.preventDefault();
     ev.stopPropagation();
     fecharFavos();
@@ -479,7 +562,63 @@
     /* v28: na 1ª foto a seta de voltar some; com uma foto só, somem as duas */
     telacheia.classList.toggle('na-primeira', tcAtual === 0);
     telacheia.classList.toggle('uma-so', tcLista.length < 2);
+    pintarFilamentos(palco.querySelector('img'), tcLista[tcOrdem[tcAtual]]);
   }
+
+  /* ⚠️ v32 — OS FILAMENTOS DA FOTO, SÓ NA TELA CHEIA (27/09/2026). A frase das cores da peça (msg 2268 do Cassiano)
+     promete: "nas fotos em tela cheia, você encontra os nomes e as tonalidades reais de cada cor". Então, com a foto em
+     tela cheia, o canto de baixo à direita DA FOTO mostra os filamentos dela, um por linha, de cima pra baixo na peça.
+     - A lista vem de ALEA.filamentosPorFoto (config.js), pela MESMA chave que a tela cheia usa ("img/produtos/x.jpg"),
+       então vale igual pra foto da colmeia e pra foto do álbum. Foto sem entrada (ou lista vazia) = nada aparece.
+     - A caixa mora direto na .telacheia (não dentro do palco): a lupa mede a foto por offsetLeft/offsetTop contra a
+       .telacheia, e um invólucro posicionado em volta da foto quebraria essa conta. Por isso ela é posta no lugar
+       MEDINDO a foto (quando ela carrega, a cada troca de foto e quando a janela muda de tamanho).
+     - Some com a foto ampliada (CSS .com-zoom) e não pega clique (pointer-events: none): tocar nela é tocar na foto. */
+  /* v33 (27/09/2026, áudio 2295): o cliente lê o NOME DA PERSONALIZAÇÃO ("Cinza Fosco"), nunca o código do filamento.
+     Procura o original em ALEA.filamentos (cor + sufixo do acabamento); fora da venda, em ALEA.filamentosNomeCliente.
+     Sem tradução = a linha NÃO aparece (código não vai pro cliente). */
+  function nomeDoCliente(original) {
+    var A = window.ALEA || {};
+    var extra = (A.filamentosNomeCliente || {})[original];
+    if (extra) return extra;
+    var acabs = A.acabamentos || [];
+    for (var i = 0; i < acabs.length; i++) {
+      var cores = (A.filamentos || {})[acabs[i].id] || [];
+      for (var j = 0; j < cores.length; j++) {
+        if (cores[j].original === original) return cores[j].site + (acabs[i].sufixo || '');
+      }
+    }
+    return '';
+  }
+  var caixaFil = null;
+  function pintarFilamentos(img, chave) {
+    if (!telacheia) return;
+    var lista = (((window.ALEA || {}).filamentosPorFoto || {})[chave] || []).map(nomeDoCliente).filter(Boolean);
+    if (!caixaFil) {
+      caixaFil = document.createElement('ul');
+      caixaFil.className = 'filamentos-tc';
+      caixaFil.setAttribute('aria-label', 'Filamentos desta foto, de cima para baixo');
+      telacheia.appendChild(caixaFil);
+    }
+    caixaFil.hidden = true;
+    if (!img || !lista.length) { caixaFil.innerHTML = ''; return; }
+    caixaFil.innerHTML = lista.map(function (f) {
+      return '<li>' + String(f).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }) + '</li>';
+    }).join('');
+    var posicionar = function () { if (palcoImgAtual() === img) colocarFilamentos(img); };
+    if (img.complete && img.naturalWidth) posicionar();
+    else img.addEventListener('load', posicionar, { once: true });
+  }
+  function palcoImgAtual() { return telacheia && telacheia.querySelector('[data-palco-tc] img'); }
+  function colocarFilamentos(img) {
+    if (!caixaFil || !caixaFil.innerHTML || !img || img.offsetWidth < 2) return;
+    var folga = img.offsetWidth < 500 ? 8 : 12;
+    caixaFil.style.maxWidth = Math.max(120, img.offsetWidth - 2 * folga) + 'px';
+    caixaFil.style.right = Math.max(0, telacheia.clientWidth - (img.offsetLeft + img.offsetWidth)) + folga + 'px';
+    caixaFil.style.bottom = Math.max(0, telacheia.clientHeight - (img.offsetTop + img.offsetHeight)) + folga + 'px';
+    caixaFil.hidden = false;
+  }
+  window.addEventListener('resize', function () { if (caixaFil && !caixaFil.hidden) colocarFilamentos(palcoImgAtual()); });
 
   /* ⚠️ SEM VOLTA: passar do fim (ou do começo) FECHA em vez de dar a volta. É o pedido
      dele, e a razão é boa — carrossel que gira pra sempre não deixa o visitante saber
@@ -831,7 +970,69 @@
     });
     sel.disabled = true;
     sel.innerHTML = '<option value="">' + (liberar ? 'Escolha o acabamento acima' : '') + '</option>';
+    acertarTravaDaPagina();
   }
+
+  /* ⚠️ v29 — A COR DO NOME TRAVADA AVISA O QUE FALTA (Cassiano, vídeo 1991, 26/09/2026 03:07). Na página do produto
+     sem janela 3D (Matteo, Cláudia), ele clicava em Básico/Fosco/Perolizado com o "Um detalhe que transforma"
+     desmarcado: aparecia o cursor de proibido e nada acontecia. "Se eu clicar, você consegue tremer a tela e mandar
+     eu clicar aqui, pra dar certo." Agora uma película transparente fica por cima da cor do nome enquanto ela está
+     travada (a mesma da janela 3D, que já fazia isso lá dentro): o clique/toque TREME o "Um detalhe que transforma"
+     e a cor do nome, mostra por 3,5 s "Marque a opção acima para personalizar." (a frase da janela 3D) e, se o
+     quadrinho estiver fora da tela, rola até ele. A tremida é a `.treme-falta` de sempre, que já respeita o
+     "reduzir movimento". SÓ NO COMPUTADOR (v29b, áudios 2000/2004: "no celular não mexe"). No produto com janela 3D (Luke) quem cuida é a janela — aqui não entra. */
+  var travaPagina = null, recadoTrava = null, recadoTimer = null;
+  function acertarTravaDaPagina() {
+    if (!corNomeBox) return;
+    /* v29b (áudios 2000/2004, 03:41-03:43): "no celular não mexe" — só com mouse de verdade e tela de computador */
+    if (!(window.matchMedia && window.matchMedia('(hover: hover) and (pointer: fine) and (min-width: 761px)').matches)) return;
+    var form = corNomeBox.closest('[data-personalizar]');
+    if (!form || form.classList.contains('mora-na-janela')) { if (travaPagina) travaPagina.hidden = true; return; }
+    if (!travaPagina) {
+      travaPagina = document.createElement('div');
+      travaPagina.className = 'trava-toque trava-da-pagina';
+      travaPagina.setAttribute('aria-hidden', 'true');
+      corNomeBox.appendChild(travaPagina);
+      travaPagina.addEventListener('click', function (e) {
+        e.preventDefault(); e.stopPropagation();
+        avisarCorDoNomeTravada(form);
+      });
+    }
+    var primeiro = corNomeBox.querySelector('.acabamento input');
+    travaPagina.hidden = !(primeiro && primeiro.disabled);
+  }
+  function avisarCorDoNomeTravada(form) {
+    var extra = form.querySelector('[data-extra]');
+    var rotulo = corNomeBox.closest('label') || corNomeBox;
+    if (!recadoTrava) {
+      recadoTrava = document.createElement('p');
+      recadoTrava.className = 'recado-trava';
+      recadoTrava.setAttribute('role', 'status');
+      recadoTrava.hidden = true;
+      rotulo.parentNode.insertBefore(recadoTrava, rotulo.nextSibling);
+    }
+    recadoTrava.textContent = 'Marque a opção acima para personalizar.';
+    recadoTrava.hidden = false;
+    requestAnimationFrame(function () { recadoTrava.classList.add('visivel'); });
+    clearTimeout(recadoTimer);
+    recadoTimer = setTimeout(function () {
+      recadoTrava.classList.remove('visivel');
+      setTimeout(function () { if (!recadoTrava.classList.contains('visivel')) recadoTrava.hidden = true; }, 300);
+    }, 3500);
+    [extra, rotulo].forEach(function (el) {
+      if (!el) return; el.classList.remove('treme-falta'); void el.offsetWidth; el.classList.add('treme-falta');
+    });
+    if (extra) {
+      var r = extra.getBoundingClientRect();
+      var topo = document.querySelector('.topo');
+      var cima = topo ? Math.max(0, topo.getBoundingClientRect().bottom) : 0;
+      if (r.top < cima + 8 || r.bottom > window.innerHeight - 8) {
+        var querMenos = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        window.scrollTo({ top: Math.max(0, window.scrollY + r.top - cima - 24), behavior: querMenos ? 'auto' : 'smooth' });
+      }
+    }
+  }
+  acertarTravaDaPagina();   // a cor do nome já nasce travada (o detalhe nasce desmarcado)
 
   function corDoNomeEscolhida() {
     if (!corNomeBox) return { texto: '', original: '', escolha: null };
@@ -862,6 +1063,17 @@
      filamento sazonal não se promete antes de existir. */
   var caixaCores = document.querySelector('[data-cores-peca]');
   var camposCores = document.querySelector('[data-cores-campos]');
+  /* v31 (msg 2268 do Cassiano, 27/09/2026): a frase pequena entre o título "Cores da peça" e as opções. O texto mora
+     no config.js (`ALEA.fraseCoresDaPeca`); sem ele, nada entra. */
+  (function fraseDasCores() {
+    var txt = (window.ALEA || {}).fraseCoresDaPeca;
+    var tit = caixaCores && caixaCores.querySelector('.rotulo-grupo');
+    if (!txt || !tit || caixaCores.querySelector('.dica-cores')) return;
+    var p = document.createElement('p');
+    p.className = 'dica-cores';
+    p.textContent = txt;
+    tit.insertAdjacentElement('afterend', p);
+  })();
 
   /* ⚠️ ETAPA 28 (22/09/2026, 21:19): o SORTEIO saiu — "algumas não têm tantas opções por se tratar
      de filamento". Agora é UMA cor por caixa, FIXA, na ordem que ele ditou, de cima pra baixo:
@@ -1019,7 +1231,9 @@
         cor_nome: corDoNomeEscolhida().texto,
         cor_nome_original: corDoNomeEscolhida().original,
         cor_nome_escolha: corDoNomeEscolhida().escolha,
-        cores: coresEscolhidas()
+        cores: coresEscolhidas(),
+        /* 26/09/2026: marcou o "Estou ciente da possível variação de cor" na janela Personalize (personalizar3d.js v9) */
+        ciente_cor: (function () { if (window.aleaCienteCor) return true; try { return !!sessionStorage.getItem('alea_ciente_cor'); } catch (e) { return false; } })()
       },
       extras: extras,
       /* o ACEITE vai junto do item, com data e hora. É a prova de que a declaração foi
@@ -1042,7 +1256,8 @@
   function oQueFalta() {
     var faltas = [];
     var nome = document.querySelector('[data-personalizar] [name="nome_pet"]');
-    /* ETAPA 58 (8): "Deseja mesmo não adicionar nome?" -> Sim marca o formulário (data-sem-nome) e o nome não é cobrado */
+    /* ETAPA 58 (8) -> v34: o quadradinho "Sem nome" marcado põe `data-sem-nome` no formulário e o nome não é cobrado
+       (a pergunta "Deseja mesmo não adicionar nome?" saiu). Desmarcado e vazio: a trava de sempre, frase de sempre. */
     var formSN = document.querySelector('[data-personalizar]');
     var semNome = formSN && formSN.hasAttribute('data-sem-nome');
     if (nome && !nome.value.trim() && !semNome) faltas.push({ el: nome.closest('label') || nome, texto: 'Por favor, digite o nome do pet.' });
@@ -1250,7 +1465,11 @@
     /* ⚠️ ETAPA 58 (11) (16:24, com 2 prints — substitui a ETAPA 47): "editar" volta pra esta página PARADA na
        posição dos botões (Personalize aqui, declaração, Comprar à vista) e JÁ com a janela de personalizar aberta,
        tudo preenchido, a peça de frente, centralizada e parada. */
-    if (p.sem_nome) { var fsn = document.querySelector('[data-personalizar]'); if (fsn) fsn.setAttribute('data-sem-nome', ''); }
+    /* v34: o item salvo "sem nome" volta com o quadradinho Sem nome MARCADO (campo vazio e travado) */
+    if (p.sem_nome) {
+      if (window.aleaMarcarSemNome) window.aleaMarcarSemNome(true);
+      else { var fsn = document.querySelector('[data-personalizar]'); if (fsn) fsn.setAttribute('data-sem-nome', ''); }
+    }
     if (p.cores && p.cores.escolhas) window.aleaMiniatura3D = item.miniatura || null;
     if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
     function abrirEditando() {
@@ -1260,6 +1479,20 @@
     if (document.readyState === 'complete') setTimeout(abrirEditando, 50);
     else window.addEventListener('load', function () { setTimeout(abrirEditando, 50); }, { once: true });
   })();
+
+  /* v31 — CORES DA PEÇA COMEÇAM VAZIAS A CADA ABERTURA (áudio 2263 do Cassiano, 27/09/2026 — substitui o "form já
+     marcado com a cor da capa" da prévia 4438fdf): "toda vez que abrir a personalização, a parte Cores da peça começa
+     SEM NENHUMA opção marcada", pra o cliente escolher de novo. Quem mostra a cor da CAPA é só a peça 3D (config.js,
+     `modelos3d[slug].original`), que pinta com o original enquanto nada está escolhido.
+     Limpa: Tricolor/Bicolor/Monocromático, as janelas de acabamento e cor. NÃO mexe no Nome do pet nem no detalhe.
+     EXCEÇÃO: editando um item da sacola (`?editar=`), valem as escolhas daquele item. A v30 está em
+     03_site/_versoes_anteriores/cor_da_capa_antes_2026-09-27/. */
+  window.aleaLimparCoresDaPeca = function () {
+    if (editando || !caixaCores || !camposCores) return;
+    Array.prototype.forEach.call(caixaCores.querySelectorAll('input[name="cores_peca"]'), function (r) { r.checked = false; });
+    camposCores.innerHTML = '';
+    caixaCores.classList.remove('faltou');
+  };
 
   function porNoCarrinho(eDepoisFechar) {
     var faltas = oQueFalta();

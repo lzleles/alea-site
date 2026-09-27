@@ -136,7 +136,7 @@
       b.classList.toggle('tem-item', n > 0);
       var bolinha = b.querySelector('[data-quantos]');
       if (bolinha) bolinha.textContent = String(n);
-      b.setAttribute('aria-label', n ? ('Carrinho com ' + n + (n === 1 ? ' item' : ' itens')) : 'Carrinho vazio');
+      b.setAttribute('aria-label', n ? ('Sacola com ' + n + (n === 1 ? ' item' : ' itens')) : 'Sacola vazia');
     });
   }
 
@@ -168,6 +168,10 @@
     /* ETAPA 44: o material (PLA) SAI da sacola — "não faz sentido estar ali". Continua indo na
        mensagem do WhatsApp (é informação de produção pra quem faz a peça). */
     if (i.material && comMaterial) partes.push(i.material);
+    /* 26/09/2026 (Cassiano, áudios 2178/2180): o aceite do aviso de cor da janela "Personalize" entra em TODA descrição
+       do item — na sacola, no "Resumo do Pedido" do Finalizar Compra (loja-compra.js) e no pedido que chega pra ele.
+       Quem marca é o personalizar3d.js (v9); quem grava no item, o produto.js. */
+    if (p.ciente_cor) partes.push('Cliente ciente da variação de cor da tela');
     return partes.join(' · ');
   }
 
@@ -217,7 +221,8 @@
            a ultima coisa que alguem quer ver antes de fechar um pedido. */
         '<img src="' + (i.miniatura || ('img/produtos/' + i.capa + '_obj_m.webp')) + '" alt="" loading="lazy" ' +
         'onerror="this.onerror=null;this.src=&quot;img/produtos/' + i.capa + '_m.jpg&quot;">' +
-        '<div class="lado"><div class="cabeca-linha"><div class="titulo">' + i.nome + '</div>' +
+        /* NOMES COLLAB (26/09/2026): "× Ayla" nunca se separa — o × não fica sozinho no fim da linha */
+        '<div class="lado"><div class="cabeca-linha"><div class="titulo">' + String(i.nome).replace(/ × /g, ' × ') + '</div>' +
         '<button class="tirar-x" type="button" data-tirar="' + n + '" aria-label="Tirar ' + i.nome +
         ' da sacola" title="Tirar da sacola">&times;</button></div>' +
         '<div class="detalhe">' + (descreverItem(i) || 'sem personalização') + '</div>' +

@@ -85,9 +85,15 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
       <span class="rotulo">Conta</span>
     </button>
+    <!-- LISTA DE DESEJOS (audio 2300 do Cassiano, 27/09/2026): entre a Conta e a Sacola, o MESMO botao dos dois.
+         Leva a lista-de-desejos.html (site.js). Posto por _lista_desejos_no_topo_v1_2026-09-27.py. -->
+    <button class="botao-icone" type="button" data-abrir="desejos" aria-label="Lista de Desejos" title="Lista de Desejos">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20.5s-7.5-4.6-9.3-9.2C1.4 8 3.4 4.5 6.9 4.5c2.1 0 3.6 1.2 5.1 3 1.5-1.8 3-3 5.1-3 3.5 0 5.5 3.5 4.2 6.8-1.8 4.6-9.3 9.2-9.3 9.2z"></path></svg>
+      <span class="rotulo">Desejos</span>
+    </button>
     <button class="botao-icone" type="button" data-abrir="carrinho" aria-haspopup="dialog">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 8.5h14V21H5z"></path><path d="M9 8.5V7a3 3 0 0 1 6 0v1.5"></path></svg>
-      <span class="rotulo">Carrinho</span>
+      <span class="rotulo">Sacola</span>
       <span class="quantos" data-quantos>0</span>
     </button>
   </nav>
@@ -112,16 +118,24 @@
          a marca nova exata. A ordem dos áudios dele (15:05): a capivara entra COM o "& Co." do
          lado (`.eco-capivara`); quando ela assenta, o "& Co." mergulha nela; então o ālea sai
          letra por letra; e no fim o "& Co." aparece embaixo (`.eco-final`). -->
+    <!-- ABERTURA CENTRALIZADA (áudio do Cassiano de 26/09/2026 21:13): a capivara entra grande com o
+         "& Co." do lado (igual antes), mas em vez de ir pra esquerda ela DIMINUI e fica NO CENTRO; o
+         "& Co." do lado some como antes; e a escrita nova "ālea & Co." (v11, letra a letra) sai de
+         BAIXO da capivara, devagar e toda junta, e para centralizada embaixo dela.
+         As peças letra1-4 e eco_final continuam em img/marca/e_co/ (não foram apagadas), só não
+         entram mais aqui. Reverter = voltar este bloco, o bloco ABERTURA do estilo.css e o
+         abertura.js pro commit 4f3ccfa. -->
     <div class="marca-anim" aria-hidden="true">
-      <img class="eco-capivara" src="img/marca/e_co/eco_capivara.svg" alt="">
+      <!-- RODADA 3 (áudios 2167-2168): a perna dianteira da capivara é um "poste" na frente do
+           "& Co.". A janela anda junto com a capivara e recorta, com borda reta, tudo o que passa
+           pra esquerda da perna; o "& Co." desliza dentro dela e vai sendo engolido. -->
+      <div class="eco-janela"><img class="eco-capivara" src="img/marca/e_co/eco_capivara.svg" alt=""></div>
       <img class="capivara" src="img/marca/e_co/capivara.svg" alt="">
-      <!-- o "& Co." final vem ANTES das letras de propósito: ele desce de TRÁS do ālea, então
-           tem que ficar atrás delas na pilha (ajuste do Cassiano, 15:41). -->
-      <img class="eco-final" src="img/marca/e_co/eco_final.svg" alt="">
-      <img class="letra l1" src="img/marca/e_co/letra1.svg" alt="">
-      <img class="letra l2" src="img/marca/e_co/letra2.svg" alt="">
-      <img class="letra l3" src="img/marca/e_co/letra3.svg" alt="">
-      <img class="letra l4" src="img/marca/e_co/letra4.svg" alt="">
+      <!-- a janela recorta a escrita na linha dos pés da capivara: é isso que faz ela
+           "sair de baixo" da capivara em vez de aparecer por cima dela. -->
+      <div class="escrita-janela">
+        <img class="escrita" src="img/marca/e_co/escrita_letra_a_letra.svg" alt="">
+      </div>
     </div>
 
     <!-- a frase vai INTEIRA no HTML (Google e leitor de tela leem mesmo sem JS); o JS

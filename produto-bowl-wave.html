@@ -75,9 +75,15 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
       <span class="rotulo">Conta</span>
     </button>
+    <!-- LISTA DE DESEJOS (audio 2300 do Cassiano, 27/09/2026): entre a Conta e a Sacola, o MESMO botao dos dois.
+         Leva a lista-de-desejos.html (site.js). Posto por _lista_desejos_no_topo_v1_2026-09-27.py. -->
+    <button class="botao-icone" type="button" data-abrir="desejos" aria-label="Lista de Desejos" title="Lista de Desejos">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20.5s-7.5-4.6-9.3-9.2C1.4 8 3.4 4.5 6.9 4.5c2.1 0 3.6 1.2 5.1 3 1.5-1.8 3-3 5.1-3 3.5 0 5.5 3.5 4.2 6.8-1.8 4.6-9.3 9.2-9.3 9.2z"></path></svg>
+      <span class="rotulo">Desejos</span>
+    </button>
     <button class="botao-icone" type="button" data-abrir="carrinho" aria-haspopup="dialog">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 8.5h14V21H5z"></path><path d="M9 8.5V7a3 3 0 0 1 6 0v1.5"></path></svg>
-      <span class="rotulo">Carrinho</span>
+      <span class="rotulo">Sacola</span>
       <span class="quantos" data-quantos>0</span>
     </button>
   </nav>
@@ -97,7 +103,7 @@
       <p class="valor-grande" data-valor data-preco-base="179">R$ 179,00</p>
       <p>Comedouro elevado com o nome do seu cão impresso no corpo da peça.</p>
       <p>A onda que dá nome à peça vem do grafismo da marca — é o mesmo desenho que aparece na embalagem e na tag, aplicado na curva do comedouro.</p><p>O nome não é adesivo colado. Ele é impresso junto com a peça, em baixo relevo na cor do objeto, então não descasca, não desbota e não sai na lavagem. A tigela interna é de inox e sai pra lavar.</p><p>A base elevada deixa o cão comer com o pescoço em posição mais natural, sem ter que abaixar a cabeça até o chão.</p><p>*Ps.: Acompanha tigela em inox.</p>
-      <dl class="ficha"><div><dt>Material</dt><dd>PLA</dd></div><div><dt>Personalização</dt><dd>Nome do pet em baixo relevo na cor do objeto.</dd></div><div><dt>Produção</dt><dd>Sob encomenda, 3 dias úteis após a confirmação de pagamento!</dd></div><div><dt>Cores</dt><dd>Totalmente personalizável, podendo escolher entre filamento básico, fosco ou perolizado.</dd></div><div data-ficha-medidas><dt>Peso e dimensões</dt><dd>218 g · 8,4 × 21,3 × 21,2 cm (altura × largura × comprimento)</dd></div></dl>
+      <dl class="ficha"><div><dt>Material</dt><dd>PLA é um material utilizado na impressão 3D, produzido a partir de fontes renováveis, como milho e cana-de-açúcar. É leve, versátil e proporciona excelente acabamento.</dd></div><div><dt>Personalização</dt><dd>Nome do pet em baixo relevo na cor do objeto.</dd></div><div><dt>Produção</dt><dd>Sob encomenda, 3 dias úteis após a confirmação de pagamento!</dd></div><div data-ficha-medidas><dt>Peso e dimensões</dt><dd>218 g · 8,4 × 21,3 × 21,2 cm (altura × largura × comprimento)</dd></div></dl>
 
       <section class="aviso-personalizado">
         <h2>PRODUTOS PERSONALIZADOS</h2>
@@ -122,7 +128,7 @@
       </label>
 
       <p class="recado-aceite" data-recado-aceite hidden>
-        Marque a declaração acima para adicionar ao carrinho.
+        Marque a declaração acima para adicionar à sacola.
       </p>
       <div class="botoes-produto" data-botoes>
         <button class="botao" type="button" data-comprar-agora
@@ -131,7 +137,7 @@
           Comprar agora
         </button>
         <button class="botao-sacola" type="button" data-add-carrinho
-                aria-label="Adicionar ao carrinho" title="Adicionar ao carrinho">
+                aria-label="Adicionar à sacola" title="Adicionar à sacola">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 8.5h14V21H5z"></path><path d="M9 8.5V7a3 3 0 0 1 6 0v1.5"></path></svg>
         </button>
       </div>

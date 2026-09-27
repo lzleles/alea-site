@@ -6,6 +6,8 @@
    saida: Feed de produtos, filtros visuais, navegação e posição persistida
    status: ativo (cabecalho proposto pelo Codex em 2026-09-20, confianca ALTA; conferir na proxima vez que o script rodar)
    validado_em: TBD
+   v34 (27/09/2026, áudio 2308): no card, o nome do "× Nome" vai num <span class="nome"> (o degradê mede o nome, e o
+      × fica azul sólido). Antes: 03_site/_versoes_anteriores/x_azul_nome_proporcional_antes_2026-09-27/js/feed.js
 */
 /* =============================================================================
    feed.js — o feed: um objeto por tela, preto, deslizando pra cima
@@ -94,6 +96,24 @@
      O resto do nome do produto continua na régua da legenda. */
   function comNomeMarca(txt) {
     return String(txt).replace(/[āa]lea/gi, '<span class="marca-nome">ālea</span>');
+  }
+
+  /* ⚠️ v32 — NOMES COLLAB (26/09/2026, decididos pelo Cassiano; a v31 está em
+     03_site/_versoes_anteriores/nomes_collab_antes_2026-09-26/js/): o nome do produto termina em "× Nome do pet"
+     ("ālea Pet Bowl × Luke"). No card, o "× Luke" desce PEQUENO numa linha própria (`.collab`, estilo.css
+     "NOMES COLLAB"); o nome principal fica na régua de sempre. Nome sem " × " sai como antes. */
+  /* v33 (26/09/2026, "× Ayla Pompom"): o nome da Ayla usa ESPAÇO SEM QUEBRA depois do × ("× Ayla Pompom"),
+     pra não partir na sacola. A v32 só procurava " × " e, com o sem-quebra, o card perdia a linha pequena. Agora
+     acha os dois. A v32 está em 03_site/_versoes_anteriores/rodada5_dourado_ayla_antes_2026-09-26/. */
+  function nomeNoCard(txt) {
+    txt = String(txt);
+    var i = Math.max(txt.lastIndexOf(' × '), txt.lastIndexOf(' × '));
+    if (i < 0) return comNomeMarca(txt);
+    /* o "×" vai num span próprio: o × da Defante é um pontinho (visto no print de 26/09); o `.x` o desenha na Hanken */
+    /* v34 (27/09/2026, áudio 2308 do Cassiano): o NOME ganha span próprio (.nome). O "×" fica sempre azul e o degradê
+       é medido pela largura do NOME, em 4 fatias iguais (estilo.css v34). O espaço (comum ou sem quebra) fica fora. */
+    return comNomeMarca(txt.slice(0, i)) + ' <span class="collab"><span class="x">×</span>' + txt.charAt(i + 2) +
+      '<span class="nome">' + txt.slice(i + 3) + '</span></span>';
   }
 
   function nomeDaCategoria(id) {
@@ -212,7 +232,7 @@
         '<div class="legenda">' +
           '<span class="lado-esquerdo">' +
             '<span class="categoria">' + nomeDaCategoria(c.categoria) + '</span>' +
-            '<span class="produto-mini">' + comNomeMarca(c.produto) + '</span>' +
+            '<span class="produto-mini">' + nomeNoCard(c.produto) + '</span>' +   // v32
             '<a class="ver" href="produto-' + c.pagina + '.html">ver produto →</a>' +
           '</span>' +
           (mostrarPreco ? '<span class="valor">' + (c.preco === null ? 'Sob consulta' : moeda(c.preco)) + '</span>' : '') +
@@ -254,6 +274,8 @@
 
     itens = Array.prototype.slice.call(palco.querySelectorAll('.item'));
     categoriaAtual = catId;
+    cartoesAtuais = lista;
+    montarGaleriasPC();                                  // v31: só no computador (ver o bloco v31 lá embaixo)
 
     if (window.aleaLigarBotoes) window.aleaLigarBotoes(palco);
     /* o menu do cartão de fim nasce aqui, depois que o site.js já montou os outros */
@@ -348,6 +370,7 @@
   }
 
   function voltarPraPrimeira(item) {
+    if (item.__galeriaPC) { mostrarGaleriaPC(item, -1); pintarSetasFoto(item); }   // v31
     var fotos = fotosDo(item);
     if (fotos.length < 2) return;
     var atual = fotos.findIndex(function (f) { return f.classList.contains('ativa'); });
@@ -523,7 +546,8 @@
       return Math.max(0, fotosDo(it).findIndex(function (f) { return f.classList.contains('ativa'); }));
     });
     var estado = { cat: categoriaAtual, top: (typeof topoForcado === 'number') ? topoForcado : feed.scrollTop,
-                   fotos: fotos, foco: emFoco ? itens.indexOf(emFoco) : -1 };
+                   fotos: fotos, foco: emFoco ? itens.indexOf(emFoco) : -1,
+                   galeria: itens.map(function (it) { return fotoDaGaleria(it); }) };   // v31
     try { sessionStorage.setItem(EXATO, JSON.stringify(estado)); } catch (e) { /* aba anônima */ }
   }
 
@@ -598,6 +622,9 @@
     var exato = estadoExatoPedido(catId);             // ETAPA 17
     if (exato) {
       itens.forEach(function (it, k) { fixarFoto(it, exato.fotos[k] || 0); });
+      if (exato.galeria) itens.forEach(function (it, k) {                          // v31
+        if (it.__galeriaPC && exato.galeria[k] >= 0) { mostrarGaleriaPC(it, exato.galeria[k]); pintarSetasFoto(it); }
+      });
       emFoco = (exato.foco >= 0 && itens[exato.foco]) ? itens[exato.foco] : null;
     } else {
       voltarPraPrimeira(itens[indice]);
@@ -637,6 +664,7 @@
     pintarContador();
     guardarPosicao();
     if (window.aleaDistorcao) window.aleaDistorcao.montar(itens[indice].querySelector('.objeto'));
+    document.dispatchEvent(new CustomEvent('alea:feed-aberto'));   // v29: as setas ‹ › do computador se acertam
   }
 
   function fechar() {
@@ -652,6 +680,20 @@
   }
 
   window.aleaFeed = { abrir: abrir, fechar: fechar, aberto: function () { return aberto; } };
+
+  /* ⚠️ v30 (26/09/2026, pedido do Cassiano; a v29 está em 03_site/_versoes_anteriores/personalizar_matteo_claudia_antes_2026-09-26/js/):
+     "no menu de categorias do fim do feed, tocar na categoria ATUAL leva ao começo dela". Antes, o link da
+     categoria em que a pessoa já está (`#pet` com o endereço já em `#pet`) não fazia NADA: o endereço não muda,
+     então o `hashchange` não dispara. Agora o toque na categoria atual rola o feed até o TOPO (a intro da
+     categoria + o 1º produto), com a rolagem suave (ou direta, se o aparelho pede menos movimento).
+     Tocar em OUTRA categoria continua indo pelo `hashchange`, como sempre. Vale no celular e no computador. */
+  feed.addEventListener('click', function (e) {
+    var a = e.target.closest && e.target.closest('[data-menu-categorias] a[data-categoria]');
+    if (!a || !aberto || a.getAttribute('data-categoria') !== categoriaAtual) return;
+    e.preventDefault();
+    indice = 0;
+    feed.scrollTo({ top: 0, behavior: querMenosMovimento ? 'auto' : 'smooth' });
+  });
 
   /* ==================================================================== os gestos */
   /* ⚠️ 5ª RODADA: A RODA E O DEDO NA VERTICAL NÃO SÃO MAIS NOSSOS.
@@ -732,6 +774,7 @@
     else if (e.key === 'Home') { e.preventDefault(); irParaItem(0, true); }
     else if (e.key === 'End') { e.preventDefault(); irParaItem(itens.length - 1, true); }
     else if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
+      if (item && item.__galeriaPC) { e.preventDefault(); andarFotoPC(item, e.key === 'ArrowRight' ? 1 : -1); return; }   // v31
       var fotos = fotosDo(item);
       if (fotos.length < 2) return;
       e.preventDefault();
@@ -743,6 +786,12 @@
 
   /* --- clique: bolinha troca foto, o resto avança ------------------------- */
   palco.addEventListener('click', function (e) {
+    /* v31: a seta ‹ › do computador passa as FOTOS do próprio produto (e nunca rola a página) */
+    var setaFoto = e.target.closest('[data-seta-foto]');
+    if (setaFoto) {
+      andarFotoPC(setaFoto.closest('.item'), parseInt(setaFoto.getAttribute('data-seta-foto'), 10));
+      return;
+    }
     /* v28: a seta do computador passa a foto do cartão dela (e não dá a volta: na ponta ela não faz nada) */
     var seta = e.target.closest('[data-seta-feed]');
     if (seta) {
@@ -752,7 +801,8 @@
       var dirS = parseInt(seta.getAttribute('data-seta-feed'), 10);
       if (atualS + dirS >= 0 && atualS + dirS < fotosS.length) pedirFoto(itemS, atualS + dirS, dirS);
       return;
-    }    var bolinha = e.target.closest('[data-foto]');
+    }
+    var bolinha = e.target.closest('[data-foto]');
     if (bolinha) {
       var n = parseInt(bolinha.getAttribute('data-foto'), 10);
       var item = bolinha.closest('.item') || itens[indice];   // ETAPA 15: a bolinha é DA peça dela
@@ -774,7 +824,10 @@
        iPhone com `touch-action: pan-y`. O 1º toque já começou a centralizar — então a tela que se
        guarda é a de ANTES do 1º toque, que é a que ele deixou. */
     var agora = Date.now();
-    if (ultimoToque && ultimoToque.peca === peca && agora - ultimoToque.t < 350) {
+    /* v29 (Cassiano, 26/09/2026 03:05): "no computador, você só vai conseguir entrar no produto se clicar em 'ver
+       produto'. Não coloque a opção de clicar duas vezes, porque ninguém clica duas vezes." No COMPUTADOR o duplo
+       clique não entra mais; o clique só centraliza a peça. No celular, o toque duplo continua como está. */
+    if (!pcDeMouse() && ultimoToque && ultimoToque.peca === peca && agora - ultimoToque.t < 350) {
       var ver = peca.querySelector('a.ver[href]');
       guardarEstadoExato(ultimoToque.topo);
       sairGuardado = true;                          // o pagehide não sobrescreve com a tela meio rolada
@@ -789,6 +842,191 @@
   /* rede: qualquer saída da página com o feed aberto guarda a tela (link do cabeçalho, sacola…) */
   window.addEventListener('pagehide', function () { if (aberto && !sairGuardado) guardarEstadoExato(); });
   var sairGuardado = false;
+
+  /* =============================================================================
+     ⚠️ v29 — O FEED NO COMPUTADOR (Cassiano, 26/09/2026 03:05-03:10, áudios + vídeo 1992).
+     Tudo aqui só vale com MOUSE de verdade e tela de computador (a mesma régua do CSS v28/v29:
+     hover + ponteiro fino + largura ≥ 761 px). No celular e no touchpad nada muda.
+
+     (1) A RODA DO MOUSE VIRA CARROSSEL. "Eu uso a bolinha do mouse; se eu rolar, está demorando muito. Tem como
+         rolar mais suave, como um carrossel, ir bem rápido dependendo da forma que eu rolo a bolinha?"
+         Medido antes (03_site\_LEIA_DESKTOP_2_2026-09-26.md): cada "clique" da roda anda 100 px e um produto tem
+         ~600-700 px — eram 6-7 cliques da roda por produto. Agora CADA CLIQUE da roda = UM PRODUTO, com a peça
+         assentando no centro da tela numa curva suave. Girar rápido manda vários cliques em sequência, e cada um
+         empilha mais um produto no destino: giro lento vai um a um, giro rápido pula vários.
+         Só a roda de MOUSE (clique de 120 no wheelDelta, ou rolagem por linhas). O touchpad continua com a rolagem
+         livre do navegador, que é a "fluida" que ele aprovou em 17/09 (5ª rodada).
+     (2) [SAIU NA v31 — vídeo 2175: "não é pra ele ir pra debaixo, é pra ele passar as fotos aqui"] as setas ‹ › que
+         iam pro produto seguinte/anterior. A v29 está em 03_site/_versoes_anteriores/setas_e_modal_antes_2026-09-26/. */
+  var mqPC = window.matchMedia ? window.matchMedia('(hover: hover) and (pointer: fine) and (min-width: 761px)') : null;
+  function pcDeMouse() { return !!(mqPC && mqPC.matches); }
+
+  function limiteDoFeed() { return Math.max(0, feed.scrollHeight - feed.clientHeight); }
+  /* onde o feed para em cada item: o 1º no topo (a intro da categoria aparece junto); os outros com a FOTO no
+     centro; o cartão de fim no fim */
+  function paradaDo(i) {
+    if (i <= 0) return 0;
+    var it = itens[i];
+    var alvo = it.querySelector('.area-objeto');
+    var y = alvo ? posNoFeed(alvo) + alvo.offsetHeight / 2 - feed.clientHeight / 2 : limiteDoFeed();
+    return Math.max(0, Math.min(limiteDoFeed(), y));
+  }
+  var anim = null, animando = false;
+  function quadroDaRolagem(t) {
+    if (!anim) { animando = false; return; }
+    var k = Math.min(1, (t - anim.t0) / anim.dur);
+    var e = 1 - Math.pow(1 - k, 3);                 // sai rápido e assenta devagar
+    feed.scrollTop = anim.de + (anim.para - anim.de) * e;
+    if (k < 1) requestAnimationFrame(quadroDaRolagem);
+    else { anim = null; animando = false; }
+  }
+  function rolarAte(y) {
+    y = Math.max(0, Math.min(limiteDoFeed(), y));
+    if (querMenosMovimento) { anim = null; feed.scrollTop = y; return; }
+    anim = { de: feed.scrollTop, para: y, t0: performance.now(), dur: 520 };
+    if (!animando) { animando = true; requestAnimationFrame(quadroDaRolagem); }
+  }
+  /* o próximo destino SEMPRE a partir de onde o feed VAI parar (se já está andando) — é isso que empilha */
+  function andarProdutos(passos) {
+    if (!aberto || !itens.length) return;
+    var base = anim ? anim.para : feed.scrollTop;
+    var alvo = base, i;
+    if (passos > 0) {
+      for (i = 0; i < itens.length && passos > 0; i++) {
+        var p = paradaDo(i);
+        if (p > alvo + 8) { alvo = p; passos--; }
+      }
+    } else {
+      for (i = itens.length - 1; i >= 0 && passos < 0; i--) {
+        var q = paradaDo(i);
+        if (q < alvo - 8) { alvo = q; passos++; }
+      }
+    }
+    if (alvo !== base) rolarAte(alvo);
+  }
+
+  feed.addEventListener('wheel', function (e) {
+    if (!aberto || !pcDeMouse() || e.ctrlKey || gavetaNaFrente()) return;
+    if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) return;
+    var linhas = e.deltaMode === 1;
+    var rodaDeMouse = linhas || (e.wheelDeltaY && Math.abs(e.wheelDeltaY) >= 120 && e.wheelDeltaY % 120 === 0);
+    if (!rodaDeMouse) return;                       // touchpad: a rolagem livre do navegador
+    e.preventDefault();
+    /* roda "solta" (Logitech e parecidas) manda 2-3 cliques num evento só: cada 120 é um produto */
+    var cliques = linhas ? Math.max(1, Math.round(Math.abs(e.deltaY) / 3))
+                         : Math.max(1, Math.round(Math.abs(e.wheelDeltaY) / 120));
+    andarProdutos(Math.min(cliques, 3) * (e.deltaY > 0 ? 1 : -1));
+  }, { passive: false });
+  /* quem pegar a barra de rolagem ou o teclado no meio do carrossel manda: a animação larga */
+  ['mousedown', 'keydown', 'touchstart'].forEach(function (ev) {
+    feed.addEventListener(ev, function (e) {
+      if (e.target && e.target.closest && e.target.closest('.seta-foto')) return;
+      anim = null;
+    }, { passive: true });
+  });
+
+  /* =============================================================================
+     ⚠️ v31 — AS SETAS DO FEED PASSAM AS FOTOS DO PRÓPRIO PRODUTO (Cassiano, 26/09/2026, vídeo 2175).
+     "aqui eu clico [na setinha], ele vai pra debaixo, não é pra ele ir pra debaixo, é pra ele passar as fotos aqui.
+      Essa setinha tem que ficar centralizada com a foto, e quando eu clicar nela ele vai passar as fotos desse
+      produto. Pra rolar a tela, eu vou rolar no mouse, eu não vou rolar a tela clicando aqui."
+     SÓ NO COMPUTADOR (a mesma régua de sempre: mqPC). No celular NADA disto nasce: nem a galeria, nem as setas.
+     - SAÍRAM as setas ‹ › de "produto seguinte/anterior" da v29 (presas no meio da TELA). A roda do mouse continua
+       rolando a página, com o carrossel da v29 (um clique da roda = um produto) — é ela que "rola a tela".
+     - ENTRARAM duas setas por cartão, coladas nas laterais da FOTO dele e no meio da altura dela, no mesmo traço
+       discreto. A fila de fotos é a MESMA da página do produto (a colmeia): a capa do feed (a versão quadrada da capa
+       da página) e depois `PRODUTOS[slug].galeria`, na ordem — nada novo, nada inventado.
+     - As fotos da página NÃO são quadradas: aparecem NA PROPORÇÃO DELAS, inteiras, dentro do quadrado da capa, sem
+       recorte e sem esticar (regra dele: "no álbum e na colmeia a foto aparece na proporção dela", _REGRA_CAPA_DO_FEED).
+       Por isso elas não passam pela lona WebGL (que desenha num quadrado) — ficam numa camada própria por cima.
+     - Na 1ª foto a ‹ some; na última, a › DÁ A VOLTA pra 1ª (é um carrossel de fotos; não existe parede).
+     - Cartão com 1 foto só (sem galeria): sem setas. */
+  var cartoesAtuais = [];
+
+  function galeriaDoCartao(c) {
+    if (!c) return [];
+    var p = (window.PRODUTOS || []).filter(function (x) { return x.slug === c.pagina; })[0];
+    return ((p && p.galeria) || []).filter(function (f) { return (c.fotos || []).indexOf(f) < 0; });
+  }
+  function imgsDaGaleria(item) { return item.__galeriaPC ? Array.prototype.slice.call(item.__galeriaPC.querySelectorAll('img')) : []; }
+  function fotoDaGaleria(item) {
+    return imgsDaGaleria(item).findIndex(function (i) { return i.classList.contains('ativa'); });
+  }
+  function totalPC(item) { return fotosDo(item).length + imgsDaGaleria(item).length; }
+  function atualPC(item) {
+    var g = fotoDaGaleria(item);
+    if (g >= 0) return fotosDo(item).length + g;
+    return Math.max(0, fotosDo(item).findIndex(function (f) { return f.classList.contains('ativa'); }));
+  }
+
+  function montarGaleriaPC(item, c) {
+    if (!item || item.__galeriaPC || item.__semGaleriaPC || !c) return;
+    var extras = galeriaDoCartao(c);
+    if (fotosDo(item).length + extras.length < 2) { item.__semGaleriaPC = true; return; }   // 1 foto só: sem setas
+    var area = item.querySelector('.area-objeto');
+    var g = document.createElement('div');
+    g.className = 'galeria-pc';
+    g.innerHTML = extras.map(function (f, k) {
+      return '<img src="img/produtos/' + f + '.jpg" loading="lazy" decoding="async" alt="' + c.produto +
+        ' — foto ' + (k + 2) + '">';
+    }).join('');
+    area.appendChild(g);
+    [[-1, 'Foto anterior', '15 5 8 12 15 19', 'ant'], [1, 'Próxima foto', '9 5 16 12 9 19', 'prox']].forEach(function (s) {
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'seta-foto seta-foto-' + s[3];
+      b.setAttribute('data-seta-foto', String(s[0]));
+      b.setAttribute('aria-label', s[1]);
+      b.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="' + s[2] + '"></polyline></svg>';
+      area.appendChild(b);
+    });
+    area.classList.add('tem-galeria-pc');
+    item.__galeriaPC = g;
+    pintarSetasFoto(item);
+  }
+
+  function montarGaleriasPC() {
+    if (!pcDeMouse()) return;
+    itens.forEach(function (it) {
+      var i = parseInt(it.getAttribute('data-i'), 10);
+      if (!isNaN(i) && cartoesAtuais[i]) montarGaleriaPC(it, cartoesAtuais[i]);
+    });
+  }
+  /* a janela do computador que ficou larga depois de aberta (ou o mouse que chegou) também ganha as setas */
+  if (mqPC && mqPC.addEventListener) mqPC.addEventListener('change', montarGaleriasPC);
+
+  /* k = -1 esconde a camada (volta a valer a foto da lona); k >= 0 mostra a foto k da galeria */
+  function mostrarGaleriaPC(item, k) {
+    var imgs = imgsDaGaleria(item);
+    imgs.forEach(function (im, j) { im.classList.toggle('ativa', j === k); });
+    var area = item.querySelector('.area-objeto');
+    if (area) area.classList.toggle('na-galeria', k >= 0);
+    if (k >= 0 && imgs[k + 1] && imgs[k + 1].loading === 'lazy') imgs[k + 1].loading = 'eager';   // a próxima já vem
+  }
+
+  function pintarSetasFoto(item) {
+    var area = item && item.querySelector('.area-objeto');
+    if (!area) return;
+    area.classList.toggle('foto-primeira', atualPC(item) === 0);
+  }
+
+  function andarFotoPC(item, dir) {
+    if (!item || !item.__galeriaPC) return;
+    var L = fotosDo(item).length, T = totalPC(item);
+    var n = atualPC(item) + dir;
+    if (n < 0) return;                       // na 1ª a ‹ nem aparece
+    if (n >= T) n = 0;                       // na última, a › dá a volta pra 1ª
+    if (n >= L) {
+      mostrarGaleriaPC(item, n - L);
+    } else {
+      mostrarGaleriaPC(item, -1);
+      var atualLona = Math.max(0, fotosDo(item).findIndex(function (f) { return f.classList.contains('ativa'); }));
+      if (atualLona !== n) pedirFoto(item, n, n > atualLona ? 1 : -1);
+    }
+    var dica = item.querySelector('[data-dica]');
+    if (dica) dica.classList.add('some');
+    pintarSetasFoto(item);
+  }
 
   document.dispatchEvent(new CustomEvent('alea:feed-pronto'));
 })();

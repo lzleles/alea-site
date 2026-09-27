@@ -6,6 +6,13 @@
    saida: Links, menus, redes, campos preenchidos e gavetas interativas
    status: ativo (cabecalho proposto pelo Codex em 2026-09-20, confianca ALTA; conferir na proxima vez que o script rodar)
    validado_em: TBD
+   27/09/2026: o botão novo do topo `data-abrir="desejos"` (coração, entre Conta e Sacola — áudio 2300 do Cassiano) leva
+      à lista-de-desejos.html, do mesmo jeito que a Conta leva à conta.html. Antes:
+      03_site/_versoes_anteriores/lista_desejos_antes_2026-09-27/js/site.js
+   27/09/2026 (áudio 2308): embrulharNomeCollab() põe o nome do "× Nome" num <span class="nome"> onde faltar (o degradê
+      proporcional mede o nome). Antes: 03_site/_versoes_anteriores/x_azul_nome_proporcional_antes_2026-09-27/js/site.js
+   27/09/2026 (áudio 2317): o coração do TOPO fica colorido (degradê perolizado) quando a Lista de Desejos tem alguma peça;
+      vazia = igual antes. Bloco no fim do arquivo. Antes: 03_site/_versoes_anteriores/coracao_topo_colorido_antes_2026-09-27/
 */
 /* =============================================================================
    site.js — o que vale em TODA página (abertura, feed, produto, textos)
@@ -211,6 +218,29 @@ window.aleaCorDoTopo = (function () {
      Ele é o único que vai pintado por dentro. */
   var CHEIOS = { linktree: true };
 
+  /* ⚠️ v29 (Cassiano, áudio 1997, 26/09/2026 03:10): "o ālea preto também do site, ele não vai direto pro Instagram,
+     arruma isso também". A logo grande do rodapé (preto) vira link pro Instagram da ālea, em aba nova. O endereço
+     sai do `C.instagram` do config.js ('alea.co_', conferido na API da Meta em 16/09/2026) — não é digitado aqui.
+     Sem @ no config, a logo continua só imagem (nunca link morto). Só no computador (v29b). */
+  function ligarLogoDoRodape() {
+    /* v29b (áudios 2000/2004): "tudo que eu pedi pra mexer no site do computador é no computador; no celular não mexe" */
+    if (!(window.matchMedia && window.matchMedia('(hover: hover) and (pointer: fine) and (min-width: 761px)').matches)) return;
+    var usuario = (C.instagram || '').replace(/^@/, '');
+    if (!usuario) return;
+    Array.prototype.forEach.call(document.querySelectorAll('.rodape img.marca-rodape'), function (img) {
+      if (img.closest('a')) return;
+      var a = document.createElement('a');
+      a.className = 'marca-rodape-link';
+      a.href = 'https://www.instagram.com/' + usuario + '/';
+      a.target = '_blank';
+      a.rel = 'noopener';
+      a.setAttribute('aria-label', 'Instagram da ālea & Co. (@' + usuario + ')');
+      a.title = '@' + usuario;
+      img.parentNode.insertBefore(a, img);
+      a.appendChild(img);
+    });
+  }
+
   function montarRedes() {
     var caixas = document.querySelectorAll('[data-redes]');
     if (!caixas.length) return;
@@ -335,6 +365,8 @@ window.aleaCorDoTopo = (function () {
          do lado da sacola, em meu perfil, para aparecer essa página". O carrinho continua gaveta. */
       if (b && b.getAttribute('data-abrir') === 'conta') { e.preventDefault(); location.href = 'conta.html'; return; }
       if (b && b.getAttribute('data-abrir') === 'carrinho') { e.preventDefault(); location.href = 'finalizar-compra.html'; return; }
+      /* 27/09/2026 (áudio 2300 do Cassiano): o coração do topo, entre a Conta e a Sacola, leva à página da Lista de Desejos */
+      if (b && b.getAttribute('data-abrir') === 'desejos') { e.preventDefault(); location.href = 'lista-de-desejos.html'; return; }
       if (b) { e.preventDefault(); abrir(b.getAttribute('data-abrir')); return; }
       if (e.target.closest('[data-fechar-gaveta]')) fechar();
     });
@@ -392,6 +424,23 @@ window.aleaCorDoTopo = (function () {
     document.body.appendChild(s);
   }
 
+  /* 27/09/2026 (áudio 2308 do Cassiano): o degradê do "× Nome" mede o NOME, que precisa estar num <span class="nome">.
+     As 4 páginas de produto e o feed.js (v34) já saem assim; isto embrulha qualquer .collab que chegue sem o span
+     (página refeita por gerador antigo), pra o nome nunca ficar sem cor. Só mexe no texto que vem DEPOIS do ×. */
+  function embrulharNomeCollab() {
+    Array.prototype.forEach.call(document.querySelectorAll('.collab'), function (c) {
+      if (c.querySelector('.nome')) return;
+      var x = c.querySelector('.x');
+      var no = x ? x.nextSibling : c.firstChild;
+      if (!no || no.nodeType !== 3) return;
+      var t = no.nodeValue, sep = /^[  ]/.test(t) ? t.charAt(0) : '';
+      var n = document.createElement('span');
+      n.className = 'nome'; n.textContent = t.slice(sep.length);
+      no.nodeValue = sep;
+      c.insertBefore(n, no.nextSibling);
+    });
+  }
+
   /* -------------------------------------------------------------------- início */
   /* ETAPA 72 (24/09/2026): linha da ficha ainda sem número (ex.: "Peso e dimensões — a informar") só aparece na
      PRÉVIA; no site do ar ela some. Nunca mostrar "a informar" pro cliente de verdade. */
@@ -402,10 +451,12 @@ window.aleaCorDoTopo = (function () {
 
   function iniciar() {
     esconderFaltas();
+    embrulharNomeCollab();
     ligarVoltarProFeed();
     preencherContato();
     montarMenuCategorias();
     montarRedes();
+  ligarLogoDoRodape();
     montarGavetas();
     window.aleaLigarBotoes();     // as páginas de produto já nascem prontas no HTML
     carregarConta();
@@ -418,4 +469,35 @@ window.aleaCorDoTopo = (function () {
   } else {
     iniciar();
   }
+})();
+
+/* CORAÇÃO DO TOPO COLORIDO QUANDO A LISTA TEM PEÇA (áudio 2317 do Cassiano, 27/09/2026): "se a pessoa tiver alguma coisa
+   na lista de desejos, o coração dela lá em cima vai ficar sempre colorido. Se ela não tiver, vai permanecer igual."
+   Lê a lista direto do aparelho (a mesma chave do loja-dados.js, alea_desejos_v1), porque nem toda página carrega o
+   loja-dados.js. Repinta ao tocar num coração/remover (depois do clique), quando outra aba muda a lista e ao voltar
+   pelo "voltar" do navegador. O desenho (span .coracao-silk-topo com o degradê) está no estilo.css v35. */
+(function () {
+  function temDesejos() {
+    try { var l = JSON.parse(localStorage.getItem('alea_desejos_v1') || '[]'); return Array.isArray(l) && l.length > 0; }
+    catch (e) { return false; }
+  }
+  function pintar() {
+    var tem = temDesejos();
+    document.querySelectorAll('[data-abrir="desejos"]').forEach(function (b) {
+      if (!b.querySelector('.coracao-silk-topo')) {
+        var s = document.createElement('span');
+        s.className = 'coracao-silk-topo'; s.setAttribute('aria-hidden', 'true');
+        b.insertBefore(s, b.firstChild);
+      }
+      b.classList.toggle('tem-desejos', tem);
+    });
+  }
+  /* na CAPTURA (antes do botão agir): o coração da peça reescreve o próprio innerHTML no clique, e depois disso o alvo
+     do toque já saiu da página e o closest() não o acha mais */
+  document.addEventListener('click', function (e) {
+    if (e.target && e.target.closest && e.target.closest('[data-desejo], .loja-desejos button, .loja-desejos .tirar')) setTimeout(pintar, 0);
+  }, true);
+  window.addEventListener('storage', function (e) { if (!e.key || e.key === 'alea_desejos_v1') pintar(); });
+  window.addEventListener('pageshow', pintar);
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', pintar); else pintar();
 })();

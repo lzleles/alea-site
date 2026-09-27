@@ -6,6 +6,10 @@
    saida: estilos .loja-*
    status: prévia (23/09/2026)
    validado_em: 2026-09-23 (print em 390 px contra os vídeos do Cassiano)
+   v2 (27/09/2026): o botão "Lista de Desejos" da página de produto (coração + texto) ganha o degradê perolizado do
+      "× Nome" (áudio 2300); e a página nova lista-de-desejos.html usa a mesma grade .loja-desejos da Minha Conta.
+      Bloco novo no fim do trecho "o coração da lista de desejos". Antes: _versoes_anteriores/lista_desejos_antes_2026-09-27/css/.
+   v3 (27/09/2026, áudio 2310): só o CORAÇÃO fica no degradê; o texto volta à cor de antes.
 */
 /* =============================================================================
    loja.css — a conta e a compra "iguais às da Tiffany" (pedido do Cassiano, 23/09/2026 20:36-20:47)
@@ -54,6 +58,10 @@
   border-radius: 0; background: var(--terracota); color: var(--off); font: inherit; font-size: 14px; font-weight: 500;
   letter-spacing: .02em; cursor: pointer; text-decoration: none; }
 .loja-bt:hover { background: var(--laranja); }
+/* v29 (26/09/2026, Cassiano: "a cor de escolher produto preto fica muito feio, pode deixar ele claro"): o ".loja a { color: inherit }"
+   vencia a cor do botão quando ele é um <a> (o "Escolher Produtos" da sacola vazia) — letra escura no terracota. */
+/* v29b (áudios 2000/2004): só no computador — no celular fica a cor de antes */
+@media (hover: hover) and (pointer: fine) and (min-width: 761px) { .loja a.loja-bt { color: var(--off); } }
 .loja-bt:disabled { background: var(--dourado); cursor: not-allowed; opacity: .75; }
 .loja-bt.entrar { min-width: 122px; }
 .loja-bt.largo { display: flex; width: 100%; min-height: 50px; }
@@ -197,6 +205,34 @@
 .loja-coracao svg { width: 20px; height: 20px; }
 .loja-coracao[aria-pressed="true"] svg { fill: var(--terracota); stroke: var(--terracota); }
 .loja-coracao[aria-pressed="true"] { color: var(--terracota); }
+.loja-coracao .coracao-silk { display: none; }
+
+/* v2 (27/09/2026, áudio 2300 do Cassiano) — "LISTA DE DESEJOS" NO MESMO DEGRADÊ PEROLIZADO DO "× Nome".
+   O coração e o texto usam AS MESMAS variáveis do × Nome (--collab-reflexo, --collab-volume, --collab-cores, contorno e halo),
+   que moram no <body> do estilo.css (v33): se a variação do degradê mudar (body.nome-verde-a/-c, nome-dourado…), o botão
+   muda junto. Texto: background-clip: text (+ -webkit-, o do Safari do iPhone). Coração: o mesmo fundo recortado pela
+   silhueta do coração (mask; contorno quando fora da lista, cheio quando dentro). Tudo PARADO: sem animação nem transição.
+   Sem suporte (navegador velho): fica o coração SVG antigo, como era.
+   v3 (27/09/2026, áudio 2310 do Cassiano: "é pra mudar só o CORAÇÃO em degradê. A cor do texto 'Lista de Desejos' pode
+   deixar na que tava"): o TEXTO voltou à cor, peso e tamanho de antes (--tinta-fraca; terracota quando está na lista);
+   SÓ o coração fica no degradê perolizado (as 4 cores em fatias iguais, estilo.css v34). Antes (209ad74):
+   03_site/_versoes_anteriores/x_azul_nome_proporcional_antes_2026-09-27/css/loja.css. A v1 (antes da v2) está em
+   03_site/_versoes_anteriores/lista_desejos_antes_2026-09-27/css/. */
+@supports ((-webkit-background-clip: text) or (background-clip: text)) and ((-webkit-mask-image: none) or (mask-image: none)) {
+  .loja-coracao { animation: none; transition: none; }
+  .loja-coracao svg { display: none; }
+  .loja-coracao .coracao-silk {
+    background-image: var(--collab-reflexo), var(--collab-volume), var(--collab-cores);
+    filter: var(--collab-halo); animation: none;
+    display: block; flex: none; width: 20px; height: 20px;
+    -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2'%3E%3Cpath d='M12 20.5s-7.5-4.6-9.3-9.2C1.4 8 3.4 4.5 6.9 4.5c2.1 0 3.6 1.2 5.1 3 1.5-1.8 3-3 5.1-3 3.5 0 5.5 3.5 4.2 6.8-1.8 4.6-9.3 9.2-9.3 9.2z'/%3E%3C/svg%3E") center / contain no-repeat;
+            mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2'%3E%3Cpath d='M12 20.5s-7.5-4.6-9.3-9.2C1.4 8 3.4 4.5 6.9 4.5c2.1 0 3.6 1.2 5.1 3 1.5-1.8 3-3 5.1-3 3.5 0 5.5 3.5 4.2 6.8-1.8 4.6-9.3 9.2-9.3 9.2z'/%3E%3C/svg%3E") center / contain no-repeat;
+  }
+  .loja-coracao[aria-pressed="true"] .coracao-silk {
+    -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='black' stroke='black' stroke-width='2'%3E%3Cpath d='M12 20.5s-7.5-4.6-9.3-9.2C1.4 8 3.4 4.5 6.9 4.5c2.1 0 3.6 1.2 5.1 3 1.5-1.8 3-3 5.1-3 3.5 0 5.5 3.5 4.2 6.8-1.8 4.6-9.3 9.2-9.3 9.2z'/%3E%3C/svg%3E");
+            mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='black' stroke='black' stroke-width='2'%3E%3Cpath d='M12 20.5s-7.5-4.6-9.3-9.2C1.4 8 3.4 4.5 6.9 4.5c2.1 0 3.6 1.2 5.1 3 1.5-1.8 3-3 5.1-3 3.5 0 5.5 3.5 4.2 6.8-1.8 4.6-9.3 9.2-9.3 9.2z'/%3E%3C/svg%3E");
+  }
+}
 
 /* a faixa que diz "isto é prévia" — some no ar. Mora dentro do <main>, então sangra até a borda. */
 .loja-previa { background: var(--dourado); color: var(--tinta); font-size: 11.5px; line-height: 1.4; text-align: center; padding: 6px 12px;

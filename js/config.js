@@ -129,11 +129,15 @@ window.ALEA = {
      ETAPA 31 (22/09/2026, 21:33): CORES termina com "entre filamento básico, fosco ou perolizado."
      (palavras dele; era "entre filamentos básicos, foscos ou brilhosos." — "perolizado" é o nome
      que ele passou a usar pro acabamento, como no exemplo da cor do nome). */
+  /* 27/09/2026 (áudio 2333 + texto 2334 do Cassiano): a linha CORES SAIU da ficha ("é bom ficar menor"), e o
+     Material PLA passa a mostrar a frase dele (material_pla). Aplicado nas páginas por
+     03_site/_ficha_material_pla_sem_cores_v1_2026-09-27.py. O gerador de páginas ainda escreve o formato antigo:
+     rodar esse script depois dele. */
   ficha_padrao: {
     personalizacao: 'Nome do pet em baixo relevo na cor do objeto.',
     producao: 'Sob encomenda, 3 dias úteis após a confirmação de pagamento!',
-    cores: 'Totalmente personalizável, podendo escolher entre filamento básico, ' +
-           'fosco ou perolizado.'
+    material_pla: 'PLA é um material utilizado na impressão 3D, produzido a partir de fontes renováveis, ' +
+                  'como milho e cana-de-açúcar. É leve, versátil e proporciona excelente acabamento.'
   },
 
   /* ADICIONAIS DE PERSONALIZACAO — o que soma no preco da peca.
@@ -209,10 +213,11 @@ window.ALEA = {
      25/09/2026: a LISTA REAL dele substituiu as de teste (ver o bloco `filamentos` abaixo). */
   filamentos: {
     /* LISTA REAL do Cassiano (25/09/2026, audios 1786-1815, tudo PLA; nomes do site trocados por ele na
-       msg 1827; sem 4a aba - audio 1830; + Rosa Silk msg 1835). Gerado por 03_site/07_gerar_filamentos_config_v3_rosa_silk_2026-09-25.py
-       a partir de 03_site/_LISTA_FILAMENTOS_DELE_2026-09-25.json - nao editar a mao. Antes: cores de TESTE
-       (Azul/Amarelo/Verde) no Basico e Perolizado e as 5 foscas Bambu da msg 546.
-       hex = cor OFICIAL do fabricante; eSUN Silk Lime = aproximado (medido na foto oficial da eSUN). */
+       msg 1827; sem 4a aba - audio 1830; + Rosa Silk msg 1835). Gerado por 03_site/07_gerar_filamentos_config_v4_textura_por_cor_2026-09-26.py
+       a partir de 03_site/_LISTA_FILAMENTOS_DELE_2026-09-25.json + _TEXTURAS_FILAMENTO.json - nao editar a mao.
+       hex = cor OFICIAL do fabricante; eSUN Silk Lime = aproximado (medido na foto oficial da eSUN).
+       v4 (26/09/2026): `textura` = filamento com efeito (Marmore: foto IMG_0039 da Chica), `hex_oficial` =
+       o do catalogo quando o hex veio da foto dele, `rugosidade`/`metal` = brilho proprio da cor. */
     basico: [
       { site: 'Laranja', hex: '#FF671F', original: 'Bambu Lab · PLA · Lite · Orange (16301)' },
       { site: 'Vermelho', hex: '#C6001A', original: 'Bambu Lab · PLA · Lite · Red (16200)' },
@@ -225,7 +230,7 @@ window.ALEA = {
       { site: 'Preto', hex: '#272729', original: 'eSUN · PLA · PLA-Basic · Black' },
       { site: 'Roxo', hex: '#603BA0', original: 'Elegoo · PLA · PLA · Purple' },
       { site: 'Marrom', hex: '#5F3839', original: 'Multfila · PLA · Mult Speed · Marrom (PCI-PLA-046)' },
-      { site: 'Mármore', hex: '#E4E4E4', original: 'SUNLU · PLA · High Speed Marble · Chestnut Brown Marble' }
+      { site: 'Mármore', hex: '#E4E4E4', original: 'SUNLU · PLA · High Speed Marble · Chestnut Brown Marble', textura: { img: 'img/texturas/marmore.png', mm: [78.2, 39.1], contraste: 1 } }
     ],
     fosco: [
       { site: 'Branco', hex: '#F6F6F6', original: 'Elegoo · PLA · Matte · Matte White' },
@@ -244,13 +249,13 @@ window.ALEA = {
       { site: 'Terracota', hex: '#AC7362', original: 'Multfila · PLA · Mult Matte · Marrom Terracota (4225-PCI-PLM-124)' }
     ],
     perolizado: [
-      { site: 'Branco', hex: '#FFFFFF', original: 'Elegoo · PLA · Silk · Silk White' },
+      { site: 'Branco', hex: '#FFFFFF', original: 'Elegoo · PLA · Silk · Silk White', rugosidade: 0.2, metal: 0.05 },
       { site: 'Prata', hex: '#B2C1DA', original: 'SUNLU · PLA · Silk PLA+ · Silk Silver' },
       { site: 'Dourado', hex: '#D09531', original: 'Multfila · PLA · Mult Silk · Ouro Envelhecido (4226-PCI-PLS-048)' },
       { site: 'Laranja', hex: '#F15505', original: 'Voolt3D · PLA · V-Silk · Laranja (PL-LJ-SK-1)' },
       { site: 'Vermelho', hex: '#DA342E', original: 'Multfila · PLA · Mult Silk · Vermelho Metalizado (4226-PCI-PLS-026)' },
       { site: 'Rosa', hex: '#FF7F6F', original: 'eSUN · PLA · PLA-Silk · Pink' },
-      { site: 'Azul Aqua', hex: '#6BBFE3', original: 'eSUN · PLA · Silk · Aqua' },
+      { site: 'Azul Aqua', hex: '#6BBFE3', original: 'eSUN · PLA · Silk · Aqua', rugosidade: 0.2, metal: 0.18 },
       { site: 'Azul', hex: '#358AE8', original: 'Multfila · PLA · Mult Silk · Azul Safira Metalizado (4226-PCI-PLS-025)' },
       { site: 'Azul Céu', hex: '#035EB7', original: 'Voolt3D · PLA · V-Silk · Azul Sky (PL-AZ-SY-SK-1)' },
       { site: 'Verde Limão', hex: '#A3E810', original: 'eSUN · PLA · PLA-Silk · Lime' },
@@ -260,7 +265,7 @@ window.ALEA = {
   /* como cada acabamento aparece (a ordem é a da tela) e o que ele acrescenta ao nome da cor:
      Básico não acrescenta nada ("Azul"); Fosco e Perolizado sim ("Azul Fosco", "Azul Perolizado"). */
   acabamentos: [
-    { id: 'basico',     rotulo: 'Básico',     sufixo: '' },
+    { id: 'basico',     rotulo: 'Clássico',   sufixo: '' },   // 27/09/2026, áudio 2341: "Básico" -> "Clássico" (mais elegante); o id fica 'basico' (a sacola guarda o id) e a cor continua sem sufixo ("Azul")
     { id: 'fosco',      rotulo: 'Fosco',      sufixo: ' Fosco' },
     { id: 'perolizado', rotulo: 'Perolizado', sufixo: ' Perolizado' }
   ],
@@ -306,4 +311,145 @@ window.ALEA = {
    luke_g.glb que a janela "Personalize aqui" do antigo Bowl Wave já usava (o Cassiano: "o do Luke eu já tenho, é o
    único que tenho"). A página nova (produto-luke-bowl.html) ganha a mesma janela 3D sem copiar a configuração:
    é a mesma peça, uma configuração só. Matteo, Ayla e Cláudia não têm .glb ainda -> formulário na própria página. */
+/* FRASE DAS CORES DA PEÇA (msg 2268 do Cassiano, 27/09/2026, texto EXATO): vai bem pequena entre o título "Cores da
+   peça" e as opções Tricolor/Bicolor/Monocromático, em todos os produtos (produto.js v31). Trocar AQUI. */
+window.ALEA.fraseCoresDaPeca = 'Qualquer dúvida, nas fotos em tela cheia, você encontra os nomes e as tonalidades reais de cada cor.';
 window.ALEA.modelos3d['luke-bowl'] = window.ALEA.modelos3d['bowl-wave'];
+/* COR DA CAPA (áudio 2253 do Cassiano, 27/09/2026): cores da foto lukebowl_capa — tricolor: topo Laranja (Básico),
+   corpo Branco (Fosco), base Cinza (Fosco). A peça 3D já abria nelas (`original`). Só registro: o formulário começa
+   VAZIO (áudio 2263). */
+window.ALEA.modelos3d['luke-bowl'].capa = { modo: 'tricolor', escolhas: [
+  { acabamento: 'basico', cor: 'Laranja' }, { acabamento: 'fosco', cor: 'Branco' }, { acabamento: 'fosco', cor: 'Cinza' }] };
+
+/* 26/09/2026 (pedido do Cassiano: "o Matteo e a Cláudia iguais ao Luke"): as duas ganham a janela 3D "Personalize aqui",
+   cada uma com o SEU arquivo. A Ayla fica sem (áudio 1864: peça sem personalização).
+   Os .glb saem do 07_render_capa/exportar_glb_configurador_v3_varias_partes_e_logo.py, SEM decimar (alvo 999999):
+   decimado a 16-20 mil faces, a divisa das cores virava serrote e o Matteo perdia a forma (visto em 26/09).
+   `original` = as cores que o PRÓPRIO arquivo 3D dele traz (project_settings do .3mf), com o nome oficial do filamento.
+   Os campos novos (zonaNome, bicolor, fonteInvertida, nomeInicial) estão explicados no personalizar3d.js v7. */
+window.ALEA.modelos3d['matteo-texturized'] = {
+  /* 13_lote_2026-09-25_2001/02_ALEA Matteo Texturized_msg1851.zip -> "ALEA Elevated Dog Bowl Texturized.3mf",
+     objeto 5 (placa "P"). Zonas: extrusora 1 = topo (a parte de cima, onde o nome está), 2 = base. */
+  glb: 'modelos/matteo_g.glb',
+  nome: 'modelos/matteo_g_nome.json',
+  /* o arquivo grava o nome em Arial; no site vai a Arimo (licença livre SIL OFL 1.1, em fonts/arimo_LICENSE.txt; mesma medida de letra da Arial) */
+  fonte: 'fonts/arimo.ttf',
+  fonteInvertida: false,
+  zonaNome: 'topo',
+  /* 26/09/2026 (vídeos dele msgs 2067-2068: "o do Matteo é texturizado (...) lá na pré-visualização ele já tem que
+     estar com essa textura"): a PELE FELPUDA que o fatiador aplica em TODAS as paredes. Não é forma do arquivo (a
+     malha é lisa); é ajuste do projeto, copiado do .3mf (Metadata/project_settings.config): fuzzy_skin = allwalls,
+     modo displacement, ruído billow, 4 oitavas, persistência 0,5, escala 1 mm, espessura 0,2 mm, pontos a cada 0,8 mm.
+     Conferido no G-code fatiado (07_render_capa/textura_2026-09-26/fatiado): a parede externa foge da lisa até
+     +0,35-0,37 mm, com um ponto a cada 0,85-0,88 mm. A janela 3D desenha o relevo na luz (sem peso de malha). */
+  pele: { ruido: 'billow', oitavas: 4, persistencia: 0.5, escalaMm: 1, espessuraMm: 0.2 },
+  /* COR DA CAPA (áudio 2253, 27/09/2026): cores da foto matteotex_capa — topo preto, base cáqui (as mesmas do `original`,
+     que já batiam com a capa). Só registro: o formulário começa VAZIO (áudio 2263) e a peça abre no `original`. */
+  capa: { modo: 'bicolor', escolhas: [{ acabamento: 'basico', cor: 'Preto' }, { acabamento: 'fosco', cor: 'Cáqui' }] },
+  /* só bicolor e monocromático (áudio 1863). Bicolor: cor 1 = topo, cor 2 = base. */
+  bicolor: { topo: 0, principal: 0, base: 1 },
+  original: {
+    topo:      { site: 'Preto', hex: '#000000', acabamento: 'basico', oficial: 'Bambu Lab · PLA · Lite · Black' },
+    principal: { site: 'Preto', hex: '#000000', acabamento: 'basico', oficial: 'Bambu Lab · PLA · Lite · Black' },
+    base:      { site: 'Cáqui', hex: '#E8DBB7', acabamento: 'fosco',  oficial: 'Bambu Lab · PLA · Matte · Desert Tan (11401)' }
+  }
+};
+window.ALEA.modelos3d['claudia-wave'] = {
+  /* 13_lote_2026-09-25_2001/04_ALEA Claudia Wave_separados/ALEA Cláudia Wave_msg1859.3mf, objeto 32 (placa "Wave - G").
+     Zonas: extrusora 3 = topo (o aro), 1 = principal (o corpo, onde o nome está), 2 = base (a onda). */
+  glb: 'modelos/claudia_g.glb',
+  nome: 'modelos/claudia_g_nome.json',
+  fonte: 'fonts/defante.otf',
+  /* o arquivo traz "Chica" (a cachorrinha das fotos); a peça se chama Cláudia, e o mesmo arquivo tem "Cláudia" no objeto 20 */
+  nomeInicial: 'Cláudia',
+  /* bicolor como ele imprime (foto claudiawave_capa): cor 1 = aro e corpo, cor 2 = a onda de baixo */
+  bicolor: { topo: 0, principal: 0, base: 1 },
+  /* COR DA CAPA (áudio 2253 do Cassiano, 27/09/2026): "o comedouro tem que ficar na COR DA CAPA quando abre a
+     personalização. A capa da Cláudia é bicolor: BRANCO PEROLIZADO com AQUA PEROLIZADO". A peça abre assim (aro e
+     corpo = cor 1, a onda = cor 2, como na foto claudiawave_capa). O formulário começa VAZIO (áudio 2263); `capa` é só
+     registro das cores da foto, ninguém lê.
+     ANTES: as cores que o .3mf trazia — aro Vermelho (Bambu PLA Lite Red), corpo Mármore, onda Azul Silk. O aro
+     vermelho parecia "solto" em cima da peça: medido no .glb, ele ENCOSTA no corpo (corpo até y 120,3 mm, aro de
+     120,2 a 136,3 mm, os dois com raio 82-88 mm) — era só a cor diferente, que não existe na peça da capa. */
+  original: {
+    topo:      { site: 'Branco',    hex: '#FFFFFF', acabamento: 'perolizado', oficial: 'Elegoo · PLA · Silk · Silk White' },
+    principal: { site: 'Branco',    hex: '#FFFFFF', acabamento: 'perolizado', oficial: 'Elegoo · PLA · Silk · Silk White' },
+    base:      { site: 'Azul Aqua', hex: '#6BBFE3', acabamento: 'perolizado', oficial: 'eSUN · PLA · Silk · Aqua' }
+  },
+  capa: { modo: 'bicolor', escolhas: [{ acabamento: 'perolizado', cor: 'Branco' }, { acabamento: 'perolizado', cor: 'Azul Aqua' }] }
+};
+
+/* FILAMENTOS DE CADA FOTO — aparecem SÓ com a foto em TELA CHEIA, no canto de baixo à direita (produto.js v32, 27/09/2026).
+   É PALPITE da casa, olhando as fotos: o Cassiano corrige a lista aqui (um filamento por linha, de CIMA pra BAIXO na
+   peça, nome EXATO como na lista dele ou como ele confirmou, ex.: Ivory White, Silk Yellow Green, Charcoal). Foto sem
+   linha ou com [] = nada aparece. A chave é o caminho da foto grande.
+   Origem: 03_site/_FILAMENTOS_POR_FOTO_PALPITE_2026-09-27.json (com a confiança e o motivo de cada palpite). */
+/* O QUE O CLIENTE LÊ na tela cheia (27/09/2026, áudio 2295 do Cassiano): "aqueles códigos, aquela nomenclatura é só entre
+   eu e você. Entre o cliente e a foto vai ter que ser os nomes lá da personalização. Básico, fosco, perolizado e os nomes
+   em português." A lista abaixo guarda o nome ORIGINAL (pra ele); o produto.js mostra o nome da personalização
+   (cor + sufixo do acabamento, ex.: "Cinza Fosco"). Filamento que NÃO está à venda cai aqui, com o nome em português: */
+window.ALEA.filamentosNomeCliente = {
+  "Bambu Lab · PLA · Matte · Ivory White": "Branco Fosco",                          // À VENDA (é o Branco fosco, 11100 — áudio 2332); fica aqui só pra casar o nome sem código
+  "Bambu Lab · PLA · Matte · Charcoal": "Preto Fosco",                              // ele: Charcoal = "Preto"
+  "Fulljoy · PLA · Silk · Yellow Green": "Verde e Amarelo Perolizado",              // dual color verde+amarelo
+  "Elegoo · PLA · Silk · Gold": "Dourado Perolizado",                               // áudio 2293
+  "Multfila · PLA · Silk Dual Color · Dourado e Vermelho": "Dourado e Vermelho Perolizado", // áudio 2290
+  "Elegoo · PLA · Silk Dual Color · Black Purple": "Preto e Roxo Perolizado"        // áudio 2292
+};
+window.ALEA.filamentosPorFoto = {
+  "img/produtos/lukebowl_capa.jpg": ["Bambu Lab · PLA · Lite · Orange (16301)", "Bambu Lab · PLA · Matte · Ivory White", "Bambu Lab · PLA · Matte · Ash Gray (11102)"],
+  "img/produtos/lukebowl_0005.jpg": ["Bambu Lab · PLA · Lite · Orange (16301)", "Bambu Lab · PLA · Matte · Ivory White", "Bambu Lab · PLA · Matte · Ash Gray (11102)"],
+  "img/produtos/lukebowl_9148.jpg": ["Bambu Lab · PLA · Lite · Orange (16301)", "Bambu Lab · PLA · Matte · Ivory White", "Bambu Lab · PLA · Matte · Ash Gray (11102)"],
+  "img/produtos/lukebowl_9170.jpg": ["Bambu Lab · PLA · Lite · Orange (16301)", "Bambu Lab · PLA · Matte · Ivory White", "Bambu Lab · PLA · Matte · Ash Gray (11102)"],
+  "img/produtos/lukebowl_wa182751.jpg": ["Bambu Lab · PLA · Matte · Latte Brown (11800)", "SUNLU · PLA · High Speed Marble · Chestnut Brown Marble", "Multfila · PLA · Mult Speed · Marrom (PCI-PLA-046)"],
+  "img/produtos/lukebowl_wa182753.jpg": ["Bambu Lab · PLA · Matte · Latte Brown (11800)", "SUNLU · PLA · High Speed Marble · Chestnut Brown Marble", "Multfila · PLA · Mult Speed · Marrom (PCI-PLA-046)"],
+  "img/produtos/lukebowl_wa183050.jpg": ["Bambu Lab · PLA · Matte · Latte Brown (11800)", "SUNLU · PLA · High Speed Marble · Chestnut Brown Marble", "Multfila · PLA · Mult Speed · Marrom (PCI-PLA-046)"],
+  "img/produtos/lukebowl_9185.jpg": ["Bambu Lab · PLA · Lite · Orange (16301)", "Bambu Lab · PLA · Matte · Ivory White", "Bambu Lab · PLA · Matte · Ash Gray (11102)"],
+  "img/produtos/lukebowl_9189.jpg": ["Bambu Lab · PLA · Lite · Orange (16301)", "Bambu Lab · PLA · Matte · Ivory White", "Bambu Lab · PLA · Matte · Ash Gray (11102)"],
+  "img/produtos/lukebowl_0241.jpg": ["Fulljoy · PLA · Silk · Yellow Green"],
+  "img/produtos/lukebowl_9291.jpg": ["Fulljoy · PLA · Silk · Yellow Green"],
+  "img/produtos/lukebowl_9295.jpg": ["Fulljoy · PLA · Silk · Yellow Green"],
+  "img/produtos/lukebowl_9304.jpg": ["Fulljoy · PLA · Silk · Yellow Green"],
+  "img/produtos/lukebowl_9307.jpg": ["Fulljoy · PLA · Silk · Yellow Green"],
+  "img/produtos/lukebowl_9312.jpg": ["Fulljoy · PLA · Silk · Yellow Green"],
+  "img/produtos/lukebowl_9313.jpg": ["Fulljoy · PLA · Silk · Yellow Green"],
+  "img/produtos/lukebowl_9318.jpg": ["Fulljoy · PLA · Silk · Yellow Green"],
+  "img/produtos/matteotex_capa.jpg": ["Bambu Lab · PLA · Matte · Charcoal", "Bambu Lab · PLA · Matte · Desert Tan (11401)"],
+  "img/produtos/matteotex_0094.jpg": ["Bambu Lab · PLA · Matte · Charcoal", "Bambu Lab · PLA · Matte · Desert Tan (11401)"],
+  "img/produtos/matteotex_9202.jpg": ["Bambu Lab · PLA · Matte · Charcoal", "Bambu Lab · PLA · Matte · Desert Tan (11401)"],
+  "img/produtos/matteotex_9220.jpg": ["Bambu Lab · PLA · Matte · Charcoal", "Bambu Lab · PLA · Matte · Desert Tan (11401)"],
+  "img/produtos/matteotex_9240.jpg": ["Bambu Lab · PLA · Matte · Charcoal", "Bambu Lab · PLA · Matte · Desert Tan (11401)"],
+  "img/produtos/matteotex_9255.jpg": ["Bambu Lab · PLA · Matte · Charcoal", "Bambu Lab · PLA · Matte · Desert Tan (11401)"],
+  "img/produtos/matteotex_9262.jpg": ["Bambu Lab · PLA · Matte · Charcoal", "Bambu Lab · PLA · Matte · Desert Tan (11401)"],
+  "img/produtos/aylapompom_capa.jpg": ["Bambu Lab · PLA · Lite · Red (16200)", "eSUN · PLA · PLA-Basic · Black", "Elegoo · PLA · Matte · Matte White", "Voolt3D · PLA · V-Silk · Verde (PL-VD-SK-1)"],
+  "img/produtos/aylapompom_0145.jpg": ["Bambu Lab · PLA · Lite · Red (16200)", "eSUN · PLA · PLA-Basic · Black", "Elegoo · PLA · Matte · Matte White", "Voolt3D · PLA · V-Silk · Verde (PL-VD-SK-1)"],
+  "img/produtos/aylapompom_9120.jpg": ["Bambu Lab · PLA · Lite · Red (16200)", "eSUN · PLA · PLA-Basic · Black", "Elegoo · PLA · Matte · Matte White", "Voolt3D · PLA · V-Silk · Verde (PL-VD-SK-1)"],
+  "img/produtos/aylapompom_9737.jpg": ["Bambu Lab · PLA · Lite · Red (16200)", "eSUN · PLA · PLA-Basic · Black", "Elegoo · PLA · Matte · Matte White", "Voolt3D · PLA · V-Silk · Verde (PL-VD-SK-1)"],
+  "img/produtos/aylapompom_9859.jpg": ["Bambu Lab · PLA · Lite · Red (16200)", "eSUN · PLA · PLA-Basic · Black", "Elegoo · PLA · Matte · Matte White", "Voolt3D · PLA · V-Silk · Verde (PL-VD-SK-1)"],
+  "img/produtos/aylapompom_9931.jpg": [],
+  "img/produtos/aylapompom_9935.jpg": [],
+  "img/produtos/claudiawave_capa.jpg": ["Elegoo · PLA · Silk · Silk White", "Elegoo · PLA · Silk · Gold", "eSUN · PLA · Silk · Aqua"],
+  "img/produtos/claudiawave_0039.jpg": ["Elegoo · PLA · Matte · Sakura Pink", "SUNLU · PLA · High Speed Marble · Chestnut Brown Marble", "Bambu Lab · PLA · Lite · Cyan (16600)"],
+  "img/produtos/claudiawave_0196.jpg": ["Multfila · PLA · Silk Dual Color · Dourado e Vermelho", "Elegoo · PLA · Silk Dual Color · Black Purple"],
+  "img/produtos/claudiawave_9569.jpg": ["Elegoo · PLA · Silk · Silk White", "Elegoo · PLA · Silk · Gold", "eSUN · PLA · Silk · Aqua"],
+  "img/produtos/claudiawave_9590.jpg": ["Elegoo · PLA · Silk · Silk White", "Elegoo · PLA · Silk · Gold", "eSUN · PLA · Silk · Aqua"],
+  "img/produtos/claudiawave_9676.jpg": ["Multfila · PLA · Silk Dual Color · Dourado e Vermelho", "Elegoo · PLA · Silk Dual Color · Black Purple"],
+  "img/produtos/claudiawave_9698.jpg": ["Multfila · PLA · Silk Dual Color · Dourado e Vermelho", "Elegoo · PLA · Silk Dual Color · Black Purple"],
+  "img/produtos/claudiawave_0020.jpg": ["Elegoo · PLA · Matte · Sakura Pink", "SUNLU · PLA · High Speed Marble · Chestnut Brown Marble", "Bambu Lab · PLA · Lite · Cyan (16600)"],
+  "img/produtos/claudiawave_0104.jpg": ["Elegoo · PLA · Matte · Sakura Pink", "SUNLU · PLA · High Speed Marble · Chestnut Brown Marble", "Bambu Lab · PLA · Lite · Cyan (16600)"],
+  "img/produtos/claudiawave_0166.jpg": ["Multfila · PLA · Silk Dual Color · Dourado e Vermelho", "Elegoo · PLA · Silk Dual Color · Black Purple"],
+  "img/produtos/claudiawave_9528.jpg": ["Elegoo · PLA · Silk · Silk White", "Elegoo · PLA · Silk · Gold", "eSUN · PLA · Silk · Aqua"],
+  "img/produtos/claudiawave_9566.jpg": ["Elegoo · PLA · Silk · Silk White", "Elegoo · PLA · Silk · Gold", "eSUN · PLA · Silk · Aqua"],
+  "img/produtos/claudiawave_9570.jpg": ["Elegoo · PLA · Silk · Silk White", "Elegoo · PLA · Silk · Gold", "eSUN · PLA · Silk · Aqua"],
+  "img/produtos/claudiawave_9572.jpg": ["Elegoo · PLA · Silk · Silk White", "Elegoo · PLA · Silk · Gold", "eSUN · PLA · Silk · Aqua"],
+  "img/produtos/claudiawave_9587.jpg": ["Elegoo · PLA · Silk · Silk White", "Elegoo · PLA · Silk · Gold", "eSUN · PLA · Silk · Aqua"],
+  "img/produtos/claudiawave_9647.jpg": ["Multfila · PLA · Silk Dual Color · Dourado e Vermelho", "Elegoo · PLA · Silk Dual Color · Black Purple"],
+  "img/produtos/claudiawave_9648.jpg": ["Multfila · PLA · Silk Dual Color · Dourado e Vermelho", "Elegoo · PLA · Silk Dual Color · Black Purple"],
+  "img/produtos/claudiawave_9654.jpg": ["Multfila · PLA · Silk Dual Color · Dourado e Vermelho", "Elegoo · PLA · Silk Dual Color · Black Purple"],
+  "img/produtos/claudiawave_9674.jpg": ["Multfila · PLA · Silk Dual Color · Dourado e Vermelho", "Elegoo · PLA · Silk Dual Color · Black Purple"],
+  "img/produtos/claudiawave_9695.jpg": ["Multfila · PLA · Silk Dual Color · Dourado e Vermelho", "Elegoo · PLA · Silk Dual Color · Black Purple"],
+  "img/produtos/lukebowl_capaq.jpg": ["Bambu Lab · PLA · Lite · Orange (16301)", "Bambu Lab · PLA · Matte · Ivory White", "Bambu Lab · PLA · Matte · Ash Gray (11102)"],
+  "img/produtos/matteotex_capaq.jpg": ["Bambu Lab · PLA · Matte · Charcoal", "Bambu Lab · PLA · Matte · Desert Tan (11401)"],
+  "img/produtos/aylapompom_capaq.jpg": ["Bambu Lab · PLA · Lite · Red (16200)", "eSUN · PLA · PLA-Basic · Black", "Elegoo · PLA · Matte · Matte White", "Voolt3D · PLA · V-Silk · Verde (PL-VD-SK-1)"],
+  "img/produtos/claudiawave_capaq.jpg": ["Elegoo · PLA · Silk · Silk White", "Elegoo · PLA · Silk · Gold", "eSUN · PLA · Silk · Aqua"]
+};
