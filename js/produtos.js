@@ -113,7 +113,7 @@ window.VITRINE = [
   { produto: 'ālea Pet Bowl × Luke',                      nome: 'Luke',    categoria: 'pet', preco: null, pagina: 'luke-bowl',         recorte: false, fotos: ['lukebowl_capaq'] },
   { produto: 'ālea Elevated Pet Bowl × Matteo',           nome: 'Matteo',  categoria: 'pet', preco: null, pagina: 'matteo-texturized', recorte: false, fotos: ['matteotex_capaq'] },
   { produto: 'ālea Pet Bowl – Watermelon Edition × Ayla Pompom', nome: 'Ayla Pompom',    categoria: 'pet', preco: null, pagina: 'ayla-pompom',       recorte: false, fotos: ['aylapompom_capaq'] },
-  { produto: 'ālea Pet Bowl Wave × Cláudia',              nome: 'Cláudia', categoria: 'pet', preco: null, pagina: 'claudia-wave',      recorte: false, fotos: ['claudiawave_capaq'] }
+  { produto: 'ālea Pet Bowl Wave × Cláudia',              nome: 'Cláudia', categoria: 'pet', preco: null, pagina: 'claudia-wave',      recorte: false, fotos: ['claudiawave_anjoq'] }
 ];
 /* A VITRINE ATÉ 25/09/2026 20:01 (fora do ar por ordem dele, msg 1884) — guardada, não apagada:
 window.VITRINE = [
@@ -225,7 +225,7 @@ window.PRODUTOS = [
     material: 'PLA',          // .3mf dele: Bambu PLA Marble + PLA Silk + PLA Lite
     /* ⚠ CAPA TROCÁVEL: vai virar a versão com a homenagem (coroa com asas, áudio 1856), feita à parte. Entra pelo
        06_fotos_profissionais_v2 (_capas_novas/claudia-wave.jpg) SEM mexer aqui. */
-    capa: 'claudiawave_capa',
+    capa: 'claudiawave_anjo',   // 27/09/2026 msgs 2361-2363: a homenagem (anjinho)
     cores_peca: ['tricolor', 'bicolor', 'monocromatico'],   // áudio 1865: sem ÁLBUM mono, mas a personalização mono FICA
     configuracoes: [
       /* tricolor: 2 fotos, sem Capa.JPG -> a 1ª é a capa do álbum */
