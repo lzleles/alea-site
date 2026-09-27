@@ -450,7 +450,7 @@ window.ALEA.filamentosPorFoto = {
   "img/produtos/claudiawave_9674.jpg": ["Multfila · PLA · Silk Dual Color · Dourado e Vermelho", "Elegoo · PLA · Silk Dual Color · Black Purple"],
   "img/produtos/claudiawave_9695.jpg": ["Multfila · PLA · Silk Dual Color · Dourado e Vermelho", "Elegoo · PLA · Silk Dual Color · Black Purple"],
   "img/produtos/lukebowl_capaq.jpg": ["Bambu Lab · PLA · Lite · Orange (16301)", "Bambu Lab · PLA · Matte · Ivory White", "Bambu Lab · PLA · Matte · Ash Gray (11102)"],
-  "img/produtos/matteotex_capaq.jpg": ["Bambu Lab · PLA · Matte · Charcoal", "Bambu Lab · PLA · Matte · Desert Tan (11401)"],
+  "img/produtos/matteotex_9262q.jpg": ["Bambu Lab · PLA · Matte · Charcoal", "Bambu Lab · PLA · Matte · Desert Tan (11401)"],
   "img/produtos/aylapompom_capaq.jpg": ["Bambu Lab · PLA · Lite · Red (16200)", "eSUN · PLA · PLA-Basic · Black", "Elegoo · PLA · Matte · Matte White", "Voolt3D · PLA · V-Silk · Verde (PL-VD-SK-1)"],
   "img/produtos/claudiawave_capaq.jpg": ["Elegoo · PLA · Silk · Silk White", "Elegoo · PLA · Silk · Gold", "eSUN · PLA · Silk · Aqua"]
 };

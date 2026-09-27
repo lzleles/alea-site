@@ -111,7 +111,7 @@ window.CATEGORIAS = [
    Quem aplica a troca: 03_site/_nomes_collab_v1_2026-09-26.py (idempotente). */
 window.VITRINE = [
   { produto: 'ālea Pet Bowl × Luke',                      nome: 'Luke',    categoria: 'pet', preco: null, pagina: 'luke-bowl',         recorte: false, fotos: ['lukebowl_capaq'] },
-  { produto: 'ālea Elevated Pet Bowl × Matteo',           nome: 'Matteo',  categoria: 'pet', preco: null, pagina: 'matteo-texturized', recorte: false, fotos: ['matteotex_capaq'] },
+  { produto: 'ālea Elevated Pet Bowl × Matteo',           nome: 'Matteo',  categoria: 'pet', preco: null, pagina: 'matteo-texturized', recorte: false, fotos: ['matteotex_9262q'] },
   { produto: 'ālea Pet Bowl – Watermelon Edition × Ayla Pompom', nome: 'Ayla Pompom',    categoria: 'pet', preco: null, pagina: 'ayla-pompom',       recorte: false, fotos: ['aylapompom_capaq'] },
   { produto: 'ālea Pet Bowl Wave × Cláudia',              nome: 'Cláudia', categoria: 'pet', preco: null, pagina: 'claudia-wave',      recorte: false, fotos: ['claudiawave_anjoq'] }
 ];
