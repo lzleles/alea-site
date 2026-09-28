@@ -11,6 +11,9 @@
       03_site/_versoes_anteriores/lista_desejos_antes_2026-09-27/js/site.js
    27/09/2026 (áudio 2308): embrulharNomeCollab() põe o nome do "× Nome" num <span class="nome"> onde faltar (o degradê
       proporcional mede o nome). Antes: 03_site/_versoes_anteriores/x_azul_nome_proporcional_antes_2026-09-27/js/site.js
+   28/09/2026 (áudios 3035/3037): o botão de ORÇAMENTO (data-assunto começando por "orçamento") deixa de ir pro WhatsApp e
+      abre o e-mail da pessoa pra C.email_orcamento (comercial@aleaco.art.br). O botão fica igual; perde a classe .zap (não conta
+      como WhatsApp no rastro nem dispara a conversão do WhatsApp). Antes: 03_site/_versoes_anteriores/orcamento_email_antes_2026-09-28/
    27/09/2026 (áudio 2317): o coração do TOPO fica colorido (degradê perolizado) quando a Lista de Desejos tem alguma peça;
       vazia = igual antes. Bloco no fim do arquivo. Antes: 03_site/_versoes_anteriores/coracao_topo_colorido_antes_2026-09-27/
 */
@@ -116,6 +119,16 @@ window.aleaCorDoTopo = (function () {
     Array.prototype.forEach.call(botoes, function (b) {
       b.setAttribute('data-ligado', '1');
       var assunto = b.getAttribute('data-assunto') || 'os produtos da ālea & Co.';
+      if (C.email_orcamento && /^or[çc]amento/i.test(assunto)) {
+        /* 28/09/2026: orçamento vai por E-MAIL (áudios 3035/3037). */
+        b.classList.remove('zap');
+        b.classList.add('email-orcamento');
+        b.setAttribute('href', 'mailto:' + C.email_orcamento +
+          '?subject=' + encodeURIComponent('Orçamento de peça personalizada') +
+          '&body=' + encodeURIComponent('Oi! Vim pelo site da ālea & Co. e quero um orçamento de uma peça personalizada.' + String.fromCharCode(10, 10)));
+        b.removeAttribute('target');
+        return;
+      }
       if (temZap) {
         b.setAttribute('href', linkZap(assunto));
         b.setAttribute('target', '_blank');
