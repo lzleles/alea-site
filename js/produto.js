@@ -4,8 +4,14 @@
    objetivo: Controla galeria, tela cheia, personalização, preço, aceite e inclusão de produtos no carrinho.
    entrada: DOM da página, configuração comercial e dados do produto
    saida: Galeria interativa, item personalizado e comandos para o carrinho
-   status: ativo — v36 (28/09/2026, grupo "Tamanho" na página: M/G ou P/G, obrigatório, vai no pedido)
-   validado_em: 28/09/2026 (Playwright 390 e 1440, 03_site/_testar_tamanhos_v3_2026-09-28.py)
+   status: ativo — v37 (28/09/2026, "Pronto" sem cor escolhida = as cores da FOTO DE CAPA; tamanhos M/G nas 3 peças)
+   validado_em: 28/09/2026 (Playwright 390 e 1440, 03_site/_testar_pronto_sem_cor_v1_2026-09-28.py)
+   v37 (28/09/2026, áudios 3030/3031 + vídeo 3029 do Cassiano, 02:43; a v36 está em
+        03_site/_versoes_anteriores/pronto_sem_cor_antes_2026-09-28/js/): "se a pessoa não escolher as cores, é porque ela
+        escolheu a cor do Luke [da foto]. Aí você já deixa pronto, que aí é só colocar na sacola" — e "a mesma coisa para o
+        Matteo, para o Bowl Wave". Ver window.aleaAssumirCorDaCapa (perto do aleaLimparCoresDaPeca). O formulário continua
+        começando VAZIO (áudio 2263); só o "Pronto" sem escolha assume a capa. Áudio 3033: "todos são M e G, não tem P"
+        (config.js ALEA.tamanhos).
 */
 /* =============================================================================
    produto.js — o que só a página de produto faz
@@ -1198,6 +1204,8 @@
 
   if (caixaCores) {
     caixaCores.addEventListener('change', function (ev) {
+      /* v37: mexeu com a mão (evento de verdade, não o do aleaAssumirCorDaCapa) = a escolha passa a ser dele, não da foto */
+      if (ev.isTrusted) caixaCores.removeAttribute('data-cores-da-capa');
       var r = ev.target.closest('input[name="cores_peca"]');
       if (r) desenharCamposDeCor(r);
     });
@@ -1228,7 +1236,10 @@
       cores: lista,
       originais: originais,
       escolhas: escolhas,
-      a_combinar: !!r.getAttribute('data-aviso')
+      a_combinar: !!r.getAttribute('data-aviso'),
+      /* v37: true = o cliente apertou "Pronto" sem escolher e as cores são as da FOTO DE CAPA (aleaAssumirCorDaCapa).
+         Na sacola e no pedido sai IGUAL à escolha à mão; o campo é só pra quem lê o pedido no servidor (e-mail v3). */
+      da_capa: caixaCores.hasAttribute('data-cores-da-capa')
     };
   }
 
@@ -1268,7 +1279,7 @@
         cor_nome_original: corDoNomeEscolhida().original,
         cor_nome_escolha: corDoNomeEscolhida().escolha,
         cores: coresEscolhidas(),
-        /* v36: o tamanho que o cliente escolheu na página (rótulo do arquivo dele: M, P ou G); '' = produto sem tamanhos */
+        /* v36: o tamanho que o cliente escolheu na página (M ou G nas 3 peças — áudio 3033: "todos são M e G, não tem P"); '' = produto sem tamanhos */
         tamanho: tamanhoEscolhido(),
         /* 26/09/2026: marcou o "Estou ciente da possível variação de cor" na janela Personalize (personalizar3d.js v9) */
         ciente_cor: (function () { if (window.aleaCienteCor) return true; try { return !!sessionStorage.getItem('alea_ciente_cor'); } catch (e) { return false; } })()
@@ -1507,6 +1518,7 @@
           rad.dispatchEvent(new Event('change', { bubbles: true }));
           c.querySelector('select').value = e.cor;
         });
+        if (p.cores.da_capa) caixaCores.setAttribute('data-cores-da-capa', '');   // v37: continua "da capa" ao editar
       }
     }
     if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
@@ -1544,6 +1556,54 @@
     Array.prototype.forEach.call(caixaCores.querySelectorAll('input[name="cores_peca"]'), function (r) { r.checked = false; });
     camposCores.innerHTML = '';
     caixaCores.classList.remove('faltou');
+    caixaCores.removeAttribute('data-cores-da-capa');
+  };
+
+  /* ⚠️ v37 — "PRONTO" SEM COR ESCOLHIDA = AS CORES DA FOTO DE CAPA (áudios 3030/3031 + vídeo de tela 3029 do Cassiano,
+     28/09/2026 02:43). Antes: o cliente passava o passo 3 sem escolher, apertava "Pronto", e a compra voltava com "Por
+     favor, selecione a cor da peça.". Palavras dele: "eu não quero que volte. Se a pessoa não escolher as cores, é porque
+     ela escolheu a cor do Luke. Aí você já deixa pronto, que aí é só colocar na sacola" — "a mesma coisa para o Matteo,
+     para o Bowl Wave (...) é porque ela configurou nas cores da foto".
+     Quem chama: o "Pronto" do último passo da janela (personalizar3d.js v12). Só age quando NENHUM Tricolor/Bicolor/
+     Monocromático está marcado; aí marca o modo e cada acabamento + cor de `ALEA.modelos3d[slug].capa` (config.js, áudio
+     2253) pelos MESMOS campos da escolha à mão — então resumo, sacola, pedido e mensagem saem iguais (nome simples do
+     site; o nome exato do filamento vai no pedido, como sempre). Escolheu algo pela metade = vale a escolha dele e a trava
+     de sempre (não misturo a foto com a escolha). Produto sem `capa` = nada muda. Se alguma cor da capa não estiver mais
+     na lista do site, desfaz tudo e fica a trava: pedido com cor errada é pior que pedido travado.
+     O formulário continua começando VAZIO a cada abertura (áudio 2263, aleaLimparCoresDaPeca acima). */
+  window.aleaAssumirCorDaCapa = function () {
+    if (!caixaCores || !camposCores || !botaoComprar) return false;
+    if (caixaCores.querySelector('input[name="cores_peca"]:checked')) return false;
+    var slugC = botaoComprar.getAttribute('data-slug');
+    var capa = ((((window.ALEA || {}).modelos3d || {})[slugC]) || {}).capa;
+    if (!capa || !capa.modo || !capa.escolhas || !capa.escolhas.length) return false;
+    var r = caixaCores.querySelector('input[name="cores_peca"][value="' + capa.modo + '"]');
+    if (!r) return false;
+    r.checked = true;
+    r.dispatchEvent(new Event('change', { bubbles: true }));      // desenha as janelas de cor (e tira a cor de falta)
+    var campos = camposCores.querySelectorAll('.campo-cor');
+    var ok = campos.length === capa.escolhas.length;
+    Array.prototype.forEach.call(campos, function (c, k) {
+      var e = capa.escolhas[k];
+      var rad = e && c.querySelector('.acabamento input[value="' + e.acabamento + '"]');
+      if (!rad) { ok = false; return; }
+      rad.checked = true;
+      rad.dispatchEvent(new Event('change', { bubbles: true }));  // abre a lista de cores daquele acabamento
+      var sel = c.querySelector('select');
+      sel.value = e.cor;
+      if (sel.value !== e.cor) { ok = false; return; }
+      sel.dispatchEvent(new Event('change', { bubbles: true }));  // a peça 3D repinta e a falta some
+    });
+    if (!ok) {
+      Array.prototype.forEach.call(caixaCores.querySelectorAll('input[name="cores_peca"]'), function (x) { x.checked = false; });
+      camposCores.innerHTML = '';
+      return false;
+    }
+    caixaCores.setAttribute('data-cores-da-capa', '');
+    if (document.activeElement && document.activeElement.blur) document.activeElement.blur();   // o select da capa não fica com o foco
+    var rec = document.querySelector('[data-recado-aceite]');
+    if (rec && /cor da peça|acabamento da cor|a cor do topo|a cor da base|a cor principal/.test(rec.textContent)) rec.hidden = true;
+    return true;
   };
 
   function porNoCarrinho(eDepoisFechar) {

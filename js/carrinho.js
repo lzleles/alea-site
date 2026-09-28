@@ -145,7 +145,7 @@
     var p = i.personalizacao || {};
     var partes = [];
     /* 28/09/2026 (Cassiano, áudios ~02:14-02:17: "pra Shih Tzu e pra Golden é diferente o tamanho"): o TAMANHO escolhido
-       na página (produto.js v36, rótulo do arquivo dele: M, P ou G) abre a descrição — na sacola, no Resumo do Pedido
+       na página (produto.js v36; M ou G nas 3 peças desde o áudio 3033, "não tem P") abre a descrição — na sacola, no Resumo do Pedido
        (loja-compra.js) e na mensagem do pedido. Item antigo, sem tamanho, sai como antes. */
     if (p.tamanho) partes.push('Tamanho: ' + p.tamanho);
     if (p.nome_pet) partes.push('Nome: ' + p.nome_pet);    // ETAPA 44 (22:38): N maiúsculo

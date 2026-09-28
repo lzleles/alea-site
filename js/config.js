@@ -407,17 +407,20 @@ window.ALEA.modelos3d['claudia-wave'] = {
 /* TAMANHOS À VENDA (28/09/2026, áudios do Cassiano ~02:14-02:17: "pra Shih Tzu e pra Golden é diferente o tamanho (...)
    arrumar uma opção lá no site"). A página ganha o grupo "Tamanho" (produto.js v36) logo acima do "Personalize aqui";
    escolher é OBRIGATÓRIO e o tamanho vai no item da sacola, no Resumo do Pedido e na mensagem do pedido ("Tamanho: M").
-   O rótulo é o do ARQUIVO dele (nome da placa no Bambu Studio), não inventado:
+   O rótulo saiu do ARQUIVO dele (nome da placa no Bambu Studio):
      luke-bowl ......... msg 3016 "ALEA Pet Bowl": "Tri Color - M" (placa 4) e "Tri Color - G" (placa 7)
-     matteo-texturized . "ALEA Elevated Dog Bowl Texturized v1 logo padrao": "P" (placa 1) e "G" (placa 2)
-     claudia-wave ...... "ALEA Dog Bowl Wave v3 logo em todas": "Wave Tri - P" (placa 2) e "Wave - G" (placa 10)
+     matteo-texturized . "ALEA Elevated Dog Bowl Texturized v1 logo padrao": placa 1 (escrita "P") e "G" (placa 2)
+     claudia-wave ...... "ALEA Dog Bowl Wave v3 logo em todas": placa 2 (escrita "Wave Tri - P") e "Wave - G" (placa 10)
+   ⚠ 28/09/2026 02:44, áudio 3033 do Cassiano: "eu escrevi errado, todos são M e G, não tem P". O "P" das placas do
+     Elevated e do Wave foi ERRO DE DIGITAÇÃO dele: o menor dos 3 é M. O cliente vê M/G nas 3 peças. Os arquivos .glb
+     continuam com o nome antigo (matteo_p.glb, claudia_p.glb) — é nome de arquivo, o cliente não vê.
    A janela 3D NÃO troca de tamanho (áudio 3019): é só pra ver as cores. PREÇO por tamanho: não existe aqui (as 3 peças
    estão "Sob consulta"); se um dia o G custar mais, é decisão do Cassiano/Lázaro e entra como campo novo, não aqui.
    Produto fora desta lista = sem o grupo Tamanho (nada muda na página). */
 window.ALEA.tamanhos = {
   'luke-bowl':         ['M', 'G'],
-  'matteo-texturized': ['P', 'G'],
-  'claudia-wave':      ['P', 'G']
+  'matteo-texturized': ['M', 'G'],   // era ['P','G'] até o áudio 3033
+  'claudia-wave':      ['M', 'G']    // era ['P','G'] até o áudio 3033
 };
 /* A LOGO NUNCA É PINTADA (Cassiano, 28/09/2026 ~02:16: "a logo nunca vai ser pintada. Sempre baixo-relevo (...) a nossa logo
    não muda de cor, não muda de formato, nada"). Conferido no personalizar3d.js v11: a logo está DENTRO do .glb, como parte
