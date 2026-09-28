@@ -5,8 +5,8 @@
              pet GRAVADO ao vivo e as cores da peça e do nome trocando na hora, conforme o formulário.
    entrada: ALEA.modelos3d[slug] e ALEA.filamentos (config.js); o formulário [data-personalizar] da página
    saida: a janela (modal); o formulário de verdade MORA dentro dela enquanto está aberta
-   status: v11 (27/09/2026, quadradinho "Sem nome" no passo 1; saiu a pergunta "Deseja mesmo não adicionar nome?")
-   validado_em: 27/09/2026 (Playwright 1440 px e 390 px: 03_site/_testar_sem_nome_v1_2026-09-27.py)
+   status: v12 (28/09/2026, "Pronto" sem cor escolhida assume as cores da foto de capa — produto.js v37)
+   validado_em: 28/09/2026 (Playwright 1440 px e 390 px: 03_site/_testar_pronto_sem_cor_v1_2026-09-28.py)
 */
 /* =============================================================================
    HISTÓRICO (a v1 da etapa 53 está em 03_site/_versoes_anteriores/js_2026-09-23/)
@@ -84,6 +84,11 @@
       passo 1: nome vazio e quadradinho desmarcado = a trava de sempre (treme, cor de falta, "Por favor, digite o nome do
       pet.", cursor no campo) — nenhuma frase nova; marcado = segue pro passo 2, sem nome. Marcar tira a letra da peça na
       hora (antes, no passo 1 vazio, a peça mostrava o nome original da foto).
+   v12 (28/09/2026, áudios 3030/3031 + vídeo 3029 do Cassiano; a v11 está em
+      03_site/_versoes_anteriores/pronto_sem_cor_antes_2026-09-28/js/): "se a pessoa não escolher as cores, é porque ela
+      escolheu a cor do Luke (...) aí é só colocar na sacola". O "Pronto" do último passo chama window.aleaAssumirCorDaCapa
+      (produto.js v37) ANTES de fechar: sem Tricolor/Bicolor/Monocromático marcado, o formulário recebe as cores da capa
+      (config.js `capa`) e a compra passa. X, Esc e clique fora continuam fechando sem mexer em nada.
    ============================================================================= */
 
 /* ⚠️ OS TEXTOS DO AVISO DE COR — trocar AQUI, e só aqui. Os dois são do Cassiano, palavra por palavra (26/09/2026).
@@ -264,7 +269,9 @@ export async function abrirJanela3D(cfg, aoFechar, aoMontar, opcoes) {
       if (cx && cx.checked) { cx.checked = false; cx.dispatchEvent(new Event('change', { bubbles: true })); }
       mostrarPasso(passoAtual + 1);
     }
-    else if (acao === 'pronto') fechar();
+    /* v12 (áudios 3030/3031 do Cassiano, 28/09/2026): "Pronto" sem nenhuma cor escolhida = as cores da FOTO DE CAPA
+       (produto.js v37, aleaAssumirCorDaCapa). Só o Pronto faz isso — o X, o Esc e o clique fora fecham sem mexer. */
+    else if (acao === 'pronto') { if (window.aleaAssumirCorDaCapa) window.aleaAssumirCorDaCapa(); fechar(); }
   });
   /* v11: a trava do nome no passo 1 — a MESMA da compra: cor de falta no rótulo, treme, a frase de sempre, cursor no campo */
   function faltaONome(cn) {

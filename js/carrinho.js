@@ -4,8 +4,8 @@
    objetivo: Mantém carrinho, dados locais e histórico de pedidos e prepara o fechamento da compra pelo WhatsApp.
    entrada: DOM, configuração global e dados do localStorage
    saida: Gavetas, contador, histórico local e mensagem de pedido no WhatsApp
-   status: ativo (cabecalho proposto pelo Codex em 2026-09-20, confianca ALTA; conferir na proxima vez que o script rodar)
-   validado_em: TBD
+   status: ativo (28/09/2026: a descrição do item abre com "Tamanho: X" quando o produto tem tamanho — produto.js v36)
+   validado_em: 28/09/2026 (Playwright, 03_site/_testar_tamanhos_v3_2026-09-28.py: sacola e texto do pedido com o tamanho)
 */
 /* =============================================================================
    carrinho.js — o carrinho e a conta, os dois botões que ele pediu no canto
@@ -144,6 +144,10 @@
   function descreverItem(i, comMaterial) {
     var p = i.personalizacao || {};
     var partes = [];
+    /* 28/09/2026 (Cassiano, áudios ~02:14-02:17: "pra Shih Tzu e pra Golden é diferente o tamanho"): o TAMANHO escolhido
+       na página (produto.js v36; M ou G nas 3 peças desde o áudio 3033, "não tem P") abre a descrição — na sacola, no Resumo do Pedido
+       (loja-compra.js) e na mensagem do pedido. Item antigo, sem tamanho, sai como antes. */
+    if (p.tamanho) partes.push('Tamanho: ' + p.tamanho);
     if (p.nome_pet) partes.push('Nome: ' + p.nome_pet);    // ETAPA 44 (22:38): N maiúsculo
     else if (p.sem_nome) partes.push('Nome: sem nome');      // ETAPA 58 (8): o cliente confirmou que não quer nome
     if (p.cor) partes.push('cores da peça: ' + p.cor);      // formato antigo, ainda no aparelho de quem já comprou

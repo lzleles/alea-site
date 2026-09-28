@@ -2266,3 +2266,9 @@ body.nome-dourado {
    03_site/_versoes_anteriores/sem_nome_menor_antes_2026-09-27/css/. */
 .personalizar label.sem-nome { top: -1px; gap: 6px; font-size: 12.5px; font-weight: 500; }
 .personalizar label.sem-nome input { width: 14px; height: 14px; border-radius: 3px; }
+
+/* v39 (28/09/2026, áudios do Cassiano ~02:14-02:17: "arrumar uma opção lá no site" pro tamanho): o grupo TAMANHO que o
+   produto.js v36 põe logo acima do "Personalize aqui". Mesmo desenho do "Cores da peça" (rótulo dourado, bolinhas em
+   maiúscula dourada); aqui só a distância até o botão. A v38 está em 03_site/_versoes_anteriores/tamanhos_antes_2026-09-28/css/. */
+.tamanho-peca { margin: 4px 0 14px; }
+.tamanho-peca .cores-opcoes { margin-bottom: 0; gap: 8px 28px; }
