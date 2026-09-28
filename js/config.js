@@ -328,10 +328,16 @@ window.ALEA.modelos3d['luke-bowl'].capa = { modo: 'tricolor', escolhas: [
    `original` = as cores que o PRÓPRIO arquivo 3D dele traz (project_settings do .3mf), com o nome oficial do filamento.
    Os campos novos (zonaNome, bicolor, fonteInvertida, nomeInicial) estão explicados no personalizar3d.js v7. */
 window.ALEA.modelos3d['matteo-texturized'] = {
-  /* 13_lote_2026-09-25_2001/02_ALEA Matteo Texturized_msg1851.zip -> "ALEA Elevated Dog Bowl Texturized.3mf",
-     objeto 5 (placa "P"). Zonas: extrusora 1 = topo (a parte de cima, onde o nome está), 2 = base. */
-  glb: 'modelos/matteo_g.glb',
-  nome: 'modelos/matteo_g_nome.json',
+  /* 28/09/2026 (áudio 01:17 do Cassiano, "o Personalize aqui do Elevated Pet Bowl Texturized, que é o do Matteo", msg 2979):
+     o arquivo NOVO dele (corpo novo, logo nova ālea & Co.). A msg 2979 é byte a byte o arquivo que ele mandou às 00:00
+     (msg 2940); o que ele IMPRIME é a versão com a logo no padrão que ele aprovou ("perfeito", áudio 2948):
+     05_bambu/elevated_2026-09-27/"ALEA Elevated Dog Bowl Texturized v1 logo padrao.3mf", objeto 4 (placa "G").
+     Zonas: extrusora 1 = topo (onde o nome e a logo estão), 2 = base (pintada até ~44 mm).
+     Exportado por 07_render_capa/exportar_glb_configurador_v5_booleano_tolerante.py (sem decimar).
+     ANTES (26/09): 13_lote_2026-09-25_2001/02_ALEA Matteo Texturized_msg1851.zip, objeto 5 (placa "P"), logo antiga.
+     ?v= força o navegador a baixar o arquivo novo (o nome do arquivo não mudou). */
+  glb: 'modelos/matteo_g.glb?v=2026-09-28',
+  nome: 'modelos/matteo_g_nome.json?v=2026-09-28',
   /* o arquivo grava o nome em Arial; no site vai a Arimo (licença livre SIL OFL 1.1, em fonts/arimo_LICENSE.txt; mesma medida de letra da Arial) */
   fonte: 'fonts/arimo.ttf',
   fonteInvertida: false,
@@ -355,10 +361,14 @@ window.ALEA.modelos3d['matteo-texturized'] = {
   }
 };
 window.ALEA.modelos3d['claudia-wave'] = {
-  /* 13_lote_2026-09-25_2001/04_ALEA Claudia Wave_separados/ALEA Cláudia Wave_msg1859.3mf, objeto 32 (placa "Wave - G").
-     Zonas: extrusora 3 = topo (o aro), 1 = principal (o corpo, onde o nome está), 2 = base (a onda). */
-  glb: 'modelos/claudia_g.glb',
-  nome: 'modelos/claudia_g_nome.json',
+  /* 28/09/2026 (áudio 01:17 do Cassiano, "o Personalize aqui do Wave", msg 2977): a msg 2977 é o MESMO projeto da
+     msg 1859 (todos os arquivos internos iguais), ainda com a logo ANTIGA. O que ele imprime é a versão com a logo nova
+     aprovada em 27/09: 05_bambu/logo_wave_2026-09-27/"ALEA Dog Bowl Wave v3 logo em todas.3mf", objeto 32 (placa
+     "Wave - G"; mesma malha, mesmas cores, só a logo trocada). Exportado pelo exportar_glb_configurador_v5.
+     Zonas: extrusora 3 = topo (o aro), 1 = principal (o corpo, onde o nome e a logo estão), 2 = base (a onda).
+     ANTES (26/09): 13_lote_2026-09-25_2001/04_ALEA Claudia Wave_separados/ALEA Cláudia Wave_msg1859.3mf, obj 32. */
+  glb: 'modelos/claudia_g.glb?v=2026-09-28',
+  nome: 'modelos/claudia_g_nome.json?v=2026-09-28',
   fonte: 'fonts/defante.otf',
   /* o arquivo traz "Chica" (a cachorrinha das fotos); a peça se chama Cláudia, e o mesmo arquivo tem "Cláudia" no objeto 20 */
   nomeInicial: 'Cláudia',
