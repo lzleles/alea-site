@@ -4,8 +4,8 @@
    objetivo: Controla galeria, tela cheia, personalização, preço, aceite e inclusão de produtos no carrinho.
    entrada: DOM da página, configuração comercial e dados do produto
    saida: Galeria interativa, item personalizado e comandos para o carrinho
-   status: ativo — v34 (27/09/2026, quadradinho "Sem nome" no campo do nome; saiu a pergunta "Deseja mesmo não adicionar nome?")
-   validado_em: 27/09/2026 (Playwright 390 e 1440, 03_site/_testar_sem_nome_v1_2026-09-27.py)
+   status: ativo — v36 (28/09/2026, grupo "Tamanho" na página: M/G ou P/G, obrigatório, vai no pedido)
+   validado_em: 28/09/2026 (Playwright 390 e 1440, 03_site/_testar_tamanhos_v3_2026-09-28.py)
 */
 /* =============================================================================
    produto.js — o que só a página de produto faz
@@ -179,6 +179,42 @@
       if (!semNomeCaixa.checked) { try { campoN.focus({ preventScroll: true }); } catch (e) { campoN.focus(); } }
     });
   })();
+
+  /* ⚠️ v36 (28/09/2026, áudios do Cassiano ~02:14-02:17: "pra Shih Tzu e pra Golden é diferente o tamanho (...) arrumar uma
+     opção lá no site"; áudio 3019: a janela 3D NÃO troca de tamanho, "é só para ele ter uma noção das cores"). A v35 está em
+     03_site/_versoes_anteriores/tamanhos_antes_2026-09-28/js/.
+     O grupo "Tamanho" NASCE AQUI, por JS (o gerador de páginas não muda), só no produto listado em ALEA.tamanhos (config.js),
+     logo ACIMA do botão "Personalize aqui" — fica na página, à vista, e não entra na janela 3D. Mesmo desenho das bolinhas
+     Tricolor/Bicolor/Monocromático (classes cores-peca/cores-opcoes). Nasce SEM nada marcado: escolher é obrigatório
+     (oQueFalta: "Por favor, escolha o tamanho."), e o tamanho vai no item (personalizacao.tamanho) -> sacola, Resumo do
+     Pedido e mensagem do pedido ("Tamanho: M", carrinho.js). O "editar" da sacola devolve o tamanho marcado. Sem preço
+     por tamanho (decisão do Cassiano/Lázaro; as peças estão "Sob consulta"). */
+  var caixaTamanho = null;
+  (function grupoTamanho() {
+    var slugT = botaoComprar && botaoComprar.getAttribute('data-slug');
+    var lista = slugT && ((window.ALEA || {}).tamanhos || {})[slugT];
+    var formT = document.querySelector('[data-personalizar]');
+    if (!lista || !lista.length || !formT) return;
+    caixaTamanho = document.createElement('div');
+    caixaTamanho.className = 'cores-peca tamanho-peca';
+    caixaTamanho.setAttribute('data-tamanho-peca', '');
+    caixaTamanho.innerHTML = '<span class="rotulo-grupo">Tamanho</span><div class="cores-opcoes">' +
+      lista.map(function (t) {
+        return '<label><input type="radio" name="tamanho" value="' + String(t).replace(/"/g, '') + '"> ' + t + '</label>';
+      }).join('') + '</div>';
+    formT.parentNode.insertBefore(caixaTamanho, formT);   // o botão Personalize (abaixo) entra entre este grupo e o formulário
+    caixaTamanho.addEventListener('change', function () {
+      Array.prototype.forEach.call(caixaTamanho.querySelectorAll('.rotulo-grupo, .cores-opcoes label, .faltou'),
+        function (x) { x.classList.remove('faltou'); });
+      caixaTamanho.classList.remove('faltou');
+      var rec = document.querySelector('[data-recado-aceite]');
+      if (rec && rec.textContent === 'Por favor, escolha o tamanho.') rec.hidden = true;
+    });
+  })();
+  function tamanhoEscolhido() {
+    var r = caixaTamanho && caixaTamanho.querySelector('input[name="tamanho"]:checked');
+    return r ? r.value : '';
+  }
 
   /* ⚠️ ETAPA 53 (23/09/2026, 14:27, protótipo): botão "Personalize aqui" -> janela com a peça em 3D, nome
      gravado ao vivo e cores trocando na hora (js/personalizar3d.js). Só aparece no produto que tem modelo 3D
@@ -1232,6 +1268,8 @@
         cor_nome_original: corDoNomeEscolhida().original,
         cor_nome_escolha: corDoNomeEscolhida().escolha,
         cores: coresEscolhidas(),
+        /* v36: o tamanho que o cliente escolheu na página (rótulo do arquivo dele: M, P ou G); '' = produto sem tamanhos */
+        tamanho: tamanhoEscolhido(),
         /* 26/09/2026: marcou o "Estou ciente da possível variação de cor" na janela Personalize (personalizar3d.js v9) */
         ciente_cor: (function () { if (window.aleaCienteCor) return true; try { return !!sessionStorage.getItem('alea_ciente_cor'); } catch (e) { return false; } })()
       },
@@ -1293,6 +1331,12 @@
         });
       }
     }
+    /* v36: o tamanho (na página, acima do Personalize). Vem DEPOIS das faltas do formulário de propósito: faltando algo lá
+       dentro, a janela abre e mostra aquela falta primeiro; resolvido, a página treme no Tamanho. */
+    if (caixaTamanho && !tamanhoEscolhido()) {
+      faltas.push({ el: caixaTamanho.querySelector('.rotulo-grupo') || caixaTamanho, texto: 'Por favor, escolha o tamanho.' });
+      Array.prototype.forEach.call(caixaTamanho.querySelectorAll('.cores-opcoes label'), function (l) { faltas.push({ el: l, texto: null }); });
+    }
     if (!caixaAceite || !caixaAceite.checked) {
       faltas.push({ el: document.querySelector('[data-aceite]'), texto: 'Por favor, aceite os termos da declaração.' });   // ETAPA 32 (21:38): frase dele
     }
@@ -1342,6 +1386,9 @@
       var alvo = primeira.el.matches && primeira.el.matches('input, select') ? primeira.el
                : primeira.el.querySelector ? (primeira.el.querySelector('select:not([disabled])') ||
                  primeira.el.querySelector('input')) : null;
+      if (!alvo && caixaTamanho && caixaTamanho.contains(primeira.el)) {   // v36: o foco vai pra 1ª bolinha do Tamanho
+        alvo = caixaTamanho.querySelector('input[name="tamanho"]');
+      }
       if (!alvo && caixaCores && primeira.el.classList.contains('rotulo-grupo')) {
         alvo = caixaCores.querySelector('input[name="cores_peca"]');
       }
@@ -1426,6 +1473,11 @@
     var p = item.personalizacao || {};
     var nome = document.querySelector('[data-personalizar] [name="nome_pet"]');
     if (nome) nome.value = p.nome_pet || '';
+    /* v36: o tamanho volta marcado */
+    if (caixaTamanho && p.tamanho) {
+      var rt = caixaTamanho.querySelector('input[name="tamanho"][value="' + String(p.tamanho).replace(/"/g, '') + '"]');
+      if (rt) rt.checked = true;
+    }
     (item.extras || []).forEach(function (x) {
       var rot = document.querySelector('[data-extra][data-extra-id="' + x.id + '"]');
       var cx = rot && rot.querySelector('[data-extra-caixa]');

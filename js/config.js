@@ -278,8 +278,17 @@ window.ALEA = {
      PLA Matte, cor = código oficial do Bambu Studio). Os nomes simples estão PROPOSTOS a ele (msg 547). */
   modelos3d: {
     'bowl-wave': {
-      glb: 'modelos/luke_g.glb',
-      nome: 'modelos/luke_g_nome.json',
+      /* 28/09/2026 (áudios do Cassiano ~02:14-02:17, msg 3016 "ALEA Pet Bowl"): o Luke ganhou a LOGO NOVA (ālea & Co. +
+         capivara, recorte na cor da parte) e a janela 3D passou a mostrar o tamanho M ("lá na prévia do site pode deixar
+         sempre o tamanho M (...) ali é só para ele ter uma noção das cores", áudio 3019).
+         M = placa 4 "Tri Color - M", objeto 13 · G = placa 7 "Tri Color - G", objeto 21 (mesmo arquivo).
+         Exportados por 07_render_capa/exportar_glb_configurador_v5_booleano_tolerante.py, "1=principal,2=base,3=topo",
+         --zonas-por-altura, sem decimar. O arquivo M traz "Cacau" gravado -> nomeInicial 'Luke' (a peça abre como na capa).
+         TROCAR PRO G (uma linha cada): glb 'modelos/luke_g.glb?v=2026-09-28b' e nome 'modelos/luke_g_nome.json?v=2026-09-28b'
+         (o G novo também tem a logo nova e traz "Luke"; o G antigo, logo antiga, está em 03_site/_versoes_anteriores/tamanhos_antes_2026-09-28/). */
+      glb: 'modelos/luke_m.glb?v=2026-09-28b',
+      nome: 'modelos/luke_m_nome.json?v=2026-09-28b',
+      nomeInicial: 'Luke',
       fonte: 'fonts/defante.otf',
       original: {
         topo:      { site: 'Laranja', hex: '#FF671F', acabamento: 'basico', oficial: 'Bambu Lab · PLA · Lite · Orange (16301)' },
@@ -336,8 +345,11 @@ window.ALEA.modelos3d['matteo-texturized'] = {
      Exportado por 07_render_capa/exportar_glb_configurador_v5_booleano_tolerante.py (sem decimar).
      ANTES (26/09): 13_lote_2026-09-25_2001/02_ALEA Matteo Texturized_msg1851.zip, objeto 5 (placa "P"), logo antiga.
      ?v= força o navegador a baixar o arquivo novo (o nome do arquivo não mudou). */
-  glb: 'modelos/matteo_g.glb?v=2026-09-28',
-  nome: 'modelos/matteo_g_nome.json?v=2026-09-28',
+  /* 28/09/2026 02:17 (áudio 3019): a janela 3D mostra o tamanho MENOR do arquivo, placa 1 "P", objeto 6 (mesmo arquivo,
+     mesma logo, exportador v5). TROCAR PRO G (uma linha cada): 'modelos/matteo_g.glb?v=2026-09-28' e
+     'modelos/matteo_g_nome.json?v=2026-09-28' (placa 2 "G", objeto 4). */
+  glb: 'modelos/matteo_p.glb?v=2026-09-28b',
+  nome: 'modelos/matteo_p_nome.json?v=2026-09-28b',
   /* o arquivo grava o nome em Arial; no site vai a Arimo (licença livre SIL OFL 1.1, em fonts/arimo_LICENSE.txt; mesma medida de letra da Arial) */
   fonte: 'fonts/arimo.ttf',
   fonteInvertida: false,
@@ -367,8 +379,11 @@ window.ALEA.modelos3d['claudia-wave'] = {
      "Wave - G"; mesma malha, mesmas cores, só a logo trocada). Exportado pelo exportar_glb_configurador_v5.
      Zonas: extrusora 3 = topo (o aro), 1 = principal (o corpo, onde o nome e a logo estão), 2 = base (a onda).
      ANTES (26/09): 13_lote_2026-09-25_2001/04_ALEA Claudia Wave_separados/ALEA Cláudia Wave_msg1859.3mf, obj 32. */
-  glb: 'modelos/claudia_g.glb?v=2026-09-28',
-  nome: 'modelos/claudia_g_nome.json?v=2026-09-28',
+  /* 28/09/2026 02:17 (áudio 3019): a janela 3D mostra o tamanho MENOR do arquivo, placa 2 "Wave Tri - P", objeto 5 (mesmas
+     partes top/bottom, mesma logo nova, exportador v5). TROCAR PRO G (uma linha cada): 'modelos/claudia_g.glb?v=2026-09-28'
+     e 'modelos/claudia_g_nome.json?v=2026-09-28' (placa 10 "Wave - G", objeto 32). */
+  glb: 'modelos/claudia_p.glb?v=2026-09-28b',
+  nome: 'modelos/claudia_p_nome.json?v=2026-09-28b',
   fonte: 'fonts/defante.otf',
   /* o arquivo traz "Chica" (a cachorrinha das fotos); a peça se chama Cláudia, e o mesmo arquivo tem "Cláudia" no objeto 20 */
   nomeInicial: 'Cláudia',
@@ -388,6 +403,27 @@ window.ALEA.modelos3d['claudia-wave'] = {
   },
   capa: { modo: 'bicolor', escolhas: [{ acabamento: 'perolizado', cor: 'Branco' }, { acabamento: 'perolizado', cor: 'Azul Aqua' }] }
 };
+
+/* TAMANHOS À VENDA (28/09/2026, áudios do Cassiano ~02:14-02:17: "pra Shih Tzu e pra Golden é diferente o tamanho (...)
+   arrumar uma opção lá no site"). A página ganha o grupo "Tamanho" (produto.js v36) logo acima do "Personalize aqui";
+   escolher é OBRIGATÓRIO e o tamanho vai no item da sacola, no Resumo do Pedido e na mensagem do pedido ("Tamanho: M").
+   O rótulo é o do ARQUIVO dele (nome da placa no Bambu Studio), não inventado:
+     luke-bowl ......... msg 3016 "ALEA Pet Bowl": "Tri Color - M" (placa 4) e "Tri Color - G" (placa 7)
+     matteo-texturized . "ALEA Elevated Dog Bowl Texturized v1 logo padrao": "P" (placa 1) e "G" (placa 2)
+     claudia-wave ...... "ALEA Dog Bowl Wave v3 logo em todas": "Wave Tri - P" (placa 2) e "Wave - G" (placa 10)
+   A janela 3D NÃO troca de tamanho (áudio 3019): é só pra ver as cores. PREÇO por tamanho: não existe aqui (as 3 peças
+   estão "Sob consulta"); se um dia o G custar mais, é decisão do Cassiano/Lázaro e entra como campo novo, não aqui.
+   Produto fora desta lista = sem o grupo Tamanho (nada muda na página). */
+window.ALEA.tamanhos = {
+  'luke-bowl':         ['M', 'G'],
+  'matteo-texturized': ['P', 'G'],
+  'claudia-wave':      ['P', 'G']
+};
+/* A LOGO NUNCA É PINTADA (Cassiano, 28/09/2026 ~02:16: "a logo nunca vai ser pintada. Sempre baixo-relevo (...) a nossa logo
+   não muda de cor, não muda de formato, nada"). Conferido no personalizar3d.js v11: a logo está DENTRO do .glb, como parte
+   da malha de cada zona (o exportador põe as paredes da gravação na zona da parede em volta), então ela só pega a cor da
+   PARTE onde está. O "Um detalhe que transforma" (nome colorido) pinta SÓ o material da letra do nome (matLetra: o corte
+   do nome gravado ao vivo + a letra preenchida) — nunca a logo. Não há opção no site que mexa na logo. */
 
 /* FILAMENTOS DE CADA FOTO — aparecem SÓ com a foto em TELA CHEIA, no canto de baixo à direita (produto.js v32, 27/09/2026).
    É PALPITE da casa, olhando as fotos: o Cassiano corrige a lista aqui (um filamento por linha, de CIMA pra BAIXO na
