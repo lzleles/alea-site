@@ -309,7 +309,9 @@
      em torno de (17,85%, 38,64%). Mudou lá no CSS, muda aqui. */
   var VB_W = 3462.47, VB_H = 970.75;
   var CAP_FIM = { tx: 0.3215, ty: 0.2118, k: 1.551, ox: 0.1785, oy: 0.3864 };
-  var TINTA_ESCRITA = { x0: 174 / 3249, x1: 3074 / 3249, y0: 174 / 836, y1: 661 / 836 };  // medido no raster 2 px/un
+  /* 29/09/2026 (áudio 4232): escrita = nominativa OFICIAL (escrita_nominativa_oficial.svg: tinta 1450 un + folga 87 un
+     num viewBox 1624 × 407,64 - impresso pelo 03_site/_escrita_nominativa_oficial_v1). A antiga era 174/3249 … 661/836. */
+  var TINTA_ESCRITA = { x0: 87 / 1624, x1: 1537 / 1624, y0: 87 / 407.64, y1: 320.64 / 407.64 };
   function medirFolga() {
     if (!abertura || !marca || !window.ALEA_FOLGA) return;
     var a = abertura.getBoundingClientRect();
@@ -367,7 +369,7 @@
      bico). No fim a escrita limpa aparece por cima e os traços somem — igual ao vídeo aprovado. */
   var camadaImpressao = null, animacoesImpressao = [], esperaDaImpressao = null, fimDaImpressao = null;
   if (NO_COMPUTADOR && window.fetch) {
-    fetch('img/marca/e_co/escrita_impressao.svg').then(function (r) { return r.ok ? r.text() : ''; }).then(function (t) {
+    fetch('img/marca/e_co/escrita_impressao_oficial.svg').then(function (r) { return r.ok ? r.text() : ''; }).then(function (t) {
       var janela = document.querySelector('.marca-anim .escrita-janela');
       if (!t || !janela) return;
       janela.insertAdjacentHTML('beforeend', t);

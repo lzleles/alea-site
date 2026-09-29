@@ -398,7 +398,7 @@ body.tem-clareira .abertura::before {
   --cap-fim: translate(32.15%, 21.18%) scale(1.551);
   /* a escrita desce ABAIXO da caixa. Rodada 2: pés da capivara a 0,3348×largura, escrita com
      0,1029×largura de altura → fundo em 0,4377; a caixa tem 0,2804 → faltam 0,157 + respiro. */
-  margin-bottom: calc(var(--marca-w) * .168);
+  margin-bottom: calc(var(--marca-w) * .2635);   /* 29/09 (áudio 4232): nome maior - fundo da janela em 0,5336 da largura (era .168) */
   visibility: hidden;                    /* liberada pelo JS, ver acima */
 }
 .marca-anim img { position: absolute; inset: 0; width: 100%; height: 100%; }
@@ -442,8 +442,13 @@ body.marca-anima .marca-anim .capivara {
       RODADA 2 (26/09/2026 21:30): a janela desce pros pés da capivara MAIOR (119,4% da caixa,
       ver --cap-fim), encolhe pra 39,97% (tinta = 35,70%, a largura que a capivara tinha), e a
       subida fica mais lenta: 4,5s, começando aos 6,5s (quando o "& Co." acabou de apagar). */
+/* 29/09/2026 (áudio 4232: "a primeira logo que você vai mudar é a central do site (...) o nome ficou maior"): a escrita
+   é a NOMINATIVA OFICIAL e a proporção é a da LOGO OFICIAL dele (_REGUA/logos_oficiais_2026-09-29/Logo.svg, medida por
+   pixel): nome = 1,2556 × a largura da capivara e vão capivara→nome = 0,0815 × a largura da capivara. A capivara fica do
+   mesmo tamanho (55,37% da caixa); a tinta do nome vai a 69,52% → janela 77,86% (tinta = 89,29% do SVG novo). Topo:
+   pés 33,475% da largura + vão 4,515% − folga do SVG 4,171% = 33,82% da largura = 120,63% da altura. Era 39,97% / 119,4%. */
 .marca-anim .escrita-janela {
-  position: absolute; top: 119.4%; left: 50%; width: 39.97%;
+  position: absolute; top: 120.63%; left: 50%; width: 77.86%;
   transform: translateX(-50%);
   overflow: hidden;
 }
