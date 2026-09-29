@@ -258,7 +258,7 @@
       '<div class="fim">' +
         /* ETAPA 4 (22/09/2026): o logo do fim virou a marca NOVA (Capivara Página Inicial),
            e o "ou veja outra categoria" saiu (pedido dele). */
-        '<img src="img/marca/e_co/logo_lado.svg" alt="ālea & Co.">' +
+        '<img src="img/marca/e_co/logo_horizontal_oficial.svg" alt="ālea & Co.">' +
         '<p data-assinatura>Onde cada impressão começa com um sonho!</p>' +
         '<a class="botao zap" data-assunto="orçamento de uma peça personalizada">Orçamentos e personalizados</a>' +
         '<nav class="menu-categorias" data-menu-categorias aria-label="Categorias"></nav>' +

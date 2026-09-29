@@ -316,6 +316,29 @@ body.tem-clareira .abertura::before {
 @media (min-aspect-ratio: 3/5) {
   .abertura::before { background-size: clamp(1000px, 90vw, 1400px) auto; background-position: center top; }
 }
+/* 29/09/2026 — SÓ NO COMPUTADOR (vídeo 4100 do Cassiano): "aqui em cima não aparece nada (...) vamos fazer igual a
+   nossa logo (...) o contorno aqui, bem redondo". A elipse (clareira) não entra no computador (o abertura.js nem a
+   liga); no lugar dela, a MÁSCARA medida pelo abertura.js (`medirFolga`): estampa em todo lugar, menos numa folga
+   redonda em volta da capivara (pelo contorno) e de cada texto (retângulo de quina redonda). Opacidade e desenho da
+   estampa são os de antes ("pode deixar desse jeito, mais fosca, esfumaçada").
+   ⚠️ 29/09/2026 09:25 (áudios 4205/4206): "não existe diferença de site de computador e celular pra mim (...) o que eu
+   te pedi hoje é tudo pro computador e pro celular". O bloco deixou de estar preso ao computador: vale nas duas telas
+   (era `@media (hover: hover) and (pointer: fine) and (min-width: 761px)`). */
+@media all {
+  /* "colocar mais textura onde não tem": a linha Off (#EEE8DE) some no miolo claro do degradê (#F8F5F0). Escurecer o
+     desenho em 14% faz ela aparecer ali sem ficar forte nas manchas de cor; a opacidade .5 ("fosca") é a de antes. */
+  .abertura::before { filter: brightness(.86); transition: opacity .9s ease; }
+  /* 29/09/2026 (vídeo 4173): "a hora que dá Enter (...) você vê a animação dentro dela. Tem como tampar pra não ver?
+     (...) queria que mostrasse só ela, ela indo pro canto dela e aí depois aparecer". A folga é medida pro lugar FINAL
+     da capivara; enquanto ela anda gigante, a estampa aparecia por dentro dela. Então a estampa espera: some até a
+     capivara chegar (o abertura.js tira `estampa-espera`) e entra em 0,9 s. Pular a abertura tira na hora. */
+  body.estampa-espera .abertura::before { opacity: 0; transition: none; }
+  body.tem-folga .abertura::before {
+    -webkit-mask-image: var(--folga-mascara); mask-image: var(--folga-mascara);
+    -webkit-mask-size: 100% 100%; mask-size: 100% 100%;
+    -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
+  }
+}
 /* a mancha que se mexe devagar: dá vida sem pedir atenção */
 .abertura::after {
   content: ''; position: absolute; inset: -20%;
@@ -375,7 +398,7 @@ body.tem-clareira .abertura::before {
   --cap-fim: translate(32.15%, 21.18%) scale(1.551);
   /* a escrita desce ABAIXO da caixa. Rodada 2: pés da capivara a 0,3348×largura, escrita com
      0,1029×largura de altura → fundo em 0,4377; a caixa tem 0,2804 → faltam 0,157 + respiro. */
-  margin-bottom: calc(var(--marca-w) * .168);
+  margin-bottom: calc(var(--marca-w) * .2635);   /* 29/09 (áudio 4232): nome maior - fundo da janela em 0,5336 da largura (era .168) */
   visibility: hidden;                    /* liberada pelo JS, ver acima */
 }
 .marca-anim img { position: absolute; inset: 0; width: 100%; height: 100%; }
@@ -419,8 +442,13 @@ body.marca-anima .marca-anim .capivara {
       RODADA 2 (26/09/2026 21:30): a janela desce pros pés da capivara MAIOR (119,4% da caixa,
       ver --cap-fim), encolhe pra 39,97% (tinta = 35,70%, a largura que a capivara tinha), e a
       subida fica mais lenta: 4,5s, começando aos 6,5s (quando o "& Co." acabou de apagar). */
+/* 29/09/2026 (áudio 4232: "a primeira logo que você vai mudar é a central do site (...) o nome ficou maior"): a escrita
+   é a NOMINATIVA OFICIAL e a proporção é a da LOGO OFICIAL dele (_REGUA/logos_oficiais_2026-09-29/Logo.svg, medida por
+   pixel): nome = 1,2556 × a largura da capivara e vão capivara→nome = 0,0815 × a largura da capivara. A capivara fica do
+   mesmo tamanho (55,37% da caixa); a tinta do nome vai a 69,52% → janela 77,86% (tinta = 89,29% do SVG novo). Topo:
+   pés 33,475% da largura + vão 4,515% − folga do SVG 4,171% = 33,82% da largura = 120,63% da altura. Era 39,97% / 119,4%. */
 .marca-anim .escrita-janela {
-  position: absolute; top: 119.4%; left: 50%; width: 39.97%;
+  position: absolute; top: 120.63%; left: 50%; width: 77.86%;
   transform: translateX(-50%);
   overflow: hidden;
 }
@@ -442,6 +470,23 @@ body.marca-anima .marca-anim .escrita-janela .escrita {
   from { transform: translateY(-100%); }
   to   { transform: none; }
 }
+/* 29/09/2026 — SÓ NO COMPUTADOR (áudio 4102): "ao invés dele descer, você vai imprimir ele pra mim". A escrita não
+   desce: fica no lugar, invisível, e a camada `svg.impressao` (traços de contorno + anéis, animados pelo abertura.js)
+   a desenha; no fim a escrita limpa acende e os traços somem. Pular a abertura (`sem-abertura`) mostra a limpa. */
+.marca-anim .escrita-janela svg.impressao {
+  position: absolute; inset: 0; width: 100%; height: 100%; display: block;
+  visibility: hidden; transition: opacity .5s ease;
+}
+body.imprimindo .marca-anim .escrita-janela svg.impressao { visibility: visible; }
+body.escrita-impressa .marca-anim .escrita-janela svg.impressao { opacity: 0; }
+/* 29/09/2026 (vídeo 4226 + áudio 4227: "quando dá F5 tem um resquício do nome bem no meio da capivara e ele some"): a
+   escrita APAGA na hora (sem transição) — a transição de 0,5 s ficava só pra ACENDER no fim da impressão. E cada traço
+   da impressão nasce invisível; o abertura.js acende um por um na vez dele (o Safari pintava a ponta antes da hora). */
+body.escrita-imprime .marca-anim .escrita-janela .escrita { transform: none; animation: none; opacity: 0; transition: none; }
+body.escrita-imprime.escrita-impressa .marca-anim .escrita-janela .escrita { opacity: 1; transition: opacity .5s ease; }
+body.sem-abertura .marca-anim .escrita-janela .escrita { opacity: 1; }
+.marca-anim .escrita-janela svg.impressao path { opacity: 0; }
+body.sem-abertura .marca-anim .escrita-janela svg.impressao { display: none; }
 /* As peças da montagem antiga (letra1-4 e eco_final: o ālea saindo letra por letra pra
    direita e o "& Co." descendo de trás dele) continuam em img/marca/e_co/, mas saíram do
    HTML em 26/09/2026 — as regras delas (.letra, .l1-.l4, .eco-final) saíram junto.
@@ -489,12 +534,15 @@ body.marca-medida:not(.marca-anima) .marca-anim .eco-capivara { opacity: 1; tran
 body.marca-anima .marca-anim .eco-capivara {
   /* RODADA 4 (26/09/2026): 50% mais rápido — 1,7s ÷ 1,5 = 1,133s (5,0 → 6,13s). Mesma curva (linear). */
   /* RODADA 5 (26/09/2026): 30% mais rápido — 1,133s ÷ 1,3 = 0,872s (5,0 → 5,87s). Mesma curva (linear). */
-  animation: eco-engolido-pela-perna 0.872s linear 5.0s both;
+  /* 29/09/2026 (áudio 4245, "& Co." oficial): ele é menor (x 990,8..1259,2, era 970..1276). MESMA velocidade de antes
+     (340 un em 0,872 s = 390 un/s): anda 323 un (o ponto passa da perna em x 950 com folga de 14 un) em 0,828 s.
+     O abertura.js (ECO_ATRAVESSA_MS) acompanha. Era 0,872 s / -9,82%. */
+  animation: eco-engolido-pela-perna 0.828s linear 5.0s both;
 }
 @keyframes eco-engolido-pela-perna {
   from   { transform: none;               opacity: 1; }
-  99.9%  { transform: translateX(-9.82%); opacity: 1; }
-  to     { transform: translateX(-9.82%); opacity: 0; }
+  99.9%  { transform: translateX(-9.33%); opacity: 1; }
+  to     { transform: translateX(-9.33%); opacity: 0; }
 }
 /* A versão anterior (rodada 2: `eco-entra-na-capivara`, o "& Co." colado na capivara e apagando
    em fade de 1,7s) saiu daqui na rodada 3 — está no commit fb5cd7a se ele quiser comparar. */

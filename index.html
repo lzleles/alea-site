@@ -20,13 +20,13 @@
 <meta property="og:title" content="ālea &amp; Co.">
 <meta property="og:description" content="Impresso em 3D, sob encomenda, com a estampa que você escolher. Jataí-GO.">
 <meta property="og:url" content="https://www.aleaco.art.br/">
-<meta property="og:image" content="img/marca/og_compartilhar.jpg">
+<meta property="og:image" content="img/marca/og_compartilhar_2026-09-29.jpg">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="img/marca/og_compartilhar.jpg">
+<meta name="twitter:image" content="img/marca/og_compartilhar_2026-09-29.jpg">
 
-<link rel="icon" href="img/marca/icone_alea_2026-09-28_32.png" type="image/png" sizes="32x32">
-<link rel="icon" href="img/marca/icone_alea_2026-09-28_48.png" type="image/png" sizes="48x48">
-<link rel="apple-touch-icon" href="img/marca/icone_alea_2026-09-28_180.png">
+<link rel="icon" href="img/marca/icone_alea_2026-09-29_32.png" type="image/png" sizes="32x32">
+<link rel="icon" href="img/marca/icone_alea_2026-09-29_48.png" type="image/png" sizes="48x48">
+<link rel="apple-touch-icon" href="img/marca/icone_alea_2026-09-29_180.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@300;400;600;700&display=swap" rel="stylesheet">
@@ -65,8 +65,8 @@
          capivara em miniatura (pedido do Cassiano em áudio). Peça gerada por
          _montar_marca_e_co_v1_rebrand_2026-09-22.py. -->
     <a class="marca" href="index.html" aria-label="ālea — início">
-      <img class="colorida" src="img/marca/e_co/capivara_mini.svg" alt="ālea" width="46" height="28">
-      <img class="clara" src="img/marca/e_co/capivara_mini_claro.svg" alt="ālea" width="46" height="28">
+      <img class="colorida" src="img/marca/e_co/grafismo_eco_oficial.svg" alt="ālea" width="46" height="28">
+      <img class="clara" src="img/marca/e_co/grafismo_eco_oficial_claro.svg" alt="ālea" width="46" height="28">
     </a>
     <button class="voltar-categorias" type="button" data-fechar-feed hidden>&larr; categorias</button>
   </span>
@@ -131,12 +131,15 @@
       <!-- RODADA 3 (áudios 2167-2168): a perna dianteira da capivara é um "poste" na frente do
            "& Co.". A janela anda junto com a capivara e recorta, com borda reta, tudo o que passa
            pra esquerda da perna; o "& Co." desliza dentro dela e vai sendo engolido. -->
-      <div class="eco-janela"><img class="eco-capivara" src="img/marca/e_co/eco_capivara.svg" alt=""></div>
+      <!-- 29/09/2026 (áudio 4245): o "& Co." do começo é o da GRAFISMO & CO. OFICIAL (03_site/_eco_abertura_oficial_v1); o antigo fica. -->
+      <div class="eco-janela"><img class="eco-capivara" src="img/marca/e_co/eco_capivara_oficial.svg" alt=""></div>
       <img class="capivara" src="img/marca/e_co/capivara.svg" alt="">
       <!-- a janela recorta a escrita na linha dos pés da capivara: é isso que faz ela
            "sair de baixo" da capivara em vez de aparecer por cima dela. -->
       <div class="escrita-janela">
-        <img class="escrita" src="img/marca/e_co/escrita_letra_a_letra.svg" alt="">
+        <!-- 29/09/2026 (áudio 4232): a escrita é a LOGO NOMINATIVA OFICIAL dele, agrupada por peça (03_site/_escrita_nominativa_oficial_v1).
+             A antiga (escrita_letra_a_letra.svg) fica em img/marca/e_co/. -->
+        <img class="escrita" src="img/marca/e_co/escrita_nominativa_oficial.svg" alt="">
       </div>
     </div>
 
@@ -158,13 +161,13 @@
 
 <!-- ALEA:RODAPE -->
 <footer class="rodape">
-  <img class="marca-rodape" src="img/marca/e_co/logo_lado_claro.svg" alt="ālea">
+  <img class="marca-rodape" src="img/marca/e_co/logo_horizontal_oficial_claro.svg" alt="ālea">
   <p class="frase" data-assinatura>Onde cada impressão começa com um sonho!</p>
   <a class="orcamento zap" data-assunto="orçamento de uma peça personalizada">Orçamentos e personalizados, clique aqui!</a>
   <nav class="menu-categorias" data-menu-categorias aria-label="Categorias"></nav>
   <div class="redes" data-redes></div>
   <p class="lei">
-    © <img src="img/marca/e_co/logo_lado_claro.svg" alt="ālea"> <span id="ano">2026</span> — Todos os direitos reservados.
+    © <img src="img/marca/e_co/logo_horizontal_oficial_claro.svg" alt="ālea"> <span id="ano">2026</span> — Todos os direitos reservados.
     <span class="creditos">
       <span data-campo="responsavel">Cassiano Rosado</span>, <span data-campo="cidade">Jataí</span>/<span data-campo="uf">GO</span> ·
       CNPJ <span data-campo="cnpj">61.338.171/0001-10</span> ·
@@ -190,6 +193,7 @@
      O abertura.js vem antes do feed.js porque ele ESPERA o aviso `alea:feed-pronto`;
      carregado depois, perderia o aviso e a categoria do endereço não abriria. -->
 <script src="js/distorcao.js"></script>
+<script src="js/folga_capivara.js"></script>
 <script src="js/abertura.js"></script>
 <script src="js/feed.js"></script>
 </body>

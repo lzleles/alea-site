@@ -52,6 +52,18 @@
    faça a animação igual como se estivesse apertando F5."
    Ver `comoCheguei()` lá embaixo: a decisão saiu da marca de sessão e passou pro TIPO da
    navegação + de onde a pessoa veio.
+
+   29/09/2026 — SÓ NO COMPUTADOR (vídeo 4100 + áudio 4102 do Cassiano; celular intocado, regra "computador é
+   computador"):
+     1. A ESTAMPA EM TODO LUGAR, COM FOLGA REDONDA EM VOLTA DA MARCA — "aqui em cima não aparece nada (...) vamos
+        fazer igual a nossa logo (...) o contorno aqui, bem redondo, bonitinho". A elipse enorme (clareira) sai no
+        computador; entra uma MÁSCARA com a regra das peças da marca: capivara pelo CONTORNO (silhueta alargada e
+        alisada, gerada em js/folga_capivara.js), e cada texto (escrita, frase, menu) num retângulo de quina redonda.
+        → `medirFolga()`
+     2. O "ālea & Co." NÃO DESCE: SE IMPRIME — "ao invés dele descer, você vai imprimir ele pra mim", igual ao vídeo
+        da logo que ele aprovou em 28/09: contorno e depois anéis pra dentro, peça por peça, velocidade constante;
+        no fim a escrita limpa entra no lugar. Os traços vêm de img/marca/e_co/escrita_impressao.svg.
+        → `imprimirEscrita()`
    ========================================================================== */
 
 (function () {
@@ -83,7 +95,21 @@
      03_site/_versoes_anteriores/rodada5_dourado_ayla_antes_2026-09-26/. */
   var ECO_SOME_MS = 170;           // a escrita começa 0,17s depois do "& Co." (CSS: delay 5.17s). Era 1000          // a escrita começa quando o "& Co." está quase engolido (5,0 + 1,0 = 6,0s; CSS: delay 6.0s). Era 1500
   var ESCRITA_MS = 2308;           // a escrita sai de baixo da capivara (CSS: 2.308s). Era 3000 (e antes 4500)
-  var FIM_DA_MARCA = PAUSA_CAPIVARA_MS + CAPIVARA_MS + ECO_SOME_MS + ESCRITA_MS;  // 7,478s (era 9,0s; antes 11,0s)
+  /* 29/09/2026: a escrita se imprime (ver o cabeçalho) e leva IMPRIME_MS; a estampa usa a folga medida e espera a
+     capivara chegar. Nasceu só no computador; desde os áudios 4205/4206 (29/09 09:25: "não existe diferença de site
+     de computador e celular pra mim (...) o que eu te pedi hoje é tudo pro computador e pro celular") vale nas DUAS
+     telas. O nome ficou pra não mexer nas 6 linhas que o usam; o celular antigo (escrita descendo) só volta se ele
+     pedir "só computador". */
+  var NO_COMPUTADOR = true;
+  var IMPRIME_MS = 3600;
+  /* 29/09/2026 (áudio 4202): "o ālea está começando a imprimir antes do & Co. desaparecer (...) no momento em que ele
+     desaparece, começa a imprimir". O "& Co." atravessa a perna em 0,872 s a partir dos 5,0 s (CSS
+     `eco-engolido-pela-perna`) e some aos 5,872 s: a impressão começa AÍ, e não 0,17 s depois de ele começar a andar.
+     Mudou a duração lá no CSS, muda aqui. No celular a escrita continua descendo no tempo de antes (ECO_SOME_MS). */
+  var ECO_ATRAVESSA_MS = 828;      // 29/09 (áudio 4245): "& Co." oficial, menor - 0,828 s na mesma velocidade (era 872)
+  var ECO_FOLGA_MS = 40;           // "logo depois, no momento em que ele desaparece": ~2 quadros depois do último pixel
+  var ANTES_DA_ESCRITA = NO_COMPUTADOR ? ECO_ATRAVESSA_MS + ECO_FOLGA_MS : ECO_SOME_MS;
+  var FIM_DA_MARCA = PAUSA_CAPIVARA_MS + CAPIVARA_MS + ANTES_DA_ESCRITA + (NO_COMPUTADOR ? IMPRIME_MS : ESCRITA_MS);
 
   /* =======================================================================
      1) F5 VOLTA PRO COMEÇO — e por que isso não é automático
@@ -180,6 +206,9 @@
 
   var querMenosMovimento = window.matchMedia &&
     window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  /* 29/09 (vídeo 4173): no computador, a estampa já nasce escondida se a abertura vai tocar - senão ela aparece
+     por dentro da capivara gigante antes do `load` (quem devolve é o abrirComAnimacao, no tempo da capivara) */
+  if (NO_COMPUTADOR && !jaViu && !querMenosMovimento) corpo.classList.add('estampa-espera');
 
   /* =======================================================================
      2) O MAIOR TAMANHO POSSÍVEL DA CAPIVARA
@@ -200,6 +229,11 @@
      na render: x 0..1236, y 2..748. */
   var CX0 = 0, CX1 = 1236, LARG_VB = 3462.47;
   var CY0 = 2, CY1 = 748, ALT_VB = 970.75;
+  /* 29/09/2026 (foto 4243 + áudio 4244: "essa capivara não está centralizada na tela (...) quando a gente abre a página,
+     ela está inteirinha para o lado direito"): no 1º quadro a capivara vem COM o "& Co." do lado (eco_capivara_oficial.svg,
+     tinta até x 1260, medido), mas só a capivara (0..1236) era centralizada e cabia na tela - o conjunto encostava na direita.
+     Agora o que se centraliza e se encaixa é o CONJUNTO (0..1276). */
+  var CX1_GRUPO = 1260;            // "& Co." OFICIAL (áudio 4245): tinta até x 1259,2 (o antigo ia a 1276)
   var FOLGA_LARGURA = 0.92;        // quanto da janela a capivara pode ocupar
   var FOLGA_ALTURA = 0.80;
 
@@ -218,15 +252,18 @@
     var centroX = r.left + r.width * ((CX0 + CX1) / 2) / LARG_VB;
     var centroY = r.top + r.height * ((CY0 + CY1) / 2) / ALT_VB;
 
+    var larguraGrupo = r.width * (CX1_GRUPO - CX0) / LARG_VB;
     var k = Math.min(
-      (window.innerWidth * FOLGA_LARGURA) / larguraDela,
+      (window.innerWidth * FOLGA_LARGURA) / larguraGrupo,
       (window.innerHeight * FOLGA_ALTURA) / alturaDela
     );
     if (!(k > 1)) k = 1;           // janela minúscula: não encolher a marca
 
     var raiz = document.documentElement.style;
     raiz.setProperty('--cap-k', k.toFixed(3));
-    raiz.setProperty('--cap-dx', (window.innerWidth / 2 - centroX).toFixed(1) + 'px');
+    /* a escala gira em torno do centro da capivara; o centro do conjunto fica (1276-1236)/2 un à direita dele, vezes k */
+    var desvioGrupo = r.width * ((CX1_GRUPO - CX1) / 2) / LARG_VB * k;
+    raiz.setProperty('--cap-dx', (window.innerWidth / 2 - centroX - desvioGrupo).toFixed(1) + 'px');
     raiz.setProperty('--cap-dy', (window.innerHeight / 2 - centroY).toFixed(1) + 'px');
 
     /* -------------------------------------- 2b) "3x MENOR DO QUE DA CAPIVARA" (item 3)
@@ -254,6 +291,7 @@
      saiu 23 px errada em 17/09/2026. Por isso a medida se repete: no load, quando a fonte
      responde, quando o menu acende e a cada resize. Medir de novo não custa nada. */
   function medirClareira() {
+    if (NO_COMPUTADOR) { medirFolga(); return; }
     if (!abertura || !miolo) return;
     var a = abertura.getBoundingClientRect();
     var m = miolo.getBoundingClientRect();
@@ -266,6 +304,120 @@
     raiz.setProperty('--clareira-rx', (m.width * 1.18).toFixed(1) + 'px');
     raiz.setProperty('--clareira-ry', (m.height * 1.30).toFixed(1) + 'px');
     corpo.classList.add('tem-clareira');
+  }
+
+  /* =======================================================================
+     2d) A FOLGA REDONDA EM VOLTA DA MARCA — só no computador (29/09/2026, vídeo 4100)
+     =======================================================================
+     A estampa cobre a abertura inteira; a máscara só tira ela de onde está a marca, com a regra das peças
+     da marca: a CAPIVARA pelo contorno (a silhueta alargada e alisada que vem pronta do js/folga_capivara.js,
+     no viewBox das peças) e cada TEXTO num retângulo de quina redonda com a MESMA folga.
+     ⚠️ A conta é feita pro lugar FINAL da capivara, não pra onde ela está agora (no início ela está gigante):
+     a peça tem a caixa da `.marca-anim` e termina em `--cap-fim` = translate(32,15%, 21,18%) scale(1,551)
+     em torno de (17,85%, 38,64%). Mudou lá no CSS, muda aqui. */
+  var VB_W = 3462.47, VB_H = 970.75;
+  var CAP_FIM = { tx: 0.3215, ty: 0.2118, k: 1.551, ox: 0.1785, oy: 0.3864 };
+  /* 29/09/2026 (áudio 4232): escrita = nominativa OFICIAL (escrita_nominativa_oficial.svg: tinta 1450 un + folga 87 un
+     num viewBox 1624 × 407,64 - impresso pelo 03_site/_escrita_nominativa_oficial_v1). A antiga era 174/3249 … 661/836. */
+  var TINTA_ESCRITA = { x0: 87 / 1624, x1: 1537 / 1624, y0: 87 / 407.64, y1: 320.64 / 407.64 };
+  function medirFolga() {
+    if (!abertura || !marca || !window.ALEA_FOLGA) return;
+    var a = abertura.getBoundingClientRect();
+    var m = marca.getBoundingClientRect();
+    if (!a.width || !m.width) return;
+    var W = m.width, H = m.height;
+    var sx = W / VB_W * CAP_FIM.k, sy = H / VB_H * CAP_FIM.k;
+    var tx = m.left - a.left + CAP_FIM.ox * W * (1 - CAP_FIM.k) + CAP_FIM.tx * W;
+    var ty = m.top - a.top + CAP_FIM.oy * H * (1 - CAP_FIM.k) + CAP_FIM.ty * H;
+    var folga = window.ALEA_FOLGA.folga_un * sx;          // a mesma folga da capivara vale pros textos
+    var furos = '<path transform="matrix(' + [sx, 0, 0, sy, tx, ty].map(function (v) { return v.toFixed(3); }).join(' ') +
+                ')" d="' + window.ALEA_FOLGA.d + '"/>';
+    function retangulo(r) {
+      if (!r || !r.width || !r.height) return '';
+      return '<rect x="' + (r.left - a.left - folga).toFixed(1) + '" y="' + (r.top - a.top - folga).toFixed(1) +
+             '" width="' + (r.width + 2 * folga).toFixed(1) + '" height="' + (r.height + 2 * folga).toFixed(1) +
+             '" rx="' + folga.toFixed(1) + '"/>';
+    }
+    var janela = document.querySelector('.marca-anim .escrita-janela');
+    if (janela) {
+      var j = janela.getBoundingClientRect();
+      furos += retangulo({ left: j.left + j.width * TINTA_ESCRITA.x0, top: j.top + j.height * TINTA_ESCRITA.y0,
+                           width: j.width * (TINTA_ESCRITA.x1 - TINTA_ESCRITA.x0), height: j.height * (TINTA_ESCRITA.y1 - TINTA_ESCRITA.y0) });
+    }
+    var frase = document.querySelector('.abertura .assinatura');
+    if (frase && frase.textContent.trim()) {                // enquanto a frase está vazia ela não tem caixa
+      var rg = document.createRange(); rg.selectNodeContents(frase);
+      furos += retangulo(rg.getBoundingClientRect());
+    }
+    var menu = document.querySelector('.abertura .menu-categorias');
+    if (menu && menu.children.length) {
+      var r0 = null;
+      Array.prototype.forEach.call(menu.children, function (el) {
+        var r = el.getBoundingClientRect(); if (!r.width) return;
+        r0 = r0 ? { left: Math.min(r0.left, r.left), top: Math.min(r0.top, r.top), right: Math.max(r0.right, r.right), bottom: Math.max(r0.bottom, r.bottom) }
+                : { left: r.left, top: r.top, right: r.right, bottom: r.bottom };
+      });
+      if (r0) furos += retangulo({ left: r0.left, top: r0.top, width: r0.right - r0.left, height: r0.bottom - r0.top });
+    }
+    var w = a.width.toFixed(0), h = a.height.toFixed(0);
+    var svg = '<svg xmlns="http://www.w3.org/2000/svg" width="' + w + '" height="' + h + '" viewBox="0 0 ' + w + ' ' + h + '">' +
+              '<defs><filter id="f" x="-5%" y="-5%" width="110%" height="110%"><feGaussianBlur stdDeviation="2"/></filter>' +
+              '<mask id="m"><rect width="100%" height="100%" fill="#fff"/><g fill="#000" filter="url(#f)">' + furos + '</g></mask></defs>' +
+              '<rect width="100%" height="100%" fill="#000" mask="url(#m)"/></svg>';
+    document.documentElement.style.setProperty('--folga-mascara', 'url("data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg) + '")');
+    corpo.classList.add('tem-folga');
+  }
+
+  /* =======================================================================
+     2e) O "ālea & Co." SE IMPRIME — só no computador (29/09/2026, áudio 4102)
+     =======================================================================
+     Os traços (contorno + anéis, peça por peça, da esquerda pra direita) vêm prontos do
+     img/marca/e_co/escrita_impressao.svg (gerado por 03_site/_escrita_impressao_v1_2026-09-29.py) e são
+     desenhados com stroke-dashoffset a VELOCIDADE CONSTANTE (cada traço leva o tempo do seu comprimento, como o
+     bico). No fim a escrita limpa aparece por cima e os traços somem — igual ao vídeo aprovado. */
+  var camadaImpressao = null, animacoesImpressao = [], esperaDaImpressao = null, fimDaImpressao = null;
+  if (NO_COMPUTADOR && window.fetch) {
+    fetch('img/marca/e_co/escrita_impressao_oficial.svg').then(function (r) { return r.ok ? r.text() : ''; }).then(function (t) {
+      var janela = document.querySelector('.marca-anim .escrita-janela');
+      if (!t || !janela) return;
+      janela.insertAdjacentHTML('beforeend', t);
+      camadaImpressao = janela.querySelector('svg.impressao');
+    }, function () {});
+  }
+  function pararImpressao(terminar) {
+    if (esperaDaImpressao) { clearTimeout(esperaDaImpressao); esperaDaImpressao = null; }
+    if (fimDaImpressao) { clearTimeout(fimDaImpressao); fimDaImpressao = null; }
+    animacoesImpressao.forEach(function (an) { try { an.cancel(); } catch (e) {} });
+    animacoesImpressao = [];
+    corpo.classList.remove('imprimindo');
+    if (terminar) corpo.classList.add('escrita-impressa');
+  }
+  function imprimirEscrita() {
+    if (!camadaImpressao || !camadaImpressao.animate) { pararImpressao(true); return; }
+    var tracos = camadaImpressao.querySelectorAll('path');
+    var lens = [], total = 0;
+    Array.prototype.forEach.call(tracos, function (p) { var L = p.getTotalLength(); lens.push(L); total += L; });
+    if (!total) { pararImpressao(true); return; }
+    var CORRE = IMPRIME_MS - 500, t = 0;                  // os últimos 0,5 s são a troca pela escrita limpa
+    Array.prototype.forEach.call(tracos, function (p, i) {
+      var L = lens[i], dur = CORRE * L / total;
+      /* 29/09/2026 (vídeo 4221 + áudio 4222: "ficou umas falinhas (...) antes de começar a imprimir, mostrando já onde
+         vai ser impresso"): com stroke-linecap round, o traço de comprimento ZERO ainda pinta a ponta redonda — cada
+         traço que não começou mostrava um pontinho. A folga FORA empurra o traço pra antes do início do caminho
+         (maior que a ponta de 5,5), então nada aparece até a vez dele. */
+      var FORA = 20;
+      p.style.strokeDasharray = L + ' ' + (L + FORA);
+      animacoesImpressao.push(p.animate([{ strokeDashoffset: L + FORA }, { strokeDashoffset: 0 }],
+        { duration: dur, delay: t, fill: 'both', easing: 'linear' }));
+      /* 29/09/2026 (vídeo 4226 + áudio 4227, "não saiu não"): a folga acima resolveu no Chromium, mas o Safari do
+         iPhone seguiu pintando a ponta. Cada traço agora fica INVISÍVEL (opacity 0 no estilo.css) até a vez dele:
+         esta animação o acende no instante em que começa a correr - vale em qualquer navegador. */
+      animacoesImpressao.push(p.animate([{ opacity: 1 }, { opacity: 1 }],
+        { duration: Math.max(dur, 1), delay: t, fill: 'forwards' }));
+      t += dur;
+    });
+    corpo.classList.add('imprimindo');
+    fimDaImpressao = setTimeout(function () { fimDaImpressao = null; corpo.classList.add('escrita-impressa'); }, CORRE);
   }
 
   /* ------------------------------------------------ 3) a frase, letra por letra
@@ -327,6 +479,7 @@
     alvo.appendChild(letras);
     alvo.appendChild(cursor);
     alvo.appendChild(resto);
+    medirClareira();              /* 29/09: a frase inteira (o `resto`) já tem caixa - a folga dela entra agora */
 
     var i = 0;
     (function escrever() {
@@ -375,11 +528,15 @@
      pular podia cair numa categoria que ninguém está vendo. */
   var pulou = false;
   var esperaDaFrase = null;
+  var esperaDaEstampa = null;
 
   function pularAbertura() {
     if (pulou || !corpo.classList.contains('marca-anima')) return;
     pulou = true;
     if (esperaDaFrase) { clearTimeout(esperaDaFrase); esperaDaFrase = null; }
+    if (esperaDaEstampa) { clearTimeout(esperaDaEstampa); esperaDaEstampa = null; }
+    corpo.classList.remove('estampa-espera');
+    pararImpressao(true);
     corpo.classList.remove('marca-anima');
     corpo.classList.add('sem-abertura', 'marca-medida', 'site-revelado', 'frase-revelada');
     escreverDeUmaVez();
@@ -404,12 +561,29 @@
     medirCapivara();
     medirClareira();
     corpo.classList.add('marca-medida');
+    /* 29/09: no computador a escrita se imprime - começa quando ela começaria a descer */
+    pararImpressao(false);
+    corpo.classList.remove('escrita-impressa');
+    if (NO_COMPUTADOR) {
+      /* 29/09 (vídeo 4173): a estampa só entra depois que a capivara chega no lugar dela */
+      corpo.classList.add('estampa-espera');
+      if (esperaDaEstampa) clearTimeout(esperaDaEstampa);
+      corpo.classList.add('escrita-imprime');
+    }
     /* dois quadros de espera: o primeiro aplica o estado de partida (capivara gigante),
        o segundo liga a animação. Ligar os dois no mesmo quadro é o jeito clássico de o
        navegador juntar as duas mudanças e não animar nada. */
     requestAnimationFrame(function () {
       requestAnimationFrame(function () {
         corpo.classList.add('marca-anima');
+        /* 29/09: os dois relógios ligam AQUI, junto com o CSS - ligados antes dos 2 quadros, a impressão saía ~30 ms
+           antes do "& Co." sumir (medido: 5,843 s no 390 e 5,860 s no 1440, com o & Co. sumindo aos 5,872 s). */
+        if (NO_COMPUTADOR && !pulou) {
+          esperaDaEstampa = setTimeout(function () { esperaDaEstampa = null; corpo.classList.remove('estampa-espera'); },
+                                       PAUSA_CAPIVARA_MS + CAPIVARA_MS);
+          esperaDaImpressao = setTimeout(function () { esperaDaImpressao = null; imprimirEscrita(); },
+                                         PAUSA_CAPIVARA_MS + CAPIVARA_MS + ECO_ATRAVESSA_MS + ECO_FOLGA_MS);   /* áudio 4202 */
+        }
       });
     });
     /* a frase só começa DEPOIS da última letra do logo, e o menu só depois da frase
