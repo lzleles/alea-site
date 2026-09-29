@@ -51,16 +51,16 @@
 
 :root {
   --off:        #EAE4DB;
-  --terracota:  #924429;
-  --laranja:    #B26E3A;
-  --dourado:    #AA9661;
-  --azul:       #7695A5;
+  --terracota:  #9D3E20;
+  --laranja:    #BD6A2C;
+  --dourado:    #AF9559;
+  --azul:       #6C96A7;
   --tinta:      #2B2118;
   --tinta-fraca:#6B5D50;
   --papel:      #F6F3EE;
   --preto:      #000000;   /* ETAPA 13 (22/09/2026, 18:52): PRETO PURO, pedido dele ("preto forte intenso, igual o laulau"). Era #14100D, o preto quente. */
   --branco:     #FFFFFF;   /* ETAPA 13: branco puro pro texto das partes escuras (feed e rodapé). O --off segue nas partes claras. */
-  --borda:      rgba(146, 68, 41, .16);
+  --borda:      rgba(157, 62, 32, .16);
 
   --fonte-titulo: 'Defante', 'Hanken Grotesk', system-ui, sans-serif;   /* etapa 10: era 'Outfit' */
   --fonte-corpo:  'Hanken Grotesk', system-ui, -apple-system, 'Segoe UI', sans-serif;
@@ -267,9 +267,9 @@ body.escuro .botao-icone:hover, body.escuro .botao-icone:focus-visible { backgro
   text-align: center;
   overflow: hidden;
   background:
-    radial-gradient(1100px 720px at 16% 14%, rgba(118, 149, 165, .60), transparent 62%),
-    radial-gradient(940px 660px at 86% 24%, rgba(170, 150, 97, .58), transparent 60%),
-    radial-gradient(1080px 780px at 52% 98%, rgba(146, 68, 41, .46), transparent 64%),
+    radial-gradient(1100px 720px at 16% 14%, rgba(108, 150, 167, .60), transparent 62%),
+    radial-gradient(940px 660px at 86% 24%, rgba(175, 149, 89, .58), transparent 60%),
+    radial-gradient(1080px 780px at 52% 98%, rgba(157, 62, 32, .46), transparent 64%),
     linear-gradient(162deg, #F8F5F0 0%, #EAE4DB 54%, #E2D6C6 100%);
 }
 /* onde o navegador mede as duas alturas, a faixa acompanha a barra de verdade (o mínimo de
@@ -319,7 +319,7 @@ body.tem-clareira .abertura::before {
 /* a mancha que se mexe devagar: dá vida sem pedir atenção */
 .abertura::after {
   content: ''; position: absolute; inset: -20%;
-  background: radial-gradient(520px 520px at 30% 40%, rgba(178, 110, 58, .22), transparent 60%);
+  background: radial-gradient(520px 520px at 30% 40%, rgba(189, 106, 44, .22), transparent 60%);
   animation: respirar 22s ease-in-out infinite alternate;
   pointer-events: none;
 }
@@ -1759,9 +1759,9 @@ html, body { overflow-x: clip; }
 .feed {
   color: var(--tinta);
   background:
-    radial-gradient(1100px 720px at 16% 14%, rgba(118, 149, 165, .60), transparent 62%),
-    radial-gradient(940px 660px at 86% 24%, rgba(170, 150, 97, .58), transparent 60%),
-    radial-gradient(1080px 780px at 52% 98%, rgba(146, 68, 41, .46), transparent 64%),
+    radial-gradient(1100px 720px at 16% 14%, rgba(108, 150, 167, .60), transparent 62%),
+    radial-gradient(940px 660px at 86% 24%, rgba(175, 149, 89, .58), transparent 60%),
+    radial-gradient(1080px 780px at 52% 98%, rgba(157, 62, 32, .46), transparent 64%),
     linear-gradient(162deg, #F8F5F0 0%, #EAE4DB 54%, #E2D6C6 100%);
 }
 .feed::before {
@@ -2114,9 +2114,9 @@ html.topo-emendado .aviso-memoria { display: none !important; }
    com aquele verde que você chama de dourado (…) o azul perfeito, impecável; o terracota com laranja também lindo, mas ele
    tem que acabar naquele verde dourado. Ele nem apareceu nos degradês." A ponta era #ffbe2e (ouro amarelo-laranja), e em
    nome curto ("× Luke") ela quase não aparecia. O AZUL e o LARANJA/TERRACOTA são as MESMAS cores; o acabamento silk
-   (reflexo, volume, contorno, halo) é o MESMO. Muda só o FIM: o último ~30% é o oliva-dourado da marca (--dourado #AA9661,
+   (reflexo, volume, contorno, halo) é o MESMO. Muda só o FIM: o último ~30% é o oliva-dourado da marca (--dourado #AF9559,
    frase da abertura #af9559), e o laranja/terracota chegam um pouco antes pra abrir esse espaço.
-     A (fiel)      #AA9661 > #b9a56e > #AA9661, a partir de 72%            → body.nome-verde-a
+     A (fiel)      #AF9559 > #b9a56e > #AF9559, a partir de 72%            → body.nome-verde-a
      B (luminosa)  #b7a24f > #d1be6b > #bfab58 (mesmo matiz oliva ~48°, mais claro e vivo), a partir de 71%  → PADRÃO
                    (e body.nome-verde-b, igual ao padrão, pra comparação)
      C (espaço)    o tom da B, a partir de 62% (azul e laranja comprimidos) → body.nome-verde-c
@@ -2132,7 +2132,7 @@ html.topo-emendado .aviso-memoria { display: none !important; }
      onde faltar, pelo site.js), em 4 FATIAS IGUAIS (~25% cada) com transições curtas e iguais (8% cada):
        azul ciano 0-21% · laranja #ff8a1a 29-46% · terracota #e8401e 54-71% · verde dourado (tom da B) 79-100%.
      Em "Luke": L azul, u laranja, k terracota, e verde; em "Ayla Pompom", ao longo das 11 letras.
-   · Variações (classe no <body>): o padrão é o tom B; `nome-verde-a` = o mesmo desenho com o #AA9661 fiel;
+   · Variações (classe no <body>): o padrão é o tom B; `nome-verde-a` = o mesmo desenho com o #AF9559 fiel;
      `nome-ouro-silk` = o mesmo desenho terminando no ouro antigo #ffbe2e; `nome-verde-c` (a de "mais espaço pro verde")
      foi APOSENTADA por este pedido e agora é igual ao padrão; `nome-dourado` continua (× e nome dourados).
    · .collab sem o span .nome (fallback): o degradê cai no .collab inteiro, como na v33, pra o nome nunca sumir.
@@ -2155,7 +2155,7 @@ body {
 }
 body.nome-verde-a {
   --collab-cores: linear-gradient(90deg, #00b8f0 0%, #19c6ff 10%, #0a9ad6 21%, #ff8a1a 29%, #ff8a1a 46%,
-                                         #e8401e 54%, #e8401e 71%, #AA9661 79%, #b9a56e 90%, #AA9661 100%);
+                                         #e8401e 54%, #e8401e 71%, #AF9559 79%, #b9a56e 90%, #AF9559 100%);
 }
 body.nome-verde-b, body.nome-verde-c {
   --collab-cores: linear-gradient(90deg, #00b8f0 0%, #19c6ff 10%, #0a9ad6 21%, #ff8a1a 29%, #ff8a1a 46%,

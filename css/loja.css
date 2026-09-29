@@ -49,9 +49,9 @@
 .loja-sub { font-family: var(--fonte-titulo); font-weight: 400; font-size: 20px; line-height: 24px; text-align: center;
   margin: 58px 0 14px; }
 .loja-miudo { font-size: 11px; line-height: 1.5; color: var(--lj-cinza); }
-.loja-aviso { margin: 14px 0; padding: 10px 12px; font-size: 13px; line-height: 1.45; background: rgba(170, 150, 97, .16);
+.loja-aviso { margin: 14px 0; padding: 10px 12px; font-size: 13px; line-height: 1.45; background: rgba(175, 149, 89, .16);
   border-left: 3px solid var(--dourado); }
-.loja-erro { margin: 12px 0; padding: 10px 12px; font-size: 13px; background: rgba(146, 68, 41, .09); color: var(--terracota); }
+.loja-erro { margin: 12px 0; padding: 10px 12px; font-size: 13px; background: rgba(157, 62, 32, .09); color: var(--terracota); }
 
 /* ------------------------------------------------------------------ botões */
 .loja-bt { display: inline-flex; align-items: center; justify-content: center; min-height: 40px; padding: 0 22px; border: 0;
