@@ -52,6 +52,18 @@
    faça a animação igual como se estivesse apertando F5."
    Ver `comoCheguei()` lá embaixo: a decisão saiu da marca de sessão e passou pro TIPO da
    navegação + de onde a pessoa veio.
+
+   29/09/2026 — SÓ NO COMPUTADOR (vídeo 4100 + áudio 4102 do Cassiano; celular intocado, regra "computador é
+   computador"):
+     1. A ESTAMPA EM TODO LUGAR, COM FOLGA REDONDA EM VOLTA DA MARCA — "aqui em cima não aparece nada (...) vamos
+        fazer igual a nossa logo (...) o contorno aqui, bem redondo, bonitinho". A elipse enorme (clareira) sai no
+        computador; entra uma MÁSCARA com a regra das peças da marca: capivara pelo CONTORNO (silhueta alargada e
+        alisada, gerada em js/folga_capivara.js), e cada texto (escrita, frase, menu) num retângulo de quina redonda.
+        → `medirFolga()`
+     2. O "ālea & Co." NÃO DESCE: SE IMPRIME — "ao invés dele descer, você vai imprimir ele pra mim", igual ao vídeo
+        da logo que ele aprovou em 28/09: contorno e depois anéis pra dentro, peça por peça, velocidade constante;
+        no fim a escrita limpa entra no lugar. Os traços vêm de img/marca/e_co/escrita_impressao.svg.
+        → `imprimirEscrita()`
    ========================================================================== */
 
 (function () {
@@ -83,7 +95,11 @@
      03_site/_versoes_anteriores/rodada5_dourado_ayla_antes_2026-09-26/. */
   var ECO_SOME_MS = 170;           // a escrita começa 0,17s depois do "& Co." (CSS: delay 5.17s). Era 1000          // a escrita começa quando o "& Co." está quase engolido (5,0 + 1,0 = 6,0s; CSS: delay 6.0s). Era 1500
   var ESCRITA_MS = 2308;           // a escrita sai de baixo da capivara (CSS: 2.308s). Era 3000 (e antes 4500)
-  var FIM_DA_MARCA = PAUSA_CAPIVARA_MS + CAPIVARA_MS + ECO_SOME_MS + ESCRITA_MS;  // 7,478s (era 9,0s; antes 11,0s)
+  /* 29/09/2026: no COMPUTADOR a escrita se imprime (ver o cabeçalho) e leva IMPRIME_MS; no celular segue descendo. */
+  var NO_COMPUTADOR = !!(window.matchMedia &&
+    window.matchMedia('(hover: hover) and (pointer: fine) and (min-width: 761px)').matches);
+  var IMPRIME_MS = 3600;
+  var FIM_DA_MARCA = PAUSA_CAPIVARA_MS + CAPIVARA_MS + ECO_SOME_MS + (NO_COMPUTADOR ? IMPRIME_MS : ESCRITA_MS);
 
   /* =======================================================================
      1) F5 VOLTA PRO COMEÇO — e por que isso não é automático
@@ -254,6 +270,7 @@
      saiu 23 px errada em 17/09/2026. Por isso a medida se repete: no load, quando a fonte
      responde, quando o menu acende e a cada resize. Medir de novo não custa nada. */
   function medirClareira() {
+    if (NO_COMPUTADOR) { medirFolga(); return; }
     if (!abertura || !miolo) return;
     var a = abertura.getBoundingClientRect();
     var m = miolo.getBoundingClientRect();
@@ -266,6 +283,108 @@
     raiz.setProperty('--clareira-rx', (m.width * 1.18).toFixed(1) + 'px');
     raiz.setProperty('--clareira-ry', (m.height * 1.30).toFixed(1) + 'px');
     corpo.classList.add('tem-clareira');
+  }
+
+  /* =======================================================================
+     2d) A FOLGA REDONDA EM VOLTA DA MARCA — só no computador (29/09/2026, vídeo 4100)
+     =======================================================================
+     A estampa cobre a abertura inteira; a máscara só tira ela de onde está a marca, com a regra das peças
+     da marca: a CAPIVARA pelo contorno (a silhueta alargada e alisada que vem pronta do js/folga_capivara.js,
+     no viewBox das peças) e cada TEXTO num retângulo de quina redonda com a MESMA folga.
+     ⚠️ A conta é feita pro lugar FINAL da capivara, não pra onde ela está agora (no início ela está gigante):
+     a peça tem a caixa da `.marca-anim` e termina em `--cap-fim` = translate(32,15%, 21,18%) scale(1,551)
+     em torno de (17,85%, 38,64%). Mudou lá no CSS, muda aqui. */
+  var VB_W = 3462.47, VB_H = 970.75;
+  var CAP_FIM = { tx: 0.3215, ty: 0.2118, k: 1.551, ox: 0.1785, oy: 0.3864 };
+  var TINTA_ESCRITA = { x0: 174 / 3249, x1: 3074 / 3249, y0: 174 / 836, y1: 661 / 836 };  // medido no raster 2 px/un
+  function medirFolga() {
+    if (!abertura || !marca || !window.ALEA_FOLGA) return;
+    var a = abertura.getBoundingClientRect();
+    var m = marca.getBoundingClientRect();
+    if (!a.width || !m.width) return;
+    var W = m.width, H = m.height;
+    var sx = W / VB_W * CAP_FIM.k, sy = H / VB_H * CAP_FIM.k;
+    var tx = m.left - a.left + CAP_FIM.ox * W * (1 - CAP_FIM.k) + CAP_FIM.tx * W;
+    var ty = m.top - a.top + CAP_FIM.oy * H * (1 - CAP_FIM.k) + CAP_FIM.ty * H;
+    var folga = window.ALEA_FOLGA.folga_un * sx;          // a mesma folga da capivara vale pros textos
+    var furos = '<path transform="matrix(' + [sx, 0, 0, sy, tx, ty].map(function (v) { return v.toFixed(3); }).join(' ') +
+                ')" d="' + window.ALEA_FOLGA.d + '"/>';
+    function retangulo(r) {
+      if (!r || !r.width || !r.height) return '';
+      return '<rect x="' + (r.left - a.left - folga).toFixed(1) + '" y="' + (r.top - a.top - folga).toFixed(1) +
+             '" width="' + (r.width + 2 * folga).toFixed(1) + '" height="' + (r.height + 2 * folga).toFixed(1) +
+             '" rx="' + folga.toFixed(1) + '"/>';
+    }
+    var janela = document.querySelector('.marca-anim .escrita-janela');
+    if (janela) {
+      var j = janela.getBoundingClientRect();
+      furos += retangulo({ left: j.left + j.width * TINTA_ESCRITA.x0, top: j.top + j.height * TINTA_ESCRITA.y0,
+                           width: j.width * (TINTA_ESCRITA.x1 - TINTA_ESCRITA.x0), height: j.height * (TINTA_ESCRITA.y1 - TINTA_ESCRITA.y0) });
+    }
+    var frase = document.querySelector('.abertura .assinatura');
+    if (frase && frase.textContent.trim()) {                // enquanto a frase está vazia ela não tem caixa
+      var rg = document.createRange(); rg.selectNodeContents(frase);
+      furos += retangulo(rg.getBoundingClientRect());
+    }
+    var menu = document.querySelector('.abertura .menu-categorias');
+    if (menu && menu.children.length) {
+      var r0 = null;
+      Array.prototype.forEach.call(menu.children, function (el) {
+        var r = el.getBoundingClientRect(); if (!r.width) return;
+        r0 = r0 ? { left: Math.min(r0.left, r.left), top: Math.min(r0.top, r.top), right: Math.max(r0.right, r.right), bottom: Math.max(r0.bottom, r.bottom) }
+                : { left: r.left, top: r.top, right: r.right, bottom: r.bottom };
+      });
+      if (r0) furos += retangulo({ left: r0.left, top: r0.top, width: r0.right - r0.left, height: r0.bottom - r0.top });
+    }
+    var w = a.width.toFixed(0), h = a.height.toFixed(0);
+    var svg = '<svg xmlns="http://www.w3.org/2000/svg" width="' + w + '" height="' + h + '" viewBox="0 0 ' + w + ' ' + h + '">' +
+              '<defs><filter id="f" x="-5%" y="-5%" width="110%" height="110%"><feGaussianBlur stdDeviation="2"/></filter>' +
+              '<mask id="m"><rect width="100%" height="100%" fill="#fff"/><g fill="#000" filter="url(#f)">' + furos + '</g></mask></defs>' +
+              '<rect width="100%" height="100%" fill="#000" mask="url(#m)"/></svg>';
+    document.documentElement.style.setProperty('--folga-mascara', 'url("data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg) + '")');
+    corpo.classList.add('tem-folga');
+  }
+
+  /* =======================================================================
+     2e) O "ālea & Co." SE IMPRIME — só no computador (29/09/2026, áudio 4102)
+     =======================================================================
+     Os traços (contorno + anéis, peça por peça, da esquerda pra direita) vêm prontos do
+     img/marca/e_co/escrita_impressao.svg (gerado por 03_site/_escrita_impressao_v1_2026-09-29.py) e são
+     desenhados com stroke-dashoffset a VELOCIDADE CONSTANTE (cada traço leva o tempo do seu comprimento, como o
+     bico). No fim a escrita limpa aparece por cima e os traços somem — igual ao vídeo aprovado. */
+  var camadaImpressao = null, animacoesImpressao = [], esperaDaImpressao = null, fimDaImpressao = null;
+  if (NO_COMPUTADOR && window.fetch) {
+    fetch('img/marca/e_co/escrita_impressao.svg').then(function (r) { return r.ok ? r.text() : ''; }).then(function (t) {
+      var janela = document.querySelector('.marca-anim .escrita-janela');
+      if (!t || !janela) return;
+      janela.insertAdjacentHTML('beforeend', t);
+      camadaImpressao = janela.querySelector('svg.impressao');
+    }, function () {});
+  }
+  function pararImpressao(terminar) {
+    if (esperaDaImpressao) { clearTimeout(esperaDaImpressao); esperaDaImpressao = null; }
+    if (fimDaImpressao) { clearTimeout(fimDaImpressao); fimDaImpressao = null; }
+    animacoesImpressao.forEach(function (an) { try { an.cancel(); } catch (e) {} });
+    animacoesImpressao = [];
+    corpo.classList.remove('imprimindo');
+    if (terminar) corpo.classList.add('escrita-impressa');
+  }
+  function imprimirEscrita() {
+    if (!camadaImpressao || !camadaImpressao.animate) { pararImpressao(true); return; }
+    var tracos = camadaImpressao.querySelectorAll('path');
+    var lens = [], total = 0;
+    Array.prototype.forEach.call(tracos, function (p) { var L = p.getTotalLength(); lens.push(L); total += L; });
+    if (!total) { pararImpressao(true); return; }
+    var CORRE = IMPRIME_MS - 500, t = 0;                  // os últimos 0,5 s são a troca pela escrita limpa
+    Array.prototype.forEach.call(tracos, function (p, i) {
+      var L = lens[i], dur = CORRE * L / total;
+      p.style.strokeDasharray = L + ' ' + L;
+      animacoesImpressao.push(p.animate([{ strokeDashoffset: L }, { strokeDashoffset: 0 }],
+        { duration: dur, delay: t, fill: 'both', easing: 'linear' }));
+      t += dur;
+    });
+    corpo.classList.add('imprimindo');
+    fimDaImpressao = setTimeout(function () { fimDaImpressao = null; corpo.classList.add('escrita-impressa'); }, CORRE);
   }
 
   /* ------------------------------------------------ 3) a frase, letra por letra
@@ -327,6 +446,7 @@
     alvo.appendChild(letras);
     alvo.appendChild(cursor);
     alvo.appendChild(resto);
+    medirClareira();              /* 29/09: a frase inteira (o `resto`) já tem caixa - a folga dela entra agora */
 
     var i = 0;
     (function escrever() {
@@ -380,6 +500,7 @@
     if (pulou || !corpo.classList.contains('marca-anima')) return;
     pulou = true;
     if (esperaDaFrase) { clearTimeout(esperaDaFrase); esperaDaFrase = null; }
+    pararImpressao(true);
     corpo.classList.remove('marca-anima');
     corpo.classList.add('sem-abertura', 'marca-medida', 'site-revelado', 'frase-revelada');
     escreverDeUmaVez();
@@ -404,6 +525,14 @@
     medirCapivara();
     medirClareira();
     corpo.classList.add('marca-medida');
+    /* 29/09: no computador a escrita se imprime - começa quando ela começaria a descer */
+    pararImpressao(false);
+    corpo.classList.remove('escrita-impressa');
+    if (NO_COMPUTADOR) {
+      corpo.classList.add('escrita-imprime');
+      esperaDaImpressao = setTimeout(function () { esperaDaImpressao = null; imprimirEscrita(); },
+                                     PAUSA_CAPIVARA_MS + CAPIVARA_MS + ECO_SOME_MS);
+    }
     /* dois quadros de espera: o primeiro aplica o estado de partida (capivara gigante),
        o segundo liga a animação. Ligar os dois no mesmo quadro é o jeito clássico de o
        navegador juntar as duas mudanças e não animar nada. */

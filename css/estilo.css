@@ -316,6 +316,21 @@ body.tem-clareira .abertura::before {
 @media (min-aspect-ratio: 3/5) {
   .abertura::before { background-size: clamp(1000px, 90vw, 1400px) auto; background-position: center top; }
 }
+/* 29/09/2026 — SÓ NO COMPUTADOR (vídeo 4100 do Cassiano): "aqui em cima não aparece nada (...) vamos fazer igual a
+   nossa logo (...) o contorno aqui, bem redondo". A elipse (clareira) não entra no computador (o abertura.js nem a
+   liga); no lugar dela, a MÁSCARA medida pelo abertura.js (`medirFolga`): estampa em todo lugar, menos numa folga
+   redonda em volta da capivara (pelo contorno) e de cada texto (retângulo de quina redonda). Opacidade e desenho da
+   estampa são os de antes ("pode deixar desse jeito, mais fosca, esfumaçada"). */
+@media (hover: hover) and (pointer: fine) and (min-width: 761px) {
+  /* "colocar mais textura onde não tem": a linha Off (#EEE8DE) some no miolo claro do degradê (#F8F5F0). Escurecer o
+     desenho em 14% faz ela aparecer ali sem ficar forte nas manchas de cor; a opacidade .5 ("fosca") é a de antes. */
+  .abertura::before { filter: brightness(.86); }
+  body.tem-folga .abertura::before {
+    -webkit-mask-image: var(--folga-mascara); mask-image: var(--folga-mascara);
+    -webkit-mask-size: 100% 100%; mask-size: 100% 100%;
+    -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
+  }
+}
 /* a mancha que se mexe devagar: dá vida sem pedir atenção */
 .abertura::after {
   content: ''; position: absolute; inset: -20%;
@@ -442,6 +457,19 @@ body.marca-anima .marca-anim .escrita-janela .escrita {
   from { transform: translateY(-100%); }
   to   { transform: none; }
 }
+/* 29/09/2026 — SÓ NO COMPUTADOR (áudio 4102): "ao invés dele descer, você vai imprimir ele pra mim". A escrita não
+   desce: fica no lugar, invisível, e a camada `svg.impressao` (traços de contorno + anéis, animados pelo abertura.js)
+   a desenha; no fim a escrita limpa acende e os traços somem. Pular a abertura (`sem-abertura`) mostra a limpa. */
+.marca-anim .escrita-janela svg.impressao {
+  position: absolute; inset: 0; width: 100%; height: 100%; display: block;
+  visibility: hidden; transition: opacity .5s ease;
+}
+body.imprimindo .marca-anim .escrita-janela svg.impressao { visibility: visible; }
+body.escrita-impressa .marca-anim .escrita-janela svg.impressao { opacity: 0; }
+body.escrita-imprime .marca-anim .escrita-janela .escrita { transform: none; animation: none; opacity: 0; transition: opacity .5s ease; }
+body.escrita-imprime.escrita-impressa .marca-anim .escrita-janela .escrita,
+body.sem-abertura .marca-anim .escrita-janela .escrita { opacity: 1; }
+body.sem-abertura .marca-anim .escrita-janela svg.impressao { display: none; }
 /* As peças da montagem antiga (letra1-4 e eco_final: o ālea saindo letra por letra pra
    direita e o "& Co." descendo de trás dele) continuam em img/marca/e_co/, mas saíram do
    HTML em 26/09/2026 — as regras delas (.letra, .l1-.l4, .eco-final) saíram junto.
