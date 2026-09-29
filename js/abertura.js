@@ -399,6 +399,11 @@
       p.style.strokeDasharray = L + ' ' + (L + FORA);
       animacoesImpressao.push(p.animate([{ strokeDashoffset: L + FORA }, { strokeDashoffset: 0 }],
         { duration: dur, delay: t, fill: 'both', easing: 'linear' }));
+      /* 29/09/2026 (vídeo 4226 + áudio 4227, "não saiu não"): a folga acima resolveu no Chromium, mas o Safari do
+         iPhone seguiu pintando a ponta. Cada traço agora fica INVISÍVEL (opacity 0 no estilo.css) até a vez dele:
+         esta animação o acende no instante em que começa a correr - vale em qualquer navegador. */
+      animacoesImpressao.push(p.animate([{ opacity: 1 }, { opacity: 1 }],
+        { duration: Math.max(dur, 1), delay: t, fill: 'forwards' }));
       t += dur;
     });
     corpo.classList.add('imprimindo');

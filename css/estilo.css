@@ -474,9 +474,13 @@ body.marca-anima .marca-anim .escrita-janela .escrita {
 }
 body.imprimindo .marca-anim .escrita-janela svg.impressao { visibility: visible; }
 body.escrita-impressa .marca-anim .escrita-janela svg.impressao { opacity: 0; }
-body.escrita-imprime .marca-anim .escrita-janela .escrita { transform: none; animation: none; opacity: 0; transition: opacity .5s ease; }
-body.escrita-imprime.escrita-impressa .marca-anim .escrita-janela .escrita,
+/* 29/09/2026 (vídeo 4226 + áudio 4227: "quando dá F5 tem um resquício do nome bem no meio da capivara e ele some"): a
+   escrita APAGA na hora (sem transição) — a transição de 0,5 s ficava só pra ACENDER no fim da impressão. E cada traço
+   da impressão nasce invisível; o abertura.js acende um por um na vez dele (o Safari pintava a ponta antes da hora). */
+body.escrita-imprime .marca-anim .escrita-janela .escrita { transform: none; animation: none; opacity: 0; transition: none; }
+body.escrita-imprime.escrita-impressa .marca-anim .escrita-janela .escrita { opacity: 1; transition: opacity .5s ease; }
 body.sem-abertura .marca-anim .escrita-janela .escrita { opacity: 1; }
+.marca-anim .escrita-janela svg.impressao path { opacity: 0; }
 body.sem-abertura .marca-anim .escrita-janela svg.impressao { display: none; }
 /* As peças da montagem antiga (letra1-4 e eco_final: o ālea saindo letra por letra pra
    direita e o "& Co." descendo de trás dele) continuam em img/marca/e_co/, mas saíram do
