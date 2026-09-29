@@ -95,11 +95,21 @@
      03_site/_versoes_anteriores/rodada5_dourado_ayla_antes_2026-09-26/. */
   var ECO_SOME_MS = 170;           // a escrita começa 0,17s depois do "& Co." (CSS: delay 5.17s). Era 1000          // a escrita começa quando o "& Co." está quase engolido (5,0 + 1,0 = 6,0s; CSS: delay 6.0s). Era 1500
   var ESCRITA_MS = 2308;           // a escrita sai de baixo da capivara (CSS: 2.308s). Era 3000 (e antes 4500)
-  /* 29/09/2026: no COMPUTADOR a escrita se imprime (ver o cabeçalho) e leva IMPRIME_MS; no celular segue descendo. */
-  var NO_COMPUTADOR = !!(window.matchMedia &&
-    window.matchMedia('(hover: hover) and (pointer: fine) and (min-width: 761px)').matches);
+  /* 29/09/2026: a escrita se imprime (ver o cabeçalho) e leva IMPRIME_MS; a estampa usa a folga medida e espera a
+     capivara chegar. Nasceu só no computador; desde os áudios 4205/4206 (29/09 09:25: "não existe diferença de site
+     de computador e celular pra mim (...) o que eu te pedi hoje é tudo pro computador e pro celular") vale nas DUAS
+     telas. O nome ficou pra não mexer nas 6 linhas que o usam; o celular antigo (escrita descendo) só volta se ele
+     pedir "só computador". */
+  var NO_COMPUTADOR = true;
   var IMPRIME_MS = 3600;
-  var FIM_DA_MARCA = PAUSA_CAPIVARA_MS + CAPIVARA_MS + ECO_SOME_MS + (NO_COMPUTADOR ? IMPRIME_MS : ESCRITA_MS);
+  /* 29/09/2026 (áudio 4202): "o ālea está começando a imprimir antes do & Co. desaparecer (...) no momento em que ele
+     desaparece, começa a imprimir". O "& Co." atravessa a perna em 0,872 s a partir dos 5,0 s (CSS
+     `eco-engolido-pela-perna`) e some aos 5,872 s: a impressão começa AÍ, e não 0,17 s depois de ele começar a andar.
+     Mudou a duração lá no CSS, muda aqui. No celular a escrita continua descendo no tempo de antes (ECO_SOME_MS). */
+  var ECO_ATRAVESSA_MS = 872;
+  var ECO_FOLGA_MS = 40;           // "logo depois, no momento em que ele desaparece": ~2 quadros depois do último pixel
+  var ANTES_DA_ESCRITA = NO_COMPUTADOR ? ECO_ATRAVESSA_MS + ECO_FOLGA_MS : ECO_SOME_MS;
+  var FIM_DA_MARCA = PAUSA_CAPIVARA_MS + CAPIVARA_MS + ANTES_DA_ESCRITA + (NO_COMPUTADOR ? IMPRIME_MS : ESCRITA_MS);
 
   /* =======================================================================
      1) F5 VOLTA PRO COMEÇO — e por que isso não é automático
@@ -538,11 +548,7 @@
       /* 29/09 (vídeo 4173): a estampa só entra depois que a capivara chega no lugar dela */
       corpo.classList.add('estampa-espera');
       if (esperaDaEstampa) clearTimeout(esperaDaEstampa);
-      esperaDaEstampa = setTimeout(function () { esperaDaEstampa = null; corpo.classList.remove('estampa-espera'); },
-                                   PAUSA_CAPIVARA_MS + CAPIVARA_MS);
       corpo.classList.add('escrita-imprime');
-      esperaDaImpressao = setTimeout(function () { esperaDaImpressao = null; imprimirEscrita(); },
-                                     PAUSA_CAPIVARA_MS + CAPIVARA_MS + ECO_SOME_MS);
     }
     /* dois quadros de espera: o primeiro aplica o estado de partida (capivara gigante),
        o segundo liga a animação. Ligar os dois no mesmo quadro é o jeito clássico de o
@@ -550,6 +556,14 @@
     requestAnimationFrame(function () {
       requestAnimationFrame(function () {
         corpo.classList.add('marca-anima');
+        /* 29/09: os dois relógios ligam AQUI, junto com o CSS - ligados antes dos 2 quadros, a impressão saía ~30 ms
+           antes do "& Co." sumir (medido: 5,843 s no 390 e 5,860 s no 1440, com o & Co. sumindo aos 5,872 s). */
+        if (NO_COMPUTADOR && !pulou) {
+          esperaDaEstampa = setTimeout(function () { esperaDaEstampa = null; corpo.classList.remove('estampa-espera'); },
+                                       PAUSA_CAPIVARA_MS + CAPIVARA_MS);
+          esperaDaImpressao = setTimeout(function () { esperaDaImpressao = null; imprimirEscrita(); },
+                                         PAUSA_CAPIVARA_MS + CAPIVARA_MS + ECO_ATRAVESSA_MS + ECO_FOLGA_MS);   /* áudio 4202 */
+        }
       });
     });
     /* a frase só começa DEPOIS da última letra do logo, e o menu só depois da frase

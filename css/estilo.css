@@ -320,8 +320,11 @@ body.tem-clareira .abertura::before {
    nossa logo (...) o contorno aqui, bem redondo". A elipse (clareira) não entra no computador (o abertura.js nem a
    liga); no lugar dela, a MÁSCARA medida pelo abertura.js (`medirFolga`): estampa em todo lugar, menos numa folga
    redonda em volta da capivara (pelo contorno) e de cada texto (retângulo de quina redonda). Opacidade e desenho da
-   estampa são os de antes ("pode deixar desse jeito, mais fosca, esfumaçada"). */
-@media (hover: hover) and (pointer: fine) and (min-width: 761px) {
+   estampa são os de antes ("pode deixar desse jeito, mais fosca, esfumaçada").
+   ⚠️ 29/09/2026 09:25 (áudios 4205/4206): "não existe diferença de site de computador e celular pra mim (...) o que eu
+   te pedi hoje é tudo pro computador e pro celular". O bloco deixou de estar preso ao computador: vale nas duas telas
+   (era `@media (hover: hover) and (pointer: fine) and (min-width: 761px)`). */
+@media all {
   /* "colocar mais textura onde não tem": a linha Off (#EEE8DE) some no miolo claro do degradê (#F8F5F0). Escurecer o
      desenho em 14% faz ela aparecer ali sem ficar forte nas manchas de cor; a opacidade .5 ("fosca") é a de antes. */
   .abertura::before { filter: brightness(.86); transition: opacity .9s ease; }
