@@ -534,12 +534,15 @@ body.marca-medida:not(.marca-anima) .marca-anim .eco-capivara { opacity: 1; tran
 body.marca-anima .marca-anim .eco-capivara {
   /* RODADA 4 (26/09/2026): 50% mais rápido — 1,7s ÷ 1,5 = 1,133s (5,0 → 6,13s). Mesma curva (linear). */
   /* RODADA 5 (26/09/2026): 30% mais rápido — 1,133s ÷ 1,3 = 0,872s (5,0 → 5,87s). Mesma curva (linear). */
-  animation: eco-engolido-pela-perna 0.872s linear 5.0s both;
+  /* 29/09/2026 (áudio 4245, "& Co." oficial): ele é menor (x 990,8..1259,2, era 970..1276). MESMA velocidade de antes
+     (340 un em 0,872 s = 390 un/s): anda 323 un (o ponto passa da perna em x 950 com folga de 14 un) em 0,828 s.
+     O abertura.js (ECO_ATRAVESSA_MS) acompanha. Era 0,872 s / -9,82%. */
+  animation: eco-engolido-pela-perna 0.828s linear 5.0s both;
 }
 @keyframes eco-engolido-pela-perna {
   from   { transform: none;               opacity: 1; }
-  99.9%  { transform: translateX(-9.82%); opacity: 1; }
-  to     { transform: translateX(-9.82%); opacity: 0; }
+  99.9%  { transform: translateX(-9.33%); opacity: 1; }
+  to     { transform: translateX(-9.33%); opacity: 0; }
 }
 /* A versão anterior (rodada 2: `eco-entra-na-capivara`, o "& Co." colado na capivara e apagando
    em fade de 1,7s) saiu daqui na rodada 3 — está no commit fb5cd7a se ele quiser comparar. */

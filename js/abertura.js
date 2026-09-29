@@ -106,7 +106,7 @@
      desaparece, começa a imprimir". O "& Co." atravessa a perna em 0,872 s a partir dos 5,0 s (CSS
      `eco-engolido-pela-perna`) e some aos 5,872 s: a impressão começa AÍ, e não 0,17 s depois de ele começar a andar.
      Mudou a duração lá no CSS, muda aqui. No celular a escrita continua descendo no tempo de antes (ECO_SOME_MS). */
-  var ECO_ATRAVESSA_MS = 872;
+  var ECO_ATRAVESSA_MS = 828;      // 29/09 (áudio 4245): "& Co." oficial, menor - 0,828 s na mesma velocidade (era 872)
   var ECO_FOLGA_MS = 40;           // "logo depois, no momento em que ele desaparece": ~2 quadros depois do último pixel
   var ANTES_DA_ESCRITA = NO_COMPUTADOR ? ECO_ATRAVESSA_MS + ECO_FOLGA_MS : ECO_SOME_MS;
   var FIM_DA_MARCA = PAUSA_CAPIVARA_MS + CAPIVARA_MS + ANTES_DA_ESCRITA + (NO_COMPUTADOR ? IMPRIME_MS : ESCRITA_MS);
@@ -229,6 +229,11 @@
      na render: x 0..1236, y 2..748. */
   var CX0 = 0, CX1 = 1236, LARG_VB = 3462.47;
   var CY0 = 2, CY1 = 748, ALT_VB = 970.75;
+  /* 29/09/2026 (foto 4243 + áudio 4244: "essa capivara não está centralizada na tela (...) quando a gente abre a página,
+     ela está inteirinha para o lado direito"): no 1º quadro a capivara vem COM o "& Co." do lado (eco_capivara_oficial.svg,
+     tinta até x 1260, medido), mas só a capivara (0..1236) era centralizada e cabia na tela - o conjunto encostava na direita.
+     Agora o que se centraliza e se encaixa é o CONJUNTO (0..1276). */
+  var CX1_GRUPO = 1260;            // "& Co." OFICIAL (áudio 4245): tinta até x 1259,2 (o antigo ia a 1276)
   var FOLGA_LARGURA = 0.92;        // quanto da janela a capivara pode ocupar
   var FOLGA_ALTURA = 0.80;
 
@@ -247,15 +252,18 @@
     var centroX = r.left + r.width * ((CX0 + CX1) / 2) / LARG_VB;
     var centroY = r.top + r.height * ((CY0 + CY1) / 2) / ALT_VB;
 
+    var larguraGrupo = r.width * (CX1_GRUPO - CX0) / LARG_VB;
     var k = Math.min(
-      (window.innerWidth * FOLGA_LARGURA) / larguraDela,
+      (window.innerWidth * FOLGA_LARGURA) / larguraGrupo,
       (window.innerHeight * FOLGA_ALTURA) / alturaDela
     );
     if (!(k > 1)) k = 1;           // janela minúscula: não encolher a marca
 
     var raiz = document.documentElement.style;
     raiz.setProperty('--cap-k', k.toFixed(3));
-    raiz.setProperty('--cap-dx', (window.innerWidth / 2 - centroX).toFixed(1) + 'px');
+    /* a escala gira em torno do centro da capivara; o centro do conjunto fica (1276-1236)/2 un à direita dele, vezes k */
+    var desvioGrupo = r.width * ((CX1_GRUPO - CX1) / 2) / LARG_VB * k;
+    raiz.setProperty('--cap-dx', (window.innerWidth / 2 - centroX - desvioGrupo).toFixed(1) + 'px');
     raiz.setProperty('--cap-dy', (window.innerHeight / 2 - centroY).toFixed(1) + 'px');
 
     /* -------------------------------------- 2b) "3x MENOR DO QUE DA CAPIVARA" (item 3)
