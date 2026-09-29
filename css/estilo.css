@@ -324,7 +324,12 @@ body.tem-clareira .abertura::before {
 @media (hover: hover) and (pointer: fine) and (min-width: 761px) {
   /* "colocar mais textura onde não tem": a linha Off (#EEE8DE) some no miolo claro do degradê (#F8F5F0). Escurecer o
      desenho em 14% faz ela aparecer ali sem ficar forte nas manchas de cor; a opacidade .5 ("fosca") é a de antes. */
-  .abertura::before { filter: brightness(.86); }
+  .abertura::before { filter: brightness(.86); transition: opacity .9s ease; }
+  /* 29/09/2026 (vídeo 4173): "a hora que dá Enter (...) você vê a animação dentro dela. Tem como tampar pra não ver?
+     (...) queria que mostrasse só ela, ela indo pro canto dela e aí depois aparecer". A folga é medida pro lugar FINAL
+     da capivara; enquanto ela anda gigante, a estampa aparecia por dentro dela. Então a estampa espera: some até a
+     capivara chegar (o abertura.js tira `estampa-espera`) e entra em 0,9 s. Pular a abertura tira na hora. */
+  body.estampa-espera .abertura::before { opacity: 0; transition: none; }
   body.tem-folga .abertura::before {
     -webkit-mask-image: var(--folga-mascara); mask-image: var(--folga-mascara);
     -webkit-mask-size: 100% 100%; mask-size: 100% 100%;

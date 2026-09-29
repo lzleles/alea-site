@@ -196,6 +196,9 @@
 
   var querMenosMovimento = window.matchMedia &&
     window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  /* 29/09 (vídeo 4173): no computador, a estampa já nasce escondida se a abertura vai tocar - senão ela aparece
+     por dentro da capivara gigante antes do `load` (quem devolve é o abrirComAnimacao, no tempo da capivara) */
+  if (NO_COMPUTADOR && !jaViu && !querMenosMovimento) corpo.classList.add('estampa-espera');
 
   /* =======================================================================
      2) O MAIOR TAMANHO POSSÍVEL DA CAPIVARA
@@ -495,11 +498,14 @@
      pular podia cair numa categoria que ninguém está vendo. */
   var pulou = false;
   var esperaDaFrase = null;
+  var esperaDaEstampa = null;
 
   function pularAbertura() {
     if (pulou || !corpo.classList.contains('marca-anima')) return;
     pulou = true;
     if (esperaDaFrase) { clearTimeout(esperaDaFrase); esperaDaFrase = null; }
+    if (esperaDaEstampa) { clearTimeout(esperaDaEstampa); esperaDaEstampa = null; }
+    corpo.classList.remove('estampa-espera');
     pararImpressao(true);
     corpo.classList.remove('marca-anima');
     corpo.classList.add('sem-abertura', 'marca-medida', 'site-revelado', 'frase-revelada');
@@ -529,6 +535,11 @@
     pararImpressao(false);
     corpo.classList.remove('escrita-impressa');
     if (NO_COMPUTADOR) {
+      /* 29/09 (vídeo 4173): a estampa só entra depois que a capivara chega no lugar dela */
+      corpo.classList.add('estampa-espera');
+      if (esperaDaEstampa) clearTimeout(esperaDaEstampa);
+      esperaDaEstampa = setTimeout(function () { esperaDaEstampa = null; corpo.classList.remove('estampa-espera'); },
+                                   PAUSA_CAPIVARA_MS + CAPIVARA_MS);
       corpo.classList.add('escrita-imprime');
       esperaDaImpressao = setTimeout(function () { esperaDaImpressao = null; imprimirEscrita(); },
                                      PAUSA_CAPIVARA_MS + CAPIVARA_MS + ECO_SOME_MS);
