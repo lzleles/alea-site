@@ -391,8 +391,13 @@
     var CORRE = IMPRIME_MS - 500, t = 0;                  // os últimos 0,5 s são a troca pela escrita limpa
     Array.prototype.forEach.call(tracos, function (p, i) {
       var L = lens[i], dur = CORRE * L / total;
-      p.style.strokeDasharray = L + ' ' + L;
-      animacoesImpressao.push(p.animate([{ strokeDashoffset: L }, { strokeDashoffset: 0 }],
+      /* 29/09/2026 (vídeo 4221 + áudio 4222: "ficou umas falinhas (...) antes de começar a imprimir, mostrando já onde
+         vai ser impresso"): com stroke-linecap round, o traço de comprimento ZERO ainda pinta a ponta redonda — cada
+         traço que não começou mostrava um pontinho. A folga FORA empurra o traço pra antes do início do caminho
+         (maior que a ponta de 5,5), então nada aparece até a vez dele. */
+      var FORA = 20;
+      p.style.strokeDasharray = L + ' ' + (L + FORA);
+      animacoesImpressao.push(p.animate([{ strokeDashoffset: L + FORA }, { strokeDashoffset: 0 }],
         { duration: dur, delay: t, fill: 'both', easing: 'linear' }));
       t += dur;
     });
