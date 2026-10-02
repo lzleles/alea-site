@@ -136,8 +136,10 @@ window.ALEA = {
      Material PLA passa a mostrar a frase dele (material_pla). Aplicado nas páginas por
      03_site/_ficha_material_pla_sem_cores_v1_2026-09-27.py. O gerador de páginas ainda escreve o formato antigo:
      rodar esse script depois dele. */
+  /* 02/10/2026 (print 5085 + áudio 5087 do Cassiano): "em todas as opções de personalização (...) nome do pet em baixo ou
+     alto relevo, na cor do objeto, dependendo da geometria da peça". Era "Nome do pet em baixo relevo na cor do objeto." */
   ficha_padrao: {
-    personalizacao: 'Nome do pet em baixo relevo na cor do objeto.',
+    personalizacao: 'Nome do pet em baixo ou alto relevo na cor do objeto, dependendo da geometria da peça.',
     producao: 'Sob encomenda, 3 dias úteis após a confirmação de pagamento!',
     material_pla: 'PLA é um material utilizado na impressão 3D, produzido a partir de fontes renováveis, ' +
                   'como milho e cana-de-açúcar. É leve, versátil e proporciona excelente acabamento.'
