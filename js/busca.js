@@ -6,7 +6,7 @@
              esfumaçada com o site atrás, traz palavras sugeridas e acha a peça por palavra parecida (cachorro, gato, pote...).
    entrada: window.VITRINE e window.PRODUTOS (produtos.js), window.CATEGORIAS; o que a pessoa digita
    saida: tela de busca por cima do site; clique leva à página da peça (produto-<slug>.html) ou à categoria (index.html#id)
-   status: v2 (03/10/2026) - em prévia
+   status: v3 (03/10/2026) - em prévia
    validado_em: 03/10/2026
    v1 (03/10/2026, Cassiano, áudios 5561/5562/5564/5567/5568 + vídeo 5566 da busca do iPhone):
       "se a pessoa pesquisar por cachorro, ou gato, ou comedouro, ou pote (...) ele cai no comedouro?" -> o site NÃO tinha
@@ -22,6 +22,12 @@
           e VOLTA ao topo vê o aviso de novo (some no próximo toque/rolagem). Ir e voltar um pouquinho não dispara.
       (2) "entre as categorias e o logo do Linktree, um campo igual esse de buscar, falando 'buscar item'; clicou, abre
           a tela da busca" -> campo no rodapé de toda página, antes das redes (celular e computador).
+   v3 (03/10/2026, vídeo 5576 + áudio 5577): "a transição perfeita do buscar do iPhone (...) enquanto estou com o dedo
+      apertado e abaixando, ele vai montando aos poucos a tela de buscar. Ele só monta ela a hora que eu solto o dedo".
+      -> a tela da busca SEGUE O DEDO: o esfumaçado cresce, as sugestões descem e a barra sobe na medida do puxão; só
+      ABRE de verdade (teclado) ao soltar passado o ponto; soltou antes ou voltou o dedo, ela se desmonta. Saiu a
+      pílula "Buscar" que descia do topo (a própria tela é o retorno). O teclado abre no próprio soltar (o iPhone só
+      deixa focar o campo dentro do toque).
 */
 (function () {
   'use strict';
@@ -89,6 +95,14 @@
     ' transition:opacity .28s ease,visibility .28s;background:rgba(234,228,219,.42);',
     ' -webkit-backdrop-filter:blur(22px) saturate(1.5);backdrop-filter:blur(22px) saturate(1.5);font-family:var(--fonte-corpo)}',
     '.busca-tela.aberta{opacity:1;visibility:visible}',
+    /* v3: enquanto o dedo puxa, a tela se monta na medida de --p (0 a 1), sem transição (segue o dedo) */
+    '.busca-tela.arrastando{visibility:visible;opacity:1;transition:none;pointer-events:none;',
+    ' background:rgba(234,228,219,calc(.42*var(--p)));-webkit-backdrop-filter:blur(calc(22px*var(--p))) saturate(calc(1 + .5*var(--p)));',
+    ' backdrop-filter:blur(calc(22px*var(--p))) saturate(calc(1 + .5*var(--p)))}',
+    '.busca-tela.arrastando .busca-corpo{opacity:var(--p);transform:translateY(calc(-48px*(1 - var(--p))))}',
+    '.busca-tela.arrastando .busca-barra{opacity:var(--p);transform:translateY(calc(40px*(1 - var(--p))))}',
+    '.busca-tela.voltando{transition:opacity .28s ease,visibility .28s}',
+    '.busca-corpo,.busca-barra{transition:opacity .28s ease,transform .32s cubic-bezier(.2,.8,.2,1)}',
     '.busca-corpo{flex:1;overflow-y:auto;padding:calc(env(safe-area-inset-top) + 22px) var(--gutter,20px) 16px;',
     ' -webkit-overflow-scrolling:touch;overscroll-behavior:contain}',
     '.busca-rot{font-size:13px;font-weight:600;letter-spacing:.02em;color:var(--tinta-fraca,#6B5D50);margin:4px 2px 10px}',
@@ -111,12 +125,6 @@
     /* no computador a barra fica em cima */
     '@media (hover:hover) and (pointer:fine){.busca-tela{flex-direction:column-reverse}.busca-barra{padding-top:28px;max-width:760px;width:100%;margin:0 auto}',
     ' .busca-corpo{padding-top:8px;max-width:760px;width:100%;margin:0 auto}}',
-    /* o "Buscar" que desce quando a pessoa puxa a tela */
-    '.busca-puxa{position:fixed;left:50%;top:0;z-index:1999;transform:translate(-50%,-60px);display:flex;align-items:center;gap:6px;',
-    ' padding:9px 18px;border-radius:999px;font:600 15px var(--fonte-corpo);color:var(--tinta,#2B2118);pointer-events:none;opacity:0;',
-    ' background:rgba(255,255,255,.6);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);box-shadow:0 2px 12px rgba(43,33,24,.15)}',
-    '.busca-puxa.solta{transition:transform .25s ease,opacity .25s ease}',
-    '.busca-puxa.pronto{color:var(--terracota,#9D3E20)}',
     /* o aviso da primeira visita */
     '.busca-dica{position:fixed;left:50%;top:calc(env(safe-area-inset-top) + 86px);z-index:1998;transform:translate(-50%,-14px);',
     ' display:flex;align-items:center;gap:10px;padding:11px 18px;border-radius:999px;white-space:nowrap;opacity:0;',
@@ -177,8 +185,9 @@
   function abrir() {
     if (aberta) return; aberta = true;
     campo.value = ''; pintar();
+    tela.classList.remove('arrastando', 'voltando'); tela.style.removeProperty('--p');
     tela.classList.add('aberta'); document.documentElement.style.overflow = 'hidden';
-    setTimeout(function () { campo.focus(); }, CELULAR ? 0 : 60);
+    if (CELULAR) campo.focus(); else setTimeout(function () { campo.focus(); }, 60);   // iPhone: foco só dentro do toque
     esconderDica(true);
   }
   function fechar() {
@@ -244,34 +253,37 @@
     return !!document.querySelector('.telacheia.aberta, .janela3d-fundo.aberta, [role="dialog"].aberta:not(.busca-tela)');
   }
   function ligarPuxar() {
-    var puxa = document.createElement('div');
-    puxa.className = 'busca-puxa'; puxa.innerHTML = LUPA + '<span>Buscar</span>';
-    document.body.appendChild(puxa);
-    var y0 = null, dy = 0;
+    var y0 = null, dy = 0, montou = false;
+    function pintarPuxao(p) {
+      if (!montou) { montou = true; campo.value = ''; pintar(); tela.classList.remove('voltando'); tela.classList.add('arrastando'); }
+      tela.style.setProperty('--p', p.toFixed(3));
+    }
+    function desmontar() {
+      if (!montou) return; montou = false;
+      tela.classList.remove('arrastando'); tela.classList.add('voltando'); tela.style.removeProperty('--p');
+      setTimeout(function () { tela.classList.remove('voltando'); }, 320);
+    }
     document.addEventListener('touchstart', function (e) {
       y0 = null; dy = 0;
       if (aberta || e.touches.length !== 1 || travada()) return;
       var sc = ondeRola(e.target);
       if (!sc || sc.scrollTop > 0) return;                            // só no topo, sem ter mais pra onde subir
-      y0 = e.touches[0].clientY; puxa.classList.remove('solta');
+      y0 = e.touches[0].clientY;
     }, { passive: true });
     document.addEventListener('touchmove', function (e) {
       if (y0 === null) return;
       dy = e.touches[0].clientY - y0;
-      if (dy <= 4) { puxa.style.opacity = '0'; return; }
-      var p = Math.min(1, dy / PUXAR);
-      puxa.style.opacity = String(p);
-      puxa.style.transform = 'translate(-50%,' + (-60 + p * 90) + 'px)';
-      puxa.classList.toggle('pronto', p >= 1);
+      if (dy <= 6) { if (montou) pintarPuxao(0); return; }
+      esconderDica();
+      pintarPuxao(Math.min(1, dy / (PUXAR * 1.6)));                   // monta aos poucos, na medida do dedo
     }, { passive: true });
     function soltar() {
       if (y0 === null) return;
       var abre = dy >= PUXAR; y0 = null;
-      puxa.classList.add('solta'); puxa.style.opacity = '0'; puxa.style.transform = 'translate(-50%,-60px)';
-      if (abre) abrir();
+      if (abre) abrir(); else desmontar();                             // só monta de verdade ao soltar
     }
     document.addEventListener('touchend', soltar, { passive: true });
-    document.addEventListener('touchcancel', soltar, { passive: true });
+    document.addEventListener('touchcancel', function () { y0 = null; desmontar(); }, { passive: true });
     mostrarDica();
   }
 
