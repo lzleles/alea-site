@@ -1109,15 +1109,21 @@ html.pagina-produto .rodape .lei .creditos { display: none; }
 /* (4) áudio 5831: o fim das categorias ganha a mesma linha "© ālea & Co. 2026 — Todos os direitos reservados." (feed.js) */
 .feed .fim .lei-fim { margin: 6px 0 0; font-size: 13px; line-height: 2; color: var(--tinta); }
 .feed .fim .lei-fim img { height: 17px; width: auto; display: inline-block; vertical-align: -3px; }
+/* v2 (fotos 5852/5853 + áudio 5854, 03/10/2026 17:55): no iPhone sobrou bege EM CIMA (uma tira entre o cabeçalho e o
+   preto: a tela real é mais alta que o 100svh) e EMBAIXO (a faixa só cobria o pedaço sob a barra e nem acendia). Agora a
+   faixa é a TELA INTEIRA do pé do cabeçalho (top medido pelo site.js) até abaixo da barra — o mesmo jeito do fim das
+   categorias, que ele aprovou (o .feed fixo com bottom negativo). Fica atrás do rodapé (z 3) e acende com opacidade. */
+.rodape-sob-a-barra {
+  --sob-a-barra: 0px;
+  display: block; position: fixed; left: 0; right: 0; top: var(--pe-do-topo, 64px); z-index: 2; pointer-events: none;
+  bottom: calc(-1 * var(--sob-a-barra));
+  background: var(--preto); opacity: 0; transition: opacity .2s ease;
+}
+.rodape { z-index: 3; }
+html.rodape-no-fim .rodape-sob-a-barra { opacity: 1; }
 @media (hover: none) and (pointer: coarse) {
-  .rodape-sob-a-barra {
-    --sob-a-barra: 110px;
-    display: block; position: fixed; left: 0; right: 0; z-index: 3; pointer-events: none;
-    bottom: calc(-1 * var(--sob-a-barra)); height: var(--sob-a-barra);
-    background: var(--preto); visibility: hidden;
-  }
+  .rodape-sob-a-barra { --sob-a-barra: 110px; }
   @supports (height: 100lvh) { .rodape-sob-a-barra { --sob-a-barra: max(110px, 100lvh - 100svh); } }
-  html.rodape-no-fim .rodape-sob-a-barra { visibility: visible; }
 }
 /* (5) áudios 5843/5845 (03/10/2026): a faixa fixa NÃO pintou no iPhone — o Safari 26 corta o fixo no pé da página e o
    pedaço sob a barra continuou bege ("lá embaixo é pra ficar preto, igual o fim das categorias"). O que aparece ali é a
@@ -1128,7 +1134,7 @@ html.rodape-no-fim { background: var(--preto); }
    (Playwright): 64 px no celular e 62 no computador em produto, inicial e categorias. Na inicial ele ficava transparente
    no fim (mostrava a estampa da abertura): no fim da página ele veste o mesmo bege das outras. */
 html.rodape-no-fim .topo {
-  background: color-mix(in srgb, var(--off) 86%, transparent) !important;
+  background: var(--off) !important;
   -webkit-backdrop-filter: saturate(140%) blur(10px) !important; backdrop-filter: saturate(140%) blur(10px) !important;
 }
 /* (7) áudio 5847 + foto 5846: no pé da tela das categorias apareciam "formas que não são nossos triângulos" (losangos,
