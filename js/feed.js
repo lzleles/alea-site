@@ -8,6 +8,10 @@
    validado_em: TBD
    v34 (27/09/2026, áudio 2308): no card, o nome do "× Nome" vai num <span class="nome"> (o degradê mede o nome, e o
       × fica azul sólido). Antes: 03_site/_versoes_anteriores/x_azul_nome_proporcional_antes_2026-09-27/js/feed.js
+   v35 (02/10/2026, vídeo IMG_2590 msg 5269 + áudios 5267/5270 do Cassiano, celular): "se a foto já está centralizada,
+      o 2º toque entra no produto". O 1º toque continua CENTRALIZANDO; tocar numa foto que JÁ está no centro da tela
+      (mesmo um toque separado, sem pressa) entra no produto como o "ver produto". O "ver produto" e o toque duplo
+      continuam. No COMPUTADOR nada muda (v29: lá só o "ver produto" entra). Ver jaCentralizada(). A v34 é o 988aa7b.
 */
 /* =============================================================================
    feed.js — o feed: um objeto por tela, preto, deslizando pra cima
@@ -732,6 +736,17 @@
     feed.scrollTo({ top: Math.max(0, topo), behavior: querMenosMovimento ? 'auto' : 'smooth' });
   }
 
+  /* v35 (msg 5270): a foto desta peça já está no centro da tela? Mesma conta do centralizarPeca (com o limite de cima e
+     de baixo do feed, que a 1ª e a última peça não passam), com folga de 5% da altura (mín. 24 px) pro arredondamento
+     da rolagem suave e pra barra do Safari que encolhe. */
+  function jaCentralizada(item) {
+    var alvo = item.querySelector('.area-objeto') || item;
+    var topo = posNoFeed(alvo) + alvo.offsetHeight / 2 - feed.clientHeight / 2;
+    var limite = Math.max(0, feed.scrollHeight - feed.clientHeight);
+    topo = Math.max(0, Math.min(limite, topo));
+    return Math.abs(feed.scrollTop - topo) <= Math.max(24, feed.clientHeight * 0.05);
+  }
+
   function aindaNaTela(item) {
     if (!item) return false;
     var fr = feed.getBoundingClientRect(), r = item.getBoundingClientRect();
@@ -833,6 +848,18 @@
       sairGuardado = true;                          // o pagehide não sobrescreve com a tela meio rolada
       ultimoToque = null;
       if (ver) { location.href = ver.getAttribute('href'); return; }
+    }
+    /* v35 (vídeo 5269 + áudio 5270, 02/10/2026): no celular, toque numa foto que JÁ está centralizada entra no produto
+       (o toque não tem mais o que centralizar). Fora do centro, o toque centraliza, como sempre. */
+    if (!pcDeMouse() && jaCentralizada(peca)) {
+      var verC = peca.querySelector('a.ver[href]');
+      if (verC) {
+        guardarEstadoExato(feed.scrollTop);
+        sairGuardado = true;
+        ultimoToque = null;
+        location.href = verC.getAttribute('href');
+        return;
+      }
     }
     ultimoToque = { peca: peca, t: agora, topo: feed.scrollTop };
     emFoco = peca;

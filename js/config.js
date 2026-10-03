@@ -6,6 +6,9 @@
    saida: Objeto global window.ALEA
    status: ativo (cabecalho proposto pelo Codex em 2026-09-20, confianca ALTA; conferir na proxima vez que o script rodar)
    validado_em: TBD
+   v38-produto (02/10/2026, prints 5275/5278 + áudios 5277/5279 do Cassiano): `modelos3d[slug].capa` deixa de ser "só
+      registro": o Personalize ABRE marcado nela (produto.js v38). Campo novo OPCIONAL `capa.nome` (ver o bloco
+      "COR DO NOME DA CAPA" perto do Luke). Só comentários mudaram aqui; nenhum valor. A versão anterior é o 988aa7b.
 */
 /* =============================================================================
    config.js — os valores que mudam. Mexe aqui, não no resto do site.
@@ -330,8 +333,15 @@ window.ALEA = {
 window.ALEA.fraseCoresDaPeca = 'Qualquer dúvida, nas fotos em tela cheia, você encontra os nomes e as tonalidades reais de cada cor.';
 window.ALEA.modelos3d['luke-bowl'] = window.ALEA.modelos3d['bowl-wave'];
 /* COR DA CAPA (áudio 2253 do Cassiano, 27/09/2026): cores da foto lukebowl_capa — tricolor: topo Laranja (Básico),
-   corpo Branco (Fosco), base Cinza (Fosco). A peça 3D já abria nelas (`original`). Só registro: o formulário começa
-   VAZIO (áudio 2263). */
+   corpo Branco (Fosco), base Cinza (Fosco). A peça 3D já abria nelas (`original`).
+   02/10/2026 (print 5275 + áudio 5277): o formulário do Personalize ABRE MARCADO nelas (produto.js v38) — era "começa
+   VAZIO" (áudio 2263, revertido por ele).
+   COR DO NOME DA CAPA (print 5278 + áudio 5279, 02/10/2026) — campo OPCIONAL `nome` dentro de `capa`:
+     capa: { modo: ..., escolhas: [...], nome: { acabamento: 'fosco', cor: 'Azul' } }
+   acabamento = 'basico' | 'fosco' | 'perolizado'; cor = o nome simples da lista do site (ALEA.filamentos) daquele
+   acabamento. Só se a peça da CAPA tem o nome PINTADO numa cor; aí a "Cor do nome" já aparece nela, apagada, até o
+   cliente marcar "Um detalhe que transforma". Nome na cor do corpo (Luke) = SEM `nome`. Nunca preencher por palpite:
+   a cor vem do Cassiano. */
 window.ALEA.modelos3d['luke-bowl'].capa = { modo: 'tricolor', escolhas: [
   { acabamento: 'basico', cor: 'Laranja' }, { acabamento: 'fosco', cor: 'Branco' }, { acabamento: 'fosco', cor: 'Cinza' }] };
 
@@ -367,7 +377,8 @@ window.ALEA.modelos3d['matteo-texturized'] = {
      +0,35-0,37 mm, com um ponto a cada 0,85-0,88 mm. A janela 3D desenha o relevo na luz (sem peso de malha). */
   pele: { ruido: 'billow', oitavas: 4, persistencia: 0.5, escalaMm: 1, espessuraMm: 0.2 },
   /* COR DA CAPA (áudio 2253, 27/09/2026): cores da foto matteotex_capa — topo preto, base cáqui (as mesmas do `original`,
-     que já batiam com a capa). Só registro: o formulário começa VAZIO (áudio 2263) e a peça abre no `original`. */
+     que já batiam com a capa). A peça abre no `original` e, desde 02/10/2026 (áudio 5277), o formulário abre marcado
+     nesta `capa` (produto.js v38). Sem `nome`: a cor do nome da capa não foi informada (ver o bloco do Luke). */
   capa: { modo: 'bicolor', escolhas: [{ acabamento: 'basico', cor: 'Preto' }, { acabamento: 'fosco', cor: 'Cáqui' }] },
   /* só bicolor e monocromático (áudio 1863). Bicolor: cor 1 = topo, cor 2 = base. */
   bicolor: { topo: 0, principal: 0, base: 1 },
@@ -396,8 +407,9 @@ window.ALEA.modelos3d['claudia-wave'] = {
   bicolor: { topo: 0, principal: 0, base: 1 },
   /* COR DA CAPA (áudio 2253 do Cassiano, 27/09/2026): "o comedouro tem que ficar na COR DA CAPA quando abre a
      personalização. A capa da Cláudia é bicolor: BRANCO PEROLIZADO com AQUA PEROLIZADO". A peça abre assim (aro e
-     corpo = cor 1, a onda = cor 2, como na foto claudiawave_capa). O formulário começa VAZIO (áudio 2263); `capa` é só
-     registro das cores da foto, ninguém lê.
+     corpo = cor 1, a onda = cor 2, como na foto claudiawave_capa). Desde 02/10/2026 (áudio 5277) o formulário abre
+     marcado nesta `capa` (produto.js v38; era "começa VAZIO", áudio 2263). Sem `nome`: a cor do nome da capa não foi
+     informada (ver o bloco do Luke).
      ANTES: as cores que o .3mf trazia — aro Vermelho (Bambu PLA Lite Red), corpo Mármore, onda Azul Silk. O aro
      vermelho parecia "solto" em cima da peça: medido no .glb, ele ENCOSTA no corpo (corpo até y 120,3 mm, aro de
      120,2 a 136,3 mm, os dois com raio 82-88 mm) — era só a cor diferente, que não existe na peça da capa. */
