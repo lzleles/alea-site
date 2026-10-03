@@ -1086,6 +1086,62 @@ body.sem-transicao-feed .feed { transition: none !important; }
 .rodape .lei img { height: 17px; width: auto; display: inline-block; vertical-align: -3px; }
 .rodape .lei .creditos { flex-basis: 100%; opacity: .85; font-size: 12px; } /* ETAPA 13: era .6 (cinza apagado no preto puro) */
 .rodape a { color: inherit; }
+/* ⚠️ O RODAPÉ É O FECHO DA PÁGINA, COMO O MENU DO FIM DO FEED (03/10/2026, fotos 5826/5828/5829 + áudio 5827 do
+   Cassiano: "esse vai ser a referência que ficou perfeito (...) vamos fazer isso também na página dos produtos e na
+   página inicial"). A referência é o fim das categorias (bloco ".feed .item:last-child" acima):
+   (1) no fim da rolagem o rodapé OCUPA a tela livre inteira (do pé do cabeçalho fixo, 64 px, ao pé da tela) -> nada
+       do produto aparece em cima; o bloco da marca até o Linktree fica CENTRADO no espaço acima da linha da lei;
+   (2) sem a faixa bege embaixo: no iPhone a barra flutuante do Safari deixa ver o que fica ABAIXO do fim da página
+       (o fundo bege do body). Uma faixa fixa preta (.rodape-sob-a-barra, ligada pelo site.js só quando o rodapé
+       chegou ao pé da tela) pinta esse pedaço na cor do rodapé. Mesma medida da abertura: --sob-a-barra. */
+.rodape {
+  min-height: calc(100svh - 64px);
+  display: flex; flex-direction: column;
+}
+@supports not (height: 100svh) { .rodape { min-height: calc(100vh - 64px); } }
+.rodape > :first-child { margin-top: auto !important; }   /* !important: o `.rodape a.marca-rodape-link` (mais abaixo) zera a margem */
+.rodape > .lei { margin-top: auto; width: 100%; }
+.rodape > .orcamento { align-self: center; }
+.rodape-sob-a-barra { display: none; }
+/* (3) áudio 5830: "na página dos produtos só vai até ālea & Co. 2026, todos os direitos reservados" -> sem a linha dos
+   créditos (responsável, CNPJ, identidade visual, links). A página inicial continua com tudo (o CNPJ segue no site). */
+html.pagina-produto .rodape .lei .creditos { display: none; }
+/* (4) áudio 5831: o fim das categorias ganha a mesma linha "© ālea & Co. 2026 — Todos os direitos reservados." (feed.js) */
+.feed .fim .lei-fim { margin: 6px 0 0; font-size: 13px; line-height: 2; color: var(--tinta); }
+.feed .fim .lei-fim img { height: 17px; width: auto; display: inline-block; vertical-align: -3px; }
+/* v2 (fotos 5852/5853 + áudio 5854, 03/10/2026 17:55): no iPhone sobrou bege EM CIMA (uma tira entre o cabeçalho e o
+   preto: a tela real é mais alta que o 100svh) e EMBAIXO (a faixa só cobria o pedaço sob a barra e nem acendia). Agora a
+   faixa é a TELA INTEIRA do pé do cabeçalho (top medido pelo site.js) até abaixo da barra — o mesmo jeito do fim das
+   categorias, que ele aprovou (o .feed fixo com bottom negativo). Fica atrás do rodapé (z 3) e acende com opacidade. */
+.rodape-sob-a-barra {
+  --sob-a-barra: 0px;
+  display: block; position: fixed; left: 0; right: 0; top: var(--pe-do-topo, 64px); z-index: 2; pointer-events: none;
+  bottom: calc(-1 * var(--sob-a-barra));
+  background: var(--preto); opacity: 0; transition: opacity .2s ease;
+}
+.rodape { z-index: 3; }
+html.rodape-no-fim .rodape-sob-a-barra { opacity: 1; }
+@media (hover: none) and (pointer: coarse) {
+  .rodape-sob-a-barra { --sob-a-barra: 110px; }
+  @supports (height: 100lvh) { .rodape-sob-a-barra { --sob-a-barra: max(110px, 100lvh - 100svh); } }
+}
+/* (5) áudios 5843/5845 (03/10/2026): a faixa fixa NÃO pintou no iPhone — o Safari 26 corta o fixo no pé da página e o
+   pedaço sob a barra continuou bege ("lá embaixo é pra ficar preto, igual o fim das categorias"). O que aparece ali é a
+   TELA de fundo do documento (o <html>; o body bege só pinta a caixa dele). Com o rodapé no pé, o <html> veste o preto:
+   do pé do cabeçalho até o fim da tela fica tudo preto. O cabeçalho não muda (64 px em todas as páginas). */
+html.rodape-no-fim { background: var(--preto); }
+/* (6) áudio 5841/5845: "o cabeçalho tem um tamanho certo (...) aplicar em todos, nunca vai sair do lugar dele". Medido
+   (Playwright): 64 px no celular e 62 no computador em produto, inicial e categorias. Na inicial ele ficava transparente
+   no fim (mostrava a estampa da abertura): no fim da página ele veste o mesmo bege das outras. */
+html.rodape-no-fim .topo {
+  background: var(--off) !important;
+  -webkit-backdrop-filter: saturate(140%) blur(10px) !important; backdrop-filter: saturate(140%) blur(10px) !important;
+}
+/* (7) áudio 5847 + foto 5846: no pé da tela das categorias apareciam "formas que não são nossos triângulos" (losangos,
+   retângulos). Causa medida: o ladrilho é ESPELHADO — a cada meio ladrilho (900 px de largura -> 677 px de altura) há um
+   eixo de espelho, e no celular o 2º eixo caía em ~677 px, no pé da tela/sob a barra. Com 1100 px o eixo seguinte vai a
+   ~828 px, abaixo da tela inteira do iPhone (o 1º fica em 0, sob o cabeçalho). Triângulos ~22% maiores, mesmo desenho.
+   A regra mora no FIM do arquivo: o `.feed::before` de baixo (camada clara) venceria esta por ordem. */
 
 /* ================================================== PÁGINAS INTERNAS (produto/texto) */
 .pagina { padding-top: calc(var(--tarja, 0px) + 92px); }
@@ -2424,3 +2480,8 @@ body.nome-dourado {
 .feed .fim .redes .linktree-pilula .lt-nome  { font-family: 'EB Garamond Linktree', Georgia, serif; font-weight: 400; font-size: 14px; color: var(--tinta); }
 .feed .fim .redes .linktree-pilula .lt-seta  { display: none; }
 .feed .fim .redes .linktree-pilula:hover { color: var(--tinta); }
+
+/* (7) do rodapé-fecho (03/10/2026, áudio 5847): o eixo do ladrilho espelhado sai da tela do celular — ver o comentário (7) lá em cima. */
+@media (max-aspect-ratio: 3/5) {
+  .abertura::before, .feed::before { background-size: 1100px auto; background-position: left top; }
+}

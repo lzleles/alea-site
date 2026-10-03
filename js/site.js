@@ -540,3 +540,36 @@ window.aleaCorDoTopo = (function () {
   var eu = document.currentScript, s = document.createElement('script');
   s.src = (eu && eu.src ? eu.src.replace(/site\.js(\?.*)?$/, '') : 'js/') + 'busca.js'; s.defer = true; document.head.appendChild(s);
 })();
+
+/* 03/10/2026 — O RODAPÉ COMO FECHO (fotos 5826/5828/5829 + áudios 5827/5830/5831 do Cassiano):
+   (1) página de produto (produto-*.html) ganha a classe `pagina-produto` no <html>: o rodapé dela termina em
+       "© ālea & Co. 2026 — Todos os direitos reservados." (o CSS esconde a linha dos créditos; a página inicial mantém tudo);
+   (2) a faixa preta que pinta o pedaço sob a barra do Safari (.rodape-sob-a-barra, ver estilo.css) só aparece quando o
+       rodapé chegou ao pé da tela (html.rodape-no-fim) — no meio da página a barra continua mostrando a página. */
+(function () {
+  var raiz = document.documentElement;
+  if (/(^|\/)produto-[^\/]*$/.test(location.pathname)) raiz.classList.add('pagina-produto');
+  function montar() {
+    var rod = document.querySelector('footer.rodape');
+    if (!rod) return;
+    var faixa = document.createElement('div'); faixa.className = 'rodape-sob-a-barra'; faixa.setAttribute('aria-hidden', 'true');
+    document.body.appendChild(faixa);
+    var pedido = false;
+    var topo = document.querySelector('header.topo');
+    // v2 (03/10/2026, fotos 5852/5853): no iPhone o pé do rodapé nem sempre "chega" ao innerHeight (a barra flutuante
+    // muda a altura) e a faixa não acendia. Acende também quando o topo do rodapé encostou no pé do cabeçalho.
+    function medir() {
+      pedido = false;
+      var pe = topo ? Math.round(topo.getBoundingClientRect().bottom) : 64;
+      faixa.style.setProperty('--pe-do-topo', pe + 'px');
+      var r = rod.getBoundingClientRect();
+      raiz.classList.toggle('rodape-no-fim', r.top <= pe + 48 || r.bottom <= window.innerHeight + 2);
+    }
+    function agendar() { if (!pedido) { pedido = true; requestAnimationFrame(medir); } }
+    window.addEventListener('scroll', agendar, { passive: true });
+    window.addEventListener('resize', agendar);
+    if (window.visualViewport) window.visualViewport.addEventListener('resize', agendar);
+    medir();
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', montar); else montar();
+})();
