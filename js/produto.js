@@ -4,8 +4,17 @@
    objetivo: Controla galeria, tela cheia, personalização, preço, aceite e inclusão de produtos no carrinho.
    entrada: DOM da página, configuração comercial e dados do produto
    saida: Galeria interativa, item personalizado e comandos para o carrinho
-   status: ativo — v38 (02/10/2026, Personalize ABRE nas cores da capa; cor do nome da capa aparece apagada)
-   validado_em: 02/10/2026 (Playwright 390 e 1440, prints em 29_site_alea_anotacoes_2026-10-02/_prints_previa/)
+   status: ativo — v39 (03/10/2026, ESTOQUE: "Comprar agora" só com a cor em estoque, senão "Encomendar agora")
+   validado_em: 03/10/2026 (Playwright 390 e 1440)
+   v39 (03/10/2026, áudios 5727/5729/5731 do Cassiano; a v38 é o commit 1b4d13f):
+     "os comedouros eu não tenho nenhum pronto (...) ao invés de comprar agora, vai ser encomendar agora" — "na frente
+     da cor específica (...) pequenininho, dois disponíveis. Se a pessoa clicar em outro sem ser ele, vai aparecer
+     encomendar agora". O estoque mora no config.js (`ALEA.estoque[slug]`, por combinação de modo + acabamento + cor).
+     · o botão principal diz "Comprar agora" SÓ quando a combinação escolhida (ou, sem escolha, a da capa) tem estoque;
+       produto sem estoque nenhum = "Encomendar agora" sempre (hoje: todos os comedouros).
+     · na lista de cores, a cor que tem peça pronta ganha " · N disponível(is)" (monocromático; no bi/tricolor a
+       combinação inteira decide o botão). O valor da opção não muda — sacola e pedido seguem iguais.
+     · o item leva `pronta_entrega: true|false` (o pedido mostra se é estoque ou encomenda).
    v38 (02/10/2026, prints 5272/5275/5278 + áudios 5273/5277/5279 do Cassiano; a v37 é o commit 988aa7b):
      1. CORES DA PEÇA ABREM MARCADAS NA CAPA (reverte o áudio 2263 de 27/09): "sempre vai começar nas cores do produto"
         — cada toque em "Personalize aqui" já vem com o modo e cada acabamento + cor de `ALEA.modelos3d[slug].capa`
@@ -1236,7 +1245,12 @@
       var tit = dono.getAttribute('data-titulo') || 'Cor';
       var lista = FIL[rad.value] || [];
       sel.innerHTML = '<option value="">' + (quantos > 1 ? tit + ': escolha a cor' : 'Escolha a cor') + '</option>' +
-        lista.map(function (f) { return '<option value="' + f.site + '">' + f.site + '</option>'; }).join('');
+        lista.map(function (f) {
+          /* v39: cor com peça pronta ganha " · N disponível(is)" na frente (só no monocromático: a peça inteira é dela) */
+          var n = quantos === 1 ? qtdEmEstoque('monocromatico', [{ acabamento: rad.value, cor: f.site }]) : 0;
+          var extra = n > 0 ? ' · ' + n + (n === 1 ? ' disponível' : ' disponíveis') : '';
+          return '<option value="' + f.site + '">' + f.site + extra + '</option>';
+        }).join('');
       sel.disabled = false;
       dono.classList.remove('faltou');
       try { sel.focus({ preventScroll: true }); } catch (e) { sel.focus(); }
@@ -1329,6 +1343,8 @@
         ciente_cor: (function () { if (window.aleaCienteCor) return true; try { return !!sessionStorage.getItem('alea_ciente_cor'); } catch (e) { return false; } })()
       },
       extras: extras,
+      /* v39: true = a combinação escolhida estava em estoque ("Comprar agora"); false = encomenda */
+      pronta_entrega: estaEmEstoque(),
       /* o ACEITE vai junto do item, com data e hora. É a prova de que a declaração foi
          marcada ANTES da compra — e é ela que sustenta a regra de não cancelamento que
          está escrita na mesma página. Aceite que não fica registrado não serve de nada. */
@@ -1601,6 +1617,7 @@
     camposCores.innerHTML = '';
     caixaCores.classList.remove('faltou');
     caixaCores.removeAttribute('data-cores-da-capa');
+    nomearBotaoPeloEstoque();   // v39
   };
 
   /* ⚠️ v38 — O PERSONALIZE ABRE NAS CORES DA CAPA (print 5275 + áudio 5277 do Cassiano, 02/10/2026: "sempre vai começar
@@ -1718,6 +1735,41 @@
      botão que parece funcionar e não vai a lugar nenhum. */
   if (botaoComprar) botaoComprar.addEventListener('click', function () { porNoCarrinho(true); });
   if (botaoSacola) botaoSacola.addEventListener('click', function () { porNoCarrinho(false); });
+
+  /* ==================================================== v39 — o ESTOQUE decide o nome do botão
+     ALEA.estoque[slug] = [{ modo: 'monocromatico', escolhas: [{ acabamento, cor }], qtd }]. Sem lista = encomenda. */
+  function qtdEmEstoque(modo, escolhas) {
+    var slugE = botaoComprar && botaoComprar.getAttribute('data-slug');
+    var lista = (((window.ALEA || {}).estoque || {})[slugE]) || [];
+    var total = 0;
+    lista.forEach(function (e) {
+      if (!(e.qtd > 0) || e.modo !== modo || !e.escolhas || e.escolhas.length !== escolhas.length) return;
+      var igual = e.escolhas.every(function (x, k) { return x.acabamento === escolhas[k].acabamento && x.cor === escolhas[k].cor; });
+      if (igual) total += e.qtd;
+    });
+    return total;
+  }
+  function estaEmEstoque() {
+    var r = caixaCores && caixaCores.querySelector('input[name="cores_peca"]:checked');
+    var c = coresEscolhidas();
+    if (r && c) {
+      if (c.escolhas.length !== (parseInt(r.getAttribute('data-campos'), 10) || 0)) return false;   // escolha pela metade
+      return qtdEmEstoque(r.value, c.escolhas) > 0;
+    }
+    /* nada escolhido: vale a cor da capa (é a que a foto e a peça 3D mostram) */
+    var slugC = botaoComprar && botaoComprar.getAttribute('data-slug');
+    var capa = ((((window.ALEA || {}).modelos3d || {})[slugC]) || {}).capa;
+    return !!(capa && capa.modo && capa.escolhas && qtdEmEstoque(capa.modo, capa.escolhas) > 0);
+  }
+  function nomearBotaoPeloEstoque() {
+    if (!botaoComprar) return;
+    var txt = estaEmEstoque() ? 'Comprar agora' : 'Encomendar agora';
+    if (botaoComprar.textContent.trim() !== txt) botaoComprar.textContent = txt;
+    botaoComprar.setAttribute('data-estoque', txt === 'Comprar agora' ? 'sim' : 'nao');
+  }
+  window.aleaNomearBotaoPeloEstoque = nomearBotaoPeloEstoque;
+  if (caixaCores) caixaCores.addEventListener('change', function () { setTimeout(nomearBotaoPeloEstoque, 0); });
+  nomearBotaoPeloEstoque();
 
   repintarPreco();
 })();

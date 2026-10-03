@@ -271,6 +271,22 @@ window.ALEA = {
       { site: 'Verde', hex: '#129856', original: 'Voolt3D · PLA · V-Silk · Verde (PL-VD-SK-1)' }
     ]
   },
+  /* O ESTOQUE — peça PRONTA, por produto (03/10/2026, áudios 5727/5729/5731 do Cassiano).
+     -------------------------------------------------------------------------------
+     Com estoque na cor escolhida o botão diz "Comprar agora"; qualquer outra cor (ou produto sem lista aqui) =
+     "Encomendar agora" (produto.js v39). `modo` = id das Cores da peça; `escolhas` = acabamento + cor (nome do site,
+     igual ALEA.filamentos), uma por campo; `qtd` = peças prontas. Quem diz o estoque é o Cassiano — nunca inventar.
+     ⚠ TESTE DE LAYOUT (áudio 5731: "você coloca que tem isso aí só pra gente ver como vai ficar"): a saboneteira NÃO
+       tem peça pronta (áudio 5730). Sai daqui quando ele mandar o estoque de verdade. Azul = Multfila Azul Safira
+       (a confirmar, msg 5734). */
+  estoque: {
+    'soap-dish': [
+      { modo: 'monocromatico', escolhas: [{ acabamento: 'perolizado', cor: 'Branco' }], qtd: 1 },
+      { modo: 'monocromatico', escolhas: [{ acabamento: 'perolizado', cor: 'Rosa' }],   qtd: 1 },
+      { modo: 'monocromatico', escolhas: [{ acabamento: 'perolizado', cor: 'Azul' }],   qtd: 1 }
+    ]
+  },
+
   /* como cada acabamento aparece (a ordem é a da tela) e o que ele acrescenta ao nome da cor:
      Básico não acrescenta nada ("Azul"); Fosco e Perolizado sim ("Azul Fosco", "Azul Perolizado"). */
   acabamentos: [
