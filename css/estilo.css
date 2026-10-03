@@ -1086,6 +1086,39 @@ body.sem-transicao-feed .feed { transition: none !important; }
 .rodape .lei img { height: 17px; width: auto; display: inline-block; vertical-align: -3px; }
 .rodape .lei .creditos { flex-basis: 100%; opacity: .85; font-size: 12px; } /* ETAPA 13: era .6 (cinza apagado no preto puro) */
 .rodape a { color: inherit; }
+/* ⚠️ O RODAPÉ É O FECHO DA PÁGINA, COMO O MENU DO FIM DO FEED (03/10/2026, fotos 5826/5828/5829 + áudio 5827 do
+   Cassiano: "esse vai ser a referência que ficou perfeito (...) vamos fazer isso também na página dos produtos e na
+   página inicial"). A referência é o fim das categorias (bloco ".feed .item:last-child" acima):
+   (1) no fim da rolagem o rodapé OCUPA a tela livre inteira (do pé do cabeçalho fixo, 64 px, ao pé da tela) -> nada
+       do produto aparece em cima; o bloco da marca até o Linktree fica CENTRADO no espaço acima da linha da lei;
+   (2) sem a faixa bege embaixo: no iPhone a barra flutuante do Safari deixa ver o que fica ABAIXO do fim da página
+       (o fundo bege do body). Uma faixa fixa preta (.rodape-sob-a-barra, ligada pelo site.js só quando o rodapé
+       chegou ao pé da tela) pinta esse pedaço na cor do rodapé. Mesma medida da abertura: --sob-a-barra. */
+.rodape {
+  min-height: calc(100svh - 64px);
+  display: flex; flex-direction: column;
+}
+@supports not (height: 100svh) { .rodape { min-height: calc(100vh - 64px); } }
+.rodape > :first-child { margin-top: auto !important; }   /* !important: o `.rodape a.marca-rodape-link` (mais abaixo) zera a margem */
+.rodape > .lei { margin-top: auto; width: 100%; }
+.rodape > .orcamento { align-self: center; }
+.rodape-sob-a-barra { display: none; }
+/* (3) áudio 5830: "na página dos produtos só vai até ālea & Co. 2026, todos os direitos reservados" -> sem a linha dos
+   créditos (responsável, CNPJ, identidade visual, links). A página inicial continua com tudo (o CNPJ segue no site). */
+html.pagina-produto .rodape .lei .creditos { display: none; }
+/* (4) áudio 5831: o fim das categorias ganha a mesma linha "© ālea & Co. 2026 — Todos os direitos reservados." (feed.js) */
+.feed .fim .lei-fim { margin: 6px 0 0; font-size: 13px; line-height: 2; color: var(--tinta); }
+.feed .fim .lei-fim img { height: 17px; width: auto; display: inline-block; vertical-align: -3px; }
+@media (hover: none) and (pointer: coarse) {
+  .rodape-sob-a-barra {
+    --sob-a-barra: 110px;
+    display: block; position: fixed; left: 0; right: 0; z-index: 3; pointer-events: none;
+    bottom: calc(-1 * var(--sob-a-barra)); height: var(--sob-a-barra);
+    background: var(--preto); visibility: hidden;
+  }
+  @supports (height: 100lvh) { .rodape-sob-a-barra { --sob-a-barra: max(110px, 100lvh - 100svh); } }
+  html.rodape-no-fim .rodape-sob-a-barra { visibility: visible; }
+}
 
 /* ================================================== PÁGINAS INTERNAS (produto/texto) */
 .pagina { padding-top: calc(var(--tarja, 0px) + 92px); }

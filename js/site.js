@@ -540,3 +540,29 @@ window.aleaCorDoTopo = (function () {
   var eu = document.currentScript, s = document.createElement('script');
   s.src = (eu && eu.src ? eu.src.replace(/site\.js(\?.*)?$/, '') : 'js/') + 'busca.js'; s.defer = true; document.head.appendChild(s);
 })();
+
+/* 03/10/2026 — O RODAPÉ COMO FECHO (fotos 5826/5828/5829 + áudios 5827/5830/5831 do Cassiano):
+   (1) página de produto (produto-*.html) ganha a classe `pagina-produto` no <html>: o rodapé dela termina em
+       "© ālea & Co. 2026 — Todos os direitos reservados." (o CSS esconde a linha dos créditos; a página inicial mantém tudo);
+   (2) a faixa preta que pinta o pedaço sob a barra do Safari (.rodape-sob-a-barra, ver estilo.css) só aparece quando o
+       rodapé chegou ao pé da tela (html.rodape-no-fim) — no meio da página a barra continua mostrando a página. */
+(function () {
+  var raiz = document.documentElement;
+  if (/(^|\/)produto-[^\/]*$/.test(location.pathname)) raiz.classList.add('pagina-produto');
+  function montar() {
+    var rod = document.querySelector('footer.rodape');
+    if (!rod) return;
+    var faixa = document.createElement('div'); faixa.className = 'rodape-sob-a-barra'; faixa.setAttribute('aria-hidden', 'true');
+    document.body.appendChild(faixa);
+    var pedido = false;
+    function medir() {
+      pedido = false;
+      raiz.classList.toggle('rodape-no-fim', rod.getBoundingClientRect().bottom <= window.innerHeight + 2);
+    }
+    function agendar() { if (!pedido) { pedido = true; requestAnimationFrame(medir); } }
+    window.addEventListener('scroll', agendar, { passive: true });
+    window.addEventListener('resize', agendar);
+    medir();
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', montar); else montar();
+})();

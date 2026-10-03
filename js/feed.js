@@ -8,6 +8,8 @@
    validado_em: TBD
    v34 (27/09/2026, áudio 2308): no card, o nome do "× Nome" vai num <span class="nome"> (o degradê mede o nome, e o
       × fica azul sólido). Antes: 03_site/_versoes_anteriores/x_azul_nome_proporcional_antes_2026-09-27/js/feed.js
+   v38 (03/10/2026, áudio 5831 do Cassiano): o cartão de fim ganha, depois do "voltar para a página inicial", a linha
+      "© ālea & Co. 2026 — Todos os direitos reservados." (a mesma do rodapé, com a logo escura).
    v37 (03/10/2026, foto 5597 + áudios 5598/5599 do Cassiano): no cartão de fim da categoria "aqui também tem que ter o
       campo de busca (...) e o logo do Linktree também" -> o fim ganha a mesma sequência do rodapé: categorias, campo
       "Buscar item" (preenchido pelo busca.js em [data-busca-fim]) e as redes ([data-redes], montadas pelo site.js), antes
@@ -282,6 +284,10 @@
            do cabeçalho, que continua só fechando, não tem esse atributo. */
         '<button class="fechar-feed" type="button" data-fechar-feed data-voltar-inicio ' +
                 'style="position:static">← voltar para a página inicial</button>' +
+        /* 03/10/2026 (áudio 5831): "vamos colocar essa informação também na página das categorias, ālea & Co. 2026,
+           todos os direitos reservados" — a mesma linha do rodapé, com a logo no lugar do nome (logo escura: fundo claro). */
+        '<p class="lei-fim">© <img src="img/marca/e_co/logo_horizontal_oficial.svg" alt="ālea & Co."> ' +
+          new Date().getFullYear() + ' — Todos os direitos reservados.</p>' +
       '</div>';
     palco.appendChild(fim);
 
