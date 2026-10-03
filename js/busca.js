@@ -6,7 +6,7 @@
              esfumaçada com o site atrás, traz palavras sugeridas e acha a peça por palavra parecida (cachorro, gato, pote...).
    entrada: window.VITRINE e window.PRODUTOS (produtos.js), window.CATEGORIAS; o que a pessoa digita
    saida: tela de busca por cima do site; clique leva à página da peça (produto-<slug>.html) ou à categoria (index.html#id)
-   status: v1 (03/10/2026) - em prévia
+   status: v2 (03/10/2026) - em prévia
    validado_em: 03/10/2026
    v1 (03/10/2026, Cassiano, áudios 5561/5562/5564/5567/5568 + vídeo 5566 da busca do iPhone):
       "se a pessoa pesquisar por cachorro, ou gato, ou comedouro, ou pote (...) ele cai no comedouro?" -> o site NÃO tinha
@@ -16,6 +16,12 @@
       a gente já mostra um tutorial: arraste a tela para baixo para pesquisar produtos".
       No computador entra a lupa "Buscar" no topo, ao lado de Conta/Desejos/Sacola (a mesma tela de busca).
       Carregado pelo site.js (toda página que tem site.js ganha a busca; nenhuma página gerada precisou mudar).
+   v2 (03/10/2026, vídeo 5572 + áudios 5573/5575 + foto 5574, na prévia v1): "ótimo, é isso aí", e mais dois:
+      (1) o aviso some na 1ª interação (bom: não enche a tela), mas "se você vê que tá indo pro topo da página, faz a
+          animação de novo, pra ele saber que tem a barra de pesquisa ali" -> no celular, quem desceu pelo menos uma tela
+          e VOLTA ao topo vê o aviso de novo (some no próximo toque/rolagem). Ir e voltar um pouquinho não dispara.
+      (2) "entre as categorias e o logo do Linktree, um campo igual esse de buscar, falando 'buscar item'; clicou, abre
+          a tela da busca" -> campo no rodapé de toda página, antes das redes (celular e computador).
 */
 (function () {
   'use strict';
@@ -183,7 +189,27 @@
 
   function montar() {
     document.body.appendChild(tela);
+    campoDoRodape();
     if (CELULAR) ligarPuxar(); else ligarLupa();
+  }
+
+  /* ---------- v2: o campo "Buscar item" no rodapé, entre as categorias e as redes (foto 5574) ---------- */
+  function campoDoRodape() {
+    var css2 = document.createElement('style');
+    css2.textContent = '.busca-rodape{display:flex;align-items:center;gap:10px;width:min(100%,360px);height:46px;margin:22px auto 18px;' +
+      'padding:0 18px;border-radius:999px;border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.08);color:rgba(255,255,255,.72);' +
+      'font:400 15px var(--fonte-corpo);cursor:pointer;text-align:left;-webkit-tap-highlight-color:transparent}' +
+      '.busca-rodape:hover{background:rgba(255,255,255,.14);color:#fff}.busca-rodape svg{flex:none}';
+    document.head.appendChild(css2);
+    document.querySelectorAll('footer.rodape').forEach(function (rod) {
+      if (rod.querySelector('.busca-rodape')) return;
+      var b = document.createElement('button');
+      b.type = 'button'; b.className = 'busca-rodape'; b.setAttribute('aria-label', 'Buscar item');
+      b.innerHTML = LUPA + '<span>Buscar item</span>';
+      b.addEventListener('click', abrir);
+      var antes = rod.querySelector('[data-redes]');
+      if (antes) rod.insertBefore(b, antes); else rod.appendChild(b);
+    });
   }
 
   /* ---------- computador: a lupa no topo ---------- */
@@ -253,18 +279,40 @@
   var dica = null, dicaTimer = null;
   function jaViuDica() { try { return localStorage.getItem(CHAVE_DICA) === '1'; } catch (e) { return false; } }
   function marcarDica() { try { localStorage.setItem(CHAVE_DICA, '1'); } catch (e) {} }
+  function exibirDica() {
+    if (dica || aberta) return;
+    dica = document.createElement('div'); dica.className = 'busca-dica';
+    dica.innerHTML = '<i aria-hidden="true">↓</i> Arraste a tela para baixo para pesquisar produtos';
+    document.body.appendChild(dica);
+    var d = dica;
+    requestAnimationFrame(function () { requestAnimationFrame(function () { d.classList.add('vis'); }); });
+    dicaTimer = setTimeout(function () { esconderDica(); }, 5000);
+    /* some na primeira interação (toque ou rolagem), depois de um respiro pra não sumir com o próprio gesto que a trouxe */
+    setTimeout(function () {
+      if (dica !== d) return;
+      function sai() { document.removeEventListener('touchstart', sai, true); document.removeEventListener('scroll', sai, true); if (dica === d) esconderDica(); }
+      document.addEventListener('touchstart', sai, true); document.addEventListener('scroll', sai, true);
+    }, 700);
+  }
   function mostrarDica() {
+    vigiarVoltaAoTopo();
     if (jaViuDica() && !/[?&]dica=1/.test(location.search)) return;
     var tenta = 0;
     (function esperar() {
       if (travada()) { if (++tenta < 60) setTimeout(esperar, 500); return; }
-      dica = document.createElement('div'); dica.className = 'busca-dica';
-      dica.innerHTML = '<i aria-hidden="true">↓</i> Arraste a tela para baixo para pesquisar produtos';
-      document.body.appendChild(dica);
-      requestAnimationFrame(function () { requestAnimationFrame(function () { dica.classList.add('vis'); }); });
-      marcarDica();
-      dicaTimer = setTimeout(function () { esconderDica(); }, 5000);
+      marcarDica(); exibirDica();
     })();
+  }
+  /* v2: desceu pelo menos uma tela e voltou ao topo (sem mais pra onde subir) -> o aviso de novo */
+  function vigiarVoltaAoTopo() {
+    var desceu = false;
+    document.addEventListener('scroll', function (e) {
+      var el = (e.target === document || e.target === document.documentElement) ? (document.scrollingElement || document.documentElement) : e.target;
+      if (!el || typeof el.scrollTop !== 'number' || el.scrollHeight <= el.clientHeight + 1) return;
+      var alt = el.clientHeight || window.innerHeight;
+      if (el.scrollTop > alt) desceu = true;
+      else if (el.scrollTop <= 0 && desceu) { desceu = false; if (!travada()) exibirDica(); }
+    }, true);
   }
   function esconderDica() {
     if (!dica) return;
