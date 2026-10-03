@@ -4,8 +4,13 @@
    objetivo: Controla galeria, tela cheia, personalização, preço, aceite e inclusão de produtos no carrinho.
    entrada: DOM da página, configuração comercial e dados do produto
    saida: Galeria interativa, item personalizado e comandos para o carrinho
-   status: ativo — v40 (03/10/2026, texto do botão da janela 3D por produto: `rotuloBotao`)
+   status: ativo — v41 (03/10/2026, 'Personalize agora' em todos + '· N em estoque')
    validado_em: 03/10/2026 (Playwright 390 e 1440)
+   v41 (03/10/2026, áudios 5817/5818 do Cassiano, na prévia ef685ac): (1) "nos comedouros também (...) todas as
+     personalizações vão ser Personalize agora" -> o padrão do botão virou "Personalize agora" (rotuloBotao segue
+     valendo pra exceção); (2) "ao invés de 1 disponível (...) aquele mesmo pontinho (...) 1 em estoque, que a pessoa
+     entende que o estoque é comprar agora" -> a cor com peça pronta mostra " · N em estoque" (o · é o mesmo U+00B7
+     do menu das categorias). Só isso mudou.
    v40 (03/10/2026, áudio 5801 do Cassiano: "ao invés de você colocar monocromático, você vai colocar personalize agora";
      a v39 está em 03_site/_versoes_anteriores/saboneteira_3d_antes_2026-10-03/js/): o botão que abre a janela 3D lê
      `ALEA.modelos3d[slug].rotuloBotao`; sem ele, continua "Personalize aqui" (os comedouros não mudam). Só isso mudou.
@@ -269,7 +274,7 @@
     var b = document.createElement('button');
     b.type = 'button';
     b.className = 'botao personalizar-3d';
-    b.textContent = cfg3d.rotuloBotao || 'Personalize aqui';   // v40: a saboneteira diz "Personalize agora" (áudio 5801)
+    b.textContent = cfg3d.rotuloBotao || 'Personalize agora';   // v41: todos dizem 'agora' (áudio 5818)   // v40: a saboneteira diz "Personalize agora" (áudio 5801)
     form.parentNode.insertBefore(b, form);
     form.classList.add('mora-na-janela');
     var aberto = false;
@@ -1251,7 +1256,7 @@
         lista.map(function (f) {
           /* v39: cor com peça pronta ganha " · N disponível(is)" na frente (só no monocromático: a peça inteira é dela) */
           var n = quantos === 1 ? qtdEmEstoque('monocromatico', [{ acabamento: rad.value, cor: f.site }]) : 0;
-          var extra = n > 0 ? ' · ' + n + (n === 1 ? ' disponível' : ' disponíveis') : '';
+          var extra = n > 0 ? ' · ' + n + ' em estoque' : '';   // v41: 'em estoque' (áudio 5817)
           return '<option value="' + f.site + '">' + f.site + extra + '</option>';
         }).join('');
       sel.disabled = false;
