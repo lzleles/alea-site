@@ -16,6 +16,8 @@
       como WhatsApp no rastro nem dispara a conversão do WhatsApp). Antes: 03_site/_versoes_anteriores/orcamento_email_antes_2026-09-28/
    27/09/2026 (áudio 2317): o coração do TOPO fica colorido (degradê perolizado) quando a Lista de Desejos tem alguma peça;
       vazia = igual antes. Bloco no fim do arquivo. Antes: 03_site/_versoes_anteriores/coracao_topo_colorido_antes_2026-09-27/
+   03/10/2026 (áudios 5561-5568 + vídeo 5566 do Cassiano): carrega o js/busca.js (A BUSCA: puxar pra baixo no topo no
+      celular, lupa "Buscar" no computador). Bloco de 4 linhas no fim do arquivo; toda página com site.js ganha a busca.
 */
 /* =============================================================================
    site.js — o que vale em TODA página (abertura, feed, produto, textos)
@@ -513,4 +515,10 @@ window.aleaCorDoTopo = (function () {
   window.addEventListener('storage', function (e) { if (!e.key || e.key === 'alea_desejos_v1') pintar(); });
   window.addEventListener('pageshow', pintar);
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', pintar); else pintar();
+})();
+
+/* 03/10/2026 — A BUSCA (js/busca.js): carregada daqui pra valer em toda página que tem o site.js, sem mexer nas páginas geradas. */
+(function () {
+  var eu = document.currentScript, s = document.createElement('script');
+  s.src = (eu && eu.src ? eu.src.replace(/site\.js(\?.*)?$/, '') : 'js/') + 'busca.js'; s.defer = true; document.head.appendChild(s);
 })();

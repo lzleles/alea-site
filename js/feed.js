@@ -8,6 +8,8 @@
    validado_em: TBD
    v34 (27/09/2026, áudio 2308): no card, o nome do "× Nome" vai num <span class="nome"> (o degradê mede o nome, e o
       × fica azul sólido). Antes: 03_site/_versoes_anteriores/x_azul_nome_proporcional_antes_2026-09-27/js/feed.js
+   v36 (03/10/2026, vídeo 5569 do Cassiano, computador): a roda do mouse anda UM produto por gesto (um toque leve mandava
+      vários eventos e pulava a Ayla) e a peça desliza mais devagar (520 -> 750 ms). Bloco no `wheel` do feed.
    v35 (02/10/2026, vídeo IMG_2590 msg 5269 + áudios 5267/5270 do Cassiano, celular): "se a foto já está centralizada,
       o 2º toque entra no produto". O 1º toque continua CENTRALIZANDO; tocar numa foto que JÁ está no centro da tela
       (mesmo um toque separado, sem pressa) entra no produto como o "ver produto". O "ver produto" e o toque duplo
@@ -898,7 +900,7 @@
     var y = alvo ? posNoFeed(alvo) + alvo.offsetHeight / 2 - feed.clientHeight / 2 : limiteDoFeed();
     return Math.max(0, Math.min(limiteDoFeed(), y));
   }
-  var anim = null, animando = false;
+  var anim = null, animando = false, ultimaRoda = 0;
   function quadroDaRolagem(t) {
     if (!anim) { animando = false; return; }
     var k = Math.min(1, (t - anim.t0) / anim.dur);
@@ -910,7 +912,7 @@
   function rolarAte(y) {
     y = Math.max(0, Math.min(limiteDoFeed(), y));
     if (querMenosMovimento) { anim = null; feed.scrollTop = y; return; }
-    anim = { de: feed.scrollTop, para: y, t0: performance.now(), dur: 520 };
+    anim = { de: feed.scrollTop, para: y, t0: performance.now(), dur: 750 };   // v36: 520 -> 750 (vídeo 5569, "mais devagar")
     if (!animando) { animando = true; requestAnimationFrame(quadroDaRolagem); }
   }
   /* o próximo destino SEMPRE a partir de onde o feed VAI parar (se já está andando) — é isso que empilha */
@@ -940,9 +942,16 @@
     if (!rodaDeMouse) return;                       // touchpad: a rolagem livre do navegador
     e.preventDefault();
     /* roda "solta" (Logitech e parecidas) manda 2-3 cliques num evento só: cada 120 é um produto */
-    var cliques = linhas ? Math.max(1, Math.round(Math.abs(e.deltaY) / 3))
-                         : Math.max(1, Math.round(Math.abs(e.wheelDeltaY) / 120));
-    andarProdutos(Math.min(cliques, 3) * (e.deltaY > 0 ? 1 : -1));
+    /* ⚠️ v36 (03/10/2026, vídeo 5569 do Cassiano, no computador): "tá muito rápido (...) já passou até a Ayla junto, eu
+       dei só um toque. Fazer essa rolagem ser mais devagar". Um toque leve na roda manda VÁRIOS eventos (mouse de roda
+       solta / alta resolução), e cada um empilhava mais um produto (até 3 por evento). Agora: UM GESTO DA RODA = UM
+       PRODUTO. Enquanto a peça está andando e até 150 ms depois do último evento da roda, os eventos seguintes não
+       contam (cada um empurra a trava pra frente). Pra ir pro outro produto, outro toque. Antes:
+       03_site/_versoes_anteriores/roda_um_por_gesto_antes_2026-10-03/js/feed.js */
+    var agora = performance.now(), travada = animando || (agora - ultimaRoda) < 150;
+    ultimaRoda = agora;
+    if (travada) return;
+    andarProdutos(e.deltaY > 0 ? 1 : -1);
   }, { passive: false });
   /* quem pegar a barra de rolagem ou o teclado no meio do carrossel manda: a animação larga */
   ['mousedown', 'keydown', 'touchstart'].forEach(function (ev) {
