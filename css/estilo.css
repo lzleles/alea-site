@@ -2336,3 +2336,72 @@ body.nome-dourado {
 .feed .fim .redes a:hover { color: var(--terracota); transform: translateY(-2px); }
 .feed .fim .redes svg { width: 22px; height: 22px; display: block; }
 .feed .fim .busca-no-fim { display: flex; justify-content: center; width: 100%; }
+
+/* 03/10/2026 (fotos 5612/5613 + áudios 5615/5616 do Cassiano): "esses vão ser os NOVOS ÍCONES do Linktree. O PRETO pras
+   partes pretas, e o BRANCO pros outros lugares, mas NÃO com o fundo branco — com o fundo que a gente tem. É só o formato,
+   a coloração, fonte." A pílula "✱ | Linktree" é montada pelo site.js (montarRedes).
+   ESCURA (rodapé preto, ref 5612): borda verde com brilho, ✱ verde, risco fino, "Linktree" branco sem serifa, ">".
+   CLARA (partes claras, ref 5613): borda dourada fina, ✱ verde, risco fino, "Linktree" serifado (EB Garamond, só as letras
+   da palavra, fonts/ebgaramond_linktree.woff2, OFL), sem ">", fundo transparente (o nosso).
+   ANIMADA (áudio 5621): um brilho CIRCULA pela borda pra chamar o clique — verde claro na escura; na clara um traço escuro
+   passando devagarzinho pelo dourado. Quem pede menos movimento no aparelho vê a borda parada.
+   Antes: 03_site/_versoes_anteriores/linktree_botao_antes_2026-10-03/ */
+@font-face {
+  font-family: 'EB Garamond Linktree';
+  src: url('../fonts/ebgaramond_linktree.woff2') format('woff2');
+  font-weight: 400; font-style: normal; font-display: swap;
+}
+@property --lt-ang { syntax: '<angle>'; initial-value: 0deg; inherits: true; }
+@keyframes lt-gira { to { --lt-ang: 360deg; } }
+
+.redes { align-items: center; }
+.redes .linktree-pilula {
+  --lt-base: #3DDC84; --lt-luz: #E9FFF2; --lt-espessura: 1.5px; --lt-volta: 3.6s;
+  position: relative; isolation: isolate;
+  display: inline-flex; align-items: center; gap: 12px; height: 40px; padding: 0 20px; box-sizing: border-box;
+  border-radius: 999px; text-decoration: none; line-height: 1; border: 0;
+  animation: lt-gira var(--lt-volta) linear infinite;
+}
+/* a borda: um anel desenhado por conic-gradient e recortado por máscara; o --lt-ang gira e a luz anda */
+.redes .linktree-pilula::before {
+  content: ''; position: absolute; inset: 0; border-radius: inherit; padding: var(--lt-espessura); pointer-events: none;
+  background: conic-gradient(from var(--lt-ang), var(--lt-base) 0 62%, var(--lt-luz) 80%, var(--lt-base) 98%);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor; mask-composite: exclude;
+}
+.redes .linktree-pilula .lt-marca { width: 18px; height: 18px; display: block; flex: none; }
+.redes .linktree-pilula .lt-barra { width: 1px; height: 18px; flex: none; }
+.redes .linktree-pilula .lt-nome  { font-size: 16px; letter-spacing: 0; }
+.redes .linktree-pilula .lt-seta  { width: 14px; height: 14px; display: block; flex: none; margin-left: -2px; }
+@media (prefers-reduced-motion: reduce) { .redes .linktree-pilula { animation: none; } }
+
+/* escura — rodapé */
+.rodape .redes .linktree-pilula {
+  background: linear-gradient(180deg, #0B1410, #050806); color: var(--branco);
+  box-shadow: 0 0 14px rgba(61, 220, 132, .28), inset 0 0 10px rgba(61, 220, 132, .08);
+}
+/* o brilho de fora acompanha a luz que gira: o mesmo anel, borrado, atrás da pílula */
+.rodape .redes .linktree-pilula::after {
+  content: ''; position: absolute; inset: -7px; border-radius: 999px; pointer-events: none; padding: 7px;
+  background: conic-gradient(from var(--lt-ang), transparent 0 68%, rgba(120, 255, 180, .45) 82%, transparent 96%);
+  filter: blur(4px);
+  /* só do lado de FORA: a máscara tira o miolo (a pílula), senão o brilho borrado pinta o fundo preto de verde */
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor; mask-composite: exclude;
+}
+.rodape .redes .linktree-pilula .lt-marca { color: #3DDC84; }
+.rodape .redes .linktree-pilula .lt-barra { background: rgba(255, 255, 255, .45); }
+.rodape .redes .linktree-pilula .lt-nome  { font-family: var(--fonte-corpo); font-weight: 600; color: var(--branco); }
+.rodape .redes .linktree-pilula .lt-seta  { color: rgba(255, 255, 255, .7); }
+.rodape .redes .linktree-pilula:hover { color: var(--branco); box-shadow: 0 0 20px rgba(61, 220, 132, .45), inset 0 0 10px rgba(61, 220, 132, .12); }
+
+/* clara — fim das categorias do feed (e qualquer outro lugar claro que ganhar as redes) */
+.feed .fim .redes .linktree-pilula {
+  --lt-base: var(--dourado); --lt-luz: var(--tinta); --lt-espessura: 1.2px; --lt-volta: 6s;
+  background: transparent; color: var(--tinta); box-shadow: 0 2px 6px rgba(43, 33, 24, .10);
+}
+.feed .fim .redes .linktree-pilula .lt-marca { color: #2FAE5B; }
+.feed .fim .redes .linktree-pilula .lt-barra { background: rgba(43, 33, 24, .35); }
+.feed .fim .redes .linktree-pilula .lt-nome  { font-family: 'EB Garamond Linktree', Georgia, serif; font-weight: 400; font-size: 21px; color: var(--tinta); }
+.feed .fim .redes .linktree-pilula .lt-seta  { display: none; }
+.feed .fim .redes .linktree-pilula:hover { color: var(--tinta); }
