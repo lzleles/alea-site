@@ -539,5 +539,12 @@ window.ALEA.filamentosPorFoto = {
   "img/produtos/lukebowl_capaq.jpg": ["Bambu Lab · PLA · Lite · Orange (16301)", "Bambu Lab · PLA · Matte · Ivory White", "Bambu Lab · PLA · Matte · Ash Gray (11102)"],
   "img/produtos/matteotex_9262q.jpg": ["Bambu Lab · PLA · Matte · Charcoal", "Bambu Lab · PLA · Matte · Desert Tan (11401)"],
   "img/produtos/aylapompom_capaq.jpg": ["Bambu Lab · PLA · Lite · Red (16200)", "eSUN · PLA · PLA-Basic · Black", "Elegoo · PLA · Matte · Matte White", "Voolt3D · PLA · V-Silk · Verde (PL-VD-SK-1)"],
-  "img/produtos/claudiawave_capaq.jpg": ["Elegoo · PLA · Silk · Silk White", "Elegoo · PLA · Silk · Gold", "eSUN · PLA · Silk · Aqua"]
+  "img/produtos/claudiawave_capaq.jpg": ["Elegoo · PLA · Silk · Silk White", "Elegoo · PLA · Silk · Gold", "eSUN · PLA · Silk · Aqua"],
+  /* 03/10/2026 — ālea Soap Dish: NÃO é palpite, é o filamento que ELE disse (msgs 5775, 5780, 5782). */
+  "img/produtos/soapdish_capa.jpg": ["eSUN · PLA · PLA-Silk · Pink", "Bambu Lab · PLA · Silk Dual Color · Phantom Blue", "Elegoo · PLA · Silk · Silk White"],
+  "img/produtos/soapdish_2620.jpg": ["Elegoo · PLA · Silk · Silk White"],
+  "img/produtos/soapdish_2622.jpg": ["eSUN · PLA · PLA-Silk · Pink"],
+  "img/produtos/soapdish_2624.jpg": ["Bambu Lab · PLA · Silk Dual Color · Phantom Blue"],
+  "img/produtos/soapdish_2621.jpg": ["eSUN · PLA · PLA-Silk · Pink", "Bambu Lab · PLA · Silk Dual Color · Phantom Blue", "Elegoo · PLA · Silk · Silk White"],
+  "img/produtos/soapdish_capaq.jpg": ["eSUN · PLA · PLA-Silk · Pink", "Bambu Lab · PLA · Silk Dual Color · Phantom Blue", "Elegoo · PLA · Silk · Silk White"]
 };

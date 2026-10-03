@@ -113,7 +113,9 @@ window.VITRINE = [
   { produto: 'ālea Pet Bowl × Luke',                      nome: 'Luke',    categoria: 'pet', preco: null, pagina: 'luke-bowl',         recorte: false, fotos: ['lukebowl_capaq'] },
   { produto: 'ālea Elevated Pet Bowl × Matteo',           nome: 'Matteo',  categoria: 'pet', preco: null, pagina: 'matteo-texturized', recorte: false, fotos: ['matteotex_9262q'] },
   { produto: 'ālea Pet Bowl – Watermelon Edition × Ayla Pompom', nome: 'Ayla Pompom',    categoria: 'pet', preco: null, pagina: 'ayla-pompom',       recorte: false, fotos: ['aylapompom_capaq'] },
-  { produto: 'ālea Pet Bowl Wave × Cláudia',              nome: 'Cláudia', categoria: 'pet', preco: null, pagina: 'claudia-wave',      recorte: false, fotos: ['claudiawave_anjoq'] }
+  { produto: 'ālea Pet Bowl Wave × Cláudia',              nome: 'Cláudia', categoria: 'pet', preco: null, pagina: 'claudia-wave',      recorte: false, fotos: ['claudiawave_anjoq'] },
+  /* 03/10/2026: 1º produto da HOME (Cassiano, msgs 5722-5788). `nome` aqui só entra no alt das fotos do feed (não há nome de pet). */
+  { produto: 'ālea Soap Dish',                            nome: 'três cores', categoria: 'home', preco: 59, pagina: 'soap-dish',       recorte: false, fotos: ['soapdish_capaq'] }
 ];
 /* A VITRINE ATÉ 25/09/2026 20:01 (fora do ar por ordem dele, msg 1884) — guardada, não apagada:
 window.VITRINE = [
@@ -257,6 +259,32 @@ window.PRODUTOS = [
       "Infelizmente, um dia depois das fotos, ela foi atropelada e não resistiu. Por isso resolvi fazer essa collab com o nome dela, pra que a Cláudia siga com a gente em cada peça."
     ],
     galeria: ['claudiawave_0039', 'claudiawave_0196', 'claudiawave_9569', 'claudiawave_9590', 'claudiawave_9676', 'claudiawave_9698']
+  },
+
+  /* ===================================================================================================
+     ālea SOAP DISH — a saboneteira, 1º produto da linha HOME (03/10/2026). Página: 01_gerar_paginas_v27_saboneteira_home;
+     fotos: 06_fotos_profissionais_v4_saboneteira (as dele por ARQUIVO, msgs 5749-5757; registro dourado limpo quando há).
+     - nome 5730 · categoria HOME 5725/5733 · preço R$ 59 msg 5759 · só Monocromático 5767 · SEM nome gravado 5769/5771.
+     - texto DELE, palavra por palavra (msg 5788); resumo vazio, como nas outras com texto dele.
+     - material PLA: o .3mf dele (ALEA Soap Dish.3mf) é PLA. Medidas: a informar (ele manda; nunca estimadas).
+     =================================================================================================== */
+  {
+    slug: 'soap-dish',
+    nome: 'ālea Soap Dish',
+    linha: 'Home',
+    categoria: 'home',
+    preco: 59,
+    material: 'PLA',
+    capa: 'soapdish_capa',
+    cores_peca: ['monocromatico'],
+    sem_nome: true,   // msg 5771: "daqui pra frente também não terá nome gravado! Será somente cor!"
+    resumo: '',
+    paragrafos: [   // msg 5788, texto DELE
+      'Com formas orgânicas e uma superfície marcada por ondas suaves, nossa saboneteira traz movimento e personalidade para um objeto presente todos os dias.',
+      'Seu desenho elevado ajuda a manter o sabonete apoiado sem perder a leveza visual da peça, enquanto as curvas criam um acabamento moderno e diferente em todos os ângulos.',
+      'Produzida em impressão 3D, é uma peça funcional que também faz parte da decoração — porque até os pequenos detalhes merecem ser especiais.'
+    ],
+    galeria: ['soapdish_2620', 'soapdish_2622', 'soapdish_2624', 'soapdish_2621']
   },
 
   /* ===================================================================================================
