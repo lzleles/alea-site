@@ -6,7 +6,7 @@
              esfumaçada com o site atrás, traz palavras sugeridas e acha a peça por palavra parecida (cachorro, gato, pote...).
    entrada: window.VITRINE e window.PRODUTOS (produtos.js), window.CATEGORIAS; o que a pessoa digita
    saida: tela de busca por cima do site; clique leva à página da peça (produto-<slug>.html) ou à categoria (index.html#id)
-   status: v3 (03/10/2026) - em prévia
+   status: v4 (03/10/2026) - em prévia
    validado_em: 03/10/2026
    v1 (03/10/2026, Cassiano, áudios 5561/5562/5564/5567/5568 + vídeo 5566 da busca do iPhone):
       "se a pessoa pesquisar por cachorro, ou gato, ou comedouro, ou pote (...) ele cai no comedouro?" -> o site NÃO tinha
@@ -28,6 +28,16 @@
       ABRE de verdade (teclado) ao soltar passado o ponto; soltou antes ou voltou o dedo, ela se desmonta. Saiu a
       pílula "Buscar" que descia do topo (a própria tela é o retorno). O teclado abre no próprio soltar (o iPhone só
       deixa focar o campo dentro do toque).
+   v4 (03/10/2026, Cassiano, vídeo 5583 + áudio 5584, vídeo 5586 + áudio 5587, vídeo 5590 + áudio 5591):
+      (1) "nunca pôr o cursor sozinho": a tela abre SEM foco (sem teclado) em qualquer caminho - puxão, lupa, campo do
+          rodapé, sugestão. O teclado só abre quando a pessoa toca na caixa "Buscar". (No iPhone o teclado empurrava a tela
+          e mostrava o rodapé por baixo.) Exceção: a tecla "/" ou Ctrl+K no computador, que já é a pessoa querendo digitar.
+      (2) "a transição está inconstante (...) tem hora que abre de uma vez. Ela SEMPRE tem que entrar embaçada, mesmo que
+          eu arraste de uma vez, movimento brusco, ela tem que entrar DEVAGAR" -> o esfumaçado NÃO segue o dedo cru: um
+          motor por quadro (requestAnimationFrame) persegue o dedo com velocidade máxima (0 a 1 em 600 ms, curva suave
+          nas pontas). Puxão brusco = a tela vem no mesmo ritmo do puxão lento. Ao soltar passado o ponto ela termina de
+          entrar devagar a partir de onde estava (nunca salta); soltou antes, volta devagar (380 ms). Abrir pela lupa ou
+          pelo rodapé e fechar pelo Cancelar usam o mesmo motor - toda entrada e saída é igual.
 */
 (function () {
   'use strict';
@@ -37,6 +47,7 @@
   var CELULAR = window.matchMedia('(hover: none) and (pointer: coarse)').matches;
   var CHAVE_DICA = 'alea_busca_dica_v1';
   var PUXAR = 80;                          // px puxando pra baixo no topo pra abrir
+  var ENTRA_MS = 600, SAI_MS = 380;        // v4: tempo mínimo de 0 a 1 (entrar) e de 1 a 0 (sair), mesmo com puxão brusco
 
   /* palavra que a pessoa digita -> palavras que existem nas peças (sem acento, minúsculo) */
   var SINONIMOS = {
@@ -92,7 +103,7 @@
   var css = document.createElement('style');
   css.textContent = [
     '.busca-tela{position:fixed;inset:0;z-index:2000;display:flex;flex-direction:column;opacity:0;visibility:hidden;',
-    ' transition:opacity .28s ease,visibility .28s;background:rgba(234,228,219,.42);',
+    ' transition:none;background:rgba(234,228,219,.42);',   /* v4: quem anima entrada e saída é o motor (--p); sem a sobra de .28s, que deixava a lista tocável depois de fechar */
     ' -webkit-backdrop-filter:blur(22px) saturate(1.5);backdrop-filter:blur(22px) saturate(1.5);font-family:var(--fonte-corpo)}',
     '.busca-tela.aberta{opacity:1;visibility:visible}',
     /* v3: enquanto o dedo puxa, a tela se monta na medida de --p (0 a 1), sem transição (segue o dedo) */
@@ -101,7 +112,6 @@
     ' backdrop-filter:blur(calc(22px*var(--p))) saturate(calc(1 + .5*var(--p)))}',
     '.busca-tela.arrastando .busca-corpo{opacity:var(--p);transform:translateY(calc(-48px*(1 - var(--p))))}',
     '.busca-tela.arrastando .busca-barra{opacity:var(--p);transform:translateY(calc(40px*(1 - var(--p))))}',
-    '.busca-tela.voltando{transition:opacity .28s ease,visibility .28s}',
     '.busca-corpo,.busca-barra{transition:opacity .28s ease,transform .32s cubic-bezier(.2,.8,.2,1)}',
     '.busca-corpo{flex:1;overflow-y:auto;padding:calc(env(safe-area-inset-top) + 22px) var(--gutter,20px) 16px;',
     ' -webkit-overflow-scrolling:touch;overscroll-behavior:contain}',
@@ -152,7 +162,7 @@
 
   SUGESTOES.forEach(function (s) {
     var b = document.createElement('button'); b.type = 'button'; b.textContent = s;
-    b.addEventListener('click', function () { campo.value = s; pintar(); campo.focus(); });
+    b.addEventListener('click', function () { campo.value = s; pintar(); });   // v4: sem foco (sem teclado)
     chips.appendChild(b);
   });
 
@@ -176,23 +186,54 @@
   campo.addEventListener('input', pintar);
   campo.addEventListener('keydown', function (e) {
     if (e.key === 'Enter') { var a = lista.querySelector('a'); if (a) location.href = a.href; }
-    if (e.key === 'Escape') fechar();
   });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && aberta) fechar(); });
   tela.querySelector('.busca-cancelar').addEventListener('click', fechar);
   tela.addEventListener('click', function (e) { if (e.target === tela || e.target.classList.contains('busca-corpo')) fechar(); });
 
-  var aberta = false;
-  function abrir() {
-    if (aberta) return; aberta = true;
+  /* ---------- v4: o motor da transição (o esfumaçado nunca anda mais rápido que ENTRA_MS/SAI_MS) ---------- */
+  var atual = 0, alvo = 0, durMs = ENTRA_MS, raf = 0, ultimo = 0, aoChegar = null, montada = false;
+  function suave(x) { return x * x * (3 - 2 * x); }                  // devagar no começo e no fim
+  function montarTela() {
+    if (montada) return; montada = true; atual = 0;
     campo.value = ''; pintar();
-    tela.classList.remove('arrastando', 'voltando'); tela.style.removeProperty('--p');
-    tela.classList.add('aberta'); document.documentElement.style.overflow = 'hidden';
-    if (CELULAR) campo.focus(); else setTimeout(function () { campo.focus(); }, 60);   // iPhone: foco só dentro do toque
+    tela.classList.remove('aberta'); tela.classList.add('arrastando'); tela.style.setProperty('--p', '0');
+  }
+  function levarA(p, ms, fim) {
+    alvo = Math.max(0, Math.min(1, p)); durMs = ms; aoChegar = fim || null;
+    if (!raf) { ultimo = 0; raf = requestAnimationFrame(passo); }
+  }
+  function passo(t) {
+    var dt = ultimo ? Math.min(50, t - ultimo) : 16; ultimo = t;
+    var d = alvo - atual, max = dt / durMs;
+    atual = Math.abs(d) <= max ? alvo : atual + (d > 0 ? max : -max);
+    tela.style.setProperty('--p', suave(atual).toFixed(3));
+    if (atual === alvo) {
+      raf = 0; var f = aoChegar; aoChegar = null; if (f) f();
+    } else raf = requestAnimationFrame(passo);
+  }
+  function terminouDeAbrir() {
+    tela.classList.remove('arrastando'); tela.classList.add('aberta'); tela.style.removeProperty('--p');
+  }
+  function terminouDeFechar() {
+    montada = false; tela.classList.remove('arrastando', 'aberta'); tela.style.removeProperty('--p');
+  }
+
+  var aberta = false;
+  function abrir(focar) {
+    if (aberta) return; aberta = true;
+    montarTela();                                                    // se o dedo já montou, segue de onde está
+    document.documentElement.style.overflow = 'hidden';
+    levarA(1, ENTRA_MS, terminouDeAbrir);
+    if (focar === true) setTimeout(function () { campo.focus(); }, 60);   // só "/" ou Ctrl+K no computador
     esconderDica(true);
   }
   function fechar() {
-    if (!aberta) return; aberta = false;
-    tela.classList.remove('aberta'); document.documentElement.style.overflow = ''; campo.blur();
+    if (!aberta) return; aberta = false; campo.blur();
+    document.documentElement.style.overflow = '';
+    if (!montada) return;
+    tela.classList.remove('aberta'); tela.classList.add('arrastando'); tela.style.setProperty('--p', suave(atual).toFixed(3));
+    levarA(0, SAI_MS, terminouDeFechar);
   }
   window.aleaAbrirBusca = abrir;
 
@@ -215,7 +256,7 @@
       var b = document.createElement('button');
       b.type = 'button'; b.className = 'busca-rodape'; b.setAttribute('aria-label', 'Buscar item');
       b.innerHTML = LUPA + '<span>Buscar item</span>';
-      b.addEventListener('click', abrir);
+      b.addEventListener('click', function () { abrir(); });
       var antes = rod.querySelector('[data-redes]');
       if (antes) rod.insertBefore(b, antes); else rod.appendChild(b);
     });
@@ -228,11 +269,11 @@
     var b = document.createElement('button');
     b.className = 'botao-icone'; b.type = 'button'; b.setAttribute('data-abrir', 'busca'); b.setAttribute('aria-label', 'Buscar');
     b.innerHTML = LUPA + ' <span class="rotulo">Buscar</span>';
-    b.addEventListener('click', abrir);
+    b.addEventListener('click', function () { abrir(); });
     nav.insertBefore(b, nav.firstChild);
     document.addEventListener('keydown', function (e) {
       if ((e.key === '/' || (e.key.toLowerCase() === 'k' && (e.ctrlKey || e.metaKey))) && !/INPUT|TEXTAREA/.test((e.target || {}).tagName || '')) {
-        e.preventDefault(); abrir();
+        e.preventDefault(); abrir(true);
       }
     });
   }
@@ -253,15 +294,13 @@
     return !!document.querySelector('.telacheia.aberta, .janela3d-fundo.aberta, [role="dialog"].aberta:not(.busca-tela)');
   }
   function ligarPuxar() {
-    var y0 = null, dy = 0, montou = false;
-    function pintarPuxao(p) {
-      if (!montou) { montou = true; campo.value = ''; pintar(); tela.classList.remove('voltando'); tela.classList.add('arrastando'); }
-      tela.style.setProperty('--p', p.toFixed(3));
+    var y0 = null, dy = 0;
+    function pintarPuxao(p) {                                        // v4: o dedo só diz ATÉ ONDE; o motor diz a velocidade
+      montarTela(); levarA(p, ENTRA_MS);
     }
     function desmontar() {
-      if (!montou) return; montou = false;
-      tela.classList.remove('arrastando'); tela.classList.add('voltando'); tela.style.removeProperty('--p');
-      setTimeout(function () { tela.classList.remove('voltando'); }, 320);
+      if (!montada || aberta) return;
+      levarA(0, SAI_MS, terminouDeFechar);
     }
     document.addEventListener('touchstart', function (e) {
       y0 = null; dy = 0;
@@ -273,14 +312,14 @@
     document.addEventListener('touchmove', function (e) {
       if (y0 === null) return;
       dy = e.touches[0].clientY - y0;
-      if (dy <= 6) { if (montou) pintarPuxao(0); return; }
+      if (dy <= 6) { if (montada) pintarPuxao(0); return; }
       esconderDica();
       pintarPuxao(Math.min(1, dy / (PUXAR * 1.6)));                   // monta aos poucos, na medida do dedo
     }, { passive: true });
     function soltar() {
       if (y0 === null) return;
       var abre = dy >= PUXAR; y0 = null;
-      if (abre) abrir(); else desmontar();                             // só monta de verdade ao soltar
+      if (abre) abrir(); else desmontar();                             // só abre de verdade ao soltar, sem teclado
     }
     document.addEventListener('touchend', soltar, { passive: true });
     document.addEventListener('touchcancel', function () { y0 = null; desmontar(); }, { passive: true });
