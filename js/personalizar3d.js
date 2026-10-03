@@ -5,8 +5,8 @@
              pet GRAVADO ao vivo e as cores da peça e do nome trocando na hora, conforme o formulário.
    entrada: ALEA.modelos3d[slug] e ALEA.filamentos (config.js); o formulário [data-personalizar] da página
    saida: a janela (modal); o formulário de verdade MORA dentro dela enquanto está aberta
-   status: v12 (28/09/2026, "Pronto" sem cor escolhida assume as cores da foto de capa — produto.js v37)
-   validado_em: 28/09/2026 (Playwright 1440 px e 390 px: 03_site/_testar_pronto_sem_cor_v1_2026-09-28.py)
+   status: v13 (03/10/2026, peça SEM nome gravado — `semNome`, a saboneteira)
+   validado_em: 03/10/2026 (Playwright 1440 px e 390 px: 03_site/_testar_saboneteira_3d_v1_2026-10-03.py)
 */
 /* =============================================================================
    HISTÓRICO (a v1 da etapa 53 está em 03_site/_versoes_anteriores/js_2026-09-23/)
@@ -89,6 +89,14 @@
       escolheu a cor do Luke (...) aí é só colocar na sacola". O "Pronto" do último passo chama window.aleaAssumirCorDaCapa
       (produto.js v37) ANTES de fechar: sem Tricolor/Bicolor/Monocromático marcado, o formulário recebe as cores da capa
       (config.js `capa`) e a compra passa. X, Esc e clique fora continuam fechando sem mexer em nada.
+   v13 (03/10/2026, áudios 5800/5801 do Cassiano; a v12 está em 03_site/_versoes_anteriores/saboneteira_3d_antes_2026-10-03/js/):
+      "aquela animação igual dos comedouros (...) a peça lá em 3D do arquivo que eu mandei, conforme a pessoa escolhe a cor
+      vai mudando" — a ālea Soap Dish entra na janela, e ela NÃO tem nome gravado (regra dele, msg 5771). Com
+      `semNome: true` no config.js, a janela não baixa o _nome.json nem a fonte, não monta o quadro do nome e a peça fica
+      sempre lisa (só a logo negativa do arquivo, que já vem no .glb). O resto é o mesmo código: o passo único é "Cores da
+      peça" e o Monocromático pinta todas as zonas. Peça sem `semNome` (os comedouros) = exatamente como na v12.
+      `folgaEnquadrar` (opcional, padrão 0,82 = o de sempre): a saboneteira é larga e baixa e saía cortada dos lados no
+      enquadramento feito pro comedouro (visto no print de 390 e 1440 px); ela usa 1,1.
    ============================================================================= */
 
 /* ⚠️ OS TEXTOS DO AVISO DE COR — trocar AQUI, e só aqui. Os dois são do Cassiano, palavra por palavra (26/09/2026).
@@ -580,15 +588,16 @@ export async function abrirJanela3D(cfg, aoFechar, aoMontar, opcoes) {
   var matLetra = vestir(mats[zonaNome].clone());
 
   /* ---------------- a peça e o quadro do nome */
+  var semNome = !!cfg.semNome;                                          // v13: peça sem nome gravado (saboneteira)
   var [gltf, quadro, fonteBin] = await Promise.all([
     new GLTFLoader().loadAsync(cfg.glb),
-    fetch(cfg.nome).then(function (r) { return r.json(); }),
+    semNome ? null : fetch(cfg.nome).then(function (r) { return r.json(); }),
     /* reversed: a Defante é .otf (curvas CFF) e desenha os contornos no sentido contrário — sem isso o miolo do
        "o" e do "a" saía cheio (visto no "Cassiano", etapa 55) */
-    new Promise(function (ok, erro) { var L = new TTFLoader(); L.reversed = cfg.fonteInvertida !== false; L.load(cfg.fonte, ok, undefined, erro); })
+    semNome ? null : new Promise(function (ok, erro) { var L = new TTFLoader(); L.reversed = cfg.fonteInvertida !== false; L.load(cfg.fonte, ok, undefined, erro); })
   ]);
   if (!vivo) return;
-  var fonte = new Font(fonteBin);
+  var fonte = semNome ? null : new Font(fonteBin);
   function zonaDoMaterial(nome) { return nome.indexOf('topo') >= 0 ? 'topo' : nome.indexOf('base') >= 0 ? 'base' : 'principal'; }
   var partes = [], zonaPorGrupo = [];
   gltf.scene.updateMatrixWorld(true);
@@ -607,19 +616,24 @@ export async function abrirJanela3D(cfg, aoFechar, aoMontar, opcoes) {
   var corpoBrush = new CSG.Brush(geo, matsArray);
   corpoBrush.updateMatrixWorld();
 
+  /* v13: sem nome gravado não há quadro — nada do bloco abaixo (até o PROF) é montado, e gravar('') nunca o usa */
+  if (!semNome) {
   var M = new THREE.Matrix4(), q = quadro.matriz_mundo_zup;
   M.set(q[0][0], q[0][1], q[0][2], q[0][3], q[1][0], q[1][1], q[1][2], q[1][3],
         q[2][0], q[2][1], q[2][2], q[2][3], q[3][0], q[3][1], q[3][2], q[3][3]);
   var quadroMundo = new THREE.Matrix4().multiplyMatrices(new THREE.Matrix4().set(1, 0, 0, 0, 0, 0, 1, 0, 0, -1, 0, 0, 0, 0, 0, 1), M);
   var bb = quadro.bbox_local_texto;
   var centroX = (bb[0][0] + bb[1][0]) / 2, baseY = bb[0][1], altOrig = bb[1][1] - bb[0][1];
-  function geoTexto(txt, tamanho, prof) {
+  /* v13: `var ... = function` (e não `function geoTexto`) porque agora mora dentro do if — num módulo, a declaração de
+     função fica presa ao bloco e o gravar() lá embaixo não a acharia (visto no Luke, 03/10/2026) */
+  var geoTexto = function (txt, tamanho, prof) {
     var g = new TextGeometry(txt, { font: fonte, size: tamanho, depth: prof, curveSegments: 6, bevelEnabled: false });
     g.computeBoundingBox(); return g;
-  }
+  };
   var ref = geoTexto(quadro.text_info.text || 'Luke', 10, 1);
   var k = altOrig / (ref.boundingBox.max.y - ref.boundingBox.min.y);
   var baseRef = ref.boundingBox.min.y;
+  }
 
   THREE.Mesh.prototype.raycast = BVH.acceleratedRaycast;
   THREE.BufferGeometry.prototype.computeBoundsTree = BVH.computeBoundsTree;
@@ -627,8 +641,8 @@ export async function abrirJanela3D(cfg, aoFechar, aoMontar, opcoes) {
   corpoRaio.geometry.computeBoundsTree();
   var eixo = new THREE.Box3().setFromBufferAttribute(geo.attributes.position).getCenter(new THREE.Vector3());
   var raio = new THREE.Raycaster(); raio.firstHitOnly = true;
-  var PROF = (parseFloat(quadro.text_info.thickness) || 1.5) / 1000;
-  var quadroEscalaMm = new THREE.Vector3().setFromMatrixColumn(quadroMundo, 0).length() * 1000;
+  var PROF = semNome ? 0 : (parseFloat(quadro.text_info.thickness) || 1.5) / 1000;
+  var quadroEscalaMm = semNome ? 1 : new THREE.Vector3().setFromMatrixColumn(quadroMundo, 0).length() * 1000;
   var avaliador = new CSG.Evaluator();
   avaliador.useGroups = true;
   avaliador.attributes = ['position', 'normal'];
@@ -707,7 +721,7 @@ export async function abrirJanela3D(cfg, aoFechar, aoMontar, opcoes) {
   var direcao = new THREE.Vector3(0, 0.35, 1).normalize();
   function distanciaQueCabe() {
     var v = THREE.MathUtils.degToRad(camera.fov) / 2, h = Math.atan(Math.tan(v) * camera.aspect);
-    return raioPeca * 0.82 / Math.sin(Math.min(v, h));
+    return raioPeca * (cfg.folgaEnquadrar || 0.82) / Math.sin(Math.min(v, h));   // v13: peça larga e baixa pede mais folga
   }
   camera.position.copy(centro).addScaledVector(direcao, distanciaQueCabe());
   controles.maxDistance = distanciaQueCabe() * 1.8;
@@ -775,6 +789,7 @@ export async function abrirJanela3D(cfg, aoFechar, aoMontar, opcoes) {
   /* (7) o NOME na peça: abre com o original da foto; digitou, muda; apagou no passo 1, volta o original; saiu do
      passo 1 em branco (confirmado), a peça fica lisa */
   function nomeParaMostrar() {
+    if (semNome) return '';                                        // v13: a saboneteira é sempre lisa
     if (form && form.hasAttribute('data-sem-nome')) return '';   // v11: quadradinho Sem nome marcado = peça lisa
     var v = campoNome ? campoNome.value.trim() : '';
     if (v) return v;

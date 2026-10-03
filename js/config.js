@@ -10,6 +10,9 @@
       registro": o Personalize ABRE marcado nela (produto.js v38). Campo novo OPCIONAL `capa.nome` (ver o bloco
       "COR DO NOME DA CAPA" perto do Luke). Só comentários mudaram aqui; nenhum valor. A versão anterior é o 988aa7b.
    v38b-produto (02/10/2026, msg 5284): primeiro valor de `capa.nome` — Cláudia, nome Dourado Perolizado (Elegoo Silk Gold).
+   v40-produto (03/10/2026, áudios 5800/5801): `modelos3d['soap-dish']` — a saboneteira na janela 3D, com os campos novos
+      `semNome` (personalizar3d.js v13) e `rotuloBotao` (produto.js v40). A versão anterior está em
+      03_site/_versoes_anteriores/saboneteira_3d_antes_2026-10-03/js/.
 */
 /* =============================================================================
    config.js — os valores que mudam. Mexe aqui, não no resto do site.
@@ -440,6 +443,28 @@ window.ALEA.modelos3d['claudia-wave'] = {
      Elegoo · PLA · Silk · Gold = "Dourado Perolizado" no site (tabela de nomes, áudio 2293). Matteo: "não tem". */
   capa: { modo: 'bicolor', escolhas: [{ acabamento: 'perolizado', cor: 'Branco' }, { acabamento: 'perolizado', cor: 'Azul Aqua' }],
           nome: { acabamento: 'perolizado', cor: 'Dourado' } }
+};
+/* 03/10/2026 (áudios 5800/5801 do Cassiano: "aquela animação igual dos comedouros (...) ao invés de você colocar
+   monocromático, você vai colocar personalize agora (...) a peça lá em 3D do arquivo que eu mandei"): a ālea Soap Dish
+   ganha a janela 3D. O .glb sai de 32_produtos_novos_2026-10-03/soap_dish/"ALEA Soap Dish.3mf", objeto 3, pelo
+   07_render_capa/exportar_glb_configurador_v6_peca_sem_nome_deitada.py ("1=principal", 80000 faces, --deitar +x):
+   a peça DEITADA como se usa (ondas pra cima), a logo Circular NEGATIVA no fundo (0,5 mm, recorte na cor da peça, nunca
+   pintada), os 4 furos dos pés. Uma zona só: 'principal' (topo/base iguais, só existem porque a janela pede as 3).
+   `semNome` (personalizar3d.js v13): sem nome gravado (msg 5771) — a janela não baixa _nome.json nem fonte.
+   `rotuloBotao` (produto.js v40): o botão diz "Personalize agora", palavra dele (os comedouros seguem "Personalize aqui").
+   CAPA: a foto soapdish_capa tem as 3 peças (Rosa, Preto com Azul e Branco). A peça abre em BRANCO PEROLIZADO (Elegoo
+   Silk White, a da foto 2620) — escolha da casa, a confirmar com ele. */
+window.ALEA.modelos3d['soap-dish'] = {
+  glb: 'modelos/soapdish.glb?v=2026-10-03',
+  semNome: true,
+  rotuloBotao: 'Personalize agora',
+  folgaEnquadrar: 1.1,   // personalizar3d v13: larga e baixa, com 0,82 (o do comedouro) saía cortada dos lados
+  capa: { modo: 'monocromatico', escolhas: [{ acabamento: 'perolizado', cor: 'Branco' }] },
+  original: {
+    topo:      { site: 'Branco', hex: '#FFFFFF', acabamento: 'perolizado', oficial: 'Elegoo · PLA · Silk · Silk White' },
+    principal: { site: 'Branco', hex: '#FFFFFF', acabamento: 'perolizado', oficial: 'Elegoo · PLA · Silk · Silk White' },
+    base:      { site: 'Branco', hex: '#FFFFFF', acabamento: 'perolizado', oficial: 'Elegoo · PLA · Silk · Silk White' }
+  }
 };
 
 /* TAMANHOS À VENDA (28/09/2026, áudios do Cassiano ~02:14-02:17: "pra Shih Tzu e pra Golden é diferente o tamanho (...)

@@ -4,8 +4,11 @@
    objetivo: Controla galeria, tela cheia, personalização, preço, aceite e inclusão de produtos no carrinho.
    entrada: DOM da página, configuração comercial e dados do produto
    saida: Galeria interativa, item personalizado e comandos para o carrinho
-   status: ativo — v39 (03/10/2026, ESTOQUE: "Comprar agora" só com a cor em estoque, senão "Encomendar agora")
+   status: ativo — v40 (03/10/2026, texto do botão da janela 3D por produto: `rotuloBotao`)
    validado_em: 03/10/2026 (Playwright 390 e 1440)
+   v40 (03/10/2026, áudio 5801 do Cassiano: "ao invés de você colocar monocromático, você vai colocar personalize agora";
+     a v39 está em 03_site/_versoes_anteriores/saboneteira_3d_antes_2026-10-03/js/): o botão que abre a janela 3D lê
+     `ALEA.modelos3d[slug].rotuloBotao`; sem ele, continua "Personalize aqui" (os comedouros não mudam). Só isso mudou.
    v39 (03/10/2026, áudios 5727/5729/5731 do Cassiano; a v38 é o commit 1b4d13f):
      "os comedouros eu não tenho nenhum pronto (...) ao invés de comprar agora, vai ser encomendar agora" — "na frente
      da cor específica (...) pequenininho, dois disponíveis. Se a pessoa clicar em outro sem ser ele, vai aparecer
@@ -266,7 +269,7 @@
     var b = document.createElement('button');
     b.type = 'button';
     b.className = 'botao personalizar-3d';
-    b.textContent = 'Personalize aqui';
+    b.textContent = cfg3d.rotuloBotao || 'Personalize aqui';   // v40: a saboneteira diz "Personalize agora" (áudio 5801)
     form.parentNode.insertBefore(b, form);
     form.classList.add('mora-na-janela');
     var aberto = false;

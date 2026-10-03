@@ -6,7 +6,7 @@
              esfumaçada com o site atrás, traz palavras sugeridas e acha a peça por palavra parecida (cachorro, gato, pote...).
    entrada: window.VITRINE e window.PRODUTOS (produtos.js), window.CATEGORIAS; o que a pessoa digita
    saida: tela de busca por cima do site; clique leva à página da peça (produto-<slug>.html) ou à categoria (index.html#id)
-   status: v5 (03/10/2026) - em prévia
+   status: v6 (03/10/2026) - em prévia
    validado_em: 03/10/2026
    v1 (03/10/2026, Cassiano, áudios 5561/5562/5564/5567/5568 + vídeo 5566 da busca do iPhone):
       "se a pessoa pesquisar por cachorro, ou gato, ou comedouro, ou pote (...) ele cai no comedouro?" -> o site NÃO tinha
@@ -47,6 +47,9 @@
       da própria lista desbotando do estado anterior. Tirada: só o motor anima.
       + (foto 5597 + áudio 5598) o campo "Buscar item" também no cartão de fim de cada categoria do feed ([data-busca-fim]),
       em tom escuro, porque ali o fundo é claro.
+   v6 (03/10/2026, foto 5812 + áudio 5813 do Cassiano, celular dele na página da saboneteira): o aviso "Arraste a tela
+      para baixo..." ficava EM CIMA do "← voltar para o feed" -> "subir ele um pouquinho para ficar entre os dois, para
+      conseguir ver tudo". posicionarDica() mede o fundo dos ícones do topo e o topo do link e centra o aviso no vão.
 */
 (function () {
   'use strict';
@@ -371,6 +374,7 @@
     dica.innerHTML = '<i aria-hidden="true">↓</i> Arraste a tela para baixo para pesquisar produtos';
     document.body.appendChild(dica);
     var d = dica;
+    posicionarDica(d);
     requestAnimationFrame(function () { requestAnimationFrame(function () { d.classList.add('vis'); }); });
     dicaTimer = setTimeout(function () { esconderDica(); }, 5000);
     /* some na primeira interação (toque ou rolagem), depois de um respiro pra não sumir com o próprio gesto que a trouxe */
@@ -379,6 +383,22 @@
       function sai() { document.removeEventListener('touchstart', sai, true); document.removeEventListener('scroll', sai, true); if (dica === d) esconderDica(); }
       document.addEventListener('touchstart', sai, true); document.addEventListener('scroll', sai, true);
     }, 700);
+  }
+  /* v6: o aviso fica NO VÃO entre os ícones do topo e o "← voltar para o feed", sem cobrir nenhum dos dois.
+     Mede na hora (a altura do topo e do link mudam com a fonte e a tela). Página sem o link: fica no lugar do CSS. */
+  function posicionarDica(d) {
+    var topo = document.querySelector('header.topo'), volta = document.querySelector('main a.voltar');
+    if (!topo || !volta) return;
+    var rv = volta.getBoundingClientRect();
+    if (!rv.height || rv.top <= 0) return;
+    var fundoTopo = 0;
+    Array.prototype.forEach.call(topo.querySelectorAll('img,svg,a,button'), function (el) {
+      var r = el.getBoundingClientRect();
+      if (r.height && r.width && r.bottom > fundoTopo && r.bottom < rv.top) fundoTopo = r.bottom;
+    });
+    if (!fundoTopo) return;
+    var h = d.getBoundingClientRect().height, vao = rv.top - fundoTopo;
+    d.style.top = Math.round(fundoTopo + Math.max(4, (vao - h) / 2)) + 'px';
   }
   function mostrarDica() {
     vigiarVoltaAoTopo();

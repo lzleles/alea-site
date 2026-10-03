@@ -110,7 +110,7 @@
       <p class="sub-busca">Saboneteira impressa em 3D</p>
       <p class="valor-grande" data-valor data-preco-base="59">R$ 59,00</p>
       <div class="descricao-produto"><p>Com formas orgânicas e uma superfície marcada por ondas suaves, nossa saboneteira traz movimento e personalidade para um objeto presente todos os dias.</p><p>Seu desenho elevado ajuda a manter o sabonete apoiado sem perder a leveza visual da peça, enquanto as curvas criam um acabamento moderno e diferente em todos os ângulos.</p><p>Produzida em impressão 3D, é uma peça funcional que também faz parte da decoração — porque até os pequenos detalhes merecem ser especiais.</p></div>
-      <dl class="ficha"><div><dt>Material</dt><dd>PLA é um material utilizado na impressão 3D, produzido a partir de fontes renováveis, como milho e cana-de-açúcar. É leve, versátil e proporciona excelente acabamento.</dd></div><div><dt>Personalização</dt><dd>Cor da peça à sua escolha, sem nome gravado.</dd></div><div><dt>Produção</dt><dd>Sob encomenda, 3 dias úteis após a confirmação de pagamento!</dd></div><div data-ficha-medidas data-falta><dt>Dimensões</dt><dd>a informar</dd></div></dl>
+      <dl class="ficha"><div><dt>Material</dt><dd>PLA é um material utilizado na impressão 3D, produzido a partir de fontes renováveis, como milho e cana-de-açúcar. É leve, versátil e proporciona excelente acabamento.</dd></div><div><dt>Produção</dt><dd>Sob encomenda, 3 dias úteis após a confirmação de pagamento!</dd></div><div data-ficha-medidas data-falta><dt>Dimensões</dt><dd>a informar</dd></div></dl>
 
       <section class="aviso-personalizado">
         <h2>PRODUTOS PERSONALIZADOS</h2>
@@ -119,13 +119,15 @@
 
       <form class="personalizar" data-personalizar autocomplete="off">
         <!-- v27 (Cassiano, 03/10/2026, msgs 5767/5769/5771): saboneteira só Monocromático e SEM nome gravado.
-             Sem "Nome do pet", sem o detalhe de R$ 30 e sem "Cor do nome". -->
+             Sem "Nome do pet", sem o detalhe de R$ 30 e sem "Cor do nome".
+             v28 (áudio 5801): este formulário mora na janela 3D "Personalize agora" (config.js
+             modelos3d['soap-dish'] + produto.js v40 + personalizar3d.js v13). -->
         <div class="cores-peca" data-cores-peca><span class="rotulo-grupo">Cores da peça</span><div class="cores-opcoes"><label><input type="radio" name="cores_peca" value="monocromatico" data-campos="1"> Monocromático</label></div><div class="cores-campos" data-cores-campos></div></div>
       </form>
 
       <label class="aceite" data-aceite>
         <input type="checkbox" data-aceite-caixa>
-        <span>Declaro que revisei cuidadosamente todas as informações da personalização, incluindo as cores. Declaro, ainda, estar ciente e de acordo com as condições acima aplicáveis a produtos personalizados, inclusive quanto a cancelamentos e devoluções.</span>
+        <span>Declaro que revisei cuidadosamente todas as informações da personalização. Declaro, ainda, estar ciente e de acordo com as condições acima aplicáveis a produtos personalizados, inclusive quanto a cancelamentos e devoluções.</span>
       </label>
 
       <p class="recado-aceite" data-recado-aceite hidden>
