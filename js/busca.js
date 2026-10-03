@@ -43,6 +43,8 @@
       vinha junto com o esfumaçado e a capivara do site aparecia vazada por trás. Agora são duas fases do mesmo
       motor: --b (esfumaçado) vai de 0 a 1 nos primeiros 40% e --c (conteúdo) entra de 35% a 100%. Ao fechar, ao
       contrário: o conteúdo some primeiro e o fundo desembaça depois.
+      v5.1 (vídeo 5602, puxão brusco no iPhone dele): a lista PISCAVA cheia no começo e sumia - era a transição de .28s
+      da própria lista desbotando do estado anterior. Tirada: só o motor anima.
       + (foto 5597 + áudio 5598) o campo "Buscar item" também no cartão de fim de cada categoria do feed ([data-busca-fim]),
       em tom escuro, porque ali o fundo é claro.
 */
@@ -120,7 +122,9 @@
     /* v5: o conteúdo só entra depois que o fundo já esfumaçou (--c), igual ao iPhone */
     '.busca-tela.arrastando .busca-corpo{opacity:var(--c);transform:translateY(calc(-48px*(1 - var(--c))))}',
     '.busca-tela.arrastando .busca-barra{opacity:var(--c);transform:translateY(calc(40px*(1 - var(--c))))}',
-    '.busca-corpo,.busca-barra{transition:opacity .28s ease,transform .32s cubic-bezier(.2,.8,.2,1)}',
+    /* v5.1 (vídeo 5602): SEM transição própria - a sobra de .28s fazia a lista aparecer cheia e sumir no começo do puxão
+       (ela "desbotava" do estado anterior até o --c=0). Quem anima é só o motor. */
+    '.busca-corpo,.busca-barra{transition:none}',
     '.busca-corpo{flex:1;overflow-y:auto;padding:calc(env(safe-area-inset-top) + 22px) var(--gutter,20px) 16px;',
     ' -webkit-overflow-scrolling:touch;overscroll-behavior:contain}',
     '.busca-rot{font-size:13px;font-weight:600;letter-spacing:.02em;color:var(--tinta-fraca,#6B5D50);margin:4px 2px 10px}',
