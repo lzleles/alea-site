@@ -9,6 +9,7 @@
    v38-produto (02/10/2026, prints 5275/5278 + áudios 5277/5279 do Cassiano): `modelos3d[slug].capa` deixa de ser "só
       registro": o Personalize ABRE marcado nela (produto.js v38). Campo novo OPCIONAL `capa.nome` (ver o bloco
       "COR DO NOME DA CAPA" perto do Luke). Só comentários mudaram aqui; nenhum valor. A versão anterior é o 988aa7b.
+   v38b-produto (02/10/2026, msg 5284): primeiro valor de `capa.nome` — Cláudia, nome Dourado Perolizado (Elegoo Silk Gold).
 */
 /* =============================================================================
    config.js — os valores que mudam. Mexe aqui, não no resto do site.
@@ -418,7 +419,10 @@ window.ALEA.modelos3d['claudia-wave'] = {
     principal: { site: 'Branco',    hex: '#FFFFFF', acabamento: 'perolizado', oficial: 'Elegoo · PLA · Silk · Silk White' },
     base:      { site: 'Azul Aqua', hex: '#6CCCDD', acabamento: 'perolizado', oficial: 'eSUN · PLA · Silk · Aqua' }
   },
-  capa: { modo: 'bicolor', escolhas: [{ acabamento: 'perolizado', cor: 'Branco' }, { acabamento: 'perolizado', cor: 'Azul Aqua' }] }
+  /* COR DO NOME DA CAPA (msg 5284 do Cassiano, 02/10/2026: "Claudia Elegoo Silk Gold"): o nome da Cláudia é pintado em
+     Elegoo · PLA · Silk · Gold = "Dourado Perolizado" no site (tabela de nomes, áudio 2293). Matteo: "não tem". */
+  capa: { modo: 'bicolor', escolhas: [{ acabamento: 'perolizado', cor: 'Branco' }, { acabamento: 'perolizado', cor: 'Azul Aqua' }],
+          nome: { acabamento: 'perolizado', cor: 'Dourado' } }
 };
 
 /* TAMANHOS À VENDA (28/09/2026, áudios do Cassiano ~02:14-02:17: "pra Shih Tzu e pra Golden é diferente o tamanho (...)
