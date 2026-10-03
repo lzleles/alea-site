@@ -1119,6 +1119,23 @@ html.pagina-produto .rodape .lei .creditos { display: none; }
   @supports (height: 100lvh) { .rodape-sob-a-barra { --sob-a-barra: max(110px, 100lvh - 100svh); } }
   html.rodape-no-fim .rodape-sob-a-barra { visibility: visible; }
 }
+/* (5) áudios 5843/5845 (03/10/2026): a faixa fixa NÃO pintou no iPhone — o Safari 26 corta o fixo no pé da página e o
+   pedaço sob a barra continuou bege ("lá embaixo é pra ficar preto, igual o fim das categorias"). O que aparece ali é a
+   TELA de fundo do documento (o <html>; o body bege só pinta a caixa dele). Com o rodapé no pé, o <html> veste o preto:
+   do pé do cabeçalho até o fim da tela fica tudo preto. O cabeçalho não muda (64 px em todas as páginas). */
+html.rodape-no-fim { background: var(--preto); }
+/* (6) áudio 5841/5845: "o cabeçalho tem um tamanho certo (...) aplicar em todos, nunca vai sair do lugar dele". Medido
+   (Playwright): 64 px no celular e 62 no computador em produto, inicial e categorias. Na inicial ele ficava transparente
+   no fim (mostrava a estampa da abertura): no fim da página ele veste o mesmo bege das outras. */
+html.rodape-no-fim .topo {
+  background: color-mix(in srgb, var(--off) 86%, transparent) !important;
+  -webkit-backdrop-filter: saturate(140%) blur(10px) !important; backdrop-filter: saturate(140%) blur(10px) !important;
+}
+/* (7) áudio 5847 + foto 5846: no pé da tela das categorias apareciam "formas que não são nossos triângulos" (losangos,
+   retângulos). Causa medida: o ladrilho é ESPELHADO — a cada meio ladrilho (900 px de largura -> 677 px de altura) há um
+   eixo de espelho, e no celular o 2º eixo caía em ~677 px, no pé da tela/sob a barra. Com 1100 px o eixo seguinte vai a
+   ~828 px, abaixo da tela inteira do iPhone (o 1º fica em 0, sob o cabeçalho). Triângulos ~22% maiores, mesmo desenho.
+   A regra mora no FIM do arquivo: o `.feed::before` de baixo (camada clara) venceria esta por ordem. */
 
 /* ================================================== PÁGINAS INTERNAS (produto/texto) */
 .pagina { padding-top: calc(var(--tarja, 0px) + 92px); }
@@ -2457,3 +2474,8 @@ body.nome-dourado {
 .feed .fim .redes .linktree-pilula .lt-nome  { font-family: 'EB Garamond Linktree', Georgia, serif; font-weight: 400; font-size: 14px; color: var(--tinta); }
 .feed .fim .redes .linktree-pilula .lt-seta  { display: none; }
 .feed .fim .redes .linktree-pilula:hover { color: var(--tinta); }
+
+/* (7) do rodapé-fecho (03/10/2026, áudio 5847): o eixo do ladrilho espelhado sai da tela do celular — ver o comentário (7) lá em cima. */
+@media (max-aspect-ratio: 3/5) {
+  .abertura::before, .feed::before { background-size: 1100px auto; background-position: left top; }
+}
