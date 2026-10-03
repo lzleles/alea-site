@@ -205,10 +205,10 @@
   /* ---------- v2: o campo "Buscar item" no rodapé, entre as categorias e as redes (foto 5574) ---------- */
   function campoDoRodape() {
     var css2 = document.createElement('style');
-    css2.textContent = '.busca-rodape{display:flex;align-items:center;gap:10px;width:min(100%,360px);height:46px;margin:22px auto 18px;' +
-      'padding:0 18px;border-radius:999px;border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.08);color:rgba(255,255,255,.72);' +
-      'font:400 15px var(--fonte-corpo);cursor:pointer;text-align:left;-webkit-tap-highlight-color:transparent}' +
-      '.busca-rodape:hover{background:rgba(255,255,255,.14);color:#fff}.busca-rodape svg{flex:none}';
+    css2.textContent = '.busca-rodape{display:flex;align-items:center;gap:8px;width:min(100%,240px);height:38px;margin:20px auto 16px;' +
+      'padding:0 14px;border-radius:999px;border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.08);color:rgba(255,255,255,.72);' +
+      'font:400 13px var(--fonte-corpo);cursor:pointer;text-align:left;-webkit-tap-highlight-color:transparent}' +
+      '.busca-rodape:hover{background:rgba(255,255,255,.14);color:#fff}.busca-rodape svg{flex:none;width:15px;height:15px}';   // v3.1 (áudio 5581): menor
     document.head.appendChild(css2);
     document.querySelectorAll('footer.rodape').forEach(function (rod) {
       if (rod.querySelector('.busca-rodape')) return;
