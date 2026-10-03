@@ -12,7 +12,7 @@
    27/09/2026 (áudio 2308): embrulharNomeCollab() põe o nome do "× Nome" num <span class="nome"> onde faltar (o degradê
       proporcional mede o nome). Antes: 03_site/_versoes_anteriores/x_azul_nome_proporcional_antes_2026-09-27/js/site.js
    28/09/2026 (áudios 3035/3037): o botão de ORÇAMENTO (data-assunto começando por "orçamento") deixa de ir pro WhatsApp e
-      abre o e-mail da pessoa pra C.email_orcamento (comercial@aleaco.art.br). O botão fica igual; perde a classe .zap (não conta
+      abre o e-mail da pessoa pra C.email_orcamento (comercial@alea3d.co). O botão fica igual; perde a classe .zap (não conta
       como WhatsApp no rastro nem dispara a conversão do WhatsApp). Antes: 03_site/_versoes_anteriores/orcamento_email_antes_2026-09-28/
    27/09/2026 (áudio 2317): o coração do TOPO fica colorido (degradê perolizado) quando a Lista de Desejos tem alguma peça;
       vazia = igual antes. Bloco no fim do arquivo. Antes: 03_site/_versoes_anteriores/coracao_topo_colorido_antes_2026-09-27/
