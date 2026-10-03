@@ -222,7 +222,7 @@ window.ALEA = {
      25/09/2026: a LISTA REAL dele substituiu as de teste (ver o bloco `filamentos` abaixo). */
   filamentos: {
     /* LISTA REAL do Cassiano (25/09/2026, audios 1786-1815, tudo PLA; nomes do site trocados por ele na
-       msg 1827; sem 4a aba - audio 1830; + Rosa Silk msg 1835). Gerado por 03_site/07_gerar_filamentos_config_v4_textura_por_cor_2026-09-26.py
+       msg 1827; sem 4a aba - audio 1830; + Rosa Silk msg 1835; + Preto com Azul msg 5779). Gerado por 03_site/07_gerar_filamentos_config_v5_preto_com_azul_2026-10-03.py
        a partir de 03_site/_LISTA_FILAMENTOS_DELE_2026-09-25.json + _TEXTURAS_FILAMENTO.json - nao editar a mao.
        hex = cor OFICIAL do fabricante; eSUN Silk Lime = aproximado (medido na foto oficial da eSUN).
        v4 (26/09/2026): `textura` = filamento com efeito (Marmore: foto IMG_0039 da Chica), `hex_oficial` =
@@ -268,7 +268,8 @@ window.ALEA = {
       { site: 'Azul', hex: '#1D87E1', original: 'Multfila · PLA · Mult Silk · Azul Safira Metalizado (4226-PCI-PLS-025)', hex_oficial: '#358AE8' },
       { site: 'Azul Céu', hex: '#1B8DCC', original: 'Voolt3D · PLA · V-Silk · Azul Sky (PL-AZ-SY-SK-1)', hex_oficial: '#035EB7' },
       { site: 'Verde Limão', hex: '#A3E810', original: 'eSUN · PLA · PLA-Silk · Lime' },
-      { site: 'Verde', hex: '#129856', original: 'Voolt3D · PLA · V-Silk · Verde (PL-VD-SK-1)' }
+      { site: 'Verde', hex: '#129856', original: 'Voolt3D · PLA · V-Silk · Verde (PL-VD-SK-1)' },
+      { site: 'Preto com Azul', hex: '#213D4E', original: 'Bambu Lab · PLA · Silk Dual Color · Phantom Blue' }
     ]
   },
   /* O ESTOQUE — peça PRONTA, por produto (03/10/2026, áudios 5727/5729/5731 do Cassiano).
@@ -277,13 +278,13 @@ window.ALEA = {
      "Encomendar agora" (produto.js v39). `modo` = id das Cores da peça; `escolhas` = acabamento + cor (nome do site,
      igual ALEA.filamentos), uma por campo; `qtd` = peças prontas. Quem diz o estoque é o Cassiano — nunca inventar.
      ⚠ TESTE DE LAYOUT (áudio 5731: "você coloca que tem isso aí só pra gente ver como vai ficar"): a saboneteira NÃO
-       tem peça pronta (áudio 5730). Sai daqui quando ele mandar o estoque de verdade. Azul = Multfila Azul Safira
-       (a confirmar, msg 5734). */
+       tem peça pronta (áudio 5730). Sai daqui quando ele mandar o estoque de verdade. A azul da foto é o Bambu Lab Silk
+       Phantom Blue = "Preto com Azul" no Perolizado (msg 5775, áudios 5777/5779; NÃO era o Azul Safira). */
   estoque: {
     'soap-dish': [
       { modo: 'monocromatico', escolhas: [{ acabamento: 'perolizado', cor: 'Branco' }], qtd: 1 },
       { modo: 'monocromatico', escolhas: [{ acabamento: 'perolizado', cor: 'Rosa' }],   qtd: 1 },
-      { modo: 'monocromatico', escolhas: [{ acabamento: 'perolizado', cor: 'Azul' }],   qtd: 1 }
+      { modo: 'monocromatico', escolhas: [{ acabamento: 'perolizado', cor: 'Preto com Azul' }], qtd: 1 }
     ]
   },
 
