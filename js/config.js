@@ -10,6 +10,9 @@
       registro": o Personalize ABRE marcado nela (produto.js v38). Campo novo OPCIONAL `capa.nome` (ver o bloco
       "COR DO NOME DA CAPA" perto do Luke). Só comentários mudaram aqui; nenhum valor. A versão anterior é o 988aa7b.
    v38b-produto (02/10/2026, msg 5284): primeiro valor de `capa.nome` — Cláudia, nome Dourado Perolizado (Elegoo Silk Gold).
+   v40-produto (03/10/2026, áudios 5800/5801): `modelos3d['soap-dish']` — a saboneteira na janela 3D, com os campos novos
+      `semNome` (personalizar3d.js v13) e `rotuloBotao` (produto.js v40). A versão anterior está em
+      03_site/_versoes_anteriores/saboneteira_3d_antes_2026-10-03/js/.
 */
 /* =============================================================================
    config.js — os valores que mudam. Mexe aqui, não no resto do site.
@@ -222,7 +225,7 @@ window.ALEA = {
      25/09/2026: a LISTA REAL dele substituiu as de teste (ver o bloco `filamentos` abaixo). */
   filamentos: {
     /* LISTA REAL do Cassiano (25/09/2026, audios 1786-1815, tudo PLA; nomes do site trocados por ele na
-       msg 1827; sem 4a aba - audio 1830; + Rosa Silk msg 1835). Gerado por 03_site/07_gerar_filamentos_config_v4_textura_por_cor_2026-09-26.py
+       msg 1827; sem 4a aba - audio 1830; + Rosa Silk msg 1835; + Preto com Azul msg 5779). Gerado por 03_site/07_gerar_filamentos_config_v5_preto_com_azul_2026-10-03.py
        a partir de 03_site/_LISTA_FILAMENTOS_DELE_2026-09-25.json + _TEXTURAS_FILAMENTO.json - nao editar a mao.
        hex = cor OFICIAL do fabricante; eSUN Silk Lime = aproximado (medido na foto oficial da eSUN).
        v4 (26/09/2026): `textura` = filamento com efeito (Marmore: foto IMG_0039 da Chica), `hex_oficial` =
@@ -268,9 +271,26 @@ window.ALEA = {
       { site: 'Azul', hex: '#1D87E1', original: 'Multfila · PLA · Mult Silk · Azul Safira Metalizado (4226-PCI-PLS-025)', hex_oficial: '#358AE8' },
       { site: 'Azul Céu', hex: '#1B8DCC', original: 'Voolt3D · PLA · V-Silk · Azul Sky (PL-AZ-SY-SK-1)', hex_oficial: '#035EB7' },
       { site: 'Verde Limão', hex: '#A3E810', original: 'eSUN · PLA · PLA-Silk · Lime' },
-      { site: 'Verde', hex: '#129856', original: 'Voolt3D · PLA · V-Silk · Verde (PL-VD-SK-1)' }
+      { site: 'Verde', hex: '#129856', original: 'Voolt3D · PLA · V-Silk · Verde (PL-VD-SK-1)' },
+      { site: 'Preto com Azul', hex: '#213D4E', original: 'Bambu Lab · PLA · Silk Dual Color · Phantom Blue' }
     ]
   },
+  /* O ESTOQUE — peça PRONTA, por produto (03/10/2026, áudios 5727/5729/5731 do Cassiano).
+     -------------------------------------------------------------------------------
+     Com estoque na cor escolhida o botão diz "Comprar agora"; qualquer outra cor (ou produto sem lista aqui) =
+     "Encomendar agora" (produto.js v39). `modo` = id das Cores da peça; `escolhas` = acabamento + cor (nome do site,
+     igual ALEA.filamentos), uma por campo; `qtd` = peças prontas. Quem diz o estoque é o Cassiano — nunca inventar.
+     ⚠ TESTE DE LAYOUT (áudio 5731: "você coloca que tem isso aí só pra gente ver como vai ficar"): a saboneteira NÃO
+       tem peça pronta (áudio 5730). Sai daqui quando ele mandar o estoque de verdade. A azul da foto é o Bambu Lab Silk
+       Phantom Blue = "Preto com Azul" no Perolizado (msg 5775, áudios 5777/5779; NÃO era o Azul Safira). */
+  estoque: {
+    'soap-dish': [
+      { modo: 'monocromatico', escolhas: [{ acabamento: 'perolizado', cor: 'Branco' }], qtd: 1 },
+      { modo: 'monocromatico', escolhas: [{ acabamento: 'perolizado', cor: 'Rosa' }],   qtd: 1 },
+      { modo: 'monocromatico', escolhas: [{ acabamento: 'perolizado', cor: 'Preto com Azul' }], qtd: 1 }
+    ]
+  },
+
   /* como cada acabamento aparece (a ordem é a da tela) e o que ele acrescenta ao nome da cor:
      Básico não acrescenta nada ("Azul"); Fosco e Perolizado sim ("Azul Fosco", "Azul Perolizado"). */
   acabamentos: [
@@ -424,6 +444,28 @@ window.ALEA.modelos3d['claudia-wave'] = {
   capa: { modo: 'bicolor', escolhas: [{ acabamento: 'perolizado', cor: 'Branco' }, { acabamento: 'perolizado', cor: 'Azul Aqua' }],
           nome: { acabamento: 'perolizado', cor: 'Dourado' } }
 };
+/* 03/10/2026 (áudios 5800/5801 do Cassiano: "aquela animação igual dos comedouros (...) ao invés de você colocar
+   monocromático, você vai colocar personalize agora (...) a peça lá em 3D do arquivo que eu mandei"): a ālea Soap Dish
+   ganha a janela 3D. O .glb sai de 32_produtos_novos_2026-10-03/soap_dish/"ALEA Soap Dish.3mf", objeto 3, pelo
+   07_render_capa/exportar_glb_configurador_v6_peca_sem_nome_deitada.py ("1=principal", 80000 faces, --deitar +x):
+   a peça DEITADA como se usa (ondas pra cima), a logo Circular NEGATIVA no fundo (0,5 mm, recorte na cor da peça, nunca
+   pintada), os 4 furos dos pés. Uma zona só: 'principal' (topo/base iguais, só existem porque a janela pede as 3).
+   `semNome` (personalizar3d.js v13): sem nome gravado (msg 5771) — a janela não baixa _nome.json nem fonte.
+   `rotuloBotao` (produto.js v40): o botão diz "Personalize agora", palavra dele (os comedouros seguem "Personalize aqui").
+   CAPA: a foto soapdish_capa tem as 3 peças (Rosa, Preto com Azul e Branco). A peça abre em BRANCO PEROLIZADO (Elegoo
+   Silk White, a da foto 2620) — escolha da casa, a confirmar com ele. */
+window.ALEA.modelos3d['soap-dish'] = {
+  glb: 'modelos/soapdish.glb?v=2026-10-03',
+  semNome: true,
+  rotuloBotao: 'Personalize agora',
+  folgaEnquadrar: 1.1,   // personalizar3d v13: larga e baixa, com 0,82 (o do comedouro) saía cortada dos lados
+  capa: { modo: 'monocromatico', escolhas: [{ acabamento: 'perolizado', cor: 'Branco' }] },
+  original: {
+    topo:      { site: 'Branco', hex: '#FFFFFF', acabamento: 'perolizado', oficial: 'Elegoo · PLA · Silk · Silk White' },
+    principal: { site: 'Branco', hex: '#FFFFFF', acabamento: 'perolizado', oficial: 'Elegoo · PLA · Silk · Silk White' },
+    base:      { site: 'Branco', hex: '#FFFFFF', acabamento: 'perolizado', oficial: 'Elegoo · PLA · Silk · Silk White' }
+  }
+};
 
 /* TAMANHOS À VENDA (28/09/2026, áudios do Cassiano ~02:14-02:17: "pra Shih Tzu e pra Golden é diferente o tamanho (...)
    arrumar uma opção lá no site"). A página ganha o grupo "Tamanho" (produto.js v36) logo acima do "Personalize aqui";
@@ -522,5 +564,12 @@ window.ALEA.filamentosPorFoto = {
   "img/produtos/lukebowl_capaq.jpg": ["Bambu Lab · PLA · Lite · Orange (16301)", "Bambu Lab · PLA · Matte · Ivory White", "Bambu Lab · PLA · Matte · Ash Gray (11102)"],
   "img/produtos/matteotex_9262q.jpg": ["Bambu Lab · PLA · Matte · Charcoal", "Bambu Lab · PLA · Matte · Desert Tan (11401)"],
   "img/produtos/aylapompom_capaq.jpg": ["Bambu Lab · PLA · Lite · Red (16200)", "eSUN · PLA · PLA-Basic · Black", "Elegoo · PLA · Matte · Matte White", "Voolt3D · PLA · V-Silk · Verde (PL-VD-SK-1)"],
-  "img/produtos/claudiawave_capaq.jpg": ["Elegoo · PLA · Silk · Silk White", "Elegoo · PLA · Silk · Gold", "eSUN · PLA · Silk · Aqua"]
+  "img/produtos/claudiawave_capaq.jpg": ["Elegoo · PLA · Silk · Silk White", "Elegoo · PLA · Silk · Gold", "eSUN · PLA · Silk · Aqua"],
+  /* 03/10/2026 — ālea Soap Dish: NÃO é palpite, é o filamento que ELE disse (msgs 5775, 5780, 5782). */
+  "img/produtos/soapdish_capa.jpg": ["eSUN · PLA · PLA-Silk · Pink", "Bambu Lab · PLA · Silk Dual Color · Phantom Blue", "Elegoo · PLA · Silk · Silk White"],
+  "img/produtos/soapdish_2620.jpg": ["Elegoo · PLA · Silk · Silk White"],
+  "img/produtos/soapdish_2622.jpg": ["eSUN · PLA · PLA-Silk · Pink"],
+  "img/produtos/soapdish_2624.jpg": ["Bambu Lab · PLA · Silk Dual Color · Phantom Blue"],
+  "img/produtos/soapdish_2621.jpg": ["eSUN · PLA · PLA-Silk · Pink", "Bambu Lab · PLA · Silk Dual Color · Phantom Blue", "Elegoo · PLA · Silk · Silk White"],
+  "img/produtos/soapdish_capaq.jpg": ["eSUN · PLA · PLA-Silk · Pink", "Bambu Lab · PLA · Silk Dual Color · Phantom Blue", "Elegoo · PLA · Silk · Silk White"]
 };

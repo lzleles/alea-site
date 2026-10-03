@@ -751,6 +751,23 @@ body.sem-transicao-feed .feed { transition: none !important; }
   padding-bottom: clamp(54px, 9vh, 90px);
 }
 @supports not (height: 100svh) { .feed .item:last-child { min-height: 100vh; } }
+/* ⚠️ O MENU DO FIM PARA CENTRADO E SEM A FAIXA CLARA EMBAIXO (03/10/2026, vídeo 5806 + áudio 5808 do Cassiano,
+   "vale pra todas as categorias"): "o máximo que ele pode rolar é até ele ficar centralizado (...) embaixo não pode
+   aparecer a parte branca". No iPhone dele o feed (fixed, inset 0) acabava na altura SEM a barra do Safari, e a barra
+   flutuante e transparente mostrava o fundo bege da página por baixo (a faixa clara). A mesma cura da abertura
+   (`--sob-a-barra`, 16/09): no celular o feed desce por baixo da barra, e o cartão do fim ganha o mesmo tanto de
+   altura e de respiro embaixo -> o degradê vai até o pé da tela e o menu continua centrado na parte visível.
+   No computador não há barra: --sob-a-barra = 0.
+   CENTRADO DE VERDADE: o respiro de cima é a altura do cabeçalho fixo (64 px medidos, 62 no computador) e o de baixo
+   só a barra -> o centro do menu cai no meio da área livre (do pé do cabeçalho ao pé da tela). Antes o respiro de
+   baixo (54-90 px) deixava o bloco ~60 px acima do meio (medido no Playwright, 390 e 1440). */
+.feed { --sob-a-barra: 0px; }
+.feed .item:last-child { padding-top: 64px; padding-bottom: var(--sob-a-barra); }
+@media (hover: none) and (pointer: coarse) {
+  .feed { --sob-a-barra: 110px; bottom: calc(-1 * var(--sob-a-barra)); }
+  @supports (height: 100lvh) { .feed { --sob-a-barra: max(110px, 100lvh - 100svh); } }
+  .feed .item:last-child { min-height: calc(100svh + var(--sob-a-barra)); }
+}
 
 /* ⚠️ A REVELAÇÃO POR ROLAGEM — 6ª rodada, 17/09/2026, e os números são MEDIDOS, não copiados
    de descrição. Ele: "no laulau é como se ela aparecesse na tela, como se não existisse ela, aí
