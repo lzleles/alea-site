@@ -8,6 +8,10 @@
    validado_em: TBD
    v34 (27/09/2026, áudio 2308): no card, o nome do "× Nome" vai num <span class="nome"> (o degradê mede o nome, e o
       × fica azul sólido). Antes: 03_site/_versoes_anteriores/x_azul_nome_proporcional_antes_2026-09-27/js/feed.js
+   v37 (03/10/2026, foto 5597 + áudios 5598/5599 do Cassiano): no cartão de fim da categoria "aqui também tem que ter o
+      campo de busca (...) e o logo do Linktree também" -> o fim ganha a mesma sequência do rodapé: categorias, campo
+      "Buscar item" (preenchido pelo busca.js em [data-busca-fim]) e as redes ([data-redes], montadas pelo site.js), antes
+      do "voltar para a página inicial".
    v36 (03/10/2026, vídeo 5569 do Cassiano, computador): a roda do mouse anda UM produto por gesto (um toque leve mandava
       vários eventos e pulava a Ayla) e a peça desliza mais devagar (520 -> 750 ms). Bloco no `wheel` do feed.
    v35 (02/10/2026, vídeo IMG_2590 msg 5269 + áudios 5267/5270 do Cassiano, celular): "se a foto já está centralizada,
@@ -268,6 +272,9 @@
         '<p data-assinatura>Onde cada impressão começa com um sonho!</p>' +
         '<a class="botao zap" data-assunto="orçamento de uma peça personalizada">Orçamentos e personalizados</a>' +
         '<nav class="menu-categorias" data-menu-categorias aria-label="Categorias"></nav>' +
+        /* v37 (foto 5597): a busca e as redes, na mesma ordem do rodapé */
+        '<div class="busca-no-fim" data-busca-fim></div>' +
+        '<div class="redes" data-redes></div>' +
         /* ⚠️ 8ª RODADA (18/09/2026, áudio das 23:02): "tem um botão lá embaixo que está
            escrito 'voltar para categorias'. Nós vamos só alterar a frase para 'voltar para
            a página inicial'. Aí, se a pessoa clicar, vai ter a animação, tudo de novo."

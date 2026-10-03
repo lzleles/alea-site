@@ -471,6 +471,7 @@ window.aleaCorDoTopo = (function () {
     preencherContato();
     montarMenuCategorias();
     montarRedes();
+    document.addEventListener('alea:feed-desenhado', montarRedes);   // 03/10/2026 (foto 5597): o cartão de fim do feed também tem as redes
   ligarLogoDoRodape();
     montarGavetas();
     window.aleaLigarBotoes();     // as páginas de produto já nascem prontas no HTML

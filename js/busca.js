@@ -6,7 +6,7 @@
              esfumaçada com o site atrás, traz palavras sugeridas e acha a peça por palavra parecida (cachorro, gato, pote...).
    entrada: window.VITRINE e window.PRODUTOS (produtos.js), window.CATEGORIAS; o que a pessoa digita
    saida: tela de busca por cima do site; clique leva à página da peça (produto-<slug>.html) ou à categoria (index.html#id)
-   status: v4 (03/10/2026) - em prévia
+   status: v5 (03/10/2026) - em prévia
    validado_em: 03/10/2026
    v1 (03/10/2026, Cassiano, áudios 5561/5562/5564/5567/5568 + vídeo 5566 da busca do iPhone):
       "se a pessoa pesquisar por cachorro, ou gato, ou comedouro, ou pote (...) ele cai no comedouro?" -> o site NÃO tinha
@@ -38,6 +38,13 @@
           nas pontas). Puxão brusco = a tela vem no mesmo ritmo do puxão lento. Ao soltar passado o ponto ela termina de
           entrar devagar a partir de onde estava (nunca salta); soltou antes, volta devagar (380 ms). Abrir pela lupa ou
           pelo rodapé e fechar pelo Cancelar usam o mesmo motor - toda entrada e saída é igual.
+   v5 (03/10/2026, vídeos 5594/5595 + áudio 5596, "tá quase", os dois com puxão brusco): o ritmo já batia (~0,6 s);
+      faltava a ORDEM do iPhone - primeiro o fundo esfumaça inteiro, só depois as sugestões aparecem. Na v4 a lista
+      vinha junto com o esfumaçado e a capivara do site aparecia vazada por trás. Agora são duas fases do mesmo
+      motor: --b (esfumaçado) vai de 0 a 1 nos primeiros 40% e --c (conteúdo) entra de 35% a 100%. Ao fechar, ao
+      contrário: o conteúdo some primeiro e o fundo desembaça depois.
+      + (foto 5597 + áudio 5598) o campo "Buscar item" também no cartão de fim de cada categoria do feed ([data-busca-fim]),
+      em tom escuro, porque ali o fundo é claro.
 */
 (function () {
   'use strict';
@@ -108,10 +115,11 @@
     '.busca-tela.aberta{opacity:1;visibility:visible}',
     /* v3: enquanto o dedo puxa, a tela se monta na medida de --p (0 a 1), sem transição (segue o dedo) */
     '.busca-tela.arrastando{visibility:visible;opacity:1;transition:none;pointer-events:none;',
-    ' background:rgba(234,228,219,calc(.42*var(--p)));-webkit-backdrop-filter:blur(calc(22px*var(--p))) saturate(calc(1 + .5*var(--p)));',
-    ' backdrop-filter:blur(calc(22px*var(--p))) saturate(calc(1 + .5*var(--p)))}',
-    '.busca-tela.arrastando .busca-corpo{opacity:var(--p);transform:translateY(calc(-48px*(1 - var(--p))))}',
-    '.busca-tela.arrastando .busca-barra{opacity:var(--p);transform:translateY(calc(40px*(1 - var(--p))))}',
+    ' background:rgba(234,228,219,calc(.42*var(--b)));-webkit-backdrop-filter:blur(calc(22px*var(--b))) saturate(calc(1 + .5*var(--b)));',
+    ' backdrop-filter:blur(calc(22px*var(--b))) saturate(calc(1 + .5*var(--b)))}',
+    /* v5: o conteúdo só entra depois que o fundo já esfumaçou (--c), igual ao iPhone */
+    '.busca-tela.arrastando .busca-corpo{opacity:var(--c);transform:translateY(calc(-48px*(1 - var(--c))))}',
+    '.busca-tela.arrastando .busca-barra{opacity:var(--c);transform:translateY(calc(40px*(1 - var(--c))))}',
     '.busca-corpo,.busca-barra{transition:opacity .28s ease,transform .32s cubic-bezier(.2,.8,.2,1)}',
     '.busca-corpo{flex:1;overflow-y:auto;padding:calc(env(safe-area-inset-top) + 22px) var(--gutter,20px) 16px;',
     ' -webkit-overflow-scrolling:touch;overscroll-behavior:contain}',
@@ -194,10 +202,18 @@
   /* ---------- v4: o motor da transição (o esfumaçado nunca anda mais rápido que ENTRA_MS/SAI_MS) ---------- */
   var atual = 0, alvo = 0, durMs = ENTRA_MS, raf = 0, ultimo = 0, aoChegar = null, montada = false;
   function suave(x) { return x * x * (3 - 2 * x); }                  // devagar no começo e no fim
+  var FUNDO_ATE = 0.40, CONTEUDO_DE = 0.35;                          // v5: as duas fases (fundo, depois conteúdo)
+  function fase(x, a, b) { return suave(Math.max(0, Math.min(1, (x - a) / (b - a)))); }
+  function pintarP(x) {
+    tela.style.setProperty('--p', suave(x).toFixed(3));
+    tela.style.setProperty('--b', fase(x, 0, FUNDO_ATE).toFixed(3));
+    tela.style.setProperty('--c', fase(x, CONTEUDO_DE, 1).toFixed(3));
+  }
+  function limparP() { ['--p', '--b', '--c'].forEach(function (v) { tela.style.removeProperty(v); }); }
   function montarTela() {
     if (montada) return; montada = true; atual = 0;
     campo.value = ''; pintar();
-    tela.classList.remove('aberta'); tela.classList.add('arrastando'); tela.style.setProperty('--p', '0');
+    tela.classList.remove('aberta'); tela.classList.add('arrastando'); pintarP(0);
   }
   function levarA(p, ms, fim) {
     alvo = Math.max(0, Math.min(1, p)); durMs = ms; aoChegar = fim || null;
@@ -207,16 +223,16 @@
     var dt = ultimo ? Math.min(50, t - ultimo) : 16; ultimo = t;
     var d = alvo - atual, max = dt / durMs;
     atual = Math.abs(d) <= max ? alvo : atual + (d > 0 ? max : -max);
-    tela.style.setProperty('--p', suave(atual).toFixed(3));
+    pintarP(atual);
     if (atual === alvo) {
       raf = 0; var f = aoChegar; aoChegar = null; if (f) f();
     } else raf = requestAnimationFrame(passo);
   }
   function terminouDeAbrir() {
-    tela.classList.remove('arrastando'); tela.classList.add('aberta'); tela.style.removeProperty('--p');
+    tela.classList.remove('arrastando'); tela.classList.add('aberta'); limparP();
   }
   function terminouDeFechar() {
-    montada = false; tela.classList.remove('arrastando', 'aberta'); tela.style.removeProperty('--p');
+    montada = false; tela.classList.remove('arrastando', 'aberta'); limparP();
   }
 
   var aberta = false;
@@ -232,7 +248,7 @@
     if (!aberta) return; aberta = false; campo.blur();
     document.documentElement.style.overflow = '';
     if (!montada) return;
-    tela.classList.remove('aberta'); tela.classList.add('arrastando'); tela.style.setProperty('--p', suave(atual).toFixed(3));
+    tela.classList.remove('aberta'); tela.classList.add('arrastando'); pintarP(atual);
     levarA(0, SAI_MS, terminouDeFechar);
   }
   window.aleaAbrirBusca = abrir;
@@ -249,7 +265,9 @@
     css2.textContent = '.busca-rodape{display:flex;align-items:center;gap:8px;width:min(100%,240px);height:38px;margin:20px auto 16px;' +
       'padding:0 14px;border-radius:999px;border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.08);color:rgba(255,255,255,.72);' +
       'font:400 13px var(--fonte-corpo);cursor:pointer;text-align:left;-webkit-tap-highlight-color:transparent}' +
-      '.busca-rodape:hover{background:rgba(255,255,255,.14);color:#fff}.busca-rodape svg{flex:none;width:15px;height:15px}';   // v3.1 (áudio 5581): menor
+      '.busca-rodape:hover{background:rgba(255,255,255,.14);color:#fff}.busca-rodape svg{flex:none;width:15px;height:15px}' +   // v3.1 (áudio 5581): menor
+      '.busca-rodape.busca-fim{margin:0 auto;border-color:rgba(43,33,24,.22);background:rgba(255,255,255,.35);color:var(--tinta,#2B2118)}' +
+      '.busca-rodape.busca-fim:hover{background:rgba(255,255,255,.6);color:var(--tinta,#2B2118)}';   // v5: no fim do feed (fundo claro)
     document.head.appendChild(css2);
     document.querySelectorAll('footer.rodape').forEach(function (rod) {
       if (rod.querySelector('.busca-rodape')) return;
@@ -259,6 +277,19 @@
       b.addEventListener('click', function () { abrir(); });
       var antes = rod.querySelector('[data-redes]');
       if (antes) rod.insertBefore(b, antes); else rod.appendChild(b);
+    });
+    campoNoFim();
+    document.addEventListener('alea:feed-desenhado', campoNoFim);
+  }
+  /* v5 (foto 5597): o mesmo campo no cartão de fim do feed, que o feed.js redesenha a cada categoria */
+  function campoNoFim() {
+    document.querySelectorAll('[data-busca-fim]').forEach(function (caixa) {
+      if (caixa.querySelector('.busca-rodape')) return;
+      var b = document.createElement('button');
+      b.type = 'button'; b.className = 'busca-rodape busca-fim'; b.setAttribute('aria-label', 'Buscar item');
+      b.innerHTML = LUPA + '<span>Buscar item</span>';
+      b.addEventListener('click', function () { abrir(); });
+      caixa.appendChild(b);
     });
   }
 

@@ -2328,3 +2328,11 @@ body.nome-dourado {
 .campo-cor-nome .acabamento input:disabled:checked {
   background: radial-gradient(circle, var(--tinta-fraca) 0 4px, #EFEAE2 4.5px);
 }
+
+/* 03/10/2026 (foto 5597 + áudios 5598/5599 do Cassiano): o cartão de fim do feed ganhou o campo "Buscar item" (busca.js)
+   e as redes (Instagram e Linktree, as mesmas do rodapé). No fundo claro do feed as redes vão na tinta escura. */
+.feed .fim .redes { display: flex; justify-content: center; gap: 18px; }
+.feed .fim .redes a { color: var(--tinta); transition: color .2s ease, transform .2s ease; }
+.feed .fim .redes a:hover { color: var(--terracota); transform: translateY(-2px); }
+.feed .fim .redes svg { width: 22px; height: 22px; display: block; }
+.feed .fim .busca-no-fim { display: flex; justify-content: center; width: 100%; }
