@@ -18,6 +18,8 @@
       vazia = igual antes. Bloco no fim do arquivo. Antes: 03_site/_versoes_anteriores/coracao_topo_colorido_antes_2026-09-27/
    03/10/2026 (áudios 5561-5568 + vídeo 5566 do Cassiano): carrega o js/busca.js (A BUSCA: puxar pra baixo no topo no
       celular, lupa "Buscar" no computador). Bloco de 4 linhas no fim do arquivo; toda página com site.js ganha a busca.
+   03/10/2026 (fotos 5612/5613 + áudios 5615/5616): o Linktree das redes vira a PÍLULA "✱ | Linktree" (montarRedes);
+      a cor de cada lugar mora no estilo.css. Antes: 03_site/_versoes_anteriores/linktree_botao_antes_2026-10-03/
 */
 /* =============================================================================
    site.js — o que vale em TODA página (abertura, feed, produto, textos)
@@ -272,6 +274,21 @@ window.aleaCorDoTopo = (function () {
         a.rel = 'noopener';
         a.setAttribute('aria-label', NOMES[id]);
         a.title = NOMES[id];
+        /* 03/10/2026 (fotos 5612/5613 + áudios 5615/5616 do Cassiano): o Linktree deixa de ser ícone solto e vira
+           PÍLULA "✱ | Linktree". Nas partes pretas a escura (borda verde, texto branco, ">"); no resto a clara
+           (borda dourada fina, texto serifado, fundo = o nosso). Quem escolhe a versão é o CSS, pelo lugar. */
+        if (id === 'linktree') {
+          a.className = 'linktree-pilula';
+          /* o ✱ das referências desenhado em traço (o símbolo cheio de 24 px virava um borrão em 18 px) */
+          a.innerHTML = '<svg class="lt-marca" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" ' +
+            'stroke-linecap="butt" aria-hidden="true"><path d="M2 9h20M12 1v22M5.3 2.3L18.7 15.7M18.7 2.3L5.3 15.7"/></svg>' +
+            '<span class="lt-barra" aria-hidden="true"></span>' +
+            '<span class="lt-nome">Linktree</span>' +
+            '<svg class="lt-seta" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" ' +
+            'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg>';
+          caixa.appendChild(a);
+          return;
+        }
         a.innerHTML = '<svg viewBox="0 0 24 24" ' +
           (CHEIOS[id] ? 'fill="currentColor" stroke="none" ' : 'fill="none" stroke="currentColor" ') +
           'stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" ' +
