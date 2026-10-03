@@ -101,7 +101,7 @@ window.ALEA = {
   email: '',                  // ⚠️ e-mail comercial da ālea — ainda não informado
   /* 28/09/2026 (áudios 3035/3037 do Cassiano): o botão "Orçamentos e personalizados" FICA, mas em vez do WhatsApp abre o
      e-mail da pessoa endereçado a este e-mail ("esse e-mail já existe" — dito por ele; MX do domínio = Google). site.js. */
-  email_orcamento: 'comercial@aleaco.art.br',
+  email_orcamento: 'comercial@alea3d.co',
   instagram: 'alea.co_',        // trocado em 16/09/2026: o @alea.decor3d deixou de existir; @alea.co_ conferido na API da Meta ("ālea & Co")
   instagram_canal: 'eaibora.3d',
 
