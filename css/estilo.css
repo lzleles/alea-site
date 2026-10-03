@@ -2320,3 +2320,11 @@ body.nome-dourado {
    maiúscula dourada); aqui só a distância até o botão. A v38 está em 03_site/_versoes_anteriores/tamanhos_antes_2026-09-28/css/. */
 .tamanho-peca { margin: 4px 0 14px; }
 .tamanho-peca .cores-opcoes { margin-bottom: 0; gap: 8px 28px; }
+
+/* v40 (02/10/2026, print 5278 + áudio 5279 do Cassiano): a COR DO NOME DA CAPA aparece JÁ ESCOLHIDA porém apagada, com
+   "Um detalhe que transforma" desmarcado (produto.js v38, `capa.nome` no config.js). A bolinha travada (v. bloco "3." acima)
+   desenhava vazia mesmo marcada; agora, marcada e travada, mostra o miolo no tom apagado — o cliente vê QUAL acabamento é
+   o da capa e que ainda não está ativo. A v39 é o commit 988aa7b. */
+.campo-cor-nome .acabamento input:disabled:checked {
+  background: radial-gradient(circle, var(--tinta-fraca) 0 4px, #EFEAE2 4.5px);
+}

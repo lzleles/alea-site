@@ -4,8 +4,20 @@
    objetivo: Controla galeria, tela cheia, personalização, preço, aceite e inclusão de produtos no carrinho.
    entrada: DOM da página, configuração comercial e dados do produto
    saida: Galeria interativa, item personalizado e comandos para o carrinho
-   status: ativo — v37 (28/09/2026, "Pronto" sem cor escolhida = as cores da FOTO DE CAPA; tamanhos M/G nas 3 peças)
-   validado_em: 28/09/2026 (Playwright 390 e 1440, 03_site/_testar_pronto_sem_cor_v1_2026-09-28.py)
+   status: ativo — v38 (02/10/2026, Personalize ABRE nas cores da capa; cor do nome da capa aparece apagada)
+   validado_em: 02/10/2026 (Playwright 390 e 1440, prints em 29_site_alea_anotacoes_2026-10-02/_prints_previa/)
+   v38 (02/10/2026, prints 5272/5275/5278 + áudios 5273/5277/5279 do Cassiano; a v37 é o commit 988aa7b):
+     1. CORES DA PEÇA ABREM MARCADAS NA CAPA (reverte o áudio 2263 de 27/09): "sempre vai começar nas cores do produto"
+        — cada toque em "Personalize aqui" já vem com o modo e cada acabamento + cor de `ALEA.modelos3d[slug].capa`
+        (config.js), as mesmas que a peça 3D mostra (Luke: Tricolor, Laranja Clássico / Branco Fosco / Cinza Fosco,
+        print 5275; áudio 5277 "isso, justamente"). O cliente só troca se quiser. Ver window.aleaAbrirNasCoresDaCapa.
+        Editar da sacola continua trazendo o que o cliente salvou. Produto sem `capa` = como antes (vazio).
+        O "Pronto sem cor = capa" (v37) continua, como rede.
+     2. COR DO NOME DA CAPA APARECE APAGADA (print 5278 + áudio 5279): se a capa tem o NOME PINTADO numa cor
+        (`capa.nome = { acabamento, cor }` no config.js), a Cor do nome já mostra essa cor (acabamento marcado + cor na
+        lista), porém APAGADA e travada, com "Um detalhe que transforma" desmarcado — o cliente vê que, pra ter aquela
+        cor, marca o detalhe; marcando, os campos acendem já nela. Sem `capa.nome` (nome na cor do corpo, como o Luke)
+        = como antes, vazio. Desmarcado, nada vai no pedido (corDoNomeEscolhida olha o detalhe).
    v37 (28/09/2026, áudios 3030/3031 + vídeo 3029 do Cassiano, 02:43; a v36 está em
         03_site/_versoes_anteriores/pronto_sem_cor_antes_2026-09-28/js/): "se a pessoa não escolher as cores, é porque ela
         escolheu a cor do Luke [da foto]. Aí você já deixa pronto, que aí é só colocar na sacola" — e "a mesma coisa para o
@@ -258,8 +270,9 @@
       }).catch(function (e) { aberto = false; console.warn('janela 3D', e); })
         .then(function () { b.classList.remove('carregando'); });
     }
-    /* v31 (áudio 2263): cada toque em "Personalize aqui" começa com as Cores da peça vazias (ver aleaLimparCoresDaPeca) */
-    b.addEventListener('click', function () { if (!aberto && window.aleaLimparCoresDaPeca) window.aleaLimparCoresDaPeca(); abrir(); });
+    /* v38 (print 5275 + áudio 5277, 02/10/2026 — substitui o "começa vazio" da v31, áudio 2263): cada toque em
+       "Personalize aqui" começa com as Cores da peça MARCADAS nas cores da capa (ver aleaAbrirNasCoresDaCapa) */
+    b.addEventListener('click', function () { if (!aberto && window.aleaAbrirNasCoresDaCapa) window.aleaAbrirNasCoresDaCapa(); abrir(); });
     window.aleaAbrirPersonalizar = abrir;
   })();
   var botaoSacola = document.querySelector('[data-add-carrinho]');
@@ -1004,14 +1017,41 @@
     });
   })();
 
+  /* v38 (print 5278 + áudio 5279 do Cassiano, 02/10/2026): a COR DO NOME DA CAPA. Quando o nome da peça da capa está
+     PINTADO numa cor, o config.js registra `ALEA.modelos3d[slug].capa.nome = { acabamento: 'fosco', cor: 'Azul' }`
+     (acabamento = id de ALEA.acabamentos; cor = o nome simples da lista ALEA.filamentos daquele acabamento). Sem o
+     campo, ou com acabamento/cor que não existem mais na lista do site, devolve null e tudo fica como antes. */
+  function corDoNomeDaCapa() {
+    var slugN = botaoComprar ? botaoComprar.getAttribute('data-slug') : '';
+    var n = (((((window.ALEA || {}).modelos3d || {})[slugN]) || {}).capa || {}).nome;
+    if (!n || !n.acabamento || !n.cor) return null;
+    var existe = (FIL_[n.acabamento] || []).some(function (f) { return f.site === n.cor; });
+    return existe ? { acabamento: n.acabamento, cor: n.cor } : null;
+  }
+  function listaDeCoresDoNome(acab, primeira) {
+    return '<option value="">' + primeira + '</option>' + (FIL_[acab] || []).map(function (f) {
+      return '<option value="' + f.site + '">' + f.site + '</option>'; }).join('');
+  }
+
   function travarCorDoNome(liberar) {
     if (!corNomeBox) return;
     var sel = corNomeBox.querySelector('select');
+    var daCapa = corDoNomeDaCapa();
     Array.prototype.forEach.call(corNomeBox.querySelectorAll('.acabamento input'), function (r) {
-      r.disabled = !liberar; if (!liberar) r.checked = false;
+      r.disabled = !liberar;
+      /* v38: travada, fica marcada só a bolinha da capa (apagada); sem cor de capa, nenhuma (como antes) */
+      if (!liberar) r.checked = !!(daCapa && r.value === daCapa.acabamento);
     });
-    sel.disabled = true;
-    sel.innerHTML = '<option value="">' + (liberar ? 'Escolha o acabamento acima' : '') + '</option>';
+    var marcada = corNomeBox.querySelector('.acabamento input:checked');
+    if (daCapa && marcada) {
+      /* v38: a lista já vem com a cor da capa escolhida — apagada se travada, acesa se o detalhe foi marcado */
+      sel.innerHTML = listaDeCoresDoNome(marcada.value, 'Escolha a cor');
+      if (!liberar || marcada.value === daCapa.acabamento) sel.value = daCapa.cor;
+      sel.disabled = !liberar;
+    } else {
+      sel.disabled = true;
+      sel.innerHTML = '<option value="">' + (liberar ? 'Escolha o acabamento acima' : '') + '</option>';
+    }
     acertarTravaDaPagina();
   }
 
@@ -1074,10 +1114,14 @@
       }
     }
   }
-  acertarTravaDaPagina();   // a cor do nome já nasce travada (o detalhe nasce desmarcado)
+  travarCorDoNome(false);   // a cor do nome já nasce travada (o detalhe nasce desmarcado); v38: com a cor da capa, se houver
 
   function corDoNomeEscolhida() {
     if (!corNomeBox) return { texto: '', original: '', escolha: null };
+    /* v38: a cor da capa aparece marcada (apagada) com o detalhe desmarcado — sem o detalhe, não há cor do nome no pedido */
+    var formN = corNomeBox.closest('[data-personalizar]');
+    var cxN = formN && formN.querySelector('[data-extra-caixa]');
+    if (cxN && !cxN.checked) return { texto: '', original: '', escolha: null };
     var ac = corNomeBox.querySelector('.acabamento input:checked');
     var sel = corNomeBox.querySelector('select');
     if (!ac || !sel.value) return { texto: '', original: '', escolha: null };
@@ -1557,6 +1601,18 @@
     camposCores.innerHTML = '';
     caixaCores.classList.remove('faltou');
     caixaCores.removeAttribute('data-cores-da-capa');
+  };
+
+  /* ⚠️ v38 — O PERSONALIZE ABRE NAS CORES DA CAPA (print 5275 + áudio 5277 do Cassiano, 02/10/2026: "sempre vai começar
+     nas cores do produto"; substitui o "começa vazio" do áudio 2263, que segue documentado acima). Quem chama: o toque
+     em "Personalize aqui" (só quando a janela ainda não está aberta). Limpa e marca a capa pelos MESMOS campos da
+     escolha à mão (aleaAssumirCorDaCapa, abaixo) — a peça 3D, que já abria na capa, continua igual e agora o
+     formulário bate com ela. Editando um item da sacola (`?editar=`), nada muda: valem as escolhas dele.
+     Produto sem `capa` no config.js = fica vazio, como antes. */
+  window.aleaAbrirNasCoresDaCapa = function () {
+    if (editando || !caixaCores || !camposCores) return false;
+    window.aleaLimparCoresDaPeca();
+    return window.aleaAssumirCorDaCapa();
   };
 
   /* ⚠️ v37 — "PRONTO" SEM COR ESCOLHIDA = AS CORES DA FOTO DE CAPA (áudios 3030/3031 + vídeo de tela 3029 do Cassiano,
